@@ -11,7 +11,8 @@ module.exports = function(grunt) {
       },
       src: [
           './src/**/*', // Your node-webkit app
-          './bower_components/**/*'
+          './bower_components/**/*',
+          './fonts/**/*'
       ]
     },
   });
