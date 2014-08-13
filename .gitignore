@@ -1,0 +1,16 @@
+# OS specific
+.DS_Store
+
+# Sublime
+*.sublime-project
+*.sublime-workspace
+
+# Modules
+bower_components
+node_modules
+resources
+tmp
+
+# Distribution
+dist
+
