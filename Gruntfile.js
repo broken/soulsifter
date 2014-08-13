@@ -9,7 +9,10 @@ module.exports = function(grunt) {
         macIcns: './DVDRipper.icns', // Path to the Mac icon file
         platforms: ['osx'] // These are the platforms that we want to build
       },
-      src: './src/**/*' // Your node-webkit app
+      src: [
+          './src/**/*', // Your node-webkit app
+          './bower_components/**/*'
+      ]
     },
   });
 
