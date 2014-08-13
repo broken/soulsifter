@@ -11,6 +11,6 @@ node_modules
 resources
 tmp
 
-# Distribution
-dist
-
+# grunt-node-webkit-builder
+build
+cache

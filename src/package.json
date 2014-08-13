@@ -1,0 +1,16 @@
+{
+  "name": "soulsifter",
+  "main": "views/index.html",
+  "version": "0.0.1",
+  "single-instance": true,
+  "window": {
+    "title": "Soul Sifter",
+    "width": 650,
+    "height": 650,
+    "min_width": 650,
+    "min_height": 650,
+    "position": "center",
+    "toolbar": true
+  },
+  "chromium-args": "--child-clean-exit"
+}
