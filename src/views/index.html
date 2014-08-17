@@ -27,6 +27,14 @@
     console.log( obj.plusOne() ); // 11
     console.log( obj.plusOne() ); // 12
     console.log( obj.plusOne() ); // 13
+
+    var ss = require('../soulsifter/build/Release/soulsifter');
+    var bg = new ss.BasicGenre();
+    bg.setId(5);
+    bg.setName('yo');
+    console.log(bg);
+    console.log(bg.getId());
+    console.log(bg.getName());
   </script>
 </body>
 </html>
