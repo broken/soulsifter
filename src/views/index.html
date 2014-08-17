@@ -21,5 +21,12 @@
       <p>Music organization tool for DJs</p>
     </section>
   </core-drawer-panel>
+  <script>
+    var addon = require('../addon/build/Release/addon');
+    var obj = new addon.MyObject(10);
+    console.log( obj.plusOne() ); // 11
+    console.log( obj.plusOne() ); // 12
+    console.log( obj.plusOne() ); // 13
+  </script>
 </body>
 </html>
