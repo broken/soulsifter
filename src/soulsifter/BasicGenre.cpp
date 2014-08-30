@@ -21,7 +21,7 @@
 #include <cppconn/exception.h>
 #include <cppconn/warning.h>
 
-//#include "MysqlAccess.h"
+#include "MysqlAccess.h"
 //#include "DTVectorUtil.h"
 
 using namespace std;
@@ -56,7 +56,7 @@ namespace soulsifter {
 
 # pragma mark static methods
 
-    /*void BasicGenre::populateFields(const sql::ResultSet* rs, BasicGenre* basicGenre) {
+    void BasicGenre::populateFields(const sql::ResultSet* rs, BasicGenre* basicGenre) {
         basicGenre->setId(rs->getInt("id"));
         basicGenre->setName(rs->getString("name"));
     }
@@ -85,7 +85,7 @@ namespace soulsifter {
         }
     }
 
-    BasicGenre* BasicGenre::findByName(const string& name) {
+    /*BasicGenre* BasicGenre::findByName(const string& name) {
         try {
             sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select * from BasicGenres where name = ?");
             ps->setString(1, name);

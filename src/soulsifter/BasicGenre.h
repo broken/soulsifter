@@ -15,9 +15,9 @@
 
 //#include "ResultSetIterator.h"
 
-//namespace sql {
-//    class ResultSet;
-//}
+namespace sql {
+    class ResultSet;
+}
 
 using namespace std;
 
@@ -31,8 +31,8 @@ namespace soulsifter {
         ~BasicGenre();
         void clear();
 
-        /*static BasicGenre* findById(int id);
-        static BasicGenre* findByName(const string& name);
+        static BasicGenre* findById(int id);
+        /*static BasicGenre* findByName(const string& name);
         static ResultSetIterator<BasicGenre>* findAll();
 
         bool sync();
@@ -53,7 +53,7 @@ namespace soulsifter {
         int id;
         string name;
 
-        //static void populateFields(const sql::ResultSet* rs, BasicGenre* basicGenre);
+        static void populateFields(const sql::ResultSet* rs, BasicGenre* basicGenre);
 
         void operator=(const BasicGenre& basicGenre);
     };

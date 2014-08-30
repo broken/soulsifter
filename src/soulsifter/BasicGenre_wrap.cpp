@@ -1,11 +1,21 @@
+#include <iostream>
 #include <node.h>
 #include "BasicGenre.h"
 #include "basicgenre_wrap.h"
 
 using namespace v8;
 
+Persistent<Function> BasicGenre::constructor;
+
 BasicGenre::BasicGenre() : ObjectWrap(), basicGenre(new dogatech::soulsifter::BasicGenre()) {};
+BasicGenre::BasicGenre(dogatech::soulsifter::BasicGenre* bg) : ObjectWrap(), basicGenre(bg) {};
 BasicGenre::~BasicGenre() { delete basicGenre; };
+
+
+Handle<Value> BasicGenre::create(const Arguments& args) {
+  HandleScope scope;
+  return scope.Close(BasicGenre::NewInstance(args));
+}
 
 void BasicGenre::Init(Handle<Object> exports) {
   Isolate* isolate = Isolate::GetCurrent();
@@ -14,6 +24,8 @@ void BasicGenre::Init(Handle<Object> exports) {
   Local<FunctionTemplate> tpl = FunctionTemplate::New(New);
   tpl->SetClassName(String::NewSymbol("BasicGenre"));
   tpl->InstanceTemplate()->SetInternalFieldCount(1);
+  tpl->Set(String::NewSymbol("create"),
+      FunctionTemplate::New(create)->GetFunction());
 
   // Prototype
   tpl->PrototypeTemplate()->Set(String::NewSymbol("getId"),
@@ -25,8 +37,7 @@ void BasicGenre::Init(Handle<Object> exports) {
   tpl->PrototypeTemplate()->Set(String::NewSymbol("setName"),
       FunctionTemplate::New(setName)->GetFunction());
 
-  Persistent<Function> constructor
-      = Persistent<Function>::New(isolate, tpl->GetFunction());
+  constructor = Persistent<Function>::New(isolate, tpl->GetFunction());
 
   exports->Set(String::NewSymbol("BasicGenre"), constructor);
 }
@@ -39,6 +50,24 @@ Handle<Value> BasicGenre::New(const Arguments& args) {
   obj->Wrap(args.This());
 
   return args.This();
+}
+
+Handle<Value> BasicGenre::NewInstance(const Arguments& args) {
+  Isolate* isolate = Isolate::GetCurrent();
+  HandleScope scope(isolate);
+
+  dogatech::soulsifter::BasicGenre* bg =
+      dogatech::soulsifter::BasicGenre::findById(args[0]->Uint32Value());
+  cout << bg->getName() << endl;
+
+  const unsigned argc = 0;
+  Handle<Value> argv[argc] = { };
+  Local<Object> instance = constructor->NewInstance(argc, argv);
+
+  BasicGenre* obj = ObjectWrap::Unwrap<BasicGenre>(instance);
+  obj->basicGenre = bg;
+
+  return scope.Close(instance);
 }
 
 Handle<Value> BasicGenre::getId(const Arguments& args) {
@@ -76,8 +105,7 @@ Handle<Value> BasicGenre::setName(const Arguments& args) {
   HandleScope scope(isolate);
 
   BasicGenre* obj = ObjectWrap::Unwrap<BasicGenre>(args.This());
-  std::string name(*v8::String::Utf8Value(args[0]->ToString()));
-  obj->basicGenre->setName(name);
+  obj->basicGenre->setName(*v8::String::Utf8Value(args[0]->ToString()));
 
   return Undefined();
 }

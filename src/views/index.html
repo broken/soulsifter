@@ -29,12 +29,12 @@
     console.log( obj.plusOne() ); // 13
 
     var ss = require('../soulsifter/build/Release/soulsifter');
-    var bg = new ss.BasicGenre();
-    bg.setId(5);
-    bg.setName('yo');
+    var bg = ss.createObject(5);
     console.log(bg);
     console.log(bg.getId());
     console.log(bg.getName());
+    var bg2 = ss.BasicGenre.create(5);
+    console.log(bg2);
   </script>
 </body>
 </html>
