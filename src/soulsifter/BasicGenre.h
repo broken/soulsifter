@@ -13,7 +13,7 @@
 #include <string>
 #include <vector>
 
-//#include "ResultSetIterator.h"
+#include "ResultSetIterator.h"
 
 namespace sql {
     class ResultSet;
@@ -32,7 +32,7 @@ namespace soulsifter {
         void clear();
 
         static BasicGenre* findById(int id);
-        /*static BasicGenre* findByName(const string& name);
+        static BasicGenre* findByName(const string& name);
         static ResultSetIterator<BasicGenre>* findAll();
 
         bool sync();
@@ -40,14 +40,14 @@ namespace soulsifter {
         int save();
 
         static const BasicGenre* findByFilepath(const string& filepath);
-        static void findAll(const vector<const BasicGenre*>** genresPtr);*/
+        static void findAll(const vector<const BasicGenre*>** genresPtr);
 
         const int getId() const;
         void setId(int id);
         const string& getName() const;
         void setName(const string& name);
 
-        //friend ResultSetIterator<BasicGenre>;
+        friend ResultSetIterator<BasicGenre>;
 
     private:
         int id;

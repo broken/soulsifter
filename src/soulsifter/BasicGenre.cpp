@@ -22,7 +22,7 @@
 #include <cppconn/warning.h>
 
 #include "MysqlAccess.h"
-//#include "DTVectorUtil.h"
+#include "DTVectorUtil.h"
 
 using namespace std;
 
@@ -85,7 +85,7 @@ namespace soulsifter {
         }
     }
 
-    /*BasicGenre* BasicGenre::findByName(const string& name) {
+    BasicGenre* BasicGenre::findByName(const string& name) {
         try {
             sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select * from BasicGenres where name = ?");
             ps->setString(1, name);
@@ -190,7 +190,7 @@ namespace soulsifter {
             cerr << ", SQLState: " << e.getSQLState() << ")" << endl;
             exit(1);
         }
-    }*/
+    }
 
 
 # pragma mark accessors
