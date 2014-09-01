@@ -2,7 +2,7 @@
   "targets": [
     {
       "target_name": "soulsifter",
-      "sources": [ "soulsifter.cc", "BasicGenre_wrap.cpp", "BasicGenre.cpp", "MysqlAccess.cpp" ],
+      "sources": [ "soulsifter.cc", "Album.cpp", "AlbumHelper.cpp", "AlbumPart.cpp", "BasicGenre_wrap.cpp", "BasicGenre.cpp", "BasicGenreHelper.cpp", "DTVectorUtil.h", "Mix.cpp", "MixHelper.cpp", "MysqlAccess.cpp", "ResultSetIterator.h", "Song_wrap.cpp", "Song.cpp", "Style.cpp"],
       'cflags!': [ '-fno-exceptions' ],
       'cflags_cc!': [ '-fno-exceptions' ],
       "link_settings": {

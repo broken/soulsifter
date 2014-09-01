@@ -1,5 +1,6 @@
 #include <node.h>
 #include "BasicGenre_wrap.h"
+#include "Song_wrap.h"
 
 using namespace v8;
 
@@ -10,6 +11,7 @@ Handle<Value> CreateObject(const Arguments& args) {
 
 void InitAll(Handle<Object> exports) {
   BasicGenre::Init(exports);
+  Song::Init(exports);
 
   exports->Set(String::NewSymbol("createObject"),
       FunctionTemplate::New(CreateObject)->GetFunction());
