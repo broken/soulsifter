@@ -3,7 +3,7 @@
 
 #include <node.h>
 #include "BasicGenre.h"
-
+/*
 class BasicGenre : public node::ObjectWrap {
  public:
   static void Init(v8::Handle<v8::Object> exports);
@@ -24,6 +24,6 @@ class BasicGenre : public node::ObjectWrap {
 
   static v8::Persistent<v8::Function> constructor;
   dogatech::soulsifter::BasicGenre* basicGenre;
-};
+};*/
 
 #endif

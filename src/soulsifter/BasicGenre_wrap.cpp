@@ -3,7 +3,7 @@
 #include "BasicGenre.h"
 #include "basicgenre_wrap.h"
 
-using namespace v8;
+/*using namespace v8;
 
 Persistent<Function> BasicGenre::constructor;
 
@@ -108,4 +108,4 @@ Handle<Value> BasicGenre::setName(const Arguments& args) {
   obj->basicGenre->setName(*v8::String::Utf8Value(args[0]->ToString()));
 
   return Undefined();
-}
+}*/

@@ -1,608 +1,514 @@
 #include <iostream>
 #include <node.h>
+#include <nan.h>
 #include "Song.h"
 #include "Song_wrap.h"
 
-using namespace v8;
-
-Persistent<Function> Song::constructor;
+v8::Persistent<v8::Function> Song::constructor;
 
 Song::Song() : ObjectWrap(), song(new dogatech::soulsifter::Song()) {};
 Song::Song(dogatech::soulsifter::Song* o) : ObjectWrap(), song(o) {};
 Song::~Song() { delete song; };
 
-Handle<Value> Song::New(const Arguments& args) {
-  Isolate* isolate = Isolate::GetCurrent();
-  HandleScope scope(isolate);
+NAN_METHOD(Song::New) {
+  NanScope();
 
   Song* obj = new Song();
   obj->Wrap(args.This());
 
-  return args.This();
+  NanReturnValue(args.This());
 }
 
 
-Handle<Value> Song::clear(const Arguments& args) {
-  Isolate* isolate = Isolate::GetCurrent();
-  HandleScope scope(isolate);
+NAN_METHOD(Song::clear) {
+  NanScope();
 
   Song* obj = ObjectWrap::Unwrap<Song>(args.This());
   obj->song->clear();
 
-  return Undefined();
+  NanReturnUndefined();
 }
 
-Handle<Value> Song::findById(const Arguments& args) {
-  Isolate* isolate = Isolate::GetCurrent();
-  HandleScope scope(isolate);
+NAN_METHOD(Song::findById) {
+  NanScope();
 
   dogatech::soulsifter::Song* song =
       dogatech::soulsifter::Song::findById(args[0]->Uint32Value());
-  const unsigned argc = 0;
-  Handle<Value> argv[argc] = { };
-  Local<Object> instance = constructor->NewInstance(argc, argv);
+  v8::Local<v8::Function> cons = NanNew<v8::Function>(constructor);
+  v8::Local<v8::Object> instance = cons->NewInstance();
 
   Song* obj = ObjectWrap::Unwrap<Song>(instance);
   obj->song = song;
 
-  return scope.Close(instance);
+  NanReturnValue(instance);
 }
 
-Handle<Value> Song::findByFilepath(const Arguments& args) {
-  Isolate* isolate = Isolate::GetCurrent();
-  HandleScope scope(isolate);
+NAN_METHOD(Song::findByFilepath) {
+  NanScope();
 
   dogatech::soulsifter::Song* song =
       dogatech::soulsifter::Song::findByFilepath(*v8::String::Utf8Value(args[0]->ToString()));
-  const unsigned argc = 0;
-  Handle<Value> argv[argc] = { };
-  Local<Object> instance = constructor->NewInstance(argc, argv);
+  v8::Local<v8::Function> cons = NanNew<v8::Function>(constructor);
+  v8::Local<v8::Object> instance = cons->NewInstance();
 
   Song* obj = ObjectWrap::Unwrap<Song>(instance);
   obj->song = song;
 
-  return scope.Close(instance);
+  NanReturnValue(instance);
 }
 
-Handle<Value> Song::findByRESongId(const Arguments& args) {
-  Isolate* isolate = Isolate::GetCurrent();
-  HandleScope scope(isolate);
+NAN_METHOD(Song::findByRESongId) {
+  NanScope();
 
   dogatech::soulsifter::Song* song =
       dogatech::soulsifter::Song::findByRESongId(args[0]->Uint32Value());
-  const unsigned argc = 0;
-  Handle<Value> argv[argc] = { };
-  Local<Object> instance = constructor->NewInstance(argc, argv);
+  v8::Local<v8::Function> cons = NanNew<v8::Function>(constructor);
+  v8::Local<v8::Object> instance = cons->NewInstance();
 
   Song* obj = ObjectWrap::Unwrap<Song>(instance);
   obj->song = song;
 
-  return scope.Close(instance);
+  NanReturnValue(instance);
 }
 
-Handle<Value> Song::sync(const Arguments& args) {
-  Isolate* isolate = Isolate::GetCurrent();
-  HandleScope scope(isolate);
+NAN_METHOD(Song::sync) {
+  NanScope();
 
   Song* obj = ObjectWrap::Unwrap<Song>(args.This());
   bool result =  obj->song->sync();
 
-  return scope.Close(Boolean::New(result));
+  NanReturnValue(NanNew<v8::Boolean>(result));
 }
 
-Handle<Value> Song::update(const Arguments& args) {
-  Isolate* isolate = Isolate::GetCurrent();
-  HandleScope scope(isolate);
+NAN_METHOD(Song::update) {
+  NanScope();
 
   Song* obj = ObjectWrap::Unwrap<Song>(args.This());
   int result =  obj->song->update();
 
-  return scope.Close(Number::New(result));
+  NanReturnValue(NanNew<v8::Number>(result));
 }
 
-Handle<Value> Song::save(const Arguments& args) {
-  Isolate* isolate = Isolate::GetCurrent();
-  HandleScope scope(isolate);
+NAN_METHOD(Song::save) {
+  NanScope();
 
   Song* obj = ObjectWrap::Unwrap<Song>(args.This());
   int result =  obj->song->save();
 
-  return scope.Close(Number::New(result));
+  NanReturnValue(NanNew<v8::Number>(result));
 }
 
-Handle<Value> Song::reAlbum(const Arguments& args) {
-  Isolate* isolate = Isolate::GetCurrent();
-  HandleScope scope(isolate);
+NAN_METHOD(Song::reAlbum) {
+  NanScope();
 
   Song* obj = ObjectWrap::Unwrap<Song>(args.This());
   const string result =  obj->song->reAlbum();
 
-  return scope.Close(String::New(result.c_str(), result.length()));
+  NanReturnValue(NanNew<v8::String>(result.c_str(), result.length()));
 }
 
-Handle<Value> Song::getDateAddedString(const Arguments& args) {
-  Isolate* isolate = Isolate::GetCurrent();
-  HandleScope scope(isolate);
+NAN_METHOD(Song::getDateAddedString) {
+  NanScope();
 
   Song* obj = ObjectWrap::Unwrap<Song>(args.This());
   const string result =  obj->song->getDateAddedString();
 
-  return scope.Close(String::New(result.c_str(), result.length()));
+  NanReturnValue(NanNew<v8::String>(result.c_str(), result.length()));
 }
 
-Handle<Value> Song::setDateAddedToNow(const Arguments& args) {
-  Isolate* isolate = Isolate::GetCurrent();
-  HandleScope scope(isolate);
+NAN_METHOD(Song::setDateAddedToNow) {
+  NanScope();
 
   Song* obj = ObjectWrap::Unwrap<Song>(args.This());
   obj->song->setDateAddedToNow();
 
-  return Undefined();
+  NanReturnUndefined();
 }
 
-Handle<Value> Song::getId(const Arguments& args) {
-  Isolate* isolate = Isolate::GetCurrent();
-  HandleScope scope(isolate);
+NAN_METHOD(Song::getId) {
+  NanScope();
 
   Song* obj = ObjectWrap::Unwrap<Song>(args.This());
   const int result =  obj->song->getId();
 
-  return scope.Close(Number::New(result));
+  NanReturnValue(NanNew<v8::Number>(result));
 }
 
-Handle<Value> Song::setId(const Arguments& args) {
-  Isolate* isolate = Isolate::GetCurrent();
-  HandleScope scope(isolate);
+NAN_METHOD(Song::setId) {
+  NanScope();
 
   Song* obj = ObjectWrap::Unwrap<Song>(args.This());
   obj->song->setId(args[0]->Uint32Value());
 
-  return Undefined();
+  NanReturnUndefined();
 }
 
-Handle<Value> Song::getArtist(const Arguments& args) {
-  Isolate* isolate = Isolate::GetCurrent();
-  HandleScope scope(isolate);
+NAN_METHOD(Song::getArtist) {
+  NanScope();
 
   Song* obj = ObjectWrap::Unwrap<Song>(args.This());
   const string& result =  obj->song->getArtist();
 
-  return scope.Close(String::New(result.c_str(), result.length()));
+  NanReturnValue(NanNew<v8::String>(result.c_str(), result.length()));
 }
 
-Handle<Value> Song::setArtist(const Arguments& args) {
-  Isolate* isolate = Isolate::GetCurrent();
-  HandleScope scope(isolate);
+NAN_METHOD(Song::setArtist) {
+  NanScope();
 
   Song* obj = ObjectWrap::Unwrap<Song>(args.This());
   obj->song->setArtist(*v8::String::Utf8Value(args[0]->ToString()));
 
-  return Undefined();
+  NanReturnUndefined();
 }
 
-Handle<Value> Song::getTrack(const Arguments& args) {
-  Isolate* isolate = Isolate::GetCurrent();
-  HandleScope scope(isolate);
+NAN_METHOD(Song::getTrack) {
+  NanScope();
 
   Song* obj = ObjectWrap::Unwrap<Song>(args.This());
   const string& result =  obj->song->getTrack();
 
-  return scope.Close(String::New(result.c_str(), result.length()));
+  NanReturnValue(NanNew<v8::String>(result.c_str(), result.length()));
 }
 
-Handle<Value> Song::setTrack(const Arguments& args) {
-  Isolate* isolate = Isolate::GetCurrent();
-  HandleScope scope(isolate);
+NAN_METHOD(Song::setTrack) {
+  NanScope();
 
   Song* obj = ObjectWrap::Unwrap<Song>(args.This());
   obj->song->setTrack(*v8::String::Utf8Value(args[0]->ToString()));
 
-  return Undefined();
+  NanReturnUndefined();
 }
 
-Handle<Value> Song::getTitle(const Arguments& args) {
-  Isolate* isolate = Isolate::GetCurrent();
-  HandleScope scope(isolate);
+NAN_METHOD(Song::getTitle) {
+  NanScope();
 
   Song* obj = ObjectWrap::Unwrap<Song>(args.This());
   const string& result =  obj->song->getTitle();
 
-  return scope.Close(String::New(result.c_str(), result.length()));
+  NanReturnValue(NanNew<v8::String>(result.c_str(), result.length()));
 }
 
-Handle<Value> Song::setTitle(const Arguments& args) {
-  Isolate* isolate = Isolate::GetCurrent();
-  HandleScope scope(isolate);
+NAN_METHOD(Song::setTitle) {
+  NanScope();
 
   Song* obj = ObjectWrap::Unwrap<Song>(args.This());
   obj->song->setTitle(*v8::String::Utf8Value(args[0]->ToString()));
 
-  return Undefined();
+  NanReturnUndefined();
 }
 
-Handle<Value> Song::getRemixer(const Arguments& args) {
-  Isolate* isolate = Isolate::GetCurrent();
-  HandleScope scope(isolate);
+NAN_METHOD(Song::getRemixer) {
+  NanScope();
 
   Song* obj = ObjectWrap::Unwrap<Song>(args.This());
   const string& result =  obj->song->getRemixer();
 
-  return scope.Close(String::New(result.c_str(), result.length()));
+  NanReturnValue(NanNew<v8::String>(result.c_str(), result.length()));
 }
 
-Handle<Value> Song::setRemixer(const Arguments& args) {
-  Isolate* isolate = Isolate::GetCurrent();
-  HandleScope scope(isolate);
+NAN_METHOD(Song::setRemixer) {
+  NanScope();
 
   Song* obj = ObjectWrap::Unwrap<Song>(args.This());
   obj->song->setRemixer(*v8::String::Utf8Value(args[0]->ToString()));
 
-  return Undefined();
+  NanReturnUndefined();
 }
 
-Handle<Value> Song::getFeaturing(const Arguments& args) {
-  Isolate* isolate = Isolate::GetCurrent();
-  HandleScope scope(isolate);
+NAN_METHOD(Song::getFeaturing) {
+  NanScope();
 
   Song* obj = ObjectWrap::Unwrap<Song>(args.This());
   const string& result =  obj->song->getFeaturing();
 
-  return scope.Close(String::New(result.c_str(), result.length()));
+  NanReturnValue(NanNew<v8::String>(result.c_str(), result.length()));
 }
 
-Handle<Value> Song::setFeaturing(const Arguments& args) {
-  Isolate* isolate = Isolate::GetCurrent();
-  HandleScope scope(isolate);
+NAN_METHOD(Song::setFeaturing) {
+  NanScope();
 
   Song* obj = ObjectWrap::Unwrap<Song>(args.This());
   obj->song->setFeaturing(*v8::String::Utf8Value(args[0]->ToString()));
 
-  return Undefined();
+  NanReturnUndefined();
 }
 
-Handle<Value> Song::getFilepath(const Arguments& args) {
-  Isolate* isolate = Isolate::GetCurrent();
-  HandleScope scope(isolate);
+NAN_METHOD(Song::getFilepath) {
+  NanScope();
 
   Song* obj = ObjectWrap::Unwrap<Song>(args.This());
   const string& result =  obj->song->getFilepath();
 
-  return scope.Close(String::New(result.c_str(), result.length()));
+  NanReturnValue(NanNew<v8::String>(result.c_str(), result.length()));
 }
 
-Handle<Value> Song::setFilepath(const Arguments& args) {
-  Isolate* isolate = Isolate::GetCurrent();
-  HandleScope scope(isolate);
+NAN_METHOD(Song::setFilepath) {
+  NanScope();
 
   Song* obj = ObjectWrap::Unwrap<Song>(args.This());
   obj->song->setFilepath(*v8::String::Utf8Value(args[0]->ToString()));
 
-  return Undefined();
+  NanReturnUndefined();
 }
 
-Handle<Value> Song::getRating(const Arguments& args) {
-  Isolate* isolate = Isolate::GetCurrent();
-  HandleScope scope(isolate);
+NAN_METHOD(Song::getRating) {
+  NanScope();
 
   Song* obj = ObjectWrap::Unwrap<Song>(args.This());
   const int result =  obj->song->getRating();
 
-  return scope.Close(Number::New(result));
+  NanReturnValue(NanNew<v8::Number>(result));
 }
 
-Handle<Value> Song::setRating(const Arguments& args) {
-  Isolate* isolate = Isolate::GetCurrent();
-  HandleScope scope(isolate);
+NAN_METHOD(Song::setRating) {
+  NanScope();
 
   Song* obj = ObjectWrap::Unwrap<Song>(args.This());
   obj->song->setRating(args[0]->Uint32Value());
 
-  return Undefined();
+  NanReturnUndefined();
 }
 
-Handle<Value> Song::getDateAdded(const Arguments& args) {
-  Isolate* isolate = Isolate::GetCurrent();
-  HandleScope scope(isolate);
+NAN_METHOD(Song::getDateAdded) {
+  NanScope();
 
   Song* obj = ObjectWrap::Unwrap<Song>(args.This());
   const time_t result =  obj->song->getDateAdded();
 
-  return scope.Close(Number::New(result* 1000));
+  NanReturnValue(NanNew<v8::Number>(result* 1000));
 }
 
-Handle<Value> Song::setDateAdded(const Arguments& args) {
-  Isolate* isolate = Isolate::GetCurrent();
-  HandleScope scope(isolate);
+NAN_METHOD(Song::setDateAdded) {
+  NanScope();
 
   Song* obj = ObjectWrap::Unwrap<Song>(args.This());
   obj->song->setDateAdded(args[0]->Uint32Value() / 1000);
 
-  return Undefined();
+  NanReturnUndefined();
 }
 
-Handle<Value> Song::getBpm(const Arguments& args) {
-  Isolate* isolate = Isolate::GetCurrent();
-  HandleScope scope(isolate);
+NAN_METHOD(Song::getBpm) {
+  NanScope();
 
   Song* obj = ObjectWrap::Unwrap<Song>(args.This());
   const string& result =  obj->song->getBpm();
 
-  return scope.Close(String::New(result.c_str(), result.length()));
+  NanReturnValue(NanNew<v8::String>(result.c_str(), result.length()));
 }
 
-Handle<Value> Song::setBpm(const Arguments& args) {
-  Isolate* isolate = Isolate::GetCurrent();
-  HandleScope scope(isolate);
+NAN_METHOD(Song::setBpm) {
+  NanScope();
 
   Song* obj = ObjectWrap::Unwrap<Song>(args.This());
   obj->song->setBpm(*v8::String::Utf8Value(args[0]->ToString()));
 
-  return Undefined();
+  NanReturnUndefined();
 }
 
-Handle<Value> Song::addTonicKey(const Arguments& args) {
-  Isolate* isolate = Isolate::GetCurrent();
-  HandleScope scope(isolate);
+NAN_METHOD(Song::addTonicKey) {
+  NanScope();
 
   Song* obj = ObjectWrap::Unwrap<Song>(args.This());
   obj->song->addTonicKey(*v8::String::Utf8Value(args[0]->ToString()));
 
-  return Undefined();
+  NanReturnUndefined();
 }
 
-Handle<Value> Song::removeTonicKey(const Arguments& args) {
-  Isolate* isolate = Isolate::GetCurrent();
-  HandleScope scope(isolate);
+NAN_METHOD(Song::removeTonicKey) {
+  NanScope();
 
   Song* obj = ObjectWrap::Unwrap<Song>(args.This());
   obj->song->removeTonicKey(*v8::String::Utf8Value(args[0]->ToString()));
 
-  return Undefined();
+  NanReturnUndefined();
 }
 
-Handle<Value> Song::getComments(const Arguments& args) {
-  Isolate* isolate = Isolate::GetCurrent();
-  HandleScope scope(isolate);
+NAN_METHOD(Song::getComments) {
+  NanScope();
 
   Song* obj = ObjectWrap::Unwrap<Song>(args.This());
   const string& result =  obj->song->getComments();
 
-  return scope.Close(String::New(result.c_str(), result.length()));
+  NanReturnValue(NanNew<v8::String>(result.c_str(), result.length()));
 }
 
-Handle<Value> Song::setComments(const Arguments& args) {
-  Isolate* isolate = Isolate::GetCurrent();
-  HandleScope scope(isolate);
+NAN_METHOD(Song::setComments) {
+  NanScope();
 
   Song* obj = ObjectWrap::Unwrap<Song>(args.This());
   obj->song->setComments(*v8::String::Utf8Value(args[0]->ToString()));
 
-  return Undefined();
+  NanReturnUndefined();
 }
 
-Handle<Value> Song::getTrashed(const Arguments& args) {
-  Isolate* isolate = Isolate::GetCurrent();
-  HandleScope scope(isolate);
+NAN_METHOD(Song::getTrashed) {
+  NanScope();
 
   Song* obj = ObjectWrap::Unwrap<Song>(args.This());
   const bool result =  obj->song->getTrashed();
 
-  return scope.Close(Boolean::New(result));
+  NanReturnValue(NanNew<v8::Boolean>(result));
 }
 
-Handle<Value> Song::setTrashed(const Arguments& args) {
-  Isolate* isolate = Isolate::GetCurrent();
-  HandleScope scope(isolate);
+NAN_METHOD(Song::setTrashed) {
+  NanScope();
 
   Song* obj = ObjectWrap::Unwrap<Song>(args.This());
   obj->song->setTrashed(args[0]->BooleanValue());
 
-  return Undefined();
+  NanReturnUndefined();
 }
 
-Handle<Value> Song::getLowQuality(const Arguments& args) {
-  Isolate* isolate = Isolate::GetCurrent();
-  HandleScope scope(isolate);
+NAN_METHOD(Song::getLowQuality) {
+  NanScope();
 
   Song* obj = ObjectWrap::Unwrap<Song>(args.This());
   const bool result =  obj->song->getLowQuality();
 
-  return scope.Close(Boolean::New(result));
+  NanReturnValue(NanNew<v8::Boolean>(result));
 }
 
-Handle<Value> Song::setLowQuality(const Arguments& args) {
-  Isolate* isolate = Isolate::GetCurrent();
-  HandleScope scope(isolate);
+NAN_METHOD(Song::setLowQuality) {
+  NanScope();
 
   Song* obj = ObjectWrap::Unwrap<Song>(args.This());
   obj->song->setLowQuality(args[0]->BooleanValue());
 
-  return Undefined();
+  NanReturnUndefined();
 }
 
-Handle<Value> Song::getRESongId(const Arguments& args) {
-  Isolate* isolate = Isolate::GetCurrent();
-  HandleScope scope(isolate);
+NAN_METHOD(Song::getRESongId) {
+  NanScope();
 
   Song* obj = ObjectWrap::Unwrap<Song>(args.This());
   const int result =  obj->song->getRESongId();
 
-  return scope.Close(Number::New(result));
+  NanReturnValue(NanNew<v8::Number>(result));
 }
 
-Handle<Value> Song::setRESongId(const Arguments& args) {
-  Isolate* isolate = Isolate::GetCurrent();
-  HandleScope scope(isolate);
+NAN_METHOD(Song::setRESongId) {
+  NanScope();
 
   Song* obj = ObjectWrap::Unwrap<Song>(args.This());
   obj->song->setRESongId(args[0]->Uint32Value());
 
-  return Undefined();
+  NanReturnUndefined();
 }
 
-Handle<Value> Song::getAlbumId(const Arguments& args) {
-  Isolate* isolate = Isolate::GetCurrent();
-  HandleScope scope(isolate);
+NAN_METHOD(Song::getAlbumId) {
+  NanScope();
 
   Song* obj = ObjectWrap::Unwrap<Song>(args.This());
   const int result =  obj->song->getAlbumId();
 
-  return scope.Close(Number::New(result));
+  NanReturnValue(NanNew<v8::Number>(result));
 }
 
-Handle<Value> Song::setAlbumId(const Arguments& args) {
-  Isolate* isolate = Isolate::GetCurrent();
-  HandleScope scope(isolate);
+NAN_METHOD(Song::setAlbumId) {
+  NanScope();
 
   Song* obj = ObjectWrap::Unwrap<Song>(args.This());
   obj->song->setAlbumId(args[0]->Uint32Value());
 
-  return Undefined();
+  NanReturnUndefined();
 }
 
-Handle<Value> Song::getAlbumPartId(const Arguments& args) {
-  Isolate* isolate = Isolate::GetCurrent();
-  HandleScope scope(isolate);
+NAN_METHOD(Song::getAlbumPartId) {
+  NanScope();
 
   Song* obj = ObjectWrap::Unwrap<Song>(args.This());
   const int result =  obj->song->getAlbumPartId();
 
-  return scope.Close(Number::New(result));
+  NanReturnValue(NanNew<v8::Number>(result));
 }
 
-Handle<Value> Song::setAlbumPartId(const Arguments& args) {
-  Isolate* isolate = Isolate::GetCurrent();
-  HandleScope scope(isolate);
+NAN_METHOD(Song::setAlbumPartId) {
+  NanScope();
 
   Song* obj = ObjectWrap::Unwrap<Song>(args.This());
   obj->song->setAlbumPartId(args[0]->Uint32Value());
 
-  return Undefined();
+  NanReturnUndefined();
 }
 
-Handle<Value> Song::addStyleById(const Arguments& args) {
-  Isolate* isolate = Isolate::GetCurrent();
-  HandleScope scope(isolate);
+NAN_METHOD(Song::addStyleById) {
+  NanScope();
 
   Song* obj = ObjectWrap::Unwrap<Song>(args.This());
   obj->song->addStyleById(args[0]->Uint32Value());
 
-  return Undefined();
+  NanReturnUndefined();
 }
 
-Handle<Value> Song::removeStyleById(const Arguments& args) {
-  Isolate* isolate = Isolate::GetCurrent();
-  HandleScope scope(isolate);
+NAN_METHOD(Song::removeStyleById) {
+  NanScope();
 
   Song* obj = ObjectWrap::Unwrap<Song>(args.This());
   obj->song->removeStyleById(args[0]->Uint32Value());
 
-  return Undefined();
+  NanReturnUndefined();
 }
 
-void Song::Init(Handle<Object> exports) {
-  Isolate* isolate = Isolate::GetCurrent();
+void Song::Init(v8::Handle<v8::Object> exports) {
+  NanScope();
 
   // Prepare constructor template
-  Local<FunctionTemplate> tpl = FunctionTemplate::New(New);
-  tpl->SetClassName(String::NewSymbol("Song"));
+  v8::Local<v8::FunctionTemplate> tpl = NanNew<v8::FunctionTemplate>(New);
+  tpl->SetClassName(NanNew<v8::String>("Song"));
   tpl->InstanceTemplate()->SetInternalFieldCount(1);
 
-  tpl->Set(String::NewSymbol("findById"),
-      FunctionTemplate::New(findById)->GetFunction());
-  tpl->Set(String::NewSymbol("findByFilepath"),
-      FunctionTemplate::New(findByFilepath)->GetFunction());
-  tpl->Set(String::NewSymbol("findByRESongId"),
-      FunctionTemplate::New(findByRESongId)->GetFunction());
+  tpl->Set(NanNew<v8::String>("findById"),
+      NanNew<v8::FunctionTemplate>(findById)->GetFunction());
+  tpl->Set(NanNew<v8::String>("findByFilepath"),
+      NanNew<v8::FunctionTemplate>(findByFilepath)->GetFunction());
+  tpl->Set(NanNew<v8::String>("findByRESongId"),
+      NanNew<v8::FunctionTemplate>(findByRESongId)->GetFunction());
 
   // Prototype
-  tpl->PrototypeTemplate()->Set(String::NewSymbol("clear"),
-      FunctionTemplate::New(clear)->GetFunction());
-  tpl->PrototypeTemplate()->Set(String::NewSymbol("sync"),
-      FunctionTemplate::New(sync)->GetFunction());
-  tpl->PrototypeTemplate()->Set(String::NewSymbol("update"),
-      FunctionTemplate::New(update)->GetFunction());
-  tpl->PrototypeTemplate()->Set(String::NewSymbol("save"),
-      FunctionTemplate::New(save)->GetFunction());
-  tpl->PrototypeTemplate()->Set(String::NewSymbol("reAlbum"),
-      FunctionTemplate::New(reAlbum)->GetFunction());
-  tpl->PrototypeTemplate()->Set(String::NewSymbol("getDateAddedString"),
-      FunctionTemplate::New(getDateAddedString)->GetFunction());
-  tpl->PrototypeTemplate()->Set(String::NewSymbol("setDateAddedToNow"),
-      FunctionTemplate::New(setDateAddedToNow)->GetFunction());
-  tpl->PrototypeTemplate()->Set(String::NewSymbol("getId"),
-      FunctionTemplate::New(getId)->GetFunction());
-  tpl->PrototypeTemplate()->Set(String::NewSymbol("setId"),
-      FunctionTemplate::New(setId)->GetFunction());
-  tpl->PrototypeTemplate()->Set(String::NewSymbol("getArtist"),
-      FunctionTemplate::New(getArtist)->GetFunction());
-  tpl->PrototypeTemplate()->Set(String::NewSymbol("setArtist"),
-      FunctionTemplate::New(setArtist)->GetFunction());
-  tpl->PrototypeTemplate()->Set(String::NewSymbol("getTrack"),
-      FunctionTemplate::New(getTrack)->GetFunction());
-  tpl->PrototypeTemplate()->Set(String::NewSymbol("setTrack"),
-      FunctionTemplate::New(setTrack)->GetFunction());
-  tpl->PrototypeTemplate()->Set(String::NewSymbol("getTitle"),
-      FunctionTemplate::New(getTitle)->GetFunction());
-  tpl->PrototypeTemplate()->Set(String::NewSymbol("setTitle"),
-      FunctionTemplate::New(setTitle)->GetFunction());
-  tpl->PrototypeTemplate()->Set(String::NewSymbol("getRemixer"),
-      FunctionTemplate::New(getRemixer)->GetFunction());
-  tpl->PrototypeTemplate()->Set(String::NewSymbol("setRemixer"),
-      FunctionTemplate::New(setRemixer)->GetFunction());
-  tpl->PrototypeTemplate()->Set(String::NewSymbol("getFeaturing"),
-      FunctionTemplate::New(getFeaturing)->GetFunction());
-  tpl->PrototypeTemplate()->Set(String::NewSymbol("setFeaturing"),
-      FunctionTemplate::New(setFeaturing)->GetFunction());
-  tpl->PrototypeTemplate()->Set(String::NewSymbol("getFilepath"),
-      FunctionTemplate::New(getFilepath)->GetFunction());
-  tpl->PrototypeTemplate()->Set(String::NewSymbol("setFilepath"),
-      FunctionTemplate::New(setFilepath)->GetFunction());
-  tpl->PrototypeTemplate()->Set(String::NewSymbol("getRating"),
-      FunctionTemplate::New(getRating)->GetFunction());
-  tpl->PrototypeTemplate()->Set(String::NewSymbol("setRating"),
-      FunctionTemplate::New(setRating)->GetFunction());
-  tpl->PrototypeTemplate()->Set(String::NewSymbol("getDateAdded"),
-      FunctionTemplate::New(getDateAdded)->GetFunction());
-  tpl->PrototypeTemplate()->Set(String::NewSymbol("setDateAdded"),
-      FunctionTemplate::New(setDateAdded)->GetFunction());
-  tpl->PrototypeTemplate()->Set(String::NewSymbol("getBpm"),
-      FunctionTemplate::New(getBpm)->GetFunction());
-  tpl->PrototypeTemplate()->Set(String::NewSymbol("setBpm"),
-      FunctionTemplate::New(setBpm)->GetFunction());
-  tpl->PrototypeTemplate()->Set(String::NewSymbol("addTonicKey"),
-      FunctionTemplate::New(addTonicKey)->GetFunction());
-  tpl->PrototypeTemplate()->Set(String::NewSymbol("removeTonicKey"),
-      FunctionTemplate::New(removeTonicKey)->GetFunction());
-  tpl->PrototypeTemplate()->Set(String::NewSymbol("getComments"),
-      FunctionTemplate::New(getComments)->GetFunction());
-  tpl->PrototypeTemplate()->Set(String::NewSymbol("setComments"),
-      FunctionTemplate::New(setComments)->GetFunction());
-  tpl->PrototypeTemplate()->Set(String::NewSymbol("getTrashed"),
-      FunctionTemplate::New(getTrashed)->GetFunction());
-  tpl->PrototypeTemplate()->Set(String::NewSymbol("setTrashed"),
-      FunctionTemplate::New(setTrashed)->GetFunction());
-  tpl->PrototypeTemplate()->Set(String::NewSymbol("getLowQuality"),
-      FunctionTemplate::New(getLowQuality)->GetFunction());
-  tpl->PrototypeTemplate()->Set(String::NewSymbol("setLowQuality"),
-      FunctionTemplate::New(setLowQuality)->GetFunction());
-  tpl->PrototypeTemplate()->Set(String::NewSymbol("getRESongId"),
-      FunctionTemplate::New(getRESongId)->GetFunction());
-  tpl->PrototypeTemplate()->Set(String::NewSymbol("setRESongId"),
-      FunctionTemplate::New(setRESongId)->GetFunction());
-  tpl->PrototypeTemplate()->Set(String::NewSymbol("getAlbumId"),
-      FunctionTemplate::New(getAlbumId)->GetFunction());
-  tpl->PrototypeTemplate()->Set(String::NewSymbol("setAlbumId"),
-      FunctionTemplate::New(setAlbumId)->GetFunction());
-  tpl->PrototypeTemplate()->Set(String::NewSymbol("getAlbumPartId"),
-      FunctionTemplate::New(getAlbumPartId)->GetFunction());
-  tpl->PrototypeTemplate()->Set(String::NewSymbol("setAlbumPartId"),
-      FunctionTemplate::New(setAlbumPartId)->GetFunction());
-  tpl->PrototypeTemplate()->Set(String::NewSymbol("addStyleById"),
-      FunctionTemplate::New(addStyleById)->GetFunction());
-  tpl->PrototypeTemplate()->Set(String::NewSymbol("removeStyleById"),
-      FunctionTemplate::New(removeStyleById)->GetFunction());
+  NanSetPrototypeTemplate(tpl, "clear", NanNew<v8::String>("clear prop?"));
+  NanSetPrototypeTemplate(tpl, "sync", NanNew<v8::String>("sync prop?"));
+  NanSetPrototypeTemplate(tpl, "update", NanNew<v8::String>("update prop?"));
+  NanSetPrototypeTemplate(tpl, "save", NanNew<v8::String>("save prop?"));
+  NanSetPrototypeTemplate(tpl, "reAlbum", NanNew<v8::String>("reAlbum prop?"));
+  NanSetPrototypeTemplate(tpl, "getDateAddedString", NanNew<v8::String>("getDateAddedString prop?"));
+  NanSetPrototypeTemplate(tpl, "setDateAddedToNow", NanNew<v8::String>("setDateAddedToNow prop?"));
+  NanSetPrototypeTemplate(tpl, "getId", NanNew<v8::String>("getId prop?"));
+  NanSetPrototypeTemplate(tpl, "setId", NanNew<v8::String>("setId prop?"));
+  NanSetPrototypeTemplate(tpl, "getArtist", NanNew<v8::String>("getArtist prop?"));
+  NanSetPrototypeTemplate(tpl, "setArtist", NanNew<v8::String>("setArtist prop?"));
+  NanSetPrototypeTemplate(tpl, "getTrack", NanNew<v8::String>("getTrack prop?"));
+  NanSetPrototypeTemplate(tpl, "setTrack", NanNew<v8::String>("setTrack prop?"));
+  NanSetPrototypeTemplate(tpl, "getTitle", NanNew<v8::String>("getTitle prop?"));
+  NanSetPrototypeTemplate(tpl, "setTitle", NanNew<v8::String>("setTitle prop?"));
+  NanSetPrototypeTemplate(tpl, "getRemixer", NanNew<v8::String>("getRemixer prop?"));
+  NanSetPrototypeTemplate(tpl, "setRemixer", NanNew<v8::String>("setRemixer prop?"));
+  NanSetPrototypeTemplate(tpl, "getFeaturing", NanNew<v8::String>("getFeaturing prop?"));
+  NanSetPrototypeTemplate(tpl, "setFeaturing", NanNew<v8::String>("setFeaturing prop?"));
+  NanSetPrototypeTemplate(tpl, "getFilepath", NanNew<v8::String>("getFilepath prop?"));
+  NanSetPrototypeTemplate(tpl, "setFilepath", NanNew<v8::String>("setFilepath prop?"));
+  NanSetPrototypeTemplate(tpl, "getRating", NanNew<v8::String>("getRating prop?"));
+  NanSetPrototypeTemplate(tpl, "setRating", NanNew<v8::String>("setRating prop?"));
+  NanSetPrototypeTemplate(tpl, "getDateAdded", NanNew<v8::String>("getDateAdded prop?"));
+  NanSetPrototypeTemplate(tpl, "setDateAdded", NanNew<v8::String>("setDateAdded prop?"));
+  NanSetPrototypeTemplate(tpl, "getBpm", NanNew<v8::String>("getBpm prop?"));
+  NanSetPrototypeTemplate(tpl, "setBpm", NanNew<v8::String>("setBpm prop?"));
+  NanSetPrototypeTemplate(tpl, "addTonicKey", NanNew<v8::String>("addTonicKey prop?"));
+  NanSetPrototypeTemplate(tpl, "removeTonicKey", NanNew<v8::String>("removeTonicKey prop?"));
+  NanSetPrototypeTemplate(tpl, "getComments", NanNew<v8::String>("getComments prop?"));
+  NanSetPrototypeTemplate(tpl, "setComments", NanNew<v8::String>("setComments prop?"));
+  NanSetPrototypeTemplate(tpl, "getTrashed", NanNew<v8::String>("getTrashed prop?"));
+  NanSetPrototypeTemplate(tpl, "setTrashed", NanNew<v8::String>("setTrashed prop?"));
+  NanSetPrototypeTemplate(tpl, "getLowQuality", NanNew<v8::String>("getLowQuality prop?"));
+  NanSetPrototypeTemplate(tpl, "setLowQuality", NanNew<v8::String>("setLowQuality prop?"));
+  NanSetPrototypeTemplate(tpl, "getRESongId", NanNew<v8::String>("getRESongId prop?"));
+  NanSetPrototypeTemplate(tpl, "setRESongId", NanNew<v8::String>("setRESongId prop?"));
+  NanSetPrototypeTemplate(tpl, "getAlbumId", NanNew<v8::String>("getAlbumId prop?"));
+  NanSetPrototypeTemplate(tpl, "setAlbumId", NanNew<v8::String>("setAlbumId prop?"));
+  NanSetPrototypeTemplate(tpl, "getAlbumPartId", NanNew<v8::String>("getAlbumPartId prop?"));
+  NanSetPrototypeTemplate(tpl, "setAlbumPartId", NanNew<v8::String>("setAlbumPartId prop?"));
+  NanSetPrototypeTemplate(tpl, "addStyleById", NanNew<v8::String>("addStyleById prop?"));
+  NanSetPrototypeTemplate(tpl, "removeStyleById", NanNew<v8::String>("removeStyleById prop?"));
 
-  constructor = Persistent<Function>::New(isolate, tpl->GetFunction());
-  exports->Set(String::NewSymbol("Song"), constructor);
+  NanAssignPersistent<v8::Function>(constructor, tpl->GetFunction());
+  exports->Set(NanNew<v8::String>("Song"), tpl->GetFunction());
 }

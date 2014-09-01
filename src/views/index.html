@@ -26,19 +26,8 @@
     </section>
   </core-drawer-panel>
   <script>
-    var addon = require('../addon/build/Release/addon');
-    var obj = new addon.MyObject(10);
-    console.log( obj.plusOne() ); // 11
-    console.log( obj.plusOne() ); // 12
-    console.log( obj.plusOne() ); // 13
-
     var ss = require('../soulsifter/build/Release/soulsifter');
-    var bg = ss.createObject(5);
-    console.log(bg);
-    console.log(bg.getId());
-    console.log(bg.getName());
-    var bg2 = ss.BasicGenre.create(5);
-    console.log(bg2);
+
   </script>
 </body>
 </html>
