@@ -11,7 +11,7 @@ module.exports = function(grunt) {
       },
       src: [
           './src/**/*', // Your node-webkit app
-          './bower_components/**/*',
+          './components/**/*',
           './fonts/**/*'
       ]
     },

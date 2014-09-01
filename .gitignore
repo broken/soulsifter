@@ -6,7 +6,7 @@
 *.sublime-workspace
 
 # Modules
-bower_components
+components
 node_modules
 resources
 tmp
