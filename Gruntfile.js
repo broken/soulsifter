@@ -46,6 +46,12 @@ module.exports = function(grunt) {
           },
         },
       },
+      updateviews: {
+        command: 'cp src/views/*.html build/soulsifter/osx/soulsifter.app/Contents/Resources/app.nw/views/',
+      },
+      updatecomponents: {
+        command: 'cp -r src/components/soul-sifter build/soulsifter/osx/soulsifter.app/Contents/Resources/app.nw/components/',
+      },
     },
   });
 
@@ -53,5 +59,6 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-shell');
   grunt.registerTask('default', ['nodewebkit', 'shell:run']);
   grunt.registerTask('nw-gyp', ['shell:nwgypclean', 'shell:nwgypconfigure', 'shell:nwgypbuild']);
+  grunt.registerTask('up', ['shell:updateviews', 'shell:updatecomponents']);
 
 };
