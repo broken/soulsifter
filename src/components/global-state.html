@@ -1,0 +1,20 @@
+<link href="../polymer/polymer.html" rel="import">
+
+
+<polymer-element name="global-state" attributes="values">
+  <script>
+    (function() {
+      var values = {};
+
+      Polymer('global-state', {
+        ready: function() {
+          this.values = values;
+          for (var i = 0; i < this.attributes.length; ++i) {
+            var attr = this.attributes[i];
+            values[attr.nodeName] = attr.value;
+          }
+        }
+      });
+    })();
+  </script>
+</polymer-element>

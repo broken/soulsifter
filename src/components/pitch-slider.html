@@ -1,0 +1,50 @@
+<link href="../polymer/polymer.html" rel="import">
+
+<link href="../core-style/core-style.html" rel="import">
+<link href="../paper-slider/paper-slider.html" rel="import">
+
+<link href="global-state.html" rel="import">
+<link href="themes.html" rel="import">
+
+
+<polymer-element name="pitch-slider" attributes="bpm maxBpm minBpm pitch pitchPctMax">
+
+  <template>
+    <core-style ref="main"></core-style>
+
+    <global-state values="{{global}}"></global-state>
+    <paper-slider editable pin min="{{-pitchPctMax}}" max="{{pitchPctMax}}" value="{{pitch}}"></paper-slider>
+  </template>
+
+  <script>
+    Polymer('pitch-slider', {
+
+      // hints
+      bpm: 0,
+      minBpm: 0,
+      maxBpm: 0,
+      pitch: 0,
+      pitchPctMax: 8,
+
+      observe: {
+        'global.song': 'globalSongChanged'
+      },
+
+      globalSongChanged: function(oldSong, song) {
+        if (!song || !song.bpm) return;
+        if (this.bpm == 0) {
+          this.bpm = song.bpm;
+          this.minBpm = this.bpm * (100 - this.pitchPctMax) / 100;
+          this.maxBpm = this.bpm * (100 + this.pitchPctMax) / 100;
+          this.asyncFire('core-signal', {name: 'bpm-changed', data: {bpm: this.bpm, minBpm: this.minBpm, maxBpm: this.maxBpm}});
+        } else {
+          var pitch = this.bpm / song.bpm;
+          pitch = (pitch - 1) * 100;
+          if (pitch > this.pitchPctMax) pitch = this.pitchPctMax;
+          if (pitch < -this.pitchPctMax) pitch = -this.pitchPctMax;
+          this.pitch = pitch;
+        }
+      }
+    });
+  </script>
+</polymer-element>

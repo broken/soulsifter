@@ -1,0 +1,28 @@
+:host {
+  font-family: RobotoDraft;
+  font-size: small;
+}
+
+
+polymer-ui-ratings {
+  margin: 0 6px;
+}
+polymer-ui-ratings::shadow #star {
+  margin: 0 -6px;
+}
+
+
+.song-item {
+  height: 30px;
+  padding-left: 8px;
+  margin: 0 20px 0 10px;
+}
+.song-item div {
+  margin: 3px;
+}
+.song-item .artist {
+  color: #777;
+}
+.song-item .title {
+  color: #000;
+}

@@ -1,0 +1,35 @@
+:host {
+  font-family: RobotoDraft;
+}
+
+
+#core_drawer_panel-drawer {
+  box-shadow: rgba(0, 0, 0, 0.1) 0px 2px 4px, rgba(0, 0, 0, 0.1) 0px 0px 3px;
+  z-index: 2;
+}
+
+
+paper-tabs {
+  color: rgb(255, 255, 255);
+  box-shadow: rgba(0, 0, 0, 0.2) 0px 3px 2px;
+  background-color: rgb(0, 188, 212);
+  z-index: 3;  /* above core-list for box-shadow */
+}
+
+core-animated-pages {
+  overflow: hidden;
+  height: 100%;
+}
+
+paper-icon-button {
+  position: absolute;
+  display: none;
+  width: 24px;
+  height: 24px;
+  font-size: 16px;
+  margin: 8px;
+}
+
+core-drawer-panel[narrow] paper-icon-button {
+  display: inline-block
+}

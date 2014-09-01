@@ -1,0 +1,42 @@
+<link href="../polymer/polymer.html" rel="import">
+
+<link href="../core-style/core-style.html" rel="import">
+
+
+<script>
+  CoreStyle.g.dark = {
+    bg: '#444',
+    fg: '#aaa',
+  }
+  CoreStyle.g.light = {
+    bg: '#fff',
+    fg: '#000',
+  }
+  CoreStyle.g.theme = CoreStyle.g.dark;
+</script>
+
+<core-style id="main-test">
+  genre-list-item {
+    background-color: {{g.theme.bg}};
+    color: {{g.theme.fg}};
+  }
+
+  genre-list {
+    background-color: {{g.theme.bg}};
+    color: {{g.theme.fg}};
+  }
+
+  .song-item {
+    background-color: {{g.theme.bg}};
+  }
+
+  song-list {
+    background-color: {{g.theme.bg}};
+    color: {{g.theme.fg}};
+  }
+
+  #core_drawer_panel-drawer {
+    box-shadow: {{g.theme.shadow}} 0px 2px 4px, {{g.theme.shadow}} 0px 0px 3px;
+  }
+  
+</core-style>

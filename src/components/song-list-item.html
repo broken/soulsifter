@@ -1,0 +1,79 @@
+<link href="../polymer/polymer.html" rel="import">
+
+<link href="../core-signals/core-signals.html" rel="import">
+<link href="../core-style/core-style.html" rel="import">
+<link href="../font-roboto/roboto.html" rel="import">
+<link href="../polymer-ui-ratings/polymer-ui-ratings.html" rel="import">
+
+<link href="global-state.html" rel="import">
+<link href="themes.html" rel="import">
+
+
+<polymer-element name="song-list-item" attributes="song">
+
+  <template>
+    <link href="song-list-item.css" rel="stylesheet">
+    <core-style ref="main"></core-style>
+
+    <global-state values="{{global}}"></global-state>
+    <core-signals on-core-signal-bpm-changed="{{bpmChanged}}"></core-signals>
+    <div horizontal layout center class="song-item" draggable="true" ondragstart="dragSong(event)" data-downloadurl="{{filepath}}" id="draggableItem">
+      <div class="artist">{{song.artist}}</div>
+      <div> - </div>
+      <div class="title">{{song.title}}</div>
+      <div flex></div>
+      <div class="bpmDiff">{{bpmDiff}}</div>
+      <polymer-ui-ratings value="{{song.rating}}"></polymer-ui-ratings>
+      <div class="added">{{song.dateAdded}}</div>
+    </div>
+  </template>
+
+  <script>
+    Polymer('song-list-item', {
+
+      /** @attribute song */
+      song: null,
+
+      bpmDiff: '',
+
+      observe: {
+        'gobal.musicDir': 'globalMusicDirChanged'
+      },
+
+      globalChanged: function(oldValue, newValue) {
+        this.globalMusicDirChanged('', this.global.musicDir);
+      },
+
+      domReady: function() {
+        this.$.draggableItem.addEventListener('dragstart', function(e) {
+        });
+      },
+
+      globalMusicDirChanged: function(oldValue, newValue) {
+        var filename = this.song.filePath.substr(this.song.filePath.lastIndexOf('/') + 1);
+        var fp = newValue + this.song.filePath.substr(this.song.filePath.search('mp3') + 3);
+        this.filepath = 'application/octet-stream:' + filename + ':file://' + fp;
+      },
+
+      bpmChanged: function(e, detail, sender) {
+        this.bpmDiff = ((this.song.bpm / detail.bpm - 1) * 100).toFixed(2);
+      },
+
+      genresChanged: function(e, detail, sender) {
+        this.genres = detail;
+      },
+
+      queryChanged: function(e, detail, sender) {
+        this.$.core_tooltip.show = true;
+        var genreIds = this.genres.map(function(g) { return g.id; });
+        var p = {q: this.query, min: this.minBpm, max: this.maxBpm, key: this.selectedSong.tonicKey, genres: genreIds.join(',')};
+        this.ajaxParams = JSON.stringify(p);
+      }
+    });
+
+    function dragSong(e) {
+      e.dataTransfer.effectAllowed = 'move';
+      e.dataTransfer.setData('text', e.target.dataset.downloadurl);
+    }
+  </script>
+</polymer-element>

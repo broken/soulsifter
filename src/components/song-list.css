@@ -1,0 +1,27 @@
+:host {
+  font-family: RobotoDraft;
+}
+
+
+core-list div {
+  box-sizing: border-box;
+  cursor: default;
+  overflow: hidden;
+}
+
+core-tooltip {
+  position: absolute;
+  left: 50%;
+  top: 20px;
+}
+
+.song {
+  height: 20px;
+  padding-left: 5px;
+}
+.song .artist {
+  color: #666;
+}
+.song .title {
+  color: #000;
+}

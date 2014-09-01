@@ -1,0 +1,86 @@
+<link href="../polymer/polymer.html" rel="import">
+
+<link href="../core-collapse/core-collapse.html" rel="import">
+<link href="../core-selection/core-selection.html" rel="import">
+<link href="../core-style/core-style.html" rel="import">
+<link href="../font-roboto/roboto.html" rel="import">
+<link href="../paper-icon-button/paper-icon-button.html" rel="import">
+<link href="../paper-ripple/paper-ripple.html" rel="import">
+<link href="../paper-shadow/paper-shadow.html" rel="import">
+
+<link href="themes.html" rel="import">
+
+
+<polymer-element name="genre-list-item" attributes="genre indent">
+
+  <template>
+    <link href="genre-list-item.css" rel="stylesheet">
+    <core-style ref="main"></core-style>
+
+    <div horizontal layout center id="item" style="padding-left: {{indent}}px;" on-tap="{{selectTapAction}}">
+      <paper-shadow animated z="{{z}}"></paper-shadow>
+      <paper-ripple fit></paper-ripple>
+      <paper-icon-button icon="{{icon}}" on-tap="{{expandTapAction}}"></paper-icon-button>
+      <div flex>{{genre.name}}</div>
+    </div>
+    <core-collapse id="collapse">
+      <template repeat="{{g in genre.subGenre}}" id="subGenreTpl">
+        <genre-list-item genre="{{g}}" indent="{{indent + 20}}"></genre-list-item>
+      </template>
+    <core-selection multi on-core-select="{{selectGenreAction}}" id="selection"></core-selection>
+    </core-collapse>
+  </template>
+
+  <script>
+    Polymer('genre-list-item', {
+      /** @event genre-select */
+
+      /** @attribute genre */
+      genre: null,
+
+      /** @attribute indent */
+      indent: 0,
+
+      /** @method select */
+      select: function(isSelected) {
+        if ((isSelected && !this.$.selection.isSelected(this)) ||
+            (!isSelected && this.$.selection.isSelected(this))) {
+          this.$.selection.toggle(this);
+        }
+        if (this.genre.subGenre) {
+          for (var i = 0, item = this.$.subGenreTpl.nextElementSibling;
+              item && i < this.genre.subGenre.length;
+              item = item.nextElementSibling, ++i) {
+            item.select(isSelected);
+          }
+        }
+      },
+
+      z: 0,
+
+      ready: function() {
+        if (this.genre.subGenre) {
+          this.icon = 'expand-more';
+        } else {
+          this.icon = 'invis';
+        }
+      },
+
+      selectTapAction: function(e, detail, sender) {
+        this.select(!this.$.selection.isSelected(this));
+      },
+
+      expandTapAction: function(e, detail, sender) {
+        if (!this.genre.subGenre) return;
+        this.$.collapse.toggle();
+        this.icon = this.$.collapse.opened ? 'expand-less' : 'expand-more';
+        e.stopPropagation();
+      },
+
+      selectGenreAction: function(e, detail, sender) {
+        this.z = detail.isSelected ? 1 : 0;
+        this.asyncFire('genre-select', this.genre);
+      },
+    });
+  </script>
+</polymer-element>

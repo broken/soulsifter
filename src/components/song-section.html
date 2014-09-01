@@ -1,0 +1,56 @@
+<link href="../polymer/polymer.html" rel="import">
+
+<link href="../core-ajax/core-ajax.html" rel="import">
+<link href="../core-scroll-header-panel/core-scroll-header-panel.html" rel="import">
+<link href="../core-style/core-style.html" rel="import">
+<link href="../font-roboto/roboto.html" rel="import">
+<link href="../polymer-ui-ratings/polymer-ui-ratings.html" rel="import">
+
+<link href="global-state.html" rel="import">
+<link href="themes.html" rel="import">
+
+
+<polymer-element name="song-section">
+
+  <template>
+    <link href="song-section.css" rel="stylesheet">
+    <core-style ref="main"></core-style>
+
+    <global-state values="{{global}}"></global-state>
+    <core-ajax auto url="/ss/songs/img" on-core-response="{{imgResponse}}" handleAs="json" params="{{ajaxParams}}"></core-ajax>
+    <core-scroll-header-panel fixed headerHeight="256" id="scroll_header_panel">
+      <div class="core-header" id="header"></div>
+      <div vertical layout fit class="content">
+        <div class="title">{{song.title}}</div>
+        <div class="artist">{{song.artist}}</div>
+        <polymer-ui-ratings value="{{song.rating}}"></polymer-ui-ratings>
+        <div class="track" self-end>{{song.album.track}}</div>
+        <div class="track" self-end>{{song.album.name}}</div>
+        <div class="released" self-end>{{song.album.releaseDateYear}}-{{song.album.releaseDateMonth}}-{{song.album.releaseDateDay}}</div>
+        <div class="comments" flex>{{song.comments}}</div>
+        <div class="bpm">{{song.bpm}} bpm</div>
+        <div class="added">{{song.dateAdded}}</div>
+      </div>
+    </core-scroll-header-panel>
+  </template>
+
+  <script>
+    Polymer('song-section', {
+
+      observe: {
+        'global.song': 'globalSongChanged'
+      },
+
+      globalSongChanged: function(oldSong, song) {
+        this.song = song;
+        if (song.album)
+          this.ajaxParams = JSON.stringify({fp: song.album.coverFilepath});
+      },
+
+      imgResponse: function(event, response) {
+        this.$.scroll_header_panel.shadowRoot.querySelector('#headerBg').style.backgroundImage = 'url("' + response.response + '")';
+      },
+
+    });
+  </script>
+</polymer-element>

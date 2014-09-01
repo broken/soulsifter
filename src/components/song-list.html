@@ -1,0 +1,79 @@
+<link href="../polymer/polymer.html" rel="import">
+
+<link href="../core-ajax/core-ajax.html" rel="import">
+<link href="../core-selector/core-selector.html" rel="import">
+<link href="../core-signals/core-signals.html" rel="import">
+<link href="../core-style/core-style.html" rel="import">
+<link href="../core-tooltip/core-tooltip.html" rel="import">
+
+<link href="global-state.html" rel="import">
+<link href="song-list-item.html" rel="import">
+<link href="themes.html" rel="import">
+
+
+<polymer-element name="song-list" attributes="query">
+
+  <template>
+    <link href="song-list.css" rel="stylesheet">
+    <core-style ref="main"></core-style>
+
+    <core-signals on-core-signal-bpm-changed="{{bpmChanged}}" on-core-signal-genres-changed="{{genresChanged}}"></core-signals>
+    <global-state values="{{global}}"></global-state>
+    <core-tooltip label="loading..." position="right" id="core_tooltip" noarrow show></core-tooltip>
+    <core-ajax auto url="/ss/songs" on-core-response="{{songsResponse}}" handleAs="json" params="{{ajaxParams}}"></core-ajax>
+    <core-selector selected="{{selectedRow}}">
+      <template repeat="{{s in songs}}">
+        <song-list-item song="{{s}}"></song-list-item>
+      </template>
+    </core-selector>
+    </core-list>
+  </template>
+
+  <script>
+    Polymer('song-list', {
+
+      created: function() {
+        // init & hint lists & objects
+        this.songs = [];
+        this.genres = [];
+      },
+
+      songsResponse: function(event, response) {
+        this.$.core_tooltip.show = false;
+        if (response.response.song) {
+          this.songs = response.response.song;
+        } else {
+          this.songs = [];
+        }
+      },
+
+      bpmChanged: function(e, detail, sender) {
+        this.minBpm = detail.minBpm;
+        this.maxBpm = detail.maxBpm;
+      },
+
+      genresChanged: function(e, detail, sender) {
+        this.genres = detail;
+      },
+
+      selectedRowChanged: function(e, detail, sender) {
+        this.global.song = this.songs[detail];
+      },
+
+      queryChanged: function(e, detail, sender) {
+        this.$.core_tooltip.show = true;
+        var genreIds = this.genres.map(function(g) { return g.id; });
+        var p = {q: this.query, genres: genreIds.join(',')};
+        if (this.minBpm) p.min = this.minBpm;
+        if (this.maxBpm) p.max = this.maxBpm;
+        if (this.global.song) p.key = this.global.song.tonicKey;
+        this.ajaxParams = JSON.stringify(p);
+      }
+    });
+
+    function dragSong(e) {
+      e.dataTransfer.effectAllowed = 'move';
+      e.dataTransfer.setData('text', e.target.dataset.downloadurl);
+    }
+  </script>
+</polymer-element>

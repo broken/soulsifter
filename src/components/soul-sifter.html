@@ -1,0 +1,48 @@
+<link href="../polymer/polymer.html" rel="import">
+
+<link href="../core-animated-pages/core-animated-pages.html" rel="import">
+<link href="../core-drawer-panel/core-drawer-panel.html" rel="import">
+<link href="../core-header-panel/core-header-panel.html" rel="import">
+<link href="../paper-icon-button/paper-icon-button.html" rel="import">
+<link href="../core-style/core-style.html" rel="import">
+<link href="../font-roboto/roboto.html" rel="import">
+<link href="../paper-tabs/paper-tabs.html" rel="import">
+
+<link href="genre-list.html" rel="import">
+<link href="song-list.html" rel="import">
+<link href="song-section.html" rel="import">
+<link href="search-toolbar.html" rel="import">
+<link href="themes.html" rel="import">
+
+
+<polymer-element name="soul-sifter">
+
+  <template>
+    <link href="soul-sifter.css" rel="stylesheet">
+    <core-style ref="main"></core-style>
+
+    <core-drawer-panel id="core_drawer_panel">
+      <section id="core_drawer_panel-drawer" drawer layout vertical>
+        <paper-tabs selected="1" id="paper_tabs">
+          <paper-tab id="paper_tab-song">Song</paper-tab>
+          <paper-tab id="paper_tab-genres" active>Genres</paper-tab>
+        </paper-tabs>
+        <core-animated-pages selected="{{ $.paper_tabs.selected }}" id="core_animated_pages">
+          <song-section></song-section>
+          <genre-list></genre-list>
+        </core-animated-pages>
+      </section>
+      <core-header-panel main>
+        <search-toolbar query="{{query}}" class="core-header">
+          <paper-icon-button icon="menu" onclick="document.querySelector('soul-sifter::shadow core-drawer-panel').togglePanel();"></paper-icon-button>
+        </search-toolbar>
+        <song-list query="{{query}}" class="content"></song-list>
+      </core-header-panel>
+    </core-drawer-panel>
+  </template>
+
+  <script>
+    Polymer('soul-sifter', {
+    });
+  </script>
+</polymer-element>

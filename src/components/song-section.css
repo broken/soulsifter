@@ -1,0 +1,29 @@
+:host {
+  font-family: RobotoDraft;
+}
+
+
+core-scroll-header-panel {
+  height: 100%;
+}
+
+core-scroll-header-panel::shadow #headerContent {
+  height: 256px;
+}
+
+.core-header {
+  height: 256px;
+}
+
+
+.artist {
+  color: #999;
+}
+
+.title {
+  margin: ;
+}
+
+.content {
+  margin: 5px 15px 20px 15px;
+}

@@ -1,0 +1,18 @@
+:host {
+  font-family: RobotoDraft;
+  font-size: 13px;
+}
+
+paper-icon-button {
+  transform: scale(.6);
+}
+
+core-collapse {
+  margin-top: -7px;
+  margin-bottom: -7px;
+}
+
+#item {
+  margin: 7px 20px 7px 20px;
+  height: 30px;
+}

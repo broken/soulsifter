@@ -1,0 +1,22 @@
+:host {
+  font-family: RobotoDraft;
+}
+
+
+core-toolbar {
+  background-color: #E56FF2;
+  box-shadow: rgba(0, 0, 0, 0.2) 0px 3px 2px;
+  height: 45px;
+}
+
+core-toolbar::shadow .toolbar-tools {
+  height: 45px;
+}
+
+.hide {
+  display: none;
+}
+
+#search_input::shadow input::-webkit-input-placeholder {
+  color: #eee;
+}
