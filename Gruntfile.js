@@ -15,9 +15,43 @@ module.exports = function(grunt) {
           './fonts/**/*'
       ]
     },
+    shell: {
+      run: {
+        command: 'build/soulsifter/osx/soulsifter.app/Contents/MacOS/node-webkit',
+      },
+      ulimit: {
+        command: 'ulimit -n 10240',
+      },
+      nwgypclean: {
+        command: 'nw-gyp clean',
+        options: {
+          execOptions: {
+            cwd: 'src/soulsifter',
+          },
+        },
+      },
+      nwgypconfigure: {
+        command: 'nw-gyp configure --target=0.10.2',
+        options: {
+          execOptions: {
+            cwd: 'src/soulsifter',
+          },
+        },
+      },
+      nwgypbuild: {
+        command: 'nw-gyp build',
+        options: {
+          execOptions: {
+            cwd: 'src/soulsifter',
+          },
+        },
+      },
+    },
   });
 
   grunt.loadNpmTasks('grunt-node-webkit-builder');
-  grunt.registerTask('default', ['nodewebkit']);
+  grunt.loadNpmTasks('grunt-shell');
+  grunt.registerTask('default', ['nodewebkit', 'shell:run']);
+  grunt.registerTask('nw-gyp', ['shell:nwgypclean', 'shell:nwgypconfigure', 'shell:nwgypbuild']);
 
 };
