@@ -2,9 +2,6 @@
   "targets": [
     {
       "target_name": "soulsifter",
-      "sources": [ "soulsifter.cc", "Album.cpp", "AlbumHelper.cpp", "AlbumPart.cpp", "AudioAnalyzer.cpp", "BasicGenre_wrap.cpp", "BasicGenre.cpp", "BasicGenreHelper.cpp", "DTVectorUtil.h", "MiniBpm.cpp", "Mix.cpp", "MixHelper.cpp", "MysqlAccess.cpp", "REAlbumCover.cpp", "RESetting.cpp", "RESettingHelper.cpp", "ResultSetIterator.h", "Song_wrap.cpp", "Song.cpp", "SongHelper.cpp", "Style.cpp", "StyleHelper.cpp"],
-      'cflags!': [ '-fno-exceptions' ],
-      'cflags_cc!': [ '-fno-exceptions' ],
       "sources": [
           # module
           "soulsifter.cc",
@@ -36,6 +33,16 @@
           # util
           "DTVectorUtil.h",
       ],
+      'cflags!': [
+          '-fno-exceptions',
+          '-std=c++11',
+          '-stdlib=libc++',
+      ],
+      'cflags_cc!': [
+          '-fno-exceptions',
+          '-std=c++11',
+          '-stdlib=libc++',
+      ],
       "link_settings": {
         "libraries": [
           "/usr/local/lib/libboost_date_time-mt.dylib",
@@ -50,7 +57,11 @@
       'conditions': [
         ['OS=="mac"', {
           'xcode_settings': {
-            'GCC_ENABLE_CPP_EXCEPTIONS': 'YES'
+            'GCC_ENABLE_CPP_EXCEPTIONS': 'YES',
+            'OTHER_CFLAGS': [ '-stdlib=libc++', ],
+            'OTHER_CPLUSPLUSFLAGS' : [ '-stdlib=libc++', '-std=c++11' ],
+            'OTHER_LDFLAGS': [ '-stdlib=libc++', ],
+            'MACOSX_DEPLOYMENT_TARGET': '10.7',
           }
         }]
       ],
