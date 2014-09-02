@@ -27,6 +27,9 @@
           "bstdfile.c",
           "madlld.cpp",
           "MiniBpm.cpp",
+          # organization
+          "MusicManager.cpp",
+          "TagWriter.cpp",
           # persistence
           "MysqlAccess.cpp",
           "ResultSetIterator.h",
