@@ -5,6 +5,37 @@
       "sources": [ "soulsifter.cc", "Album.cpp", "AlbumHelper.cpp", "AlbumPart.cpp", "AudioAnalyzer.cpp", "BasicGenre_wrap.cpp", "BasicGenre.cpp", "BasicGenreHelper.cpp", "DTVectorUtil.h", "MiniBpm.cpp", "Mix.cpp", "MixHelper.cpp", "MysqlAccess.cpp", "REAlbumCover.cpp", "RESetting.cpp", "RESettingHelper.cpp", "ResultSetIterator.h", "Song_wrap.cpp", "Song.cpp", "SongHelper.cpp", "Style.cpp", "StyleHelper.cpp"],
       'cflags!': [ '-fno-exceptions' ],
       'cflags_cc!': [ '-fno-exceptions' ],
+      "sources": [
+          # module
+          "soulsifter.cc",
+          # model
+          "Album.cpp",
+          "AlbumHelper.cpp",
+          "AlbumPart.cpp",
+          "BasicGenre_wrap.cpp",
+          "BasicGenre.cpp",
+          "BasicGenreHelper.cpp",
+          "Mix.cpp",
+          "MixHelper.cpp",
+          "REAlbumCover.cpp",
+          "RESetting.cpp",
+          "RESettingHelper.cpp",
+          "Song_wrap.cpp",
+          "Song.cpp",
+          "SongHelper.cpp",
+          "Style.cpp",
+          "StyleHelper.cpp",
+          # detection
+          "AudioAnalyzer.cpp",
+          "bstdfile.c",
+          "madlld.cpp",
+          "MiniBpm.cpp",
+          # persistence
+          "MysqlAccess.cpp",
+          "ResultSetIterator.h",
+          # util
+          "DTVectorUtil.h",
+      ],
       "link_settings": {
         "libraries": [
           "/usr/local/lib/libboost_date_time-mt.dylib",
