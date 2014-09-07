@@ -16,7 +16,7 @@
     <link href="genre-list.css" rel="stylesheet">
     <core-style ref="main"></core-style>
 
-    <core-ajax auto url="/ss/genres" on-core-response="{{genresResponse}}" handleAs="json"></core-ajax>
+    <!-- <core-ajax auto url="/ss/genres" on-core-response="{{genresResponse}}" handleAs="json"></core-ajax> -->
     <template repeat="{{g in genres}}">
       <genre-list-item genre="{{g}}" on-genre-select="{{selectAction}}"></genre-list-item>
     </template>

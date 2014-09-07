@@ -20,7 +20,7 @@
     <core-signals on-core-signal-bpm-changed="{{bpmChanged}}" on-core-signal-genres-changed="{{genresChanged}}"></core-signals>
     <global-state values="{{global}}"></global-state>
     <core-tooltip label="loading..." position="right" id="core_tooltip" noarrow show></core-tooltip>
-    <core-ajax auto url="/ss/songs" on-core-response="{{songsResponse}}" handleAs="json" params="{{ajaxParams}}"></core-ajax>
+    <!-- <core-ajax auto url="/ss/songs" on-core-response="{{songsResponse}}" handleAs="json" params="{{ajaxParams}}"></core-ajax> -->
     <core-selector selected="{{selectedRow}}">
       <template repeat="{{s in songs}}">
         <song-list-item song="{{s}}"></song-list-item>
