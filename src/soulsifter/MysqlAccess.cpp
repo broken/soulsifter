@@ -90,9 +90,9 @@ bool MysqlAccess::connect() {
     } catch (sql::SQLException &e) {
         std::cout << "ERROR: SQLException in " << __FILE__;
         std::cout << " (" << __func__<< ") on line " << __LINE__ << std::endl;
-        //std::cout << "ERROR: " << e.what();
-        //std::cout << " (MySQL error code: " << e.getErrorCode();
-        //std::cout << ", SQLState: " << e.getSQLState() << ")" << std::endl;
+        std::cout << "ERROR: " << e.what();
+        std::cout << " (MySQL error code: " << e.getErrorCode();
+        std::cout << ", SQLState: " << e.getSQLState() << ")" << std::endl;
         return false;
 	}
     return true;
@@ -105,9 +105,9 @@ bool MysqlAccess::disconnect() {
     } catch (sql::SQLException &e) {
         std::cout << "ERROR: SQLException in " << __FILE__;
         std::cout << " (" << __func__<< ") on line " << __LINE__ << std::endl;
-        //std::cout << "ERROR: " << e.what();
-        //std::cout << " (MySQL error code: " << e.getErrorCode();
-        //std::cout << ", SQLState: " << e.getSQLState() << ")" << std::endl;
+        std::cout << "ERROR: " << e.what();
+        std::cout << " (MySQL error code: " << e.getErrorCode();
+        std::cout << ", SQLState: " << e.getSQLState() << ")" << std::endl;
         return false;
     }
     return true;
@@ -127,10 +127,10 @@ sql::PreparedStatement* MysqlAccess::getPreparedStatement(std::string query) {
     } catch (sql::SQLException &e) {
         std::cout << "ERROR: SQLException in " << __FILE__;
         std::cout << " (" << __func__<< ") on line " << __LINE__ << std::endl;
-        //std::cout << "ERROR: " << e.what();
-        //std::cout << " (MySQL error code: " << e.getErrorCode();
-        //std::cout << ", SQLState: " << e.getSQLState() << ")" << std::endl;
-        //throw e;
+        std::cout << "ERROR: " << e.what();
+        std::cout << " (MySQL error code: " << e.getErrorCode();
+        std::cout << ", SQLState: " << e.getSQLState() << ")" << std::endl;
+        throw e;
     }
 }
 
@@ -148,10 +148,10 @@ const int MysqlAccess::getLastInsertId() {
     } catch (sql::SQLException &e) {
         std::cout << "ERROR: SQLException in " << __FILE__;
         std::cout << " (" << __func__<< ") on line " << __LINE__ << std::endl;
-        //std::cout << "ERROR: " << e.what();
-        //std::cout << " (MySQL error code: " << e.getErrorCode();
-        //std::cout << ", SQLState: " << e.getSQLState() << ")" << std::endl;
-        //throw e;
+        std::cout << "ERROR: " << e.what();
+        std::cout << " (MySQL error code: " << e.getErrorCode();
+        std::cout << ", SQLState: " << e.getSQLState() << ")" << std::endl;
+        throw e;
     }
 }
     
