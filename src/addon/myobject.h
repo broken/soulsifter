@@ -1,13 +1,11 @@
 #ifndef MYOBJECT_H
 #define MYOBJECT_H
 
-#include <v8.h>
 #include <node.h>
-#include <node_object_wrap.h>
 
 class MyObject : public node::ObjectWrap {
  public:
-  static void Init(v8::Handle<v8::Object> target);
+  static void Init(v8::Handle<v8::Object> exports);
 
  private:
   MyObject();
