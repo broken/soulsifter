@@ -54,7 +54,9 @@
           "/usr/local/lib/libboost_system-mt.dylib",
           "/usr/local/lib/libboost_thread-mt.dylib",
           "/usr/local/lib/libmysqlclient.18.dylib",
-          "/usr/local/lib/libmysqlcppconn.7.1.1.4.dylib",
+          "/usr/local/lib/libmysqlcppconn.7.1.1.3.dylib",
+          "/usr/local/lib/libtag.1.14.0.dylib",
+          "/opt/local/lib/libmad.dylib",
         ],
       },
       'conditions': [
