@@ -162,7 +162,7 @@ MusicManager::~MusicManager() {
       
       TagLib::ID3v2::FrameList frameList = id3v2->frameListMap()["POPM"];
       if (!frameList.isEmpty()) {
-        TagLib::ID3v2::PopularimeterFrame *popm = dynamic_cast<TagLib::ID3v2::PopularimeterFrame*>(frameList.front());
+        TagLib::ID3v2::PopularimeterFrame *popm = static_cast<TagLib::ID3v2::PopularimeterFrame*>(frameList.front());
         song->setRating(popm->rating());
       }
       
@@ -241,7 +241,7 @@ void MusicManager::readTagsFromSong(Song* song) {
         stringstream ss;
         if (tag->title() != TagLib::String::null) song->setTitle(tag->title().to8Bit());
         if (tag->artist() != TagLib::String::null) song->setArtist(tag->artist().to8Bit());
-        if (tag->track() != 0) song->setTrack(static_cast<ostringstream*>(&(ostringstream() << tag->track()))->str());
+        if (tag->track() != 0) song->setTrack((ostringstream() << tag->track()).str());
         if (tag->album() != TagLib::String::null) song->getAlbum()->setName(tag->album().to8Bit());
         if (tag->comment() != TagLib::String::null) song->setComments(tag->comment().to8Bit());
         if (tag->year() != 0) song->getAlbum()->setReleaseDateYear(tag->year());
@@ -336,9 +336,9 @@ void MusicManager::writeTagsToSong(Song* song) {
         if (trackNum > 0) {
           ++trackNum;
           if (lastSongFixed->getTrack().length() > 1 && trackNum < 10) {
-            updatedSong->setTrack('0' + static_cast<ostringstream*>(&(ostringstream() << trackNum))->str());
+            updatedSong->setTrack('0' + (ostringstream() << trackNum).str());
           } else {
-            updatedSong->setTrack(static_cast<ostringstream*>(&(ostringstream() << trackNum))->str());
+            updatedSong->setTrack((ostringstream() << trackNum).str());
           }
         }
       }
