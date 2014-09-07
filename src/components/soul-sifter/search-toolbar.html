@@ -11,6 +11,7 @@
 <link href="../font-roboto/roboto.html" rel="import">
 <link href="../paper-dialog/paper-dialog.html" rel="import">
 
+<!-- <link href="create-song.html" rel="import"> -->
 <link href="global-state.html" rel="import">
 <link href="pitch-slider.html" rel="import">
 <link href="themes.html" rel="import">
@@ -31,6 +32,7 @@
         <core-input id="search_input" placeholder="search" flex on-change="{{searchAction}}"></core-input>
       </core-field>
       <div flex></div>
+      <core-icon-button icon="add-circle" on-click="{{toggleCreateSongDialog}}" id="createSongButton"></core-icon-button>
       <core-icon-button icon="settings" on-click="{{toggleSettingsDialog}}"></core-icon-button>
       <core-icon-button icon="filter" on-click="{{toggleIsTall}}"></core-icon-button>
       <div class="bottom {{ {hide: !isTall} | tokenList }}">
@@ -41,6 +43,9 @@
     <paper-dialog backdrop layered heading="Settings" id="settingsDialog">
       <paper-input floatingLabel label="Music directory" value="{{musicDir}}"></paper-input>
     </paper-dialog>
+    <paper-dialog backdrop layered heading="Create Song" id="createSongDialog">
+      <!-- <create-song></create-song> -->
+    </paper-dialog>
   </template>
 
   <script>
@@ -50,12 +55,36 @@
 
       musicDir: '',
 
+      domReady: function() {
+        this.$.createSongButton.ondragover = function() {
+          this.icon = 'add-circle-outline';
+        };
+        this.$.createSongButton.ondragend = function() {
+          this.icon = 'add-circle';
+        };
+        this.$.createSongButton.ondrop = function(e) {
+          e.preventDefault();
+          for (var i = 0; i < e.dataTransfer.files.length; ++i) {
+            var song = new ss.Song();
+            window.console.log(song);
+            /*song.setFilepath(e.dataTransfer.files[i].path);
+            window.console.log(e.dataTransfer.files[i].path);
+            ss.MusicManager.readTagsFromSong(song);
+            window.console.log(song);*/
+          }
+        };
+      },
+
       toggleIsTall: function(e, detail, sender  ) {
         this.isTall = !this.isTall;
       },
 
       toggleSettingsDialog: function(e, detail, sender) {
         this.$.settingsDialog.toggle();
+      },
+
+      toggleCreateSongDialog: function(e, detail, sender) {
+        this.$.createSongDialog.toggle();
       },
 
       searchAction: function(e, detail, sender) {
