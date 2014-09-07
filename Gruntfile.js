@@ -60,5 +60,5 @@ module.exports = function(grunt) {
   grunt.registerTask('default', ['nodewebkit', 'shell:run']);
   grunt.registerTask('nw-gyp', ['shell:nwgypclean', 'shell:nwgypconfigure', 'shell:nwgypbuild']);
   grunt.registerTask('up', ['shell:updateviews', 'shell:updatecomponents']);
-
+  grunt.registerTask('all', ['nw-gyp', 'nodewebkit', 'shell:run']);
 };
