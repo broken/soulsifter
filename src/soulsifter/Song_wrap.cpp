@@ -2,6 +2,8 @@
 #include <node.h>
 #include <nan.h>
 #include "Song.h"
+#include "Style.h"
+#include "Style_wrap.h"
 #include "Song_wrap.h"
 
 v8::Persistent<v8::Function> Song::constructor;
@@ -19,6 +21,78 @@ NAN_METHOD(Song::New) {
   NanReturnValue(args.This());
 }
 
+v8::Local<v8::Object> Song::NewInstance() {
+
+  v8::Local<v8::Function> cons = NanNew<v8::Function>(constructor);
+  v8::Local<v8::Object> instance = cons->NewInstance();
+
+  return instance;
+}
+
+void Song::Init(v8::Handle<v8::Object> exports) {
+  NanScope();
+
+  // Prepare constructor template
+  v8::Local<v8::FunctionTemplate> tpl = NanNew<v8::FunctionTemplate>(New);
+  tpl->SetClassName(NanNew<v8::String>("Song"));
+  tpl->InstanceTemplate()->SetInternalFieldCount(1);
+
+  NanSetTemplate(tpl, "findById", NanNew<v8::FunctionTemplate>(findById)->GetFunction());
+  NanSetTemplate(tpl, "findByFilepath", NanNew<v8::FunctionTemplate>(findByFilepath)->GetFunction());
+  NanSetTemplate(tpl, "findByRESongId", NanNew<v8::FunctionTemplate>(findByRESongId)->GetFunction());
+  NanSetTemplate(tpl, "findAll", NanNew<v8::FunctionTemplate>(findAll)->GetFunction());
+
+  // Prototype
+  NanSetPrototypeTemplate(tpl, "clear", NanNew<v8::FunctionTemplate>(clear)->GetFunction());
+  NanSetPrototypeTemplate(tpl, "sync", NanNew<v8::FunctionTemplate>(sync)->GetFunction());
+  NanSetPrototypeTemplate(tpl, "update", NanNew<v8::FunctionTemplate>(update)->GetFunction());
+  NanSetPrototypeTemplate(tpl, "save", NanNew<v8::FunctionTemplate>(save)->GetFunction());
+  NanSetPrototypeTemplate(tpl, "reAlbum", NanNew<v8::FunctionTemplate>(reAlbum)->GetFunction());
+  NanSetPrototypeTemplate(tpl, "getDateAddedString", NanNew<v8::FunctionTemplate>(getDateAddedString)->GetFunction());
+  NanSetPrototypeTemplate(tpl, "setDateAddedToNow", NanNew<v8::FunctionTemplate>(setDateAddedToNow)->GetFunction());
+  NanSetPrototypeTemplate(tpl, "getId", NanNew<v8::FunctionTemplate>(getId)->GetFunction());
+  NanSetPrototypeTemplate(tpl, "setId", NanNew<v8::FunctionTemplate>(setId)->GetFunction());
+  NanSetPrototypeTemplate(tpl, "getArtist", NanNew<v8::FunctionTemplate>(getArtist)->GetFunction());
+  NanSetPrototypeTemplate(tpl, "setArtist", NanNew<v8::FunctionTemplate>(setArtist)->GetFunction());
+  NanSetPrototypeTemplate(tpl, "getTrack", NanNew<v8::FunctionTemplate>(getTrack)->GetFunction());
+  NanSetPrototypeTemplate(tpl, "setTrack", NanNew<v8::FunctionTemplate>(setTrack)->GetFunction());
+  NanSetPrototypeTemplate(tpl, "getTitle", NanNew<v8::FunctionTemplate>(getTitle)->GetFunction());
+  NanSetPrototypeTemplate(tpl, "setTitle", NanNew<v8::FunctionTemplate>(setTitle)->GetFunction());
+  NanSetPrototypeTemplate(tpl, "getRemixer", NanNew<v8::FunctionTemplate>(getRemixer)->GetFunction());
+  NanSetPrototypeTemplate(tpl, "setRemixer", NanNew<v8::FunctionTemplate>(setRemixer)->GetFunction());
+  NanSetPrototypeTemplate(tpl, "getFeaturing", NanNew<v8::FunctionTemplate>(getFeaturing)->GetFunction());
+  NanSetPrototypeTemplate(tpl, "setFeaturing", NanNew<v8::FunctionTemplate>(setFeaturing)->GetFunction());
+  NanSetPrototypeTemplate(tpl, "getFilepath", NanNew<v8::FunctionTemplate>(getFilepath)->GetFunction());
+  NanSetPrototypeTemplate(tpl, "setFilepath", NanNew<v8::FunctionTemplate>(setFilepath)->GetFunction());
+  NanSetPrototypeTemplate(tpl, "getRating", NanNew<v8::FunctionTemplate>(getRating)->GetFunction());
+  NanSetPrototypeTemplate(tpl, "setRating", NanNew<v8::FunctionTemplate>(setRating)->GetFunction());
+  NanSetPrototypeTemplate(tpl, "getDateAdded", NanNew<v8::FunctionTemplate>(getDateAdded)->GetFunction());
+  NanSetPrototypeTemplate(tpl, "setDateAdded", NanNew<v8::FunctionTemplate>(setDateAdded)->GetFunction());
+  NanSetPrototypeTemplate(tpl, "getBpm", NanNew<v8::FunctionTemplate>(getBpm)->GetFunction());
+  NanSetPrototypeTemplate(tpl, "setBpm", NanNew<v8::FunctionTemplate>(setBpm)->GetFunction());
+  NanSetPrototypeTemplate(tpl, "addTonicKey", NanNew<v8::FunctionTemplate>(addTonicKey)->GetFunction());
+  NanSetPrototypeTemplate(tpl, "removeTonicKey", NanNew<v8::FunctionTemplate>(removeTonicKey)->GetFunction());
+  NanSetPrototypeTemplate(tpl, "getComments", NanNew<v8::FunctionTemplate>(getComments)->GetFunction());
+  NanSetPrototypeTemplate(tpl, "setComments", NanNew<v8::FunctionTemplate>(setComments)->GetFunction());
+  NanSetPrototypeTemplate(tpl, "getTrashed", NanNew<v8::FunctionTemplate>(getTrashed)->GetFunction());
+  NanSetPrototypeTemplate(tpl, "setTrashed", NanNew<v8::FunctionTemplate>(setTrashed)->GetFunction());
+  NanSetPrototypeTemplate(tpl, "getLowQuality", NanNew<v8::FunctionTemplate>(getLowQuality)->GetFunction());
+  NanSetPrototypeTemplate(tpl, "setLowQuality", NanNew<v8::FunctionTemplate>(setLowQuality)->GetFunction());
+  NanSetPrototypeTemplate(tpl, "getRESongId", NanNew<v8::FunctionTemplate>(getRESongId)->GetFunction());
+  NanSetPrototypeTemplate(tpl, "setRESongId", NanNew<v8::FunctionTemplate>(setRESongId)->GetFunction());
+  NanSetPrototypeTemplate(tpl, "getAlbumId", NanNew<v8::FunctionTemplate>(getAlbumId)->GetFunction());
+  NanSetPrototypeTemplate(tpl, "setAlbumId", NanNew<v8::FunctionTemplate>(setAlbumId)->GetFunction());
+  NanSetPrototypeTemplate(tpl, "getAlbumPartId", NanNew<v8::FunctionTemplate>(getAlbumPartId)->GetFunction());
+  NanSetPrototypeTemplate(tpl, "setAlbumPartId", NanNew<v8::FunctionTemplate>(setAlbumPartId)->GetFunction());
+  NanSetPrototypeTemplate(tpl, "getStyles", NanNew<v8::FunctionTemplate>(getStyles)->GetFunction());
+  NanSetPrototypeTemplate(tpl, "setStyles", NanNew<v8::FunctionTemplate>(setStyles)->GetFunction());
+  NanSetPrototypeTemplate(tpl, "addStyleById", NanNew<v8::FunctionTemplate>(addStyleById)->GetFunction());
+  NanSetPrototypeTemplate(tpl, "removeStyleById", NanNew<v8::FunctionTemplate>(removeStyleById)->GetFunction());
+
+  NanAssignPersistent<v8::Function>(constructor, tpl->GetFunction());
+  exports->Set(NanNew<v8::String>("Song"), tpl->GetFunction());
+}
+
 
 NAN_METHOD(Song::clear) {
   NanScope();
@@ -32,8 +106,9 @@ NAN_METHOD(Song::clear) {
 NAN_METHOD(Song::findById) {
   NanScope();
 
+  int a0(args[0]->Uint32Value());
   dogatech::soulsifter::Song* song =
-      dogatech::soulsifter::Song::findById(args[0]->Uint32Value());
+      dogatech::soulsifter::Song::findById(a0);
   v8::Local<v8::Function> cons = NanNew<v8::Function>(constructor);
   v8::Local<v8::Object> instance = cons->NewInstance();
 
@@ -46,8 +121,9 @@ NAN_METHOD(Song::findById) {
 NAN_METHOD(Song::findByFilepath) {
   NanScope();
 
+  string a0(*v8::String::Utf8Value(args[0]->ToString()));
   dogatech::soulsifter::Song* song =
-      dogatech::soulsifter::Song::findByFilepath(*v8::String::Utf8Value(args[0]->ToString()));
+      dogatech::soulsifter::Song::findByFilepath(a0);
   v8::Local<v8::Function> cons = NanNew<v8::Function>(constructor);
   v8::Local<v8::Object> instance = cons->NewInstance();
 
@@ -60,8 +136,9 @@ NAN_METHOD(Song::findByFilepath) {
 NAN_METHOD(Song::findByRESongId) {
   NanScope();
 
+  int a0(args[0]->Uint32Value());
   dogatech::soulsifter::Song* song =
-      dogatech::soulsifter::Song::findByRESongId(args[0]->Uint32Value());
+      dogatech::soulsifter::Song::findByRESongId(a0);
   v8::Local<v8::Function> cons = NanNew<v8::Function>(constructor);
   v8::Local<v8::Object> instance = cons->NewInstance();
 
@@ -69,6 +146,26 @@ NAN_METHOD(Song::findByRESongId) {
   obj->song = song;
 
   NanReturnValue(instance);
+}
+
+NAN_METHOD(Song::findAll) {
+  NanScope();
+
+  dogatech::ResultSetIterator<dogatech::soulsifter::Song>* result =
+      dogatech::soulsifter::Song::findAll();
+
+  vector<dogatech::soulsifter::Song*>* v = result->toVector();
+  v8::Handle<v8::Array> a = NanNew<v8::Array>((int) v->size());
+  for (int i = 0; i < (int) v->size(); i++) {
+    v8::Local<v8::Function> cons = NanNew<v8::Function>(constructor);
+    v8::Local<v8::Object> instance = cons->NewInstance();
+    Song* o = ObjectWrap::Unwrap<Song>(instance);
+    o->song = (*v)[i];
+    a->Set(NanNew<v8::Number>(i), instance);
+  }
+  delete result;
+  delete v;
+  NanReturnValue(a);
 }
 
 NAN_METHOD(Song::sync) {
@@ -138,7 +235,8 @@ NAN_METHOD(Song::setId) {
   NanScope();
 
   Song* obj = ObjectWrap::Unwrap<Song>(args.This());
-  obj->song->setId(args[0]->Uint32Value());
+  int a0(args[0]->Uint32Value());
+  obj->song->setId(a0);
 
   NanReturnUndefined();
 }
@@ -147,7 +245,7 @@ NAN_METHOD(Song::getArtist) {
   NanScope();
 
   Song* obj = ObjectWrap::Unwrap<Song>(args.This());
-  const string& result =  obj->song->getArtist();
+  const string result =  obj->song->getArtist();
 
   NanReturnValue(NanNew<v8::String>(result.c_str(), result.length()));
 }
@@ -156,7 +254,8 @@ NAN_METHOD(Song::setArtist) {
   NanScope();
 
   Song* obj = ObjectWrap::Unwrap<Song>(args.This());
-  obj->song->setArtist(*v8::String::Utf8Value(args[0]->ToString()));
+  string a0(*v8::String::Utf8Value(args[0]->ToString()));
+  obj->song->setArtist(a0);
 
   NanReturnUndefined();
 }
@@ -165,7 +264,7 @@ NAN_METHOD(Song::getTrack) {
   NanScope();
 
   Song* obj = ObjectWrap::Unwrap<Song>(args.This());
-  const string& result =  obj->song->getTrack();
+  const string result =  obj->song->getTrack();
 
   NanReturnValue(NanNew<v8::String>(result.c_str(), result.length()));
 }
@@ -174,7 +273,8 @@ NAN_METHOD(Song::setTrack) {
   NanScope();
 
   Song* obj = ObjectWrap::Unwrap<Song>(args.This());
-  obj->song->setTrack(*v8::String::Utf8Value(args[0]->ToString()));
+  string a0(*v8::String::Utf8Value(args[0]->ToString()));
+  obj->song->setTrack(a0);
 
   NanReturnUndefined();
 }
@@ -183,7 +283,7 @@ NAN_METHOD(Song::getTitle) {
   NanScope();
 
   Song* obj = ObjectWrap::Unwrap<Song>(args.This());
-  const string& result =  obj->song->getTitle();
+  const string result =  obj->song->getTitle();
 
   NanReturnValue(NanNew<v8::String>(result.c_str(), result.length()));
 }
@@ -192,7 +292,8 @@ NAN_METHOD(Song::setTitle) {
   NanScope();
 
   Song* obj = ObjectWrap::Unwrap<Song>(args.This());
-  obj->song->setTitle(*v8::String::Utf8Value(args[0]->ToString()));
+  string a0(*v8::String::Utf8Value(args[0]->ToString()));
+  obj->song->setTitle(a0);
 
   NanReturnUndefined();
 }
@@ -201,7 +302,7 @@ NAN_METHOD(Song::getRemixer) {
   NanScope();
 
   Song* obj = ObjectWrap::Unwrap<Song>(args.This());
-  const string& result =  obj->song->getRemixer();
+  const string result =  obj->song->getRemixer();
 
   NanReturnValue(NanNew<v8::String>(result.c_str(), result.length()));
 }
@@ -210,7 +311,8 @@ NAN_METHOD(Song::setRemixer) {
   NanScope();
 
   Song* obj = ObjectWrap::Unwrap<Song>(args.This());
-  obj->song->setRemixer(*v8::String::Utf8Value(args[0]->ToString()));
+  string a0(*v8::String::Utf8Value(args[0]->ToString()));
+  obj->song->setRemixer(a0);
 
   NanReturnUndefined();
 }
@@ -219,7 +321,7 @@ NAN_METHOD(Song::getFeaturing) {
   NanScope();
 
   Song* obj = ObjectWrap::Unwrap<Song>(args.This());
-  const string& result =  obj->song->getFeaturing();
+  const string result =  obj->song->getFeaturing();
 
   NanReturnValue(NanNew<v8::String>(result.c_str(), result.length()));
 }
@@ -228,7 +330,8 @@ NAN_METHOD(Song::setFeaturing) {
   NanScope();
 
   Song* obj = ObjectWrap::Unwrap<Song>(args.This());
-  obj->song->setFeaturing(*v8::String::Utf8Value(args[0]->ToString()));
+  string a0(*v8::String::Utf8Value(args[0]->ToString()));
+  obj->song->setFeaturing(a0);
 
   NanReturnUndefined();
 }
@@ -237,7 +340,7 @@ NAN_METHOD(Song::getFilepath) {
   NanScope();
 
   Song* obj = ObjectWrap::Unwrap<Song>(args.This());
-  const string& result =  obj->song->getFilepath();
+  const string result =  obj->song->getFilepath();
 
   NanReturnValue(NanNew<v8::String>(result.c_str(), result.length()));
 }
@@ -246,7 +349,8 @@ NAN_METHOD(Song::setFilepath) {
   NanScope();
 
   Song* obj = ObjectWrap::Unwrap<Song>(args.This());
-  obj->song->setFilepath(*v8::String::Utf8Value(args[0]->ToString()));
+  string a0(*v8::String::Utf8Value(args[0]->ToString()));
+  obj->song->setFilepath(a0);
 
   NanReturnUndefined();
 }
@@ -264,7 +368,8 @@ NAN_METHOD(Song::setRating) {
   NanScope();
 
   Song* obj = ObjectWrap::Unwrap<Song>(args.This());
-  obj->song->setRating(args[0]->Uint32Value());
+  int a0(args[0]->Uint32Value());
+  obj->song->setRating(a0);
 
   NanReturnUndefined();
 }
@@ -282,7 +387,8 @@ NAN_METHOD(Song::setDateAdded) {
   NanScope();
 
   Song* obj = ObjectWrap::Unwrap<Song>(args.This());
-  obj->song->setDateAdded(args[0]->Uint32Value() / 1000);
+  time_t a0(args[0]->Uint32Value() / 1000);
+  obj->song->setDateAdded(a0);
 
   NanReturnUndefined();
 }
@@ -291,7 +397,7 @@ NAN_METHOD(Song::getBpm) {
   NanScope();
 
   Song* obj = ObjectWrap::Unwrap<Song>(args.This());
-  const string& result =  obj->song->getBpm();
+  const string result =  obj->song->getBpm();
 
   NanReturnValue(NanNew<v8::String>(result.c_str(), result.length()));
 }
@@ -300,7 +406,8 @@ NAN_METHOD(Song::setBpm) {
   NanScope();
 
   Song* obj = ObjectWrap::Unwrap<Song>(args.This());
-  obj->song->setBpm(*v8::String::Utf8Value(args[0]->ToString()));
+  string a0(*v8::String::Utf8Value(args[0]->ToString()));
+  obj->song->setBpm(a0);
 
   NanReturnUndefined();
 }
@@ -309,7 +416,8 @@ NAN_METHOD(Song::addTonicKey) {
   NanScope();
 
   Song* obj = ObjectWrap::Unwrap<Song>(args.This());
-  obj->song->addTonicKey(*v8::String::Utf8Value(args[0]->ToString()));
+  string a0(*v8::String::Utf8Value(args[0]->ToString()));
+  obj->song->addTonicKey(a0);
 
   NanReturnUndefined();
 }
@@ -318,7 +426,8 @@ NAN_METHOD(Song::removeTonicKey) {
   NanScope();
 
   Song* obj = ObjectWrap::Unwrap<Song>(args.This());
-  obj->song->removeTonicKey(*v8::String::Utf8Value(args[0]->ToString()));
+  string a0(*v8::String::Utf8Value(args[0]->ToString()));
+  obj->song->removeTonicKey(a0);
 
   NanReturnUndefined();
 }
@@ -327,7 +436,7 @@ NAN_METHOD(Song::getComments) {
   NanScope();
 
   Song* obj = ObjectWrap::Unwrap<Song>(args.This());
-  const string& result =  obj->song->getComments();
+  const string result =  obj->song->getComments();
 
   NanReturnValue(NanNew<v8::String>(result.c_str(), result.length()));
 }
@@ -336,7 +445,8 @@ NAN_METHOD(Song::setComments) {
   NanScope();
 
   Song* obj = ObjectWrap::Unwrap<Song>(args.This());
-  obj->song->setComments(*v8::String::Utf8Value(args[0]->ToString()));
+  string a0(*v8::String::Utf8Value(args[0]->ToString()));
+  obj->song->setComments(a0);
 
   NanReturnUndefined();
 }
@@ -354,7 +464,8 @@ NAN_METHOD(Song::setTrashed) {
   NanScope();
 
   Song* obj = ObjectWrap::Unwrap<Song>(args.This());
-  obj->song->setTrashed(args[0]->BooleanValue());
+  bool a0(args[0]->BooleanValue());
+  obj->song->setTrashed(a0);
 
   NanReturnUndefined();
 }
@@ -372,7 +483,8 @@ NAN_METHOD(Song::setLowQuality) {
   NanScope();
 
   Song* obj = ObjectWrap::Unwrap<Song>(args.This());
-  obj->song->setLowQuality(args[0]->BooleanValue());
+  bool a0(args[0]->BooleanValue());
+  obj->song->setLowQuality(a0);
 
   NanReturnUndefined();
 }
@@ -390,7 +502,8 @@ NAN_METHOD(Song::setRESongId) {
   NanScope();
 
   Song* obj = ObjectWrap::Unwrap<Song>(args.This());
-  obj->song->setRESongId(args[0]->Uint32Value());
+  int a0(args[0]->Uint32Value());
+  obj->song->setRESongId(a0);
 
   NanReturnUndefined();
 }
@@ -408,7 +521,8 @@ NAN_METHOD(Song::setAlbumId) {
   NanScope();
 
   Song* obj = ObjectWrap::Unwrap<Song>(args.This());
-  obj->song->setAlbumId(args[0]->Uint32Value());
+  int a0(args[0]->Uint32Value());
+  obj->song->setAlbumId(a0);
 
   NanReturnUndefined();
 }
@@ -426,7 +540,35 @@ NAN_METHOD(Song::setAlbumPartId) {
   NanScope();
 
   Song* obj = ObjectWrap::Unwrap<Song>(args.This());
-  obj->song->setAlbumPartId(args[0]->Uint32Value());
+  int a0(args[0]->Uint32Value());
+  obj->song->setAlbumPartId(a0);
+
+  NanReturnUndefined();
+}
+
+NAN_METHOD(Song::getStyles) {
+  NanScope();
+
+  Song* obj = ObjectWrap::Unwrap<Song>(args.This());
+  const vector<dogatech::soulsifter::Style*> result =  obj->song->getStyles();
+
+  v8::Handle<v8::Array> a = NanNew<v8::Array>((int) result.size());
+  for (int i = 0; i < (int) result.size(); i++) {
+    v8::Local<v8::Function> cons = NanNew<v8::Function>(constructor);
+    v8::Local<v8::Object> instance = cons->NewInstance();
+    Style* o = ObjectWrap::Unwrap<Style>(instance);
+    o->setNwcpValue(result[i]);
+    a->Set(NanNew<v8::Number>(i), instance);
+  }
+  NanReturnValue(a);
+}
+
+NAN_METHOD(Song::setStyles) {
+  NanScope();
+
+  Song* obj = ObjectWrap::Unwrap<Song>(args.This());
+  //vector<Style> a0(node::ObjectWrap::Unwrap<vector<Style>>(args[0]->ToObject())->getNwcpValue())*;
+  //obj->song->setStyles(a0);
 
   NanReturnUndefined();
 }
@@ -435,7 +577,8 @@ NAN_METHOD(Song::addStyleById) {
   NanScope();
 
   Song* obj = ObjectWrap::Unwrap<Song>(args.This());
-  obj->song->addStyleById(args[0]->Uint32Value());
+  int a0(args[0]->Uint32Value());
+  obj->song->addStyleById(a0);
 
   NanReturnUndefined();
 }
@@ -444,71 +587,9 @@ NAN_METHOD(Song::removeStyleById) {
   NanScope();
 
   Song* obj = ObjectWrap::Unwrap<Song>(args.This());
-  obj->song->removeStyleById(args[0]->Uint32Value());
+  int a0(args[0]->Uint32Value());
+  obj->song->removeStyleById(a0);
 
   NanReturnUndefined();
 }
 
-void Song::Init(v8::Handle<v8::Object> exports) {
-  NanScope();
-
-  // Prepare constructor template
-  v8::Local<v8::FunctionTemplate> tpl = NanNew<v8::FunctionTemplate>(New);
-  tpl->SetClassName(NanNew<v8::String>("Song"));
-  tpl->InstanceTemplate()->SetInternalFieldCount(1);
-
-  tpl->Set(NanNew<v8::String>("findById"),
-      NanNew<v8::FunctionTemplate>(findById)->GetFunction());
-  tpl->Set(NanNew<v8::String>("findByFilepath"),
-      NanNew<v8::FunctionTemplate>(findByFilepath)->GetFunction());
-  tpl->Set(NanNew<v8::String>("findByRESongId"),
-      NanNew<v8::FunctionTemplate>(findByRESongId)->GetFunction());
-
-  // Prototype
-  NanSetPrototypeTemplate(tpl, "clear", NanNew<v8::String>("clear prop?"));
-  NanSetPrototypeTemplate(tpl, "sync", NanNew<v8::String>("sync prop?"));
-  NanSetPrototypeTemplate(tpl, "update", NanNew<v8::String>("update prop?"));
-  NanSetPrototypeTemplate(tpl, "save", NanNew<v8::String>("save prop?"));
-  NanSetPrototypeTemplate(tpl, "reAlbum", NanNew<v8::String>("reAlbum prop?"));
-  NanSetPrototypeTemplate(tpl, "getDateAddedString", NanNew<v8::String>("getDateAddedString prop?"));
-  NanSetPrototypeTemplate(tpl, "setDateAddedToNow", NanNew<v8::String>("setDateAddedToNow prop?"));
-  NanSetPrototypeTemplate(tpl, "getId", NanNew<v8::String>("getId prop?"));
-  NanSetPrototypeTemplate(tpl, "setId", NanNew<v8::String>("setId prop?"));
-  NanSetPrototypeTemplate(tpl, "getArtist", NanNew<v8::String>("getArtist prop?"));
-  NanSetPrototypeTemplate(tpl, "setArtist", NanNew<v8::String>("setArtist prop?"));
-  NanSetPrototypeTemplate(tpl, "getTrack", NanNew<v8::String>("getTrack prop?"));
-  NanSetPrototypeTemplate(tpl, "setTrack", NanNew<v8::String>("setTrack prop?"));
-  NanSetPrototypeTemplate(tpl, "getTitle", NanNew<v8::String>("getTitle prop?"));
-  NanSetPrototypeTemplate(tpl, "setTitle", NanNew<v8::String>("setTitle prop?"));
-  NanSetPrototypeTemplate(tpl, "getRemixer", NanNew<v8::String>("getRemixer prop?"));
-  NanSetPrototypeTemplate(tpl, "setRemixer", NanNew<v8::String>("setRemixer prop?"));
-  NanSetPrototypeTemplate(tpl, "getFeaturing", NanNew<v8::String>("getFeaturing prop?"));
-  NanSetPrototypeTemplate(tpl, "setFeaturing", NanNew<v8::String>("setFeaturing prop?"));
-  NanSetPrototypeTemplate(tpl, "getFilepath", NanNew<v8::String>("getFilepath prop?"));
-  NanSetPrototypeTemplate(tpl, "setFilepath", NanNew<v8::String>("setFilepath prop?"));
-  NanSetPrototypeTemplate(tpl, "getRating", NanNew<v8::String>("getRating prop?"));
-  NanSetPrototypeTemplate(tpl, "setRating", NanNew<v8::String>("setRating prop?"));
-  NanSetPrototypeTemplate(tpl, "getDateAdded", NanNew<v8::String>("getDateAdded prop?"));
-  NanSetPrototypeTemplate(tpl, "setDateAdded", NanNew<v8::String>("setDateAdded prop?"));
-  NanSetPrototypeTemplate(tpl, "getBpm", NanNew<v8::String>("getBpm prop?"));
-  NanSetPrototypeTemplate(tpl, "setBpm", NanNew<v8::String>("setBpm prop?"));
-  NanSetPrototypeTemplate(tpl, "addTonicKey", NanNew<v8::String>("addTonicKey prop?"));
-  NanSetPrototypeTemplate(tpl, "removeTonicKey", NanNew<v8::String>("removeTonicKey prop?"));
-  NanSetPrototypeTemplate(tpl, "getComments", NanNew<v8::String>("getComments prop?"));
-  NanSetPrototypeTemplate(tpl, "setComments", NanNew<v8::String>("setComments prop?"));
-  NanSetPrototypeTemplate(tpl, "getTrashed", NanNew<v8::String>("getTrashed prop?"));
-  NanSetPrototypeTemplate(tpl, "setTrashed", NanNew<v8::String>("setTrashed prop?"));
-  NanSetPrototypeTemplate(tpl, "getLowQuality", NanNew<v8::String>("getLowQuality prop?"));
-  NanSetPrototypeTemplate(tpl, "setLowQuality", NanNew<v8::String>("setLowQuality prop?"));
-  NanSetPrototypeTemplate(tpl, "getRESongId", NanNew<v8::String>("getRESongId prop?"));
-  NanSetPrototypeTemplate(tpl, "setRESongId", NanNew<v8::String>("setRESongId prop?"));
-  NanSetPrototypeTemplate(tpl, "getAlbumId", NanNew<v8::String>("getAlbumId prop?"));
-  NanSetPrototypeTemplate(tpl, "setAlbumId", NanNew<v8::String>("setAlbumId prop?"));
-  NanSetPrototypeTemplate(tpl, "getAlbumPartId", NanNew<v8::String>("getAlbumPartId prop?"));
-  NanSetPrototypeTemplate(tpl, "setAlbumPartId", NanNew<v8::String>("setAlbumPartId prop?"));
-  NanSetPrototypeTemplate(tpl, "addStyleById", NanNew<v8::String>("addStyleById prop?"));
-  NanSetPrototypeTemplate(tpl, "removeStyleById", NanNew<v8::String>("removeStyleById prop?"));
-
-  NanAssignPersistent<v8::Function>(constructor, tpl->GetFunction());
-  exports->Set(NanNew<v8::String>("Song"), tpl->GetFunction());
-}

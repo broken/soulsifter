@@ -10,6 +10,8 @@ class Style : public node::ObjectWrap {
   static void Init(v8::Handle<v8::Object> exports);
   static NAN_METHOD(NewInstance);
 
+  void setNwcpValue(dogatech::soulsifter::Style* s) { style = s; }
+
  private:
   Style();
   explicit Style(dogatech::soulsifter::Style* style);

@@ -23,10 +23,9 @@
   </template>
 
 <script>
-  var ss = require('../soulsifter/build/Release/soulsifter');
     Polymer('genre-list', {
 
-      created: function(event, response) {
+      created: function() {
         this.genres = ss.Style.findAllParents();
       },
 

@@ -100,7 +100,7 @@ namespace soulsifter {
         void addStyleById(int styleId);
         void removeStyleById(int styleId);
 
-        friend class ResultSetIterator<Song>;
+        friend ResultSetIterator<Song>;
 
     private:
         int id;

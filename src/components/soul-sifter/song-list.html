@@ -19,8 +19,7 @@
 
     <core-signals on-core-signal-bpm-changed="{{bpmChanged}}" on-core-signal-genres-changed="{{genresChanged}}"></core-signals>
     <global-state values="{{global}}"></global-state>
-    <core-tooltip label="loading..." position="right" id="core_tooltip" noarrow show></core-tooltip>
-    <!-- <core-ajax auto url="/ss/songs" on-core-response="{{songsResponse}}" handleAs="json" params="{{ajaxParams}}"></core-ajax> -->
+    <!-- <core-tooltip label="loading..." position="right" id="core_tooltip" noarrow show></core-tooltip> -->
     <core-selector selected="{{selectedRow}}">
       <template repeat="{{s in songs}}">
         <song-list-item song="{{s}}"></song-list-item>
@@ -38,13 +37,14 @@
         this.genres = [];
       },
 
-      songsResponse: function(event, response) {
+      domReady: function() {
         this.$.core_tooltip.show = false;
-        if (response.response.song) {
+        this.songs = ss.SearchUtil.searchSongs('ooah');
+        /*if (response.response.song) {
           this.songs = response.response.song;
         } else {
           this.songs = [];
-        }
+        }*/
       },
 
       bpmChanged: function(e, detail, sender) {
@@ -67,8 +67,20 @@
         if (this.minBpm) p.min = this.minBpm;
         if (this.maxBpm) p.max = this.maxBpm;
         if (this.global.song) p.key = this.global.song.tonicKey;
+        this.songs = ss.SearchUtil.searchSongs(this.query);
+        this.$.core_tooltip.show = false;
+      },
+
+      /*genresChanged: function(e, detail, sender) {
+        this.genres = detail;
+      },
+
+      queryChanged: function(e, detail, sender) {
+        this.$.core_tooltip.show = true;
+        var genreIds = this.genres.map(function(g) { return g.id; });
+        var p = {q: this.query, min: this.minBpm, max: this.maxBpm, key: this.selectedSong.tonicKey, genres: genreIds.join(',')};
         this.ajaxParams = JSON.stringify(p);
-      }
+      }*/
     });
 
     function dragSong(e) {

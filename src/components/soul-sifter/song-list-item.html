@@ -49,26 +49,25 @@
         });
       },
 
+      songChanged: function(oldValue, newValue) {
+        this.song.artist = this.song.getArtist();
+        this.song.title = this.song.getTitle();
+        this.song.rating = this.song.getRating();
+        this.song.bpm = this.song.getBpm();
+        //this.song.tonicKey = this.song.getTonicKeys();
+        this.song.dateAdded = this.song.getDateAddedString();
+        this.song.filePath = this.song.getFilepath();
+      },
+
       globalMusicDirChanged: function(oldValue, newValue) {
-        var filename = this.song.filePath.substr(this.song.filePath.lastIndexOf('/') + 1);
-        var fp = newValue + this.song.filePath.substr(this.song.filePath.search('mp3') + 3);
-        this.filepath = 'application/octet-stream:' + filename + ':file://' + fp;
+        //var filename = this.song.filePath.substr(this.song.filePath.lastIndexOf('/') + 1);
+        //var fp = newValue + this.song.filePath.substr(this.song.filePath.search('mp3') + 3);
+        //this.filepath = 'application/octet-stream:' + filename + ':file://' + fp;
       },
 
       bpmChanged: function(e, detail, sender) {
         this.bpmDiff = ((this.song.bpm / detail.bpm - 1) * 100).toFixed(2);
       },
-
-      genresChanged: function(e, detail, sender) {
-        this.genres = detail;
-      },
-
-      queryChanged: function(e, detail, sender) {
-        this.$.core_tooltip.show = true;
-        var genreIds = this.genres.map(function(g) { return g.id; });
-        var p = {q: this.query, min: this.minBpm, max: this.maxBpm, key: this.selectedSong.tonicKey, genres: genreIds.join(',')};
-        this.ajaxParams = JSON.stringify(p);
-      }
     });
 
     function dragSong(e) {

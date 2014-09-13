@@ -8,18 +8,24 @@
 class Song : public node::ObjectWrap {
  public:
   static void Init(v8::Handle<v8::Object> exports);
+  static v8::Local<v8::Object> NewInstance();
 
- private:
+  void setNwcpValue(dogatech::soulsifter::Song* s) { song = s; }
+
   Song();
+ private:
   explicit Song(dogatech::soulsifter::Song* song);
   ~Song();
 
   static NAN_METHOD(New);
 
+  dogatech::soulsifter::Song* getNwcpValue() const { return song; }
+
   static NAN_METHOD(clear);
   static NAN_METHOD(findById);
   static NAN_METHOD(findByFilepath);
   static NAN_METHOD(findByRESongId);
+  static NAN_METHOD(findAll);
   static NAN_METHOD(sync);
   static NAN_METHOD(update);
   static NAN_METHOD(save);
@@ -60,6 +66,8 @@ class Song : public node::ObjectWrap {
   static NAN_METHOD(setAlbumId);
   static NAN_METHOD(getAlbumPartId);
   static NAN_METHOD(setAlbumPartId);
+  static NAN_METHOD(getStyles);
+  static NAN_METHOD(setStyles);
   static NAN_METHOD(addStyleById);
   static NAN_METHOD(removeStyleById);
 

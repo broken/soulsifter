@@ -17,6 +17,8 @@
           "REAlbumCover.cpp",
           "RESetting.cpp",
           "RESettingHelper.cpp",
+          "SearchUtil.cpp",
+          "SearchUtil_wrap.cpp",
           "Song.cpp",
           "Song_wrap.cpp",
           "SongHelper.cpp",
