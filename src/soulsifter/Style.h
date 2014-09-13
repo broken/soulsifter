@@ -42,6 +42,7 @@ namespace soulsifter {
         bool operator<(const Style& style) const;
         bool operator>(const Style& style) const;
 
+        static ResultSetIterator<Style>* findAllParents();
         static void findAllSortedByName(vector<Style*>** stylesPtr);
         static void findAllSortedByREId(vector<Style*>** stylesPtr);
 

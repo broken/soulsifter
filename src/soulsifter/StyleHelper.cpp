@@ -58,5 +58,13 @@ namespace soulsifter {
         sort(styles->begin(), styles->end(), reIdLessThanKey());
         (*stylesPtr) = styles;
     }
-}
-}
+
+    ResultSetIterator<Style>* Style::findAllParents() {
+        sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select * from Styles where id not in (select childId from StyleChildren)");
+        sql::ResultSet *rs = ps->executeQuery();
+        ResultSetIterator<Style> *dtrs = new ResultSetIterator<Style>(rs);
+        return dtrs;
+    }
+
+}  // namespace soulsifter
+}  // namespace dogatech
