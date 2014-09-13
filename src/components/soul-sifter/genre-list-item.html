@@ -18,8 +18,8 @@
     <core-style ref="main"></core-style>
 
     <div horizontal layout center id="item" style="padding-left: {{indent}}px;" on-tap="{{selectTapAction}}">
-      <paper-shadow animated z="{{z}}"></paper-shadow>
-      <paper-ripple fit></paper-ripple>
+      <!-- <paper-shadow animated z="{{z}}"></paper-shadow> -->
+      <!-- <paper-ripple fit></paper-ripple> -->
       <paper-icon-button icon="{{icon}}" on-tap="{{expandTapAction}}"></paper-icon-button>
       <div flex>{{genre.name}}</div>
     </div>
@@ -27,7 +27,7 @@
       <template repeat="{{g in genre.subGenre}}" id="subGenreTpl">
         <genre-list-item genre="{{g}}" indent="{{indent + 20}}"></genre-list-item>
       </template>
-    <core-selection multi on-core-select="{{selectGenreAction}}" id="selection"></core-selection>
+      <core-selection multi on-core-select="{{selectGenreAction}}" id="selection"></core-selection>
     </core-collapse>
   </template>
 
@@ -60,7 +60,6 @@
 
       ready: function() {
         this.genre.name = this.genre.getName();
-        window.console.log(this.genre.name);
         var children = this.genre.getChildren();
         if (children.length > 0) {
           this.genre.subGenre = children;
@@ -85,6 +84,11 @@
 
       selectGenreAction: function(e, detail, sender) {
         this.z = detail.isSelected ? 1 : 0;
+        if (detail.isSelected) {
+          this.$.item.style.backgroundColor = 'whitesmoke';
+        } else {
+          this.$.item.style.backgroundColor = '';
+        }
         this.asyncFire('genre-select', this.genre);
       },
     });
