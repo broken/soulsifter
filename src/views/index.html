@@ -1,33 +1,21 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Soul Sifter</title>
-  <script src="../components/platform/platform.js"></script>
-  <link href="../components/polymer/polymer.html" rel="import">
-  <link href="../components/core-drawer-panel/core-drawer-panel.html" rel="import">
-  <link href="../css/roboto.css" rel="stylesheet">
-
-  <link rel="import" href="songcreate.html">
-  <style>
-    body {
-      font-family: Roboto;
-    }
-  </style>
+<title>Soul Sifter</title>
+<script src="../components/platform/platform.js"></script>
+<link href="../components/soul-sifter/soul-sifter.html" rel="import">
 </head>
 <body>
-  <core-drawer-panel>
-    <section drawer layout vertical>
-      <h1>SoulSifter</h1>
-    </section>
-    <section main>
-      <p>Music organization tool for DJs</p>
-      <a href="songcreate.html">create song</a>
-      <create-song></create-song>
-    </section>
-  </core-drawer-panel>
-  <script>
-    var ss = require('../soulsifter/build/Release/soulsifter');
+<script>
+  var ss = require('../soulsifter/build/Release/soulsifter');
+</script>
 
-  </script>
+<soul-sifter></soul-sifter>
+
+<script>
+window.ondragover = function(e) { e.preventDefault(); return false };
+window.ondrop = function(e) { e.preventDefault(); return false };
+</script>
+
 </body>
 </html>

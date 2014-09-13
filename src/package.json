@@ -5,10 +5,10 @@
   "single-instance": true,
   "window": {
     "title": "Soul Sifter",
-    "width": 650,
-    "height": 650,
-    "min_width": 650,
-    "min_height": 650,
+    "width": 1024,
+    "height": 768,
+    "min_width": 512,
+    "min_height": 384,
     "position": "center",
     "toolbar": true
   },

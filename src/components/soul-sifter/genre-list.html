@@ -16,18 +16,18 @@
     <link href="genre-list.css" rel="stylesheet">
     <core-style ref="main"></core-style>
 
-    <!-- <core-ajax auto url="/ss/genres" on-core-response="{{genresResponse}}" handleAs="json"></core-ajax> -->
     <template repeat="{{g in genres}}">
       <genre-list-item genre="{{g}}" on-genre-select="{{selectAction}}"></genre-list-item>
     </template>
     <core-selection multi id="selection"></core-selection>
   </template>
 
-  <script>
+<script>
+  var ss = require('../soulsifter/build/Release/soulsifter');
     Polymer('genre-list', {
 
-      genresResponse: function(event, response) {
-        this.genres = response.response.genre;
+      created: function(event, response) {
+        this.genres = ss.Style.findAllParents();
       },
 
       selectAction: function(e, detail, sender) {
