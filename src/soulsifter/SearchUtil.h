@@ -10,21 +10,18 @@
 #define __soul_sifter__Search__
 
 #include <string>
+#include <vector>
 
 using namespace std;
 
 namespace dogatech {
 namespace soulsifter {
+class Song;
 
-namespace proto {
-  class GetGenresRequest;
-  class GetGenresResponse;
-  class FindSongsRequest;
-  class FindSongsResponse;
-}
-
-void getGenres(const proto::GetGenresRequest& request, proto::GetGenresResponse* response);
-void searchSongs(const proto::FindSongsRequest& request, proto::FindSongsResponse* response);
+class SearchUtil {
+public:
+  static vector<Song*>* searchSongs(const string& query);
+};
   
 }  // namespace soulsifter
 }  // namespace dogatech

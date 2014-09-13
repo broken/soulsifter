@@ -6,7 +6,7 @@
 //
 //
 
-#include "Search.h"
+#include "SearchUtil.h"
 
 #include <algorithm>
 #include <iostream>
@@ -20,8 +20,7 @@
 #include <boost/algorithm/string.hpp>
 
 #include "MysqlAccess.h"
-#include "soul_sifter.pb.h"
-#include "soul_sifter_service.pb.h"
+#include "Song.h"
 
 using namespace std;
 
@@ -191,7 +190,7 @@ string buildQueryPredicate(const vector<Atom>& atoms) {
   }
   return ss.str();
 }
-
+/*
 string buildOptionPredicate(const proto::FindSongsRequest& request) {
   stringstream ss;
   if (request.has_key_to_match()) {
@@ -286,56 +285,13 @@ string buildOptionPredicate(const proto::FindSongsRequest& request) {
   
   ss << " order by dateAdded desc limit " << request.limit();
   return ss.str();
-}
-
-// throws sql::SQLException
-void addSubGenres(proto::Genre* genre) {
-  sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select * from Styles s inner join StyleChildren c on s.id = c.childid where c.parentid = ?");
-  ps->setInt(1, genre->id());
-  sql::ResultSet *rs = ps->executeQuery();
-  vector<proto::Genre*> subGenres;
-  while (rs->next()) {
-    proto::Genre* subGenre = genre->add_subgenre();
-    subGenre->set_id(rs->getInt("id"));
-    subGenre->set_name(rs->getString("name"));
-    subGenres.push_back(subGenre);
-  }
-  rs->close();
-  delete rs;
-  // A prepared statement only has one buffer to hold results. If you need to reuse it, you have to finish using it before calling execute again.
-  for (proto::Genre* subGenre : subGenres) {
-    addSubGenres(subGenre);
-  }
-}
+}*/
 
 }  // anon namespace
 
-
-void getGenres(const proto::GetGenresRequest& request, proto::GetGenresResponse* response) {
-  try {
-    sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select * from Styles where id not in (select childId from StyleChildren)");
-    sql::ResultSet *rs = ps->executeQuery();
-    while (rs->next()) {
-      proto::Genre* genre = response->add_genre();
-      genre->set_id(rs->getInt("id"));
-      genre->set_name(rs->getString("name"));
-      addSubGenres(genre);
-    }
-    rs->close();
-    delete rs;
-  } catch (sql::SQLException &e) {
-    cerr << "ERROR: SQLException in " << __FILE__;
-    cerr << " (" << __func__<< ") on line " << __LINE__ << endl;
-    cerr << "ERROR: " << e.what();
-    cerr << " (MySQL error code: " << e.getErrorCode();
-    cerr << ", SQLState: " << e.getSQLState() << ")" << endl;
-    exit(1);
-  }
-}
-
-void searchSongs(const proto::FindSongsRequest& request, proto::FindSongsResponse* response) {
+vector<Song*>* SearchUtil::searchSongs(const string& query) {
   vector<string> fragments;
-  splitString(request.query(), &fragments);
+  splitString(query, &fragments);
   
   vector<Atom> atoms;
   for (string fragment : fragments) {
@@ -345,77 +301,21 @@ void searchSongs(const proto::FindSongsRequest& request, proto::FindSongsRespons
   }
   
   stringstream ss;
-  ss << "select s.id, s.artist, s.track, s.title, s.remixer, s.featuring, s.filePath, s.rating, s.dateAdded, s.bpm, s.comments, s.trashed, s.lowQuality, s.albumId, s.albumPartId, s.tonicKeys, a.id, a.artist, a.name, a.coverFilepath, a.mixed, a.label, a.catalogId, a.releaseDateYear, a.releaseDateMonth, a.releaseDateDay from Songs s inner join Albums a on s.albumid = a.id where true";
+  ss << "select s.id from Songs s inner join Albums a on s.albumid = a.id where true";
   ss << buildQueryPredicate(atoms);
-  ss << buildOptionPredicate(request);
+ // ss << buildOptionPredicate(request);
   
   cout << "Query:" << endl << ss.str() << endl;
   
+  vector<Song*>* songs = new vector<Song*>();
   try {
     sql::Statement *stmt = MysqlAccess::getInstance().getConnection()->createStatement();
     sql::ResultSet *rs = stmt->executeQuery(ss.str());
     while (rs->next()) {
-      proto::Song *song = response->add_song();
-      song->set_id(rs->getInt(1));
-      song->set_artist(rs->getString(2));
-      song->set_track(rs->getString(3));
-      song->set_title(rs->getString(4));
-      song->set_remixer(rs->getString(5));
-      song->set_featuring(rs->getString(6));
-      song->set_filepath(rs->getString(7));
-      song->set_rating(rs->getInt(8));
-      song->set_dateadded(rs->getString(9));
-      song->set_bpm(rs->getString(10));
-      song->set_comments(rs->getString(11));
-      song->set_trashed(rs->getBoolean(12));
-      song->set_lowquality(rs->getBoolean(13));
-      // song->setRESongId(rs->getInt("s.reSongId"));
-      song->set_albumid(rs->getInt(14));
-      if (!rs->isNull(15)) song->set_albumpartid(rs->getInt(15));
-      // keys
-      if (!rs->isNull(16)) {
-        string dbSet = rs->getString(16);
-        set<string> keys;
-        boost::split(keys, dbSet, boost::is_any_of(","));
-        boost::regex keyRegex("^([a-fA-F])(#)?(b)? (major)?(minor)?$");
-        for (string key : keys) {
-          // todo: support empty string
-          // std::replace(key.begin(), key.end(), '#', 's');
-          boost::smatch match;
-          if (!boost::regex_match(key, match, keyRegex)) {
-            // TODO cout << "WTF" << endl << key << " did not match regex" << endl;
-          } else {
-            stringstream ss;
-            ss << match[1];
-            if (match[2].length() > 0) ss << 's';
-            ss << match[3];
-            if (match[5].length() > 0) ss << 'm';
-            // TODO proto::Song_TonicKey tonicKey = proto::Song_TonicKey.
-          }
-        }
-      }
+      Song* song = Song::findById(rs->getInt(1));
+      songs->push_back(song);
       // album
-      proto::Album *album = song->mutable_album();
-      album->set_id(rs->getInt(17));
-      album->set_artist(rs->getString(18));
-      album->set_name(rs->getString(19));
-      album->set_coverfilepath(rs->getString(20));
-      album->set_mixed(rs->getBoolean(21));
-      album->set_label(rs->getString(22));
-      album->set_catalogid(rs->getString(23));
-      album->set_releasedateyear(rs->getInt(24));
-      album->set_releasedatemonth(rs->getInt(25));
-      album->set_releasedateday(rs->getInt(26));
       // genres
-      /*sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select styleId from SongStyles where songId = ?");
-      ps->setInt(1, song->id());
-      sql::ResultSet *rsg = ps->executeQuery();
-      while (rsg->next()) {
-        proto::Genre *genre = song->add_genre();
-        genre->set_id(rsg->getInt(1));
-      }
-      rsg->close();
-      delete rsg;*/
     }
     rs->close();
     delete rs;
@@ -428,6 +328,8 @@ void searchSongs(const proto::FindSongsRequest& request, proto::FindSongsRespons
     cerr << ", SQLState: " << e.getSQLState() << ")" << endl;
     exit(1);
   }
+
+  return songs;
 }
   
 }  // namespace soulsifter
