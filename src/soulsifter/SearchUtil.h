@@ -17,10 +17,11 @@ using namespace std;
 namespace dogatech {
 namespace soulsifter {
 class Song;
+class Style;
 
 class SearchUtil {
 public:
-  static vector<Song*>* searchSongs(const string& query);
+  static vector<Song*>* searchSongs(const string& query, int min_bpm, int max_bpm, const string& key, const vector<Style*>& styles, int limit);
 };
   
 }  // namespace soulsifter

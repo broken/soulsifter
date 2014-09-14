@@ -21,6 +21,7 @@
 
 #include "MysqlAccess.h"
 #include "Song.h"
+#include "Style.h"
 
 using namespace std;
 
@@ -58,10 +59,40 @@ struct CamelotKeys {
     camelotKeys["12B"] = "E major";
     return camelotKeys;
   }
+  static boost::unordered_map<string, int> initReverse() {
+    boost::unordered_map<string, int> camelotKeys;
+    camelotKeys["Ab minor"] = 17;
+    camelotKeys["B major"] = 5;
+    camelotKeys["Eb minor"] = 18;
+    camelotKeys["F# major"] = 6;
+    camelotKeys["Bb minor"] = 19;
+    camelotKeys["Db major"] = 7;
+    camelotKeys["F minor"] = 20;
+    camelotKeys["Ab major"] = 8;
+    camelotKeys["C minor"] = 21;
+    camelotKeys["Eb major"] = 9;
+    camelotKeys["G minor"] = 22;
+    camelotKeys["Bb major"] = 10;
+    camelotKeys["D minor"] = 23;
+    camelotKeys["F major"] = 11;
+    camelotKeys["A minor"] = 12;
+    camelotKeys["C major"] = 0;
+    camelotKeys["E minor"] = 13;
+    camelotKeys["G major"] = 1;
+    camelotKeys["B minor"] = 14;
+    camelotKeys["D major"] = 2;
+    camelotKeys["F# minor"] = 15;
+    camelotKeys["A major"] = 3;
+    camelotKeys["Db minor"] = 16;
+    camelotKeys["E major"] = 4;
+    return camelotKeys;
+  }
   static const boost::unordered_map<string, string> map;
+  static const boost::unordered_map<string, int> rmap;
 };
 
 const boost::unordered_map<string, string> CamelotKeys::map = CamelotKeys::init();
+const boost::unordered_map<string, int> CamelotKeys::rmap = CamelotKeys::initReverse();
 
 struct Atom {
   enum Type {
@@ -190,14 +221,14 @@ string buildQueryPredicate(const vector<Atom>& atoms) {
   }
   return ss.str();
 }
-/*
-string buildOptionPredicate(const proto::FindSongsRequest& request) {
+
+string buildOptionPredicate(int min_bpm, int max_bpm, const string& key, const vector<Style*>& styles, int limit) {
   stringstream ss;
-  if (request.has_key_to_match()) {
+  if (CamelotKeys::rmap.find(key) != CamelotKeys::rmap.end()) {
     // assume key lock always on for now
     ss << " and (";
     int num = 0;
-    switch (request.key_to_match()) {
+    switch (CamelotKeys::rmap.at(key)) {
       case 17: // Gsm = 1A
       case 5:  // B = 1B
         ss << "find_in_set('" << CamelotKeys::map.at("12A") << "', tonicKeys)>0 or find_in_set('" << CamelotKeys::map.at("12B") << "', tonicKeys)>0";
@@ -267,29 +298,29 @@ string buildOptionPredicate(const proto::FindSongsRequest& request) {
     }
     ss << ")";
   }
-  if (request.has_max_bpm() && request.has_min_bpm()) {
-    ss << " and (bpm between " << request.min_bpm() << " and " << request.max_bpm();
-    ss << " or bpm between " << request.min_bpm() / 2 << " and " << request.max_bpm() / 2;
-    ss << " or bpm between " << request.min_bpm() * 2 << " and " << request.max_bpm() * 2 << ")";
+  if (max_bpm > 0 && min_bpm > 0) {
+    ss << " and (bpm between " << min_bpm << " and " << max_bpm;
+    ss << " or bpm between " << min_bpm / 2 << " and " << max_bpm / 2;
+    ss << " or bpm between " << min_bpm * 2 << " and " << max_bpm * 2 << ")";
   }
-  if (request.genre_size() > 0) {
+  if (styles.size() > 0) {
     ss << " and exists (select 1 from SongStyles g where s.id = g.songId and g.styleId in (";
-    google::protobuf::RepeatedPtrField<proto::Genre> genres = request.genre();
     string separator("");
-    for (google::protobuf::RepeatedPtrField<proto::Genre>::const_iterator it = genres.begin(); it != genres.end(); ++it) {
-      ss << separator << it->id();
+    for (Style* s : styles) {
+      ss << separator << s->getId();
       separator = ",";
     }
     ss << "))";
   }
   
-  ss << " order by dateAdded desc limit " << request.limit();
+  ss << " order by dateAdded desc limit " << limit;
   return ss.str();
-}*/
+}
 
 }  // anon namespace
 
-vector<Song*>* SearchUtil::searchSongs(const string& query) {
+vector<Song*>* SearchUtil::searchSongs(const string& query, int min_bpm, int max_bpm, const string& key, const vector<Style*>& styles, int limit) {
+  cout << "q:" << query << ", min:" << min_bpm << ", max:" << max_bpm << ", key:" << key << ", styles:" << ", limit:" << limit << endl;
   vector<string> fragments;
   splitString(query, &fragments);
   
@@ -303,7 +334,7 @@ vector<Song*>* SearchUtil::searchSongs(const string& query) {
   stringstream ss;
   ss << "select s.id from Songs s inner join Albums a on s.albumid = a.id where true";
   ss << buildQueryPredicate(atoms);
- // ss << buildOptionPredicate(request);
+  ss << buildOptionPredicate(min_bpm, max_bpm, key, styles, limit);
   
   cout << "Query:" << endl << ss.str() << endl;
   
