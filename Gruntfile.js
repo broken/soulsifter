@@ -16,12 +16,6 @@ module.exports = function(grunt) {
       ]
     },
     shell: {
-      run: {
-        command: 'build/soulsifter/osx/soulsifter.app/Contents/MacOS/node-webkit',
-      },
-      ulimit: {
-        command: 'ulimit -n 10240',
-      },
       nwgypclean: {
         command: 'nw-gyp clean',
         options: {
@@ -53,12 +47,21 @@ module.exports = function(grunt) {
         command: 'cp -r src/components/soul-sifter build/soulsifter/osx/soulsifter.app/Contents/Resources/app.nw/components/',
       },
     },
+    spawn: {
+      run: {
+        command: './build/soulsifter/osx/soulsifter.app/Contents/MacOS/node-webkit',
+      },
+      ulimit: {
+        command: 'ulimit -n 10240',
+      },
+    },
   });
 
   grunt.loadNpmTasks('grunt-node-webkit-builder');
   grunt.loadNpmTasks('grunt-shell');
-  grunt.registerTask('default', ['nodewebkit', 'shell:run']);
+  grunt.loadNpmTasks("grunt-spawn");
+  grunt.registerTask('default', ['nodewebkit', 'spawn:run']);
   grunt.registerTask('nw-gyp', ['shell:nwgypclean', 'shell:nwgypconfigure', 'shell:nwgypbuild']);
   grunt.registerTask('up', ['shell:updateviews', 'shell:updatecomponents']);
-  grunt.registerTask('all', ['nw-gyp', 'nodewebkit', 'shell:run']);
+  grunt.registerTask('all', ['nw-gyp', 'nodewebkit', 'spawn:run']);
 };
