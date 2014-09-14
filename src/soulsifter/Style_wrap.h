@@ -8,9 +8,10 @@
 class Style : public node::ObjectWrap {
  public:
   static void Init(v8::Handle<v8::Object> exports);
-  static NAN_METHOD(NewInstance);
+  static v8::Local<v8::Object> NewInstance();
 
-  void setNwcpValue(dogatech::soulsifter::Style* s) { style = s; }
+  void setNwcpValue(dogatech::soulsifter::Style* v) { style = v; }
+  dogatech::soulsifter::Style* getNwcpValue() const { return style; }
 
  private:
   Style();
@@ -18,8 +19,6 @@ class Style : public node::ObjectWrap {
   ~Style();
 
   static NAN_METHOD(New);
-
-  dogatech::soulsifter::Style* getNwcpValue() const { return style; }
 
   static NAN_METHOD(clear);
   static NAN_METHOD(findById);

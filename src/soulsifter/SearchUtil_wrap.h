@@ -8,7 +8,10 @@
 class SearchUtil : public node::ObjectWrap {
  public:
   static void Init(v8::Handle<v8::Object> exports);
-  static NAN_METHOD(NewInstance);
+  static v8::Local<v8::Object> NewInstance();
+
+  void setNwcpValue(dogatech::soulsifter::SearchUtil* v) { searchutil = v; }
+  dogatech::soulsifter::SearchUtil* getNwcpValue() const { return searchutil; }
 
  private:
   SearchUtil();
@@ -16,8 +19,6 @@ class SearchUtil : public node::ObjectWrap {
   ~SearchUtil();
 
   static NAN_METHOD(New);
-
-  dogatech::soulsifter::SearchUtil* getNwcpValue() const { return searchutil; }
 
   static NAN_METHOD(searchSongs);
 

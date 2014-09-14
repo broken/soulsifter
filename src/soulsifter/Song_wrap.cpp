@@ -2,9 +2,9 @@
 #include <node.h>
 #include <nan.h>
 #include "Song.h"
+#include "Song_wrap.h"
 #include "Style.h"
 #include "Style_wrap.h"
-#include "Song_wrap.h"
 
 v8::Persistent<v8::Function> Song::constructor;
 
@@ -22,7 +22,6 @@ NAN_METHOD(Song::New) {
 }
 
 v8::Local<v8::Object> Song::NewInstance() {
-
   v8::Local<v8::Function> cons = NanNew<v8::Function>(constructor);
   v8::Local<v8::Object> instance = cons->NewInstance();
 
@@ -163,7 +162,6 @@ NAN_METHOD(Song::findAll) {
     o->song = (*v)[i];
     a->Set(NanNew<v8::Number>(i), instance);
   }
-  delete result;
   delete v;
   NanReturnValue(a);
 }
@@ -554,10 +552,9 @@ NAN_METHOD(Song::getStyles) {
 
   v8::Handle<v8::Array> a = NanNew<v8::Array>((int) result.size());
   for (int i = 0; i < (int) result.size(); i++) {
-    v8::Local<v8::Function> cons = NanNew<v8::Function>(constructor);
-    v8::Local<v8::Object> instance = cons->NewInstance();
+    v8::Local<v8::Object> instance = Style::NewInstance();
     Style* o = ObjectWrap::Unwrap<Style>(instance);
-    o->setNwcpValue(result[i]);
+    o->setNwcpValue((result)[i]);
     a->Set(NanNew<v8::Number>(i), instance);
   }
   NanReturnValue(a);
@@ -567,8 +564,14 @@ NAN_METHOD(Song::setStyles) {
   NanScope();
 
   Song* obj = ObjectWrap::Unwrap<Song>(args.This());
-  //vector<Style> a0(node::ObjectWrap::Unwrap<vector<Style>>(args[0]->ToObject())->getNwcpValue())*;
-  //obj->song->setStyles(a0);
+  v8::Local<v8::Array> array = v8::Local<v8::Array>::Cast(args[0]);
+  std::vector<dogatech::soulsifter::Style*> a0;
+  for (int i = 0; i < array->Length(); ++i) {
+    v8::Local<v8::Value> tmp = array->Get(i);
+    dogatech::soulsifter::Style* x(node::ObjectWrap::Unwrap<Style>(tmp->ToObject())->getNwcpValue());
+    a0.push_back(x);
+  }
+  obj->song->setStyles(a0);
 
   NanReturnUndefined();
 }

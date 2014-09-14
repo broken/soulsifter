@@ -19,13 +19,11 @@ NAN_METHOD(Style::New) {
   NanReturnValue(args.This());
 }
 
-NAN_METHOD(Style::NewInstance) {
-  NanScope();
-
+v8::Local<v8::Object> Style::NewInstance() {
   v8::Local<v8::Function> cons = NanNew<v8::Function>(constructor);
   v8::Local<v8::Object> instance = cons->NewInstance();
 
-  NanReturnValue(instance);
+  return instance;
 }
 
 void Style::Init(v8::Handle<v8::Object> exports) {
@@ -270,7 +268,7 @@ NAN_METHOD(Style::setChildren) {
 
   Style* obj = ObjectWrap::Unwrap<Style>(args.This());
   v8::Local<v8::Array> array = v8::Local<v8::Array>::Cast(args[0]);
-  vector<dogatech::soulsifter::Style*> a0;
+  std::vector<dogatech::soulsifter::Style*> a0;
   for (int i = 0; i < array->Length(); ++i) {
     v8::Local<v8::Value> tmp = array->Get(i);
     dogatech::soulsifter::Style* x(node::ObjectWrap::Unwrap<Style>(tmp->ToObject())->getNwcpValue());
@@ -323,7 +321,7 @@ NAN_METHOD(Style::setParents) {
 
   Style* obj = ObjectWrap::Unwrap<Style>(args.This());
   v8::Local<v8::Array> array = v8::Local<v8::Array>::Cast(args[0]);
-  vector<dogatech::soulsifter::Style*> a0;
+  std::vector<dogatech::soulsifter::Style*> a0;
   for (int i = 0; i < array->Length(); ++i) {
     v8::Local<v8::Value> tmp = array->Get(i);
     dogatech::soulsifter::Style* x(node::ObjectWrap::Unwrap<Style>(tmp->ToObject())->getNwcpValue());

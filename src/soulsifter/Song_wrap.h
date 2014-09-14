@@ -10,16 +10,15 @@ class Song : public node::ObjectWrap {
   static void Init(v8::Handle<v8::Object> exports);
   static v8::Local<v8::Object> NewInstance();
 
-  void setNwcpValue(dogatech::soulsifter::Song* s) { song = s; }
+  void setNwcpValue(dogatech::soulsifter::Song* v) { song = v; }
+  dogatech::soulsifter::Song* getNwcpValue() const { return song; }
 
-  Song();
  private:
+  Song();
   explicit Song(dogatech::soulsifter::Song* song);
   ~Song();
 
   static NAN_METHOD(New);
-
-  dogatech::soulsifter::Song* getNwcpValue() const { return song; }
 
   static NAN_METHOD(clear);
   static NAN_METHOD(findById);

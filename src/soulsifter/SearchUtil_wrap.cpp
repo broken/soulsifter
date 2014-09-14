@@ -2,8 +2,9 @@
 #include <node.h>
 #include <nan.h>
 #include "SearchUtil.h"
-#include "Song_wrap.h"
 #include "SearchUtil_wrap.h"
+#include "Song.h"
+#include "Song_wrap.h"
 
 v8::Persistent<v8::Function> SearchUtil::constructor;
 
@@ -20,13 +21,11 @@ NAN_METHOD(SearchUtil::New) {
   NanReturnValue(args.This());
 }
 
-NAN_METHOD(SearchUtil::NewInstance) {
-  NanScope();
-
+v8::Local<v8::Object> SearchUtil::NewInstance() {
   v8::Local<v8::Function> cons = NanNew<v8::Function>(constructor);
   v8::Local<v8::Object> instance = cons->NewInstance();
 
-  NanReturnValue(instance);
+  return instance;
 }
 
 void SearchUtil::Init(v8::Handle<v8::Object> exports) {
