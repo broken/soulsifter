@@ -44,22 +44,18 @@ void Style::Init(v8::Handle<v8::Object> exports) {
   NanSetPrototypeTemplate(tpl, "sync", NanNew<v8::FunctionTemplate>(sync)->GetFunction());
   NanSetPrototypeTemplate(tpl, "update", NanNew<v8::FunctionTemplate>(update)->GetFunction());
   NanSetPrototypeTemplate(tpl, "save", NanNew<v8::FunctionTemplate>(save)->GetFunction());
-  NanSetPrototypeTemplate(tpl, "getId", NanNew<v8::FunctionTemplate>(getId)->GetFunction());
-  NanSetPrototypeTemplate(tpl, "setId", NanNew<v8::FunctionTemplate>(setId)->GetFunction());
-  NanSetPrototypeTemplate(tpl, "getName", NanNew<v8::FunctionTemplate>(getName)->GetFunction());
-  NanSetPrototypeTemplate(tpl, "setName", NanNew<v8::FunctionTemplate>(setName)->GetFunction());
-  NanSetPrototypeTemplate(tpl, "getREId", NanNew<v8::FunctionTemplate>(getREId)->GetFunction());
-  NanSetPrototypeTemplate(tpl, "setREId", NanNew<v8::FunctionTemplate>(setREId)->GetFunction());
-  NanSetPrototypeTemplate(tpl, "getRELabel", NanNew<v8::FunctionTemplate>(getRELabel)->GetFunction());
-  NanSetPrototypeTemplate(tpl, "setRELabel", NanNew<v8::FunctionTemplate>(setRELabel)->GetFunction());
-  NanSetPrototypeTemplate(tpl, "getChildren", NanNew<v8::FunctionTemplate>(getChildren)->GetFunction());
-  NanSetPrototypeTemplate(tpl, "setChildren", NanNew<v8::FunctionTemplate>(setChildren)->GetFunction());
   NanSetPrototypeTemplate(tpl, "addChildById", NanNew<v8::FunctionTemplate>(addChildById)->GetFunction());
   NanSetPrototypeTemplate(tpl, "removeChildById", NanNew<v8::FunctionTemplate>(removeChildById)->GetFunction());
-  NanSetPrototypeTemplate(tpl, "getParents", NanNew<v8::FunctionTemplate>(getParents)->GetFunction());
-  NanSetPrototypeTemplate(tpl, "setParents", NanNew<v8::FunctionTemplate>(setParents)->GetFunction());
   NanSetPrototypeTemplate(tpl, "addParentById", NanNew<v8::FunctionTemplate>(addParentById)->GetFunction());
   NanSetPrototypeTemplate(tpl, "removeParentById", NanNew<v8::FunctionTemplate>(removeParentById)->GetFunction());
+
+  // Accessors
+  tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("id"), getId, setId);
+  tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("name"), getName, setName);
+  tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("rEId"), getREId, setREId);
+  tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("rELabel"), getRELabel, setRELabel);
+  tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("children"), getChildren, setChildren);
+  tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("parents"), getParents, setParents);
 
   NanAssignPersistent<v8::Function>(constructor, tpl->GetFunction());
   exports->Set(NanNew<v8::String>("Style"), tpl->GetFunction());
@@ -170,7 +166,7 @@ NAN_METHOD(Style::findAllParents) {
   NanReturnValue(a);
 }
 
-NAN_METHOD(Style::getId) {
+NAN_GETTER(Style::getId) {
   NanScope();
 
   Style* obj = ObjectWrap::Unwrap<Style>(args.This());
@@ -179,17 +175,17 @@ NAN_METHOD(Style::getId) {
   NanReturnValue(NanNew<v8::Number>(result));
 }
 
-NAN_METHOD(Style::setId) {
+NAN_SETTER(Style::setId) {
   NanScope();
 
   Style* obj = ObjectWrap::Unwrap<Style>(args.This());
-  int a0(args[0]->Uint32Value());
+  int a0(value->Uint32Value());
   obj->style->setId(a0);
 
   NanReturnUndefined();
 }
 
-NAN_METHOD(Style::getName) {
+NAN_GETTER(Style::getName) {
   NanScope();
 
   Style* obj = ObjectWrap::Unwrap<Style>(args.This());
@@ -198,17 +194,17 @@ NAN_METHOD(Style::getName) {
   NanReturnValue(NanNew<v8::String>(result.c_str(), result.length()));
 }
 
-NAN_METHOD(Style::setName) {
+NAN_SETTER(Style::setName) {
   NanScope();
 
   Style* obj = ObjectWrap::Unwrap<Style>(args.This());
-  string a0(*v8::String::Utf8Value(args[0]->ToString()));
+  string a0(*v8::String::Utf8Value(value->ToString()));
   obj->style->setName(a0);
 
   NanReturnUndefined();
 }
 
-NAN_METHOD(Style::getREId) {
+NAN_GETTER(Style::getREId) {
   NanScope();
 
   Style* obj = ObjectWrap::Unwrap<Style>(args.This());
@@ -217,17 +213,17 @@ NAN_METHOD(Style::getREId) {
   NanReturnValue(NanNew<v8::Number>(result));
 }
 
-NAN_METHOD(Style::setREId) {
+NAN_SETTER(Style::setREId) {
   NanScope();
 
   Style* obj = ObjectWrap::Unwrap<Style>(args.This());
-  int a0(args[0]->Uint32Value());
+  int a0(value->Uint32Value());
   obj->style->setREId(a0);
 
   NanReturnUndefined();
 }
 
-NAN_METHOD(Style::getRELabel) {
+NAN_GETTER(Style::getRELabel) {
   NanScope();
 
   Style* obj = ObjectWrap::Unwrap<Style>(args.This());
@@ -236,17 +232,17 @@ NAN_METHOD(Style::getRELabel) {
   NanReturnValue(NanNew<v8::String>(result.c_str(), result.length()));
 }
 
-NAN_METHOD(Style::setRELabel) {
+NAN_SETTER(Style::setRELabel) {
   NanScope();
 
   Style* obj = ObjectWrap::Unwrap<Style>(args.This());
-  string a0(*v8::String::Utf8Value(args[0]->ToString()));
+  string a0(*v8::String::Utf8Value(value->ToString()));
   obj->style->setRELabel(a0);
 
   NanReturnUndefined();
 }
 
-NAN_METHOD(Style::getChildren) {
+NAN_GETTER(Style::getChildren) {
   NanScope();
 
   Style* obj = ObjectWrap::Unwrap<Style>(args.This());
@@ -263,11 +259,11 @@ NAN_METHOD(Style::getChildren) {
   NanReturnValue(a);
 }
 
-NAN_METHOD(Style::setChildren) {
+NAN_SETTER(Style::setChildren) {
   NanScope();
 
   Style* obj = ObjectWrap::Unwrap<Style>(args.This());
-  v8::Local<v8::Array> array = v8::Local<v8::Array>::Cast(args[0]);
+  v8::Local<v8::Array> array = v8::Local<v8::Array>::Cast(value);
   std::vector<dogatech::soulsifter::Style*> a0;
   for (int i = 0; i < array->Length(); ++i) {
     v8::Local<v8::Value> tmp = array->Get(i);
@@ -299,7 +295,7 @@ NAN_METHOD(Style::removeChildById) {
   NanReturnUndefined();
 }
 
-NAN_METHOD(Style::getParents) {
+NAN_GETTER(Style::getParents) {
   NanScope();
 
   Style* obj = ObjectWrap::Unwrap<Style>(args.This());
@@ -316,11 +312,11 @@ NAN_METHOD(Style::getParents) {
   NanReturnValue(a);
 }
 
-NAN_METHOD(Style::setParents) {
+NAN_SETTER(Style::setParents) {
   NanScope();
 
   Style* obj = ObjectWrap::Unwrap<Style>(args.This());
-  v8::Local<v8::Array> array = v8::Local<v8::Array>::Cast(args[0]);
+  v8::Local<v8::Array> array = v8::Local<v8::Array>::Cast(value);
   std::vector<dogatech::soulsifter::Style*> a0;
   for (int i = 0; i < array->Length(); ++i) {
     v8::Local<v8::Value> tmp = array->Get(i);

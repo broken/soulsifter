@@ -42,6 +42,8 @@ void SearchUtil::Init(v8::Handle<v8::Object> exports) {
 
   // Prototype
 
+  // Accessors
+
   NanAssignPersistent<v8::Function>(constructor, tpl->GetFunction());
   exports->Set(NanNew<v8::String>("SearchUtil"), tpl->GetFunction());
 }

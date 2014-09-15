@@ -49,16 +49,6 @@
         });
       },
 
-      songChanged: function(oldValue, newValue) {
-        this.song.artist = this.song.getArtist();
-        this.song.title = this.song.getTitle();
-        this.song.rating = this.song.getRating();
-        this.song.bpm = this.song.getBpm();
-        //this.song.tonicKey = this.song.getTonicKeys();
-        this.song.dateAdded = this.song.getDateAddedString();
-        this.song.filePath = this.song.getFilepath();
-      },
-
       globalMusicDirChanged: function(oldValue, newValue) {
         //var filename = this.song.filePath.substr(this.song.filePath.lastIndexOf('/') + 1);
         //var fp = newValue + this.song.filePath.substr(this.song.filePath.search('mp3') + 3);

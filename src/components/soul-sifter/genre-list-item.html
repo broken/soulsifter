@@ -59,8 +59,7 @@
       z: 0,
 
       ready: function() {
-        this.genre.name = this.genre.getName();
-        var children = this.genre.getChildren();
+        var children = this.genre.children;
         if (children.length > 0) {
           this.genre.subGenre = children;
         }
