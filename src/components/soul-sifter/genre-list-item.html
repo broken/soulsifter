@@ -18,8 +18,8 @@
     <core-style ref="main"></core-style>
 
     <div horizontal layout center id="item" style="padding-left: {{indent}}px;" on-tap="{{selectTapAction}}">
-      <!-- <paper-shadow animated z="{{z}}"></paper-shadow> -->
-      <!-- <paper-ripple fit></paper-ripple> -->
+      <paper-shadow animated z="{{z}}"></paper-shadow>
+      <paper-ripple fit></paper-ripple>
       <paper-icon-button icon="{{icon}}" on-tap="{{expandTapAction}}"></paper-icon-button>
       <div flex>{{genre.name}}</div>
     </div>

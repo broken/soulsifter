@@ -15,4 +15,5 @@ core-collapse {
 #item {
   margin: 7px 20px 7px 20px;
   height: 30px;
+  position: relative;
 }
