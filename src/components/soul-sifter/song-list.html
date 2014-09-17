@@ -57,7 +57,9 @@
       },
 
       selectedRowChanged: function(e, detail, sender) {
-        this.global.song = this.songs[detail];
+        var s = this.songs[detail];
+        s.album = ss.Album.findById(s.albumId);
+        this.global.song = s;
       },
 
       queryChanged: function(e, detail, sender) {

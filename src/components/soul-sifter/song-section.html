@@ -17,7 +17,6 @@
     <core-style ref="main"></core-style>
 
     <global-state values="{{global}}"></global-state>
-    <!-- <core-ajax auto url="/ss/songs/img" on-core-response="{{imgResponse}}" handleAs="json" params="{{ajaxParams}}"></core-ajax> -->
     <core-scroll-header-panel fixed headerHeight="256" id="scroll_header_panel">
       <div class="core-header" id="header"></div>
       <div vertical layout fit class="content">
@@ -43,12 +42,7 @@
 
       globalSongChanged: function(oldSong, song) {
         this.song = song;
-        if (song.album)
-          this.ajaxParams = JSON.stringify({fp: song.album.coverFilepath});
-      },
-
-      imgResponse: function(event, response) {
-        this.$.scroll_header_panel.shadowRoot.querySelector('#headerBg').style.backgroundImage = 'url("' + response.response + '")';
+        this.$.scroll_header_panel.shadowRoot.querySelector('#headerBg').style.backgroundImage = 'url("' + song.album.coverFilepath + '")';
       },
 
     });

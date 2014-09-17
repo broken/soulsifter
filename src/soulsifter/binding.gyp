@@ -7,6 +7,7 @@
           "soulsifter.cc",
           # model
           "Album.cpp",
+          "Album_wrap.cpp",
           "AlbumHelper.cpp",
           "AlbumPart.cpp",
           "BasicGenre.cpp",
