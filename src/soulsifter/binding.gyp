@@ -11,7 +11,7 @@
           "AlbumHelper.cpp",
           "AlbumPart.cpp",
           "BasicGenre.cpp",
-          "BasicGenre_wrap.cpp",
+          #"BasicGenre_wrap.cpp",
           "BasicGenreHelper.cpp",
           "Mix.cpp",
           "MixHelper.cpp",

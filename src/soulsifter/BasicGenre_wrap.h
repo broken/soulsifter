@@ -1,29 +1,40 @@
-#ifndef BASICGENRE_WRAP_H
-#define BASICGENRE_WRAP_H
+#ifndef BasicGenre_wrap_h
+#define BasicGenre_wrap_h
 
 #include <node.h>
+#include <nan.h>
 #include "BasicGenre.h"
-/*
+
 class BasicGenre : public node::ObjectWrap {
  public:
   static void Init(v8::Handle<v8::Object> exports);
-  static v8::Handle<v8::Value> NewInstance(const v8::Arguments& args);
+  static v8::Local<v8::Object> NewInstance();
+
+  void setNwcpValue(dogatech::soulsifter::BasicGenre* v) { basicgenre = v; }
+  dogatech::soulsifter::BasicGenre* getNwcpValue() const { return basicgenre; }
 
  private:
   BasicGenre();
-  explicit BasicGenre(dogatech::soulsifter::BasicGenre* basicGenre);
+  explicit BasicGenre(dogatech::soulsifter::BasicGenre* basicgenre);
   ~BasicGenre();
 
-  static v8::Handle<v8::Value> New(const v8::Arguments& args);
-  static v8::Handle<v8::Value> create(const v8::Arguments& args);
+  static NAN_METHOD(New);
 
-  static v8::Handle<v8::Value> getId(const v8::Arguments& args);
-  static v8::Handle<v8::Value> setId(const v8::Arguments& args);
-  static v8::Handle<v8::Value> getName(const v8::Arguments& args);
-  static v8::Handle<v8::Value> setName(const v8::Arguments& args);
+  static NAN_METHOD(clear);
+  static NAN_METHOD(findById);
+  static NAN_METHOD(findByName);
+  static NAN_METHOD(findAll);
+  static NAN_METHOD(sync);
+  static NAN_METHOD(update);
+  static NAN_METHOD(save);
+  static NAN_METHOD(findByFilepath);
+  static NAN_GETTER(getId);
+  static NAN_SETTER(setId);
+  static NAN_GETTER(getName);
+  static NAN_SETTER(setName);
 
   static v8::Persistent<v8::Function> constructor;
-  dogatech::soulsifter::BasicGenre* basicGenre;
-};*/
+  dogatech::soulsifter::BasicGenre* basicgenre;
+};
 
 #endif
