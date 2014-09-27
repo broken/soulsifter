@@ -17,7 +17,7 @@
 
     <global-state values="{{global}}"></global-state>
     <core-signals on-core-signal-bpm-changed="{{bpmChanged}}"></core-signals>
-    <div horizontal layout center class="song-item" draggable="true" ondragstart="dragSong(event)" data-downloadurl="{{filepath}}" id="draggableItem">
+    <div horizontal layout center class="song-item" draggable="true" on-dragstart="{{dragSong}}" id="draggableItem">
       <div class="artist">{{song.artist}}</div>
       <div> - </div>
       <div class="title">{{song.title}}</div>
@@ -44,25 +44,22 @@
         this.globalMusicDirChanged('', this.global.musicDir);
       },
 
-      domReady: function() {
-        this.$.draggableItem.addEventListener('dragstart', function(e) {
-        });
-      },
-
       globalMusicDirChanged: function(oldValue, newValue) {
+        window.console.log('------globalMusicDirChanged-------');
         //var filename = this.song.filePath.substr(this.song.filePath.lastIndexOf('/') + 1);
         //var fp = newValue + this.song.filePath.substr(this.song.filePath.search('mp3') + 3);
         //this.filepath = 'application/octet-stream:' + filename + ':file://' + fp;
       },
 
       bpmChanged: function(e, detail, sender) {
+        window.console.log('------bpmChanged-------');
         this.bpmDiff = ((this.song.bpm / detail.bpm - 1) * 100).toFixed(2);
       },
-    });
 
-    function dragSong(e) {
-      e.dataTransfer.effectAllowed = 'move';
-      e.dataTransfer.setData('text', e.target.dataset.downloadurl);
-    }
+      dragSong: function(e) {
+        e.dataTransfer.effectAllowed = 'move';
+        e.dataTransfer.setData('text/plain', 'extensis-filenames-type:' + this.song.filepath);
+      },
+    });
   </script>
 </polymer-element>
