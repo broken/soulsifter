@@ -28,8 +28,8 @@
     <core-toolbar class="{{ {tall: isTall} | tokenList }}">
       <content></content>
       <core-field class="indent">
-        <core-icon icon="search"></core-icon>
-        <core-input id="search_input" placeholder="search" flex on-change="{{searchAction}}"></core-input>
+        <core-icon-button icon="search" on-click="{{searchAction}}"></core-icon-button>
+        <core-input id="search_input" placeholder="search" flex value="{{query}}"></core-input>
       </core-field>
       <div flex></div>
       <core-icon-button icon="add-circle" on-click="{{toggleCreateSongDialog}}" id="createSongButton"></core-icon-button>
@@ -88,7 +88,7 @@
       },
 
       searchAction: function(e, detail, sender) {
-        this.query = this.$.search_input.value;
+        this.asyncFire('core-signal', {name: 'search'});
       },
 
       musicDirChanged: function(oldValue, newValue) {

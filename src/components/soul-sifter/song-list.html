@@ -17,7 +17,9 @@
     <link href="song-list.css" rel="stylesheet">
     <core-style ref="main"></core-style>
 
-    <core-signals on-core-signal-bpm-changed="{{bpmChanged}}" on-core-signal-genres-changed="{{genresChanged}}"></core-signals>
+    <core-signals on-core-signal-bpm-changed="{{bpmChanged}}"
+               on-core-signal-genres-changed="{{genresChanged}}"
+                       on-core-signal-search="{{searchAction}}"></core-signals>
     <global-state values="{{global}}"></global-state>
     <!-- <core-tooltip label="loading..." position="right" id="core_tooltip" noarrow show></core-tooltip> -->
     <core-selector selected="{{selectedRow}}">
@@ -63,6 +65,10 @@
       },
 
       queryChanged: function(e, detail, sender) {
+        this.searchAction(e, detail, sender);
+      },
+
+      searchAction: function(e, detail, sender) {
         //this.$.core_tooltip.show = true;
         var genreIds = this.genres.map(function(g) { return g.id; });
         var p = {q: this.query, genres: genreIds.join(','), min: 0, max: 0};
