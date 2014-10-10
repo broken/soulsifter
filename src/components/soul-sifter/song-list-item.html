@@ -45,14 +45,12 @@
       },
 
       globalMusicDirChanged: function(oldValue, newValue) {
-        window.console.log('------globalMusicDirChanged-------');
         //var filename = this.song.filePath.substr(this.song.filePath.lastIndexOf('/') + 1);
         //var fp = newValue + this.song.filePath.substr(this.song.filePath.search('mp3') + 3);
         //this.filepath = 'application/octet-stream:' + filename + ':file://' + fp;
       },
 
       globalBpmChanged: function(oldValue, newValue) {
-        window.console.log('------bpmChanged-------');
         this.bpmDiff = ((this.global.bpm / this.song.bpm - 1) * 100).toFixed(2);
       },
 
