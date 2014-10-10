@@ -1,6 +1,5 @@
 <link href="../polymer/polymer.html" rel="import">
 
-<link href="../core-signals/core-signals.html" rel="import">
 <link href="../core-style/core-style.html" rel="import">
 <link href="../font-roboto/roboto.html" rel="import">
 <link href="../polymer-ui-ratings/polymer-ui-ratings.html" rel="import">
@@ -16,7 +15,7 @@
     <core-style ref="main"></core-style>
 
     <global-state values="{{global}}"></global-state>
-    <core-signals on-core-signal-bpm-changed="{{bpmChanged}}"></core-signals>
+
     <div horizontal layout center class="song-item" draggable="true" on-dragstart="{{dragSong}}" id="draggableItem">
       <div class="artist">{{song.artist}}</div>
       <div> - </div>
@@ -37,6 +36,7 @@
       bpmDiff: '',
 
       observe: {
+        'global.bpm': 'globalBpmChanged',
         'gobal.musicDir': 'globalMusicDirChanged'
       },
 
@@ -51,9 +51,9 @@
         //this.filepath = 'application/octet-stream:' + filename + ':file://' + fp;
       },
 
-      bpmChanged: function(e, detail, sender) {
+      globalBpmChanged: function(oldValue, newValue) {
         window.console.log('------bpmChanged-------');
-        this.bpmDiff = ((this.song.bpm / detail.bpm - 1) * 100).toFixed(2);
+        this.bpmDiff = ((this.song.bpm / this.global.bpm - 1) * 100).toFixed(2);
       },
 
       dragSong: function(e) {

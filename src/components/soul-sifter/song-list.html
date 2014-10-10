@@ -17,10 +17,10 @@
     <link href="song-list.css" rel="stylesheet">
     <core-style ref="main"></core-style>
 
-    <core-signals on-core-signal-bpm-changed="{{bpmChanged}}"
-               on-core-signal-genres-changed="{{genresChanged}}"
-                       on-core-signal-search="{{searchAction}}"></core-signals>
     <global-state values="{{global}}"></global-state>
+    <core-signals on-core-signal-genres-changed="{{genresChanged}}"
+                          on-core-signal-search="{{searchAction}}"></core-signals>
+
     <!-- <core-tooltip label="loading..." position="right" id="core_tooltip" noarrow show></core-tooltip> -->
     <core-selector selected="{{selectedRow}}">
       <template repeat="{{s in songs}}">
@@ -32,6 +32,10 @@
 
   <script>
     Polymer('song-list', {
+
+      observe: {
+        'global.bpm': 'globalBpmChanged'
+      },
 
       created: function() {
         // init & hint lists & objects
@@ -49,13 +53,16 @@
         }*/
       },
 
-      bpmChanged: function(e, detail, sender) {
-        this.minBpm = detail.minBpm;
-        this.maxBpm = detail.maxBpm;
+      globalBpmChanged: function(oldValue, newValue) {
+        var pitchPctMax = 8;
+        this.minBpm = this.global.bpm * (100 - pitchPctMax) / 100;
+        this.maxBpm = this.global.bpm * (100 + pitchPctMax) / 100;
+        this.searchAction();
       },
 
       genresChanged: function(e, detail, sender) {
         this.genres = detail;
+        this.searchAction();
       },
 
       selectedRowChanged: function(e, detail, sender) {

@@ -1,11 +1,11 @@
 <link href="../polymer/polymer.html" rel="import">
 
 <link href="../core-field/core-field.html" rel="import">
-<link href="../core-icon/core-icon.html" rel="import">
 <link href="../core-icon-button/core-icon-button.html" rel="import">
 <link href="../core-icons/core-icons.html" rel="import">
 <link href="../core-input/core-input.html" rel="import">
 <link href="../core-localstorage/core-localstorage.html" rel="import">
+<link href="../core-signals/core-signals.html" rel="import">
 <link href="../core-style/core-style.html" rel="import">
 <link href="../core-toolbar/core-toolbar.html" rel="import">
 <link href="../font-roboto/roboto.html" rel="import">
@@ -25,7 +25,8 @@
 
     <global-state values="{{global}}"></global-state>
     <core-localstorage name="soul-sifter-music-directory" value="{{musicDir}}"></core-localstorage>
-    <core-toolbar class="{{ {tall: isTall} | tokenList }}">
+
+    <core-toolbar class="{{ {'medium-tall': isTall} | tokenList }}">
       <content></content>
       <core-field class="indent">
         <core-icon-button icon="search" on-click="{{searchAction}}"></core-icon-button>
@@ -36,8 +37,9 @@
       <core-icon-button icon="settings" on-click="{{toggleSettingsDialog}}"></core-icon-button>
       <core-icon-button icon="filter" on-click="{{toggleIsTall}}"></core-icon-button>
       <div class="bottom {{ {hide: !isTall} | tokenList }}">
-        <div flex class="bottom"></div>
-        <pitch-slider class="bottom"></pitch-slider>
+        <div flex></div>
+        <pitch-slider></pitch-slider>
+        <paper-input label="bpm" floatingLabel type="string" value="{{global.bpm}}"></paper-input>
       </div>
     </core-toolbar>
     <paper-dialog backdrop layered heading="Settings" id="settingsDialog">
