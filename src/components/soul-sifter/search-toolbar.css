@@ -17,6 +17,10 @@ core-toolbar::shadow .toolbar-tools {
   display: none;
 }
 
+#bpm {
+  width: 64px;
+}
+
 #search_input::shadow input::-webkit-input-placeholder {
   color: #eee;
 }

@@ -36,11 +36,11 @@
       <core-icon-button icon="add-circle" on-click="{{toggleCreateSongDialog}}" id="createSongButton"></core-icon-button>
       <core-icon-button icon="settings" on-click="{{toggleSettingsDialog}}"></core-icon-button>
       <core-icon-button icon="filter" on-click="{{toggleIsTall}}"></core-icon-button>
-      <div class="bottom {{ {hide: !isTall} | tokenList }}">
-        <div flex></div>
-        <pitch-slider></pitch-slider>
-        <paper-input label="bpm" floatingLabel type="string" value="{{global.bpm}}"></paper-input>
-      </div>
+      <!-- middle row -->
+      <pitch-slider class="middle indent {{ {hide: !isTall} | tokenList }}"></pitch-slider>
+      <!-- bottom row -->
+      <div flex class="bottom {{ {hide: !isTall} | tokenList }}"></div>
+      <paper-input class="bottom {{ {hide: !isTall} | tokenList }}" label="bpm" floatingLabel type="number" value="{{global.bpm}}" id="bpm"></paper-input>
     </core-toolbar>
     <paper-dialog backdrop layered heading="Settings" id="settingsDialog">
       <paper-input floatingLabel label="Music directory" value="{{musicDir}}"></paper-input>

@@ -53,7 +53,7 @@
 
       globalBpmChanged: function(oldValue, newValue) {
         window.console.log('------bpmChanged-------');
-        this.bpmDiff = ((this.song.bpm / this.global.bpm - 1) * 100).toFixed(2);
+        this.bpmDiff = ((this.global.bpm / this.song.bpm - 1) * 100).toFixed(2);
       },
 
       dragSong: function(e) {

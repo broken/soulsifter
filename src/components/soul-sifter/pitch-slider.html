@@ -7,22 +7,20 @@
 <link href="themes.html" rel="import">
 
 
-<polymer-element name="pitch-slider" attributes="maxBpm minBpm pitch pitchPctMax">
+<polymer-element name="pitch-slider" attributes="pitch pitchPctMax">
 
   <template>
     <core-style ref="main"></core-style>
 
     <global-state values="{{global}}"></global-state>
 
-    <paper-slider editable pin min="{{-pitchPctMax}}" max="{{pitchPctMax}}" value="{{pitch}}"></paper-slider>
+    <paper-slider editable pin value="{{pitch}}" step="0.1" min="{{-pitchPctMax}}" max="{{pitchPctMax}}"></paper-slider>
   </template>
 
   <script>
     Polymer('pitch-slider', {
 
       // hints
-      minBpm: 0,
-      maxBpm: 0,
       pitch: 0,
       pitchPctMax: 8,
 
@@ -45,9 +43,14 @@
       },
 
       globalBpmChanged: function(oldBpm, bpm) {
-        this.minBpm = this.global.bpm * (100 - this.pitchPctMax) / 100;
-        this.maxBpm = this.global.bpm * (100 + this.pitchPctMax) / 100;
-      }
+        if (this.global.song && this.global.song.bpm)
+          this.pitch = (this.global.bpm - this.global.song.bpm) / this.global.song.bpm * 100;
+      },
+
+      pitchChanged: function(oldValue, newValue) {
+        if (this.global.song && this.global.song.bpm)
+          this.global.bpm = this.global.song.bpm * (this.pitch/100) + this.global.song.bpm * 1;
+      },
     });
   </script>
 </polymer-element>
