@@ -60,7 +60,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-node-webkit-builder');
   grunt.loadNpmTasks('grunt-shell');
   grunt.loadNpmTasks("grunt-spawn");
-  grunt.registerTask('default', ['nodewebkit', 'spawn:run']);
+  grunt.registerTask('default', ['nodewebkit']);
   grunt.registerTask('nw-gyp', ['shell:nwgypclean', 'shell:nwgypconfigure', 'shell:nwgypbuild']);
   grunt.registerTask('up', ['shell:updateviews', 'shell:updatecomponents']);
   grunt.registerTask('all', ['nw-gyp', 'nodewebkit', 'spawn:run']);
