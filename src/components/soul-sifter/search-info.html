@@ -9,43 +9,69 @@
     <link href="search-info.css" rel="stylesheet">
     <core-style ref="main"></core-style>
 
-    <div flex>
-      <span class="heading">Search atoms</span>
-      <hr>
-    </div>
-    <div horizontal layout class="text">
-      <div flex class="right">
-        <span class="emphasis">a</span> or <span class="emphasis">artist</span> <br>
-        <span class="emphasis">t</span> or <span class="emphasis">title</span> <br>
-        <span class="emphasis">r</span> or <span class="emphasis">remixer</span> <br>
-        <span class="emphasis">rating</span> <br>
-        <span class="emphasis">comment</span> <br>
-        <span class="emphasis">trashed</span> <br>
-      </div>
-      <div flex>
-        : Song artist<br>
-        : Song title<br>
-        : Song remixer<br>
-        : Song rating<br>
-        : Song comment<br>
-        : Has song been deleted<br>
-      </div>
-      <div flex class="right">
-        <span class="emphasis">lowq</span> <br>
-        <span class="emphasis">aid</span> <br>
-        <span class="emphasis">n</span> or <span class="emphasis">album</span> <br>
-        <span class="emphasis">m</span> or <span class="emphasis">mixed</span> <br>
-        <span class="emphasis">l</span> or <span class="emphasis">label</span> <br>
-        <span class="emphasis">y</span> or <span class="emphasis">year</span> <br>
-      </div>
-      <div flex>
-        : Is song low quality<br>
-        : Internal album ID<br>
-        : Album name<br>
-        : Is album mixed<br>
-        : Label released on<br>
-        : Year released<br>
+    <div vertical layout class="text">
       <div>
+        <span class="heading">Search atoms</span>
+        <hr>
+      </div>
+      <div horizontal layout>
+        <div flex class="right">
+          <span class="emphasis">id</span> : <br>
+          <span class="emphasis">a</span> or <span class="emphasis">artist</span> : <br>
+          <span class="emphasis">t</span> or <span class="emphasis">title</span> : <br>
+          <span class="emphasis">r</span> or <span class="emphasis">remixer</span> : <br>
+          <span class="emphasis">rating</span> : <br>
+          <span class="emphasis">comment</span> : <br>
+        </div>
+        <div flex>
+          Internal song ID<br>
+          Song artist<br>
+          Song title<br>
+          Song remixer<br>
+          Minimum song rating<br>
+          Song comment<br>
+        </div>
+        <div flex class="right">
+          <span class="emphasis">aid</span> : <br>
+          <span class="emphasis">n</span> or <span class="emphasis">album</span> : <br>
+          <span class="emphasis">m</span> or <span class="emphasis">mixed</span> : <br>
+          <span class="emphasis">l</span> or <span class="emphasis">label</span> : <br>
+          <span class="emphasis">y</span> or <span class="emphasis">year</span> : <br>
+          <span class="emphasis">trashed</span> : <br>
+          <span class="emphasis">lowq</span> : <br>
+        </div>
+        <div flex>
+          Internal album ID<br>
+          Album name<br>
+          Is album mixed<br>
+          Label released on<br>
+          Year released<br>
+          Has song been deleted<br>
+          Is song low quality<br>
+        </div>
+      </div>
+      <div>
+        <span class="heading">Special characters</span>
+        <hr>
+      </div>
+      <div horizontal layout>
+        <div flex class="right">
+          <span class="emphasis">-</span> : <br>
+          <span class="emphasis">"</span> : <br>
+        </div>
+        <div flex>
+          Negates a query atom<br>
+          Used to group terms<br>
+        </div>
+        <div flex class="right">
+          <span class="emphasis">0</span> or <span class="emphasis">1</span> : <br>
+          <span class="emphasis">\</span> : <br>
+        </div>
+        <div flex>
+          Boolean values<br>
+          Escape character<br>
+        </div>
+      </div>
     </div>
   </template>
   <script>

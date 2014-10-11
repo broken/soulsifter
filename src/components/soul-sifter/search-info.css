@@ -2,6 +2,10 @@ div {
   white-space: nowrap;
 }
 
+div.text {
+  width: 575px;
+}
+
 .right {
   text-align: right;
 }
