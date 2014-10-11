@@ -32,6 +32,9 @@
     // pitch slider
     ps_clr: sl_blue,
     ps_bg: '#999',
+    // search info
+    si_heading: '#CCC',
+    si_emphasis: sl_green,
   }
   CoreStyle.g.light = {
     bg: '#EEE',
@@ -110,5 +113,16 @@
   <!-- song section -->
   .title {
     color: {{g.theme.clr_bold}};
+  }
+
+  <!-- search info -->
+  .heading {
+    color: {{g.theme.si_heading}};
+  }
+  .emphasis {
+    color: {{g.theme.si_emphasis}};
+  }
+  .text {
+    color: {{g.theme.clr}};
   }
 </core-style>

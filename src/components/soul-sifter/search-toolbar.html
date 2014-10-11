@@ -14,6 +14,7 @@
 <!-- <link href="create-song.html" rel="import"> -->
 <link href="global-state.html" rel="import">
 <link href="pitch-slider.html" rel="import">
+<link href="search-info.html" rel="import">
 <link href="themes.html" rel="import">
 
 
@@ -31,6 +32,7 @@
       <core-field class="indent">
         <core-icon-button icon="search" on-click="{{searchAction}}"></core-icon-button>
         <core-input id="search_input" placeholder="search" flex value="{{query}}"></core-input>
+        <core-icon-button icon="info-outline" on-click="{{toggleSearchInfoDialog}}"></core-icon-button>
       </core-field>
       <div flex></div>
       <core-icon-button icon="add-circle" on-click="{{toggleCreateSongDialog}}" id="createSongButton"></core-icon-button>
@@ -42,6 +44,9 @@
       <div flex class="bottom {{ {hide: !isTall} | tokenList }}"></div>
       <paper-input class="bottom {{ {hide: !isTall} | tokenList }}" label="bpm" floatingLabel value="{{global.bpm}}" id="bpm"></paper-input>
     </core-toolbar>
+    <paper-dialog backdrop layered id="searchInfoDialog">
+      <search-info></search-info>
+    </paper-dialog>
     <paper-dialog backdrop layered heading="Settings" id="settingsDialog">
       <paper-input floatingLabel label="Music directory" value="{{musicDir}}"></paper-input>
     </paper-dialog>
@@ -79,6 +84,10 @@
 
       toggleIsTall: function(e, detail, sender  ) {
         this.isTall = !this.isTall;
+      },
+
+      toggleSearchInfoDialog: function(e, detail, sender) {
+        this.$.searchInfoDialog.toggle();
       },
 
       toggleSettingsDialog: function(e, detail, sender) {
