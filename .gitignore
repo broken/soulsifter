@@ -6,11 +6,12 @@
 *.sublime-workspace
 
 # Modules
-components
-node_modules
-resources
-tmp
+/components
+/node_modules
+/resources
+/tmp
+/src/soulsifter/build
 
 # grunt-node-webkit-builder
-build
-cache
+/build
+/cache
