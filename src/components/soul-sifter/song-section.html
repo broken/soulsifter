@@ -22,7 +22,10 @@
       <div vertical layout fit class="content">
         <div class="title">{{song.title}}</div>
         <div class="artist">{{song.artist}}</div>
-        <polymer-ui-ratings value="{{song.rating}}"></polymer-ui-ratings>
+        <!-- this is a crappy theming method that is deprecated, but required for the ratings atm -->
+        <div theme="polymer-ui-dark-theme">
+          <polymer-ui-ratings value="{{song.rating}}"></polymer-ui-ratings>
+        </div>
         <div class="track" self-end>{{song.album.track}}</div>
         <div class="track" self-end>{{song.album.name}}</div>
         <div class="released" self-end>{{song.album.releaseDateYear}}-{{song.album.releaseDateMonth}}-{{song.album.releaseDateDay}}</div>

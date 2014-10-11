@@ -4,39 +4,111 @@
 
 
 <script>
-  CoreStyle.g.dark = {
-    bg: '#444',
-    fg: '#aaa',
+  var inherit = 'inherit';
+  var black = 'black';
+  var osx_grey = '#B1B1B1';
+
+  var sl_blue = '#1EC8FA';
+  var sl_brown = '#6E330A';
+  var sl_green = '#39FF7E';
+  var sl_grey = '#292929';
+  var sl_orange = '#FDC443';
+  var sl_purple = '#AC1AFA';
+  CoreStyle.g.scratchlive = {
+    // main
+    bg: sl_grey,
+    clr: '#999999',
+    clr_bold: '#CCCCCC',
+    // drawer tabs
+    dt_bg: '#1F1F1F',
+    dt_clr: inherit,
+    dt_bar: sl_orange,
+    dt_ink: sl_orange,
+    // genre list
+    gl_ink: sl_orange,
+    gl_select: sl_brown,
+    // search toolbar
+    st_bg: black,
+    // pitch slider
+    ps_clr: sl_blue,
+    ps_bg: '#999',
   }
   CoreStyle.g.light = {
-    bg: '#fff',
-    fg: '#000',
+    bg: '#EEE',
+    clr: '#777',
+    clr_bold: '#000',
+    // drawer tabs
+    dt_bg: 'rgb(0, 188, 212)',
+    dt_clr: '#FFF',
+    // search toolbar
+    st_bg: '#E56FF2',
+    // song list
   }
-  CoreStyle.g.theme = CoreStyle.g.dark;
+  CoreStyle.g.theme = CoreStyle.g.scratchlive;
 </script>
 
-<core-style id="main-test">
-  genre-list-item {
-    background-color: {{g.theme.bg}};
-    color: {{g.theme.fg}};
-  }
-
-  genre-list {
-    background-color: {{g.theme.bg}};
-    color: {{g.theme.fg}};
-  }
-
-  .song-item {
+<core-style id="main">
+  <!-- main -->
+  core-drawer-panel {
+    color: {{g.theme.clr}};
     background-color: {{g.theme.bg}};
   }
 
-  song-list {
-    background-color: {{g.theme.bg}};
-    color: {{g.theme.fg}};
+  <!-- drawer tabs -->
+  paper-tabs {
+    background-color: {{g.theme.dt_bg}};
+    color: {{g.theme.dt_clr}};
+  }
+  paper-tabs::shadow #selectionBar {
+    background-color: {{g.theme.dt_bar}};
+  }
+  paper-tab::shadow #ink {
+    color: {{g.theme.dt_ink}};
   }
 
-  #core_drawer_panel-drawer {
-    box-shadow: {{g.theme.shadow}} 0px 2px 4px, {{g.theme.shadow}} 0px 0px 3px;
+  <!-- genre list -->
+  genre-list-item::shadow #item.selected {
+    background-color: {{g.theme.gl_select}};
   }
-  
+  genre-list-item::shadow paper-ripple {
+    color: {{g.theme.gl_ink}};
+  }
+
+  <!-- search toolbar -->
+  search-toolbar {
+    background-color: {{g.theme.st_bg}};
+  }
+  #search_input {
+    color: {{g.theme.clr_bold}};
+  }
+  #search_input::shadow input::-webkit-input-placeholder {
+    color: {{g.theme.clr}};
+  }
+
+  <!-- pitch slider -->
+  paper-slider::shadow #sliderBar::shadow #activeProgress {
+    background-color: {{g.theme.ps_clr}};
+  }
+  paper-slider::shadow #sliderKnobInner {
+    background-color: {{g.theme.ps_clr}};
+  }
+  paper-slider::shadow #sliderKnobInner::before {
+    background-color: {{g.theme.ps_clr}};
+  }
+  paper-slider::shadow #sliderBar::shadow #secondaryProgress {
+    background-color: {{g.theme.ps_bg}};
+  }
+
+  <!-- song list -->
+  .song-item .artist {
+    color: {{g.theme.clr}};
+  }
+  .song-item .title {
+    color: {{g.theme.clr_bold}};
+  }
+
+  <!-- song section -->
+  .title {
+    color: {{g.theme.clr_bold}};
+  }
 </core-style>

@@ -37,10 +37,10 @@
       <core-icon-button icon="settings" on-click="{{toggleSettingsDialog}}"></core-icon-button>
       <core-icon-button icon="filter" on-click="{{toggleIsTall}}"></core-icon-button>
       <!-- middle row -->
-      <pitch-slider class="middle indent {{ {hide: !isTall} | tokenList }}"></pitch-slider>
+      <pitch-slider class="bottom indent {{ {hide: !isTall} | tokenList }}"></pitch-slider>
       <!-- bottom row -->
       <div flex class="bottom {{ {hide: !isTall} | tokenList }}"></div>
-      <paper-input class="bottom {{ {hide: !isTall} | tokenList }}" label="bpm" floatingLabel type="number" value="{{global.bpm}}" id="bpm"></paper-input>
+      <paper-input class="bottom {{ {hide: !isTall} | tokenList }}" label="bpm" floatingLabel value="{{global.bpm}}" id="bpm"></paper-input>
     </core-toolbar>
     <paper-dialog backdrop layered heading="Settings" id="settingsDialog">
       <paper-input floatingLabel label="Music directory" value="{{musicDir}}"></paper-input>

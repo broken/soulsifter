@@ -20,9 +20,3 @@ polymer-ui-ratings::shadow #star {
 .song-item div {
   margin: 3px;
 }
-.song-item .artist {
-  color: #777;
-}
-.song-item .title {
-  color: #000;
-}
