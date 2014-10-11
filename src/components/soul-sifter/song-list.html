@@ -22,7 +22,7 @@
                           on-core-signal-search="{{searchAction}}"></core-signals>
 
     <!-- <core-tooltip label="loading..." position="right" id="core_tooltip" noarrow show></core-tooltip> -->
-    <core-selector selected="{{selectedRow}}">
+    <core-selector selected="{{selectedRow}}" activateEvent="click">
       <template repeat="{{s in songs}}">
         <song-list-item song="{{s}}"></song-list-item>
       </template>
