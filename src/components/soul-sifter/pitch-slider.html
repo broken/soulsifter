@@ -50,7 +50,7 @@
 
       pitchChanged: function(oldValue, newValue) {
         if (this.global.song && this.global.song.bpm)
-          this.global.bpm = this.global.song.bpm * (this.pitch/100) + this.global.song.bpm * 1;
+          this.global.bpm = (this.global.song.bpm * (this.pitch/100) + this.global.song.bpm * 1).toFixed(2);
       },
     });
   </script>
