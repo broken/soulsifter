@@ -31,7 +31,7 @@
         <div class="released" self-end>{{song.album.releaseDateYear}}-{{song.album.releaseDateMonth}}-{{song.album.releaseDateDay}}</div>
         <div class="comments" flex>{{song.comments}}</div>
         <div class="bpm">{{song.bpm}} bpm</div>
-        <div class="added">{{song.dateAdded}}</div>
+        <time class="added">{{localeDateTime}}</time>
       </div>
     </core-scroll-header-panel>
   </template>
@@ -39,12 +39,15 @@
   <script>
     Polymer('song-section', {
 
+      localeDateTime: '',
+
       observe: {
         'global.song': 'globalSongChanged'
       },
 
       globalSongChanged: function(oldSong, song) {
         this.song = song;
+        this.localeDateTime = new Date(this.song.dateAdded).toLocaleString();
         this.$.scroll_header_panel.shadowRoot.querySelector('#headerBg').style.backgroundImage = 'url("' + song.album.coverFilepath + '")';
       },
 

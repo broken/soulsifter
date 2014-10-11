@@ -26,7 +26,7 @@
       <div theme="polymer-ui-dark-theme">
         <polymer-ui-ratings value="{{song.rating}}"></polymer-ui-ratings>
       </div>
-      <div class="added">{{song.dateAdded}}</div>
+      <time class="added">{{localeDate}}</time>
     </div>
   </template>
 
@@ -38,9 +38,15 @@
 
       bpmDiff: '',
 
+      localeDate: '',
+
       observe: {
         'global.bpm': 'globalBpmChanged',
         'gobal.musicDir': 'globalMusicDirChanged'
+      },
+
+      attached: function() {
+        this.localeDate = new Date(this.song.dateAdded).toLocaleDateString();
       },
 
       globalChanged: function(oldValue, newValue) {
