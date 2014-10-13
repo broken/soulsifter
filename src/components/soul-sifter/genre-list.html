@@ -25,7 +25,7 @@
 <script>
     Polymer('genre-list', {
 
-      created: function() {
+      domReady: function() {
         this.genres = ss.Style.findAllParents();
       },
 
