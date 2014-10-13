@@ -14,9 +14,25 @@ polymer-ui-ratings::shadow #star {
 
 .song-item {
   height: 30px;
-  padding-left: 8px;
-  margin: 0 20px 0 10px;
+  padding: 0 8px;
+  margin: 0 10px;
 }
 .song-item div {
   margin: 3px;
+}
+
+.key {
+  position: relative;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+.fade-out:after {
+  display: block;
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  width: 30px;
+  content: "";
 }

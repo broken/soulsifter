@@ -17,10 +17,11 @@
     <global-state values="{{global}}"></global-state>
 
     <div horizontal layout center class="song-item" draggable="true" on-dragstart="{{dragSong}}" id="draggableItem">
-      <div class="artist">{{song.artist}}</div>
-      <div> - </div>
-      <div class="title">{{song.title}}</div>
-      <div flex></div>
+      <div flex class="key fade-out">
+        <span class="artist">{{song.artist}}</span>
+        <span> - </span>
+        <span class="title">{{song.title}}</span>
+      </div>
       <div class="bpmDiff">{{bpmDiff}}</div>
       <!-- this is a crappy theming method that is deprecated, but required for the ratings atm -->
       <div theme="polymer-ui-dark-theme">
@@ -60,7 +61,8 @@
       },
 
       globalBpmChanged: function(oldValue, newValue) {
-        this.bpmDiff = ((this.global.bpm / this.song.bpm - 1) * 100).toFixed(2);
+        if (this.global.bpm)
+          this.bpmDiff = ((this.global.bpm / this.song.bpm - 1) * 100).toFixed(2);
       },
 
       dragSong: function(e) {

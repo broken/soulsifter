@@ -35,6 +35,11 @@
     // search info
     si_heading: '#CCC',
     si_emphasis: sl_green,
+    // song list
+    sl_border: '1px solid #2F2F2F',
+    sl_hover: 'rgb(20,20,20)',
+    sl_fadeout: 'linear-gradient(to right, rgba(41,41,41,0), rgba(41,41,41,1))',
+    sl_hoverfadeout: 'linear-gradient(to right, rgba(20,20,20,0), rgba(20,20,20,1))',
   }
   CoreStyle.g.light = {
     bg: '#EEE',
@@ -54,6 +59,9 @@
   <!-- main -->
   core-drawer-panel {
     color: {{g.theme.clr}};
+    background-color: {{g.theme.bg}};
+  }
+  #core_drawer_panel-drawer {
     background-color: {{g.theme.bg}};
   }
 
@@ -103,11 +111,23 @@
   }
 
   <!-- song list -->
+  .song-item {
+    border-bottom: {{g.theme.sl_border}};
+  }
+  .song-item:hover {
+    background-color: {{g.theme.sl_hover}};
+  }
   .song-item .artist {
     color: {{g.theme.clr}};
   }
   .song-item .title {
     color: {{g.theme.clr_bold}};
+  }
+  .song-item .fade-out:after {
+    background: {{g.theme.sl_fadeout}};
+  }
+  .song-item:hover .fade-out:after {
+    background: {{g.theme.sl_hoverfadeout}};
   }
 
   <!-- song section -->
