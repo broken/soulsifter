@@ -63,8 +63,10 @@ class Song : public node::ObjectWrap {
   static NAN_SETTER(setRESongId);
   static NAN_GETTER(getAlbumId);
   static NAN_SETTER(setAlbumId);
+  static NAN_GETTER(getAlbum);
   static NAN_GETTER(getAlbumPartId);
   static NAN_SETTER(setAlbumPartId);
+  static NAN_GETTER(getAlbumPart);
   static NAN_GETTER(getStyles);
   static NAN_SETTER(setStyles);
   static NAN_METHOD(addStyleById);

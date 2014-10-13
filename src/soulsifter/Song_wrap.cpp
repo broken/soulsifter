@@ -5,6 +5,10 @@
 #include "Song_wrap.h"
 #include "Style.h"
 #include "Style_wrap.h"
+#include "AlbumPart.h"
+#include "AlbumPart_wrap.h"
+#include "Album.h"
+#include "Album_wrap.h"
 
 v8::Persistent<v8::Function> Song::constructor;
 
@@ -70,7 +74,9 @@ void Song::Init(v8::Handle<v8::Object> exports) {
   tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("lowQuality"), getLowQuality, setLowQuality);
   tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("rESongId"), getRESongId, setRESongId);
   tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("albumId"), getAlbumId, setAlbumId);
+  tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("album"), getAlbum);
   tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("albumPartId"), getAlbumPartId, setAlbumPartId);
+  tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("albumPart"), getAlbumPart);
   tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("styles"), getStyles, setStyles);
 
   NanAssignPersistent<v8::Function>(constructor, tpl->GetFunction());
@@ -510,6 +516,19 @@ NAN_SETTER(Song::setAlbumId) {
   NanReturnUndefined();
 }
 
+NAN_GETTER(Song::getAlbum) {
+  NanScope();
+
+  Song* obj = ObjectWrap::Unwrap<Song>(args.This());
+  dogatech::soulsifter::Album* result =  obj->song->getAlbum();
+  if (result == NULL) NanReturnUndefined();
+
+  v8::Local<v8::Object> instance = Album::NewInstance();
+  Album* r = ObjectWrap::Unwrap<Album>(instance);
+  r->setNwcpValue(result);
+  NanReturnValue(instance);
+}
+
 NAN_GETTER(Song::getAlbumPartId) {
   NanScope();
 
@@ -527,6 +546,19 @@ NAN_SETTER(Song::setAlbumPartId) {
   obj->song->setAlbumPartId(a0);
 
   NanReturnUndefined();
+}
+
+NAN_GETTER(Song::getAlbumPart) {
+  NanScope();
+
+  Song* obj = ObjectWrap::Unwrap<Song>(args.This());
+  dogatech::soulsifter::AlbumPart* result =  obj->song->getAlbumPart();
+  if (result == NULL) NanReturnUndefined();
+
+  v8::Local<v8::Object> instance = AlbumPart::NewInstance();
+  AlbumPart* r = ObjectWrap::Unwrap<AlbumPart>(instance);
+  r->setNwcpValue(result);
+  NanReturnValue(instance);
 }
 
 NAN_GETTER(Song::getStyles) {
