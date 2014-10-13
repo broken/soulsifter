@@ -17,6 +17,7 @@
     <global-state values="{{global}}"></global-state>
 
     <div horizontal layout center class="song-item" draggable="true" on-dragstart="{{dragSong}}" id="draggableItem">
+      <div id="cover"></div>
       <div flex class="key fade-out">
         <span class="artist">{{song.artist}}</span>
         <span> - </span>
@@ -48,6 +49,7 @@
 
       attached: function() {
         this.localeDate = new Date(this.song.dateAdded).toLocaleDateString();
+        this.$.cover.style.backgroundImage = 'url("' + this.song.album.coverFilepath + '")';
       },
 
       globalChanged: function(oldValue, newValue) {

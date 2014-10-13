@@ -21,6 +21,12 @@ polymer-ui-ratings::shadow #star {
   margin: 3px;
 }
 
+#cover {
+  background-size: cover;
+  height: 30px;
+  width: 30px;
+}
+
 .key {
   position: relative;
   overflow: hidden;
