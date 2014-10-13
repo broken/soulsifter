@@ -520,6 +520,7 @@ def hAccessor(f)
   elsif (f[$attrib] & Attrib::PTR > 0)
     str << "        #{f[$type]}* get#{cap(f[$name])}() const;\n"
     str << "        void set#{cap(f[$name])}(const #{f[$type]}& #{f[$name]});\n"
+    str << "        void set#{cap(f[$name])}(#{f[$type]}* #{f[$name]});  // takes ownership\n"
   elsif (isVector(f[$type]))
     str << "        const #{f[$type]}& get#{cap(f[$name])}();\n"
     str << "        void set#{cap(f[$name])}(const #{f[$type]}& #{f[$name]});\n"
@@ -546,6 +547,7 @@ def cAccessor(name, f)
   elsif (f[$attrib] & Attrib::PTR > 0)
     str << "    #{f[$type]}* #{cap(name)}::get#{cap(f[$name])}() const {\n        if (!#{f[$name]} && #{f[$name]}Id)\n            return #{f[$type][0..-1]}::findById(#{f[$name]}Id);\n        return #{f[$name]};\n    }\n"
     str << "    void #{cap(name)}::set#{cap(f[$name])}(const #{f[$type]}& #{f[$name]}) {\n        this->#{f[$name]}Id = #{f[$name]}.getId();\n        delete this->#{f[$name]};\n        this->#{f[$name]} = new #{f[$type]}(#{f[$name]});\n    }\n"
+    str << "    void #{cap(name)}::set#{cap(f[$name])}(#{f[$type]}* #{f[$name]}) {\n        this->#{f[$name]}Id = #{f[$name]}.getId();\n        delete this->#{f[$name]};\n        this->#{f[$name]} = #{f[$name]};\n    }\n"
   elsif (isVector(f[$type]))
     str << "    const #{f[$type]}& #{cap(name)}::get#{cap(f[$name])}() {\n        if (#{f[$name]}.empty() && !#{vectorIds(f)}.empty()) {\n            for (vector<int>::const_iterator it = #{vectorIds(f)}.begin(); it != #{vectorIds(f)}.end(); ++it) {\n                #{f[$name]}.push_back(#{vectorGeneric(f[$type])}::findById(*it));\n            }\n        }\n        return #{f[$name]};\n    }\n"
     str << "    void #{cap(name)}::set#{cap(f[$name])}(const #{f[$type]}& #{f[$name]}) {\n        deleteVectorPointers<#{vectorGeneric(f[$type])}*>(&this->#{f[$name]});\n        this->#{f[$name]} = #{f[$name]};\n        this->#{vectorIds(f)}.clear();\n        for (#{f[$type]}::const_iterator it = #{f[$name]}.begin(); it != #{f[$name]}.end(); ++it) {\n            this->#{vectorIds(f)}.push_back((*it)->getId());\n        }\n    }\n"
