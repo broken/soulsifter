@@ -332,7 +332,7 @@ vector<Song*>* SearchUtil::searchSongs(const string& query, int min_bpm, int max
   }
   
   stringstream ss;
-  ss << "select s.id from Songs s inner join Albums a on s.albumid = a.id where true";
+  ss << "select s.*, s.id as songid, s.artist as songartist, a.*, a.id as albumid, a.artist as albumartist from Songs s inner join Albums a on s.albumid = a.id where true";
   ss << buildQueryPredicate(atoms);
   ss << buildOptionPredicate(min_bpm, max_bpm, key, styles, limit);
   
@@ -343,10 +343,46 @@ vector<Song*>* SearchUtil::searchSongs(const string& query, int min_bpm, int max
     sql::Statement *stmt = MysqlAccess::getInstance().getConnection()->createStatement();
     sql::ResultSet *rs = stmt->executeQuery(ss.str());
     while (rs->next()) {
-      Song* song = Song::findById(rs->getInt(1));
+      Song* song = new Song();
+      // copied *yuck* from song.cpp
+      song->setId(rs->getInt("songid"));
+      song->setArtist(rs->getString("songartist"));
+      song->setTrack(rs->getString("track"));
+      song->setTitle(rs->getString("title"));
+      song->setRemixer(rs->getString("remixer"));
+      song->setFeaturing(rs->getString("featuring"));
+      song->setFilepath(rs->getString("filepath"));
+      song->setRating(rs->getInt("rating"));
+      song->setDateAdded(timeFromString(rs->getString("dateAdded")));
+      song->setBpm(rs->getString("bpm"));
+      song->setComments(rs->getString("comments"));
+      song->setTrashed(rs->getBoolean("trashed"));
+      song->setLowQuality(rs->getBoolean("lowQuality"));
+      song->setRESongId(rs->getInt("reSongId"));
+      song->setAlbumId(rs->getInt("albumId"));
+      if (rs->isNull("albumPartId")) song->setAlbumPartId(0);
+      else song->setAlbumPartId(rs->getInt("albumPartId"));
+      //populateStylesIds(song);
+      /*if (!rs->isNull("s.tonicKeys")) {
+          string dbSet = rs->getString("s.tonicKeys");
+          boost::split(song->tonicKeys, dbSet, boost::is_any_of(","));
+      }*/
+      // copied *yuck* from album.cpp
+      Album* album = new Album();
+      album->setId(rs->getInt("albumid"));
+      album->setName(rs->getString("name"));
+      album->setArtist(rs->getString("albumartist"));
+      album->setCoverFilepath(rs->getString("coverFilepath"));
+      album->setMixed(rs->getBoolean("mixed"));
+      album->setLabel(rs->getString("label"));
+      album->setCatalogId(rs->getString("catalogId"));
+      album->setReleaseDateYear(rs->getInt("releaseDateYear"));
+      album->setReleaseDateMonth(rs->getInt("releaseDateMonth"));
+      album->setReleaseDateDay(rs->getInt("releaseDateDay"));
+      album->setBasicGenreId(rs->getInt("basicGenreId"));
+
+      song->setAlbum(album);
       songs->push_back(song);
-      // album
-      // genres
     }
     rs->close();
     delete rs;
