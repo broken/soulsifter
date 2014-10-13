@@ -636,7 +636,7 @@ namespace soulsifter {
         this->reSong = new RESong(reSong);
     }
     void Song::setRESong(RESong* reSong) {
-        this->reSongId = reSong.getId();
+        this->reSongId = reSong->getId();
         delete this->reSong;
         this->reSong = reSong;
     }
@@ -659,7 +659,7 @@ namespace soulsifter {
         this->album = new Album(album);
     }
     void Song::setAlbum(Album* album) {
-        this->albumId = album.getId();
+        this->albumId = album->getId();
         delete this->album;
         this->album = album;
     }
@@ -682,7 +682,7 @@ namespace soulsifter {
         this->albumPart = new AlbumPart(albumPart);
     }
     void Song::setAlbumPart(AlbumPart* albumPart) {
-        this->albumPartId = albumPart.getId();
+        this->albumPartId = albumPart->getId();
         delete this->albumPart;
         this->albumPart = albumPart;
     }
