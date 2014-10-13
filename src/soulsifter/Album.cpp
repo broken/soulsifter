@@ -426,6 +426,11 @@ namespace soulsifter {
         delete this->basicGenre;
         this->basicGenre = new BasicGenre(basicGenre);
     }
+    void Album::setBasicGenre(BasicGenre* basicGenre) {
+        this->basicGenreId = basicGenre.getId();
+        delete this->basicGenre;
+        this->basicGenre = basicGenre;
+    }
 
 }
 }

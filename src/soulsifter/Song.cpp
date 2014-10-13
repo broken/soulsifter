@@ -635,6 +635,11 @@ namespace soulsifter {
         delete this->reSong;
         this->reSong = new RESong(reSong);
     }
+    void Song::setRESong(RESong* reSong) {
+        this->reSongId = reSong.getId();
+        delete this->reSong;
+        this->reSong = reSong;
+    }
 
     const int Song::getAlbumId() const { return albumId; }
     void Song::setAlbumId(const int albumId) {
@@ -653,6 +658,11 @@ namespace soulsifter {
         delete this->album;
         this->album = new Album(album);
     }
+    void Song::setAlbum(Album* album) {
+        this->albumId = album.getId();
+        delete this->album;
+        this->album = album;
+    }
 
     const int Song::getAlbumPartId() const { return albumPartId; }
     void Song::setAlbumPartId(const int albumPartId) {
@@ -670,6 +680,11 @@ namespace soulsifter {
         this->albumPartId = albumPart.getId();
         delete this->albumPart;
         this->albumPart = new AlbumPart(albumPart);
+    }
+    void Song::setAlbumPart(AlbumPart* albumPart) {
+        this->albumPartId = albumPart.getId();
+        delete this->albumPart;
+        this->albumPart = albumPart;
     }
 
     const vector<Style*>& Song::getStyles() {

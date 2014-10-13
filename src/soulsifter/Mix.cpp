@@ -339,6 +339,11 @@ namespace soulsifter {
         delete this->outSong;
         this->outSong = new Song(outSong);
     }
+    void Mix::setOutSong(Song* outSong) {
+        this->outSongId = outSong.getId();
+        delete this->outSong;
+        this->outSong = outSong;
+    }
 
     const int Mix::getInSongId() const { return inSongId; }
     void Mix::setInSongId(const int inSongId) {
@@ -356,6 +361,11 @@ namespace soulsifter {
         this->inSongId = inSong.getId();
         delete this->inSong;
         this->inSong = new Song(inSong);
+    }
+    void Mix::setInSong(Song* inSong) {
+        this->inSongId = inSong.getId();
+        delete this->inSong;
+        this->inSong = inSong;
     }
 
     const string& Mix::getBpmDiff() const { return bpmDiff; }

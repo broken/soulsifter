@@ -67,6 +67,7 @@ namespace soulsifter {
         void setBasicGenreId(int basicGenreId);
         BasicGenre* getBasicGenre() const;
         void setBasicGenre(const BasicGenre& basicGenre);
+        void setBasicGenre(BasicGenre* basicGenre);  // takes ownership
 
         friend ResultSetIterator<Album>;
 

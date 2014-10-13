@@ -50,6 +50,7 @@ namespace soulsifter {
         void setAlbumId(int albumId);
         Album* getAlbum() const;
         void setAlbum(const Album& album);
+        void setAlbum(Album* album);  // takes ownership
 
         friend ResultSetIterator<AlbumPart>;
 

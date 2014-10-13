@@ -87,14 +87,17 @@ namespace soulsifter {
         void setRESongId(int reSongId);
         RESong* getRESong() const;
         void setRESong(const RESong& reSong);
+        void setRESong(RESong* reSong);  // takes ownership
         const int getAlbumId() const;
         void setAlbumId(int albumId);
         Album* getAlbum() const;
         void setAlbum(const Album& album);
+        void setAlbum(Album* album);  // takes ownership
         const int getAlbumPartId() const;
         void setAlbumPartId(int albumPartId);
         AlbumPart* getAlbumPart() const;
         void setAlbumPart(const AlbumPart& albumPart);
+        void setAlbumPart(AlbumPart* albumPart);  // takes ownership
         const vector<Style*>& getStyles();
         void setStyles(const vector<Style*>& styles);
         void addStyleById(int styleId);

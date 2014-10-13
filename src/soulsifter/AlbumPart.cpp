@@ -276,6 +276,11 @@ namespace soulsifter {
         delete this->album;
         this->album = new Album(album);
     }
+    void AlbumPart::setAlbum(Album* album) {
+        this->albumId = album.getId();
+        delete this->album;
+        this->album = album;
+    }
 
 }
 }
