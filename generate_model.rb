@@ -937,10 +937,3 @@ output.close
 output = File.open("src/soulsifter/REAlbumCover.cpp", "w")
 output << writeCode("reAlbumCover", reAlbumCoverFields, reAlbumCoverAttribs)
 output.close
-
-output = File.open("src/soulsifter/AlbumNW.h", "w")
-output << writeHeaderForNW("album", albumFields, 0, albumCustomMethods, "")
-output.close
-output = File.open("src/soulsifter/AlbumNW.cpp", "w")
-output << writeCodeForNW("album", albumFields, 0)
-output.close
