@@ -16,6 +16,15 @@
 <body>
 
 <script>
+  var gui = require('nw.gui');
+
+  // create osx menu bar defaults
+  var mb = new gui.Menu({type:"menubar"});
+  mb.createMacBuiltin("Soul Sifter");
+  gui.Window.get().menu = mb;
+</script>
+
+<script>
   var ss = require('../soulsifter/build/Release/soulsifter');
 </script>
 
