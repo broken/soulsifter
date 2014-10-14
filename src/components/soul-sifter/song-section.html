@@ -48,7 +48,7 @@
       globalSongChanged: function(oldSong, song) {
         this.song = song;
         this.localeDateTime = new Date(this.song.dateAdded).toLocaleString();
-        this.$.scroll_header_panel.shadowRoot.querySelector('#headerBg').style.backgroundImage = 'url("' + song.album.coverFilepath + '")';
+        this.$.scroll_header_panel.shadowRoot.querySelector('#headerBg').style.backgroundImage = 'url("' + this.song.album.coverFilepath + '")';
       },
 
     });
