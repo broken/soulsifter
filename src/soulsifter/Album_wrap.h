@@ -10,7 +10,7 @@ class Album : public node::ObjectWrap {
   static void Init(v8::Handle<v8::Object> exports);
   static v8::Local<v8::Object> NewInstance();
 
-  void setNwcpValue(dogatech::soulsifter::Album* v) { album = v; }
+  void setNwcpValue(dogatech::soulsifter::Album* v) { album = v; ownership = false; }
   dogatech::soulsifter::Album* getNwcpValue() const { return album; }
 
  private:
@@ -54,6 +54,7 @@ class Album : public node::ObjectWrap {
 
   static v8::Persistent<v8::Function> constructor;
   dogatech::soulsifter::Album* album;
+  bool ownership;
 };
 
 #endif

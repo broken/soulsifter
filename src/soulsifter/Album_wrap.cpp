@@ -6,9 +6,9 @@
 
 v8::Persistent<v8::Function> Album::constructor;
 
-Album::Album() : ObjectWrap(), album(new dogatech::soulsifter::Album()) {};
-Album::Album(dogatech::soulsifter::Album* o) : ObjectWrap(), album(o) {};
-Album::~Album() { delete album; };
+Album::Album() : ObjectWrap(), album(new dogatech::soulsifter::Album()), ownership(true) {};
+Album::Album(dogatech::soulsifter::Album* o) : ObjectWrap(), album(o), ownership(true) {};
+Album::~Album() { if (ownership) delete album; };
 
 NAN_METHOD(Album::New) {
   NanScope();
