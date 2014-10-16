@@ -111,6 +111,7 @@ struct Atom {
     A_MIXED,
     A_LABEL,
     A_YEAR,
+    CUSTOM_QUERY_PREDICATE,
   };
   enum Property {
     NONE = 0x00,
@@ -137,7 +138,7 @@ void splitString(const string& query, vector<string>* atoms) {
 
 bool parse(const string& queryFragment, Atom* atom) {
   atom->clear();
-  boost::regex regex("^(-)?((id|a|artist|t|title|r|remixer|rating|comment|trashed|lowq|aid|n|album|m|mixed|l|label|y|year):)?(.+)$");
+  boost::regex regex("^(-)?((id|a|artist|t|title|r|remixer|rating|comment|trashed|lowq|aid|n|album|m|mixed|l|label|y|year|q|query):)?(.+)$");
   boost::smatch match;
   if (!boost::regex_match(queryFragment, match, regex)) {
     return false;
@@ -172,6 +173,8 @@ bool parse(const string& queryFragment, Atom* atom) {
       atom->type = Atom::A_LABEL;
     } else if (!match[3].compare("y") || !match[3].compare("year")) {
       atom->type = Atom::A_YEAR;
+    } else if (!match[3].compare("q") || !match[3].compare("query")) {
+      atom->type = Atom::CUSTOM_QUERY_PREDICATE;
     } else {
       // error
       return false;
@@ -217,6 +220,8 @@ string buildQueryPredicate(const vector<Atom>& atoms) {
       ss << "a.label like '%" << atom.value << "%'";
     } else if (atom.type == Atom::A_YEAR) {
       ss << "a.releaseDateYear = " << atom.value;
+    } else if (atom.type == Atom::CUSTOM_QUERY_PREDICATE) {
+      ss << atom.value;
     }
   }
   return ss.str();
