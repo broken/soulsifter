@@ -216,7 +216,7 @@ string buildQueryPredicate(const vector<Atom>& atoms) {
     } else if (atom.type == Atom::A_LABEL) {
       ss << "a.label like '%" << atom.value << "%'";
     } else if (atom.type == Atom::A_YEAR) {
-      ss << "a.year = " << atom.value;
+      ss << "a.releaseDateYear = " << atom.value;
     }
   }
   return ss.str();
