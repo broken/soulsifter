@@ -9,3 +9,7 @@ div.text {
 .right {
   text-align: right;
 }
+
+.heading {
+  margin-top: 12px;
+}

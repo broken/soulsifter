@@ -42,3 +42,8 @@ polymer-ui-ratings::shadow #star {
   width: 30px;
   content: "";
 }
+
+time {
+  text-align: right;
+  width: 64px;
+}
