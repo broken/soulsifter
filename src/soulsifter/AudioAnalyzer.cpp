@@ -12,6 +12,7 @@
 #include <map>
 #include <sstream>
 #include <stdio.h>
+#include <string>
 #include <utility>
 #include <vector>
 
@@ -23,6 +24,7 @@
 
 #include "madlld.h"
 #include "MiniBpm.h"
+#include "SearchUtil.h"
 #include "Song.h"
 
 namespace dogatech {
@@ -58,6 +60,35 @@ namespace dogatech {
       }
       
       return bpm;
+    }
+
+    void AudioAnalyzer::analyzeBpms() {
+      cout << "analyze bpms" << endl;
+
+      vector<Style*> emptyStyles;
+      string query = "id:\"(select max(id) from songs)\"";
+      vector<Song*>* songs = SearchUtil::searchSongs(query, 0, 0, "", emptyStyles, 1);
+      int maxId = 0;
+      for (Song* song : *songs) {
+        maxId = song->getId();
+      }
+
+      int span = 100;
+      for (int i = 0; i <= maxId; i += span) {
+        stringstream ss;
+        ss << "q:\"s.id >= " << i << "\" q:\"s.id < " << (i + span) << "\"";
+        ss << " trashed:0";
+        query = ss.str();
+        songs = SearchUtil::searchSongs(query, 0, 0, "", emptyStyles, span);
+
+        for (Song* song : *songs) {
+          string bpm = song->getBpm();
+          AudioAnalyzer::analyzeBpm(song);
+          if (bpm.compare(song->getBpm())) {
+            song->update();
+          }
+        }
+      }
     }
     
     const Keys* AudioAnalyzer::analyzeKey(Song *song) {

@@ -35,6 +35,7 @@ namespace dogatech {
       static const Keys* analyzeKey(Song* song);
       
       static const Bpms* analyzeBpm(Song* song);
+      static void analyzeBpms();
     };
     
   }

@@ -13,7 +13,6 @@
 
 <!-- <link href="create-song.html" rel="import"> -->
 <link href="global-state.html" rel="import">
-<link href="pitch-slider.html" rel="import">
 <link href="search-info.html" rel="import">
 <link href="themes.html" rel="import">
 
@@ -39,10 +38,12 @@
       <core-icon-button icon="settings" on-click="{{toggleSettingsDialog}}"></core-icon-button>
       <core-icon-button icon="filter" on-click="{{toggleIsTall}}"></core-icon-button>
       <!-- middle row -->
-      <pitch-slider class="bottom indent {{ {hide: !isTall} | tokenList }}"></pitch-slider>
       <!-- bottom row -->
       <div flex class="bottom {{ {hide: !isTall} | tokenList }}"></div>
-      <paper-input class="bottom {{ {hide: !isTall} | tokenList }}" label="bpm" floatingLabel value="{{global.bpm}}" id="bpm"></paper-input>
+      <div class="bottom {{ {hide: !isTall} | tokenList }}">
+        <core-icon-button icon="query-builder" on-click="{{analyzeBpms}}"></core-icon-button>
+        Analyze BPMs
+      </div>
     </core-toolbar>
     <paper-dialog backdrop layered id="searchInfoDialog">
       <search-info></search-info>
@@ -110,6 +111,10 @@
       globalChanged: function(oldValue, newValue) {
         if (this.musicDir)
           this.global.musicDir = this.musicDir;
+      },
+
+      analyzeBpms: function(e, detail, sender) {
+        ss.AudioAnalyzer.analyzeBpms();
       },
     });
 

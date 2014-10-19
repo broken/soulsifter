@@ -28,6 +28,7 @@
           "StyleHelper.cpp",
           # detection
           "AudioAnalyzer.cpp",
+          "AudioAnalyzer_wrap.cpp",
           "bstdfile.c",
           "madlld.cpp",
           "MiniBpm.cpp",
