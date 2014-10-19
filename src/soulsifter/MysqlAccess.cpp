@@ -52,7 +52,7 @@ namespace soulsifter {
         struct tm dt = *localtime(&time);
         char buffer[80];
         memset(buffer, 0, 80);
-        strftime(buffer, sizeof(buffer), "%Y-%m-%d %X %Z", &dt);
+        strftime(buffer, sizeof(buffer), "%Y-%m-%d %X", &dt);
         std::string str(buffer);
         return str;
     }
