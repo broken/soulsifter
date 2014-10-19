@@ -8,6 +8,7 @@
     "grunt-spawn": "^1.1.62"
   },
   "dependencies": {
+    "async": "^0.9.0",
     "nan": "^1.3.0"
   }
 }
