@@ -13,6 +13,7 @@
 #include <sstream>
 #include <stdio.h>
 #include <string>
+#include <sys/stat.h>
 #include <utility>
 #include <vector>
 
@@ -38,6 +39,13 @@ namespace dogatech {
     
     const Bpms* AudioAnalyzer::analyzeBpm(Song *song) {
       cout << "analyze bpm" << endl;
+
+      struct stat statBuffer;
+      if (stat(song->getFilepath().c_str(), &statBuffer) != 0) {
+        cerr << "File does not exist for song " << song->getId() << endl;
+        Bpms *bpm = new Bpms();
+        return bpm;
+      }
       
       breakfastquay::MiniBPM miniBpm(44100);
       
