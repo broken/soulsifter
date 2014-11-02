@@ -1,21 +1,30 @@
 #include <iostream>
 #include <node.h>
 #include <nan.h>
-#include "AlbumPart.h"
 #include "AlbumPart_wrap.h"
 #include "Album.h"
+#include "AlbumPart.h"
+#include "AlbumPart_wrap.h"
 #include "Album_wrap.h"
+#include "ResultSetIterator.h"
 
 v8::Persistent<v8::Function> AlbumPart::constructor;
 
-AlbumPart::AlbumPart() : ObjectWrap(), albumpart(new dogatech::soulsifter::AlbumPart()) {};
-AlbumPart::AlbumPart(dogatech::soulsifter::AlbumPart* o) : ObjectWrap(), albumpart(o) {};
-AlbumPart::~AlbumPart() { delete albumpart; };
+AlbumPart::AlbumPart() : ObjectWrap(), albumpart(NULL), ownWrappedObject(true) {};
+AlbumPart::AlbumPart(dogatech::soulsifter::AlbumPart* o) : ObjectWrap(), albumpart(o), ownWrappedObject(true) {};
+AlbumPart::~AlbumPart() { if (ownWrappedObject) delete albumpart; };
+
+void AlbumPart::setNwcpValue(dogatech::soulsifter::AlbumPart* v, bool own) {
+  if (ownWrappedObject)
+    delete albumpart;
+  albumpart = v;
+  ownWrappedObject = own;
+}
 
 NAN_METHOD(AlbumPart::New) {
   NanScope();
 
-  AlbumPart* obj = new AlbumPart();
+  AlbumPart* obj = new AlbumPart(new dogatech::soulsifter::AlbumPart());
   obj->Wrap(args.This());
 
   NanReturnValue(args.This());
@@ -36,27 +45,22 @@ void AlbumPart::Init(v8::Handle<v8::Object> exports) {
   tpl->SetClassName(NanNew<v8::String>("AlbumPart"));
   tpl->InstanceTemplate()->SetInternalFieldCount(1);
 
+  NanSetPrototypeTemplate(tpl, "clear", NanNew<v8::FunctionTemplate>(clear)->GetFunction());
   NanSetTemplate(tpl, "findById", NanNew<v8::FunctionTemplate>(findById)->GetFunction());
   NanSetTemplate(tpl, "findByPosAndAlbumId", NanNew<v8::FunctionTemplate>(findByPosAndAlbumId)->GetFunction());
   NanSetTemplate(tpl, "findAll", NanNew<v8::FunctionTemplate>(findAll)->GetFunction());
-
-  // Prototype
-  NanSetPrototypeTemplate(tpl, "clear", NanNew<v8::FunctionTemplate>(clear)->GetFunction());
   NanSetPrototypeTemplate(tpl, "sync", NanNew<v8::FunctionTemplate>(sync)->GetFunction());
   NanSetPrototypeTemplate(tpl, "update", NanNew<v8::FunctionTemplate>(update)->GetFunction());
   NanSetPrototypeTemplate(tpl, "save", NanNew<v8::FunctionTemplate>(save)->GetFunction());
-
-  // Accessors
   tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("id"), getId, setId);
   tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("pos"), getPos, setPos);
   tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("name"), getName, setName);
   tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("albumId"), getAlbumId, setAlbumId);
-  tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("album"), getAlbum);
+  tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("album"), getAlbum, setAlbum);
 
   NanAssignPersistent<v8::Function>(constructor, tpl->GetFunction());
   exports->Set(NanNew<v8::String>("AlbumPart"), tpl->GetFunction());
 }
-
 
 NAN_METHOD(AlbumPart::clear) {
   NanScope();
@@ -71,13 +75,13 @@ NAN_METHOD(AlbumPart::findById) {
   NanScope();
 
   int a0(args[0]->Uint32Value());
-  dogatech::soulsifter::AlbumPart* albumpart =
+  dogatech::soulsifter::AlbumPart* result =
       dogatech::soulsifter::AlbumPart::findById(a0);
-  v8::Local<v8::Function> cons = NanNew<v8::Function>(constructor);
-  v8::Local<v8::Object> instance = cons->NewInstance();
 
-  AlbumPart* obj = ObjectWrap::Unwrap<AlbumPart>(instance);
-  obj->albumpart = albumpart;
+  if (result == NULL) NanReturnUndefined();
+  v8::Local<v8::Object> instance = AlbumPart::NewInstance();
+  AlbumPart* r = ObjectWrap::Unwrap<AlbumPart>(instance);
+  r->setNwcpValue(result, true);
 
   NanReturnValue(instance);
 }
@@ -87,13 +91,13 @@ NAN_METHOD(AlbumPart::findByPosAndAlbumId) {
 
   string a0(*v8::String::Utf8Value(args[0]->ToString()));
   int a1(args[1]->Uint32Value());
-  dogatech::soulsifter::AlbumPart* albumpart =
+  dogatech::soulsifter::AlbumPart* result =
       dogatech::soulsifter::AlbumPart::findByPosAndAlbumId(a0, a1);
-  v8::Local<v8::Function> cons = NanNew<v8::Function>(constructor);
-  v8::Local<v8::Object> instance = cons->NewInstance();
 
-  AlbumPart* obj = ObjectWrap::Unwrap<AlbumPart>(instance);
-  obj->albumpart = albumpart;
+  if (result == NULL) NanReturnUndefined();
+  v8::Local<v8::Object> instance = AlbumPart::NewInstance();
+  AlbumPart* r = ObjectWrap::Unwrap<AlbumPart>(instance);
+  r->setNwcpValue(result, true);
 
   NanReturnValue(instance);
 }
@@ -225,11 +229,23 @@ NAN_GETTER(AlbumPart::getAlbum) {
 
   AlbumPart* obj = ObjectWrap::Unwrap<AlbumPart>(args.This());
   dogatech::soulsifter::Album* result =  obj->albumpart->getAlbum();
-  if (result == NULL) NanReturnUndefined();
 
+  if (result == NULL) NanReturnUndefined();
   v8::Local<v8::Object> instance = Album::NewInstance();
   Album* r = ObjectWrap::Unwrap<Album>(instance);
-  r->setNwcpValue(result);
+  r->setNwcpValue(result, false);
+
   NanReturnValue(instance);
+}
+
+NAN_SETTER(AlbumPart::setAlbum) {
+  NanScope();
+
+  AlbumPart* obj = ObjectWrap::Unwrap<AlbumPart>(args.This());
+  dogatech::soulsifter::Album* a0tmp(node::ObjectWrap::Unwrap<Album>(value->ToObject())->getNwcpValue());
+  dogatech::soulsifter::Album& a0 = *a0tmp;
+  obj->albumpart->setAlbum(a0);
+
+  NanReturnUndefined();
 }
 

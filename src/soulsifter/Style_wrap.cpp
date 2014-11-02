@@ -1,19 +1,28 @@
 #include <iostream>
 #include <node.h>
 #include <nan.h>
+#include "Style_wrap.h"
+#include "ResultSetIterator.h"
 #include "Style.h"
 #include "Style_wrap.h"
 
 v8::Persistent<v8::Function> Style::constructor;
 
-Style::Style() : ObjectWrap(), style(new dogatech::soulsifter::Style()) {};
-Style::Style(dogatech::soulsifter::Style* o) : ObjectWrap(), style(o) {};
-Style::~Style() { delete style; };
+Style::Style() : ObjectWrap(), style(NULL), ownWrappedObject(true) {};
+Style::Style(dogatech::soulsifter::Style* o) : ObjectWrap(), style(o), ownWrappedObject(true) {};
+Style::~Style() { if (ownWrappedObject) delete style; };
+
+void Style::setNwcpValue(dogatech::soulsifter::Style* v, bool own) {
+  if (ownWrappedObject)
+    delete style;
+  style = v;
+  ownWrappedObject = own;
+}
 
 NAN_METHOD(Style::New) {
   NanScope();
 
-  Style* obj = new Style();
+  Style* obj = new Style(new dogatech::soulsifter::Style());
   obj->Wrap(args.This());
 
   NanReturnValue(args.This());
@@ -34,33 +43,30 @@ void Style::Init(v8::Handle<v8::Object> exports) {
   tpl->SetClassName(NanNew<v8::String>("Style"));
   tpl->InstanceTemplate()->SetInternalFieldCount(1);
 
+  NanSetPrototypeTemplate(tpl, "clear", NanNew<v8::FunctionTemplate>(clear)->GetFunction());
   NanSetTemplate(tpl, "findById", NanNew<v8::FunctionTemplate>(findById)->GetFunction());
   NanSetTemplate(tpl, "findByREId", NanNew<v8::FunctionTemplate>(findByREId)->GetFunction());
   NanSetTemplate(tpl, "findAll", NanNew<v8::FunctionTemplate>(findAll)->GetFunction());
-  NanSetTemplate(tpl, "findAllParents", NanNew<v8::FunctionTemplate>(findAllParents)->GetFunction());
-
-  // Prototype
-  NanSetPrototypeTemplate(tpl, "clear", NanNew<v8::FunctionTemplate>(clear)->GetFunction());
   NanSetPrototypeTemplate(tpl, "sync", NanNew<v8::FunctionTemplate>(sync)->GetFunction());
   NanSetPrototypeTemplate(tpl, "update", NanNew<v8::FunctionTemplate>(update)->GetFunction());
   NanSetPrototypeTemplate(tpl, "save", NanNew<v8::FunctionTemplate>(save)->GetFunction());
-  NanSetPrototypeTemplate(tpl, "addChildById", NanNew<v8::FunctionTemplate>(addChildById)->GetFunction());
-  NanSetPrototypeTemplate(tpl, "removeChildById", NanNew<v8::FunctionTemplate>(removeChildById)->GetFunction());
-  NanSetPrototypeTemplate(tpl, "addParentById", NanNew<v8::FunctionTemplate>(addParentById)->GetFunction());
-  NanSetPrototypeTemplate(tpl, "removeParentById", NanNew<v8::FunctionTemplate>(removeParentById)->GetFunction());
-
-  // Accessors
+  NanSetTemplate(tpl, "findAllParents", NanNew<v8::FunctionTemplate>(findAllParents)->GetFunction());
+  // Unable to process findAllSortedByName
+  // Unable to process findAllSortedByREId
   tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("id"), getId, setId);
   tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("name"), getName, setName);
   tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("rEId"), getREId, setREId);
   tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("rELabel"), getRELabel, setRELabel);
   tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("children"), getChildren, setChildren);
+  NanSetPrototypeTemplate(tpl, "addChildById", NanNew<v8::FunctionTemplate>(addChildById)->GetFunction());
+  NanSetPrototypeTemplate(tpl, "removeChildById", NanNew<v8::FunctionTemplate>(removeChildById)->GetFunction());
   tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("parents"), getParents, setParents);
+  NanSetPrototypeTemplate(tpl, "addParentById", NanNew<v8::FunctionTemplate>(addParentById)->GetFunction());
+  NanSetPrototypeTemplate(tpl, "removeParentById", NanNew<v8::FunctionTemplate>(removeParentById)->GetFunction());
 
   NanAssignPersistent<v8::Function>(constructor, tpl->GetFunction());
   exports->Set(NanNew<v8::String>("Style"), tpl->GetFunction());
 }
-
 
 NAN_METHOD(Style::clear) {
   NanScope();
@@ -75,13 +81,13 @@ NAN_METHOD(Style::findById) {
   NanScope();
 
   int a0(args[0]->Uint32Value());
-  dogatech::soulsifter::Style* style =
+  dogatech::soulsifter::Style* result =
       dogatech::soulsifter::Style::findById(a0);
-  v8::Local<v8::Function> cons = NanNew<v8::Function>(constructor);
-  v8::Local<v8::Object> instance = cons->NewInstance();
 
-  Style* obj = ObjectWrap::Unwrap<Style>(instance);
-  obj->style = style;
+  if (result == NULL) NanReturnUndefined();
+  v8::Local<v8::Object> instance = Style::NewInstance();
+  Style* r = ObjectWrap::Unwrap<Style>(instance);
+  r->setNwcpValue(result, true);
 
   NanReturnValue(instance);
 }
@@ -90,13 +96,13 @@ NAN_METHOD(Style::findByREId) {
   NanScope();
 
   int a0(args[0]->Uint32Value());
-  dogatech::soulsifter::Style* style =
+  dogatech::soulsifter::Style* result =
       dogatech::soulsifter::Style::findByREId(a0);
-  v8::Local<v8::Function> cons = NanNew<v8::Function>(constructor);
-  v8::Local<v8::Object> instance = cons->NewInstance();
 
-  Style* obj = ObjectWrap::Unwrap<Style>(instance);
-  obj->style = style;
+  if (result == NULL) NanReturnUndefined();
+  v8::Local<v8::Object> instance = Style::NewInstance();
+  Style* r = ObjectWrap::Unwrap<Style>(instance);
+  r->setNwcpValue(result, true);
 
   NanReturnValue(instance);
 }
@@ -246,14 +252,13 @@ NAN_GETTER(Style::getChildren) {
   NanScope();
 
   Style* obj = ObjectWrap::Unwrap<Style>(args.This());
-  const vector<dogatech::soulsifter::Style*> result =  obj->style->getChildren();
+  const std::vector<dogatech::soulsifter::Style*> result =  obj->style->getChildren();
 
   v8::Handle<v8::Array> a = NanNew<v8::Array>((int) result.size());
   for (int i = 0; i < (int) result.size(); i++) {
-    v8::Local<v8::Function> cons = NanNew<v8::Function>(constructor);
-    v8::Local<v8::Object> instance = cons->NewInstance();
-    Style* o = ObjectWrap::Unwrap<Style>(instance);
-    o->style = result[i];
+    v8::Local<v8::Object> instance = Style::NewInstance();
+    Style* r = ObjectWrap::Unwrap<Style>(instance);
+    r->setNwcpValue((result)[i], false);
     a->Set(NanNew<v8::Number>(i), instance);
   }
   NanReturnValue(a);
@@ -263,10 +268,10 @@ NAN_SETTER(Style::setChildren) {
   NanScope();
 
   Style* obj = ObjectWrap::Unwrap<Style>(args.This());
-  v8::Local<v8::Array> array = v8::Local<v8::Array>::Cast(value);
+  v8::Local<v8::Array> a0Array = v8::Local<v8::Array>::Cast(value);
   std::vector<dogatech::soulsifter::Style*> a0;
-  for (int i = 0; i < array->Length(); ++i) {
-    v8::Local<v8::Value> tmp = array->Get(i);
+  for (int i = 0; i < a0Array->Length(); ++i) {
+    v8::Local<v8::Value> tmp = a0Array->Get(i);
     dogatech::soulsifter::Style* x(node::ObjectWrap::Unwrap<Style>(tmp->ToObject())->getNwcpValue());
     a0.push_back(x);
   }
@@ -299,14 +304,13 @@ NAN_GETTER(Style::getParents) {
   NanScope();
 
   Style* obj = ObjectWrap::Unwrap<Style>(args.This());
-  const vector<dogatech::soulsifter::Style*> result =  obj->style->getParents();
+  const std::vector<dogatech::soulsifter::Style*> result =  obj->style->getParents();
 
   v8::Handle<v8::Array> a = NanNew<v8::Array>((int) result.size());
   for (int i = 0; i < (int) result.size(); i++) {
-    v8::Local<v8::Function> cons = NanNew<v8::Function>(constructor);
-    v8::Local<v8::Object> instance = cons->NewInstance();
-    Style* o = ObjectWrap::Unwrap<Style>(instance);
-    o->style = result[i];
+    v8::Local<v8::Object> instance = Style::NewInstance();
+    Style* r = ObjectWrap::Unwrap<Style>(instance);
+    r->setNwcpValue((result)[i], false);
     a->Set(NanNew<v8::Number>(i), instance);
   }
   NanReturnValue(a);
@@ -316,10 +320,10 @@ NAN_SETTER(Style::setParents) {
   NanScope();
 
   Style* obj = ObjectWrap::Unwrap<Style>(args.This());
-  v8::Local<v8::Array> array = v8::Local<v8::Array>::Cast(value);
+  v8::Local<v8::Array> a0Array = v8::Local<v8::Array>::Cast(value);
   std::vector<dogatech::soulsifter::Style*> a0;
-  for (int i = 0; i < array->Length(); ++i) {
-    v8::Local<v8::Value> tmp = array->Get(i);
+  for (int i = 0; i < a0Array->Length(); ++i) {
+    v8::Local<v8::Value> tmp = a0Array->Get(i);
     dogatech::soulsifter::Style* x(node::ObjectWrap::Unwrap<Style>(tmp->ToObject())->getNwcpValue());
     a0.push_back(x);
   }

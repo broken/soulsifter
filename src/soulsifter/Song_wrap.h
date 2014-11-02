@@ -10,7 +10,7 @@ class Song : public node::ObjectWrap {
   static void Init(v8::Handle<v8::Object> exports);
   static v8::Local<v8::Object> NewInstance();
 
-  void setNwcpValue(dogatech::soulsifter::Song* v) { song = v; }
+  void setNwcpValue(dogatech::soulsifter::Song* v, bool own);
   dogatech::soulsifter::Song* getNwcpValue() const { return song; }
 
  private:
@@ -28,6 +28,8 @@ class Song : public node::ObjectWrap {
   static NAN_METHOD(sync);
   static NAN_METHOD(update);
   static NAN_METHOD(save);
+  // Unable to process findSongsByStyle
+  // Unable to process createRESongFromSong
   static NAN_METHOD(reAlbum);
   static NAN_GETTER(getDateAddedString);
   static NAN_METHOD(setDateAddedToNow);
@@ -51,6 +53,8 @@ class Song : public node::ObjectWrap {
   static NAN_SETTER(setDateAdded);
   static NAN_GETTER(getBpm);
   static NAN_SETTER(setBpm);
+  // Unable to process getTonicKeys
+  // Unable to process setTonicKeys
   static NAN_METHOD(addTonicKey);
   static NAN_METHOD(removeTonicKey);
   static NAN_GETTER(getComments);
@@ -61,12 +65,16 @@ class Song : public node::ObjectWrap {
   static NAN_SETTER(setLowQuality);
   static NAN_GETTER(getRESongId);
   static NAN_SETTER(setRESongId);
+  // Unable to process getRESong
+  // Unable to process setRESong
   static NAN_GETTER(getAlbumId);
   static NAN_SETTER(setAlbumId);
   static NAN_GETTER(getAlbum);
+  static NAN_SETTER(setAlbum);
   static NAN_GETTER(getAlbumPartId);
   static NAN_SETTER(setAlbumPartId);
   static NAN_GETTER(getAlbumPart);
+  static NAN_SETTER(setAlbumPart);
   static NAN_GETTER(getStyles);
   static NAN_SETTER(setStyles);
   static NAN_METHOD(addStyleById);
@@ -74,6 +82,7 @@ class Song : public node::ObjectWrap {
 
   static v8::Persistent<v8::Function> constructor;
   dogatech::soulsifter::Song* song;
+  bool ownWrappedObject;
 };
 
 #endif

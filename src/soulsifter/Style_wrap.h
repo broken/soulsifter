@@ -10,7 +10,7 @@ class Style : public node::ObjectWrap {
   static void Init(v8::Handle<v8::Object> exports);
   static v8::Local<v8::Object> NewInstance();
 
-  void setNwcpValue(dogatech::soulsifter::Style* v) { style = v; }
+  void setNwcpValue(dogatech::soulsifter::Style* v, bool own);
   dogatech::soulsifter::Style* getNwcpValue() const { return style; }
 
  private:
@@ -28,6 +28,8 @@ class Style : public node::ObjectWrap {
   static NAN_METHOD(update);
   static NAN_METHOD(save);
   static NAN_METHOD(findAllParents);
+  // Unable to process findAllSortedByName
+  // Unable to process findAllSortedByREId
   static NAN_GETTER(getId);
   static NAN_SETTER(setId);
   static NAN_GETTER(getName);
@@ -47,6 +49,7 @@ class Style : public node::ObjectWrap {
 
   static v8::Persistent<v8::Function> constructor;
   dogatech::soulsifter::Style* style;
+  bool ownWrappedObject;
 };
 
 #endif

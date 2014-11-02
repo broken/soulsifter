@@ -1,19 +1,28 @@
 #include <iostream>
 #include <node.h>
 #include <nan.h>
+#include "BasicGenre_wrap.h"
 #include "BasicGenre.h"
 #include "BasicGenre_wrap.h"
+#include "ResultSetIterator.h"
 
 v8::Persistent<v8::Function> BasicGenre::constructor;
 
-BasicGenre::BasicGenre() : ObjectWrap(), basicgenre(new dogatech::soulsifter::BasicGenre()) {};
-BasicGenre::BasicGenre(dogatech::soulsifter::BasicGenre* o) : ObjectWrap(), basicgenre(o) {};
-BasicGenre::~BasicGenre() { delete basicgenre; };
+BasicGenre::BasicGenre() : ObjectWrap(), basicgenre(NULL), ownWrappedObject(true) {};
+BasicGenre::BasicGenre(dogatech::soulsifter::BasicGenre* o) : ObjectWrap(), basicgenre(o), ownWrappedObject(true) {};
+BasicGenre::~BasicGenre() { if (ownWrappedObject) delete basicgenre; };
+
+void BasicGenre::setNwcpValue(dogatech::soulsifter::BasicGenre* v, bool own) {
+  if (ownWrappedObject)
+    delete basicgenre;
+  basicgenre = v;
+  ownWrappedObject = own;
+}
 
 NAN_METHOD(BasicGenre::New) {
   NanScope();
 
-  BasicGenre* obj = new BasicGenre();
+  BasicGenre* obj = new BasicGenre(new dogatech::soulsifter::BasicGenre());
   obj->Wrap(args.This());
 
   NanReturnValue(args.This());
@@ -34,25 +43,20 @@ void BasicGenre::Init(v8::Handle<v8::Object> exports) {
   tpl->SetClassName(NanNew<v8::String>("BasicGenre"));
   tpl->InstanceTemplate()->SetInternalFieldCount(1);
 
+  NanSetPrototypeTemplate(tpl, "clear", NanNew<v8::FunctionTemplate>(clear)->GetFunction());
   NanSetTemplate(tpl, "findById", NanNew<v8::FunctionTemplate>(findById)->GetFunction());
   NanSetTemplate(tpl, "findByName", NanNew<v8::FunctionTemplate>(findByName)->GetFunction());
   NanSetTemplate(tpl, "findAll", NanNew<v8::FunctionTemplate>(findAll)->GetFunction());
-  NanSetTemplate(tpl, "findByFilepath", NanNew<v8::FunctionTemplate>(findByFilepath)->GetFunction());
-
-  // Prototype
-  NanSetPrototypeTemplate(tpl, "clear", NanNew<v8::FunctionTemplate>(clear)->GetFunction());
   NanSetPrototypeTemplate(tpl, "sync", NanNew<v8::FunctionTemplate>(sync)->GetFunction());
   NanSetPrototypeTemplate(tpl, "update", NanNew<v8::FunctionTemplate>(update)->GetFunction());
   NanSetPrototypeTemplate(tpl, "save", NanNew<v8::FunctionTemplate>(save)->GetFunction());
-
-  // Accessors
+  NanSetTemplate(tpl, "findByFilepath", NanNew<v8::FunctionTemplate>(findByFilepath)->GetFunction());
   tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("id"), getId, setId);
   tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("name"), getName, setName);
 
   NanAssignPersistent<v8::Function>(constructor, tpl->GetFunction());
   exports->Set(NanNew<v8::String>("BasicGenre"), tpl->GetFunction());
 }
-
 
 NAN_METHOD(BasicGenre::clear) {
   NanScope();
@@ -67,13 +71,13 @@ NAN_METHOD(BasicGenre::findById) {
   NanScope();
 
   int a0(args[0]->Uint32Value());
-  dogatech::soulsifter::BasicGenre* basicgenre =
+  dogatech::soulsifter::BasicGenre* result =
       dogatech::soulsifter::BasicGenre::findById(a0);
-  v8::Local<v8::Function> cons = NanNew<v8::Function>(constructor);
-  v8::Local<v8::Object> instance = cons->NewInstance();
 
-  BasicGenre* obj = ObjectWrap::Unwrap<BasicGenre>(instance);
-  obj->basicgenre = basicgenre;
+  if (result == NULL) NanReturnUndefined();
+  v8::Local<v8::Object> instance = BasicGenre::NewInstance();
+  BasicGenre* r = ObjectWrap::Unwrap<BasicGenre>(instance);
+  r->setNwcpValue(result, true);
 
   NanReturnValue(instance);
 }
@@ -82,13 +86,13 @@ NAN_METHOD(BasicGenre::findByName) {
   NanScope();
 
   string a0(*v8::String::Utf8Value(args[0]->ToString()));
-  dogatech::soulsifter::BasicGenre* basicgenre =
+  dogatech::soulsifter::BasicGenre* result =
       dogatech::soulsifter::BasicGenre::findByName(a0);
-  v8::Local<v8::Function> cons = NanNew<v8::Function>(constructor);
-  v8::Local<v8::Object> instance = cons->NewInstance();
 
-  BasicGenre* obj = ObjectWrap::Unwrap<BasicGenre>(instance);
-  obj->basicgenre = basicgenre;
+  if (result == NULL) NanReturnUndefined();
+  v8::Local<v8::Object> instance = BasicGenre::NewInstance();
+  BasicGenre* r = ObjectWrap::Unwrap<BasicGenre>(instance);
+  r->setNwcpValue(result, true);
 
   NanReturnValue(instance);
 }
@@ -143,13 +147,13 @@ NAN_METHOD(BasicGenre::findByFilepath) {
   NanScope();
 
   string a0(*v8::String::Utf8Value(args[0]->ToString()));
-  dogatech::soulsifter::BasicGenre* basicgenre =
+  dogatech::soulsifter::BasicGenre* result =
       dogatech::soulsifter::BasicGenre::findByFilepath(a0);
-  v8::Local<v8::Function> cons = NanNew<v8::Function>(constructor);
-  v8::Local<v8::Object> instance = cons->NewInstance();
 
-  BasicGenre* obj = ObjectWrap::Unwrap<BasicGenre>(instance);
-  obj->basicgenre = basicgenre;
+  if (result == NULL) NanReturnUndefined();
+  v8::Local<v8::Object> instance = BasicGenre::NewInstance();
+  BasicGenre* r = ObjectWrap::Unwrap<BasicGenre>(instance);
+  r->setNwcpValue(result, true);
 
   NanReturnValue(instance);
 }

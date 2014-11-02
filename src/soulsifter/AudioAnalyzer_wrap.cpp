@@ -1,23 +1,25 @@
 #include <iostream>
 #include <node.h>
 #include <nan.h>
-#include "AudioAnalyzer.h"
 #include "AudioAnalyzer_wrap.h"
-#include "Song.h"
-#include "Song_wrap.h"
-#include "Style.h"
-#include "Style_wrap.h"
 
 v8::Persistent<v8::Function> AudioAnalyzer::constructor;
 
-AudioAnalyzer::AudioAnalyzer() : ObjectWrap(), audioAnalyzer(new dogatech::soulsifter::AudioAnalyzer()) {};
-AudioAnalyzer::AudioAnalyzer(dogatech::soulsifter::AudioAnalyzer* o) : ObjectWrap(), audioAnalyzer(o) {};
-AudioAnalyzer::~AudioAnalyzer() { delete audioAnalyzer; };
+AudioAnalyzer::AudioAnalyzer() : ObjectWrap(), audioanalyzer(NULL), ownWrappedObject(true) {};
+AudioAnalyzer::AudioAnalyzer(dogatech::soulsifter::AudioAnalyzer* o) : ObjectWrap(), audioanalyzer(o), ownWrappedObject(true) {};
+AudioAnalyzer::~AudioAnalyzer() { if (ownWrappedObject) delete audioanalyzer; };
+
+void AudioAnalyzer::setNwcpValue(dogatech::soulsifter::AudioAnalyzer* v, bool own) {
+  if (ownWrappedObject)
+    delete audioanalyzer;
+  audioanalyzer = v;
+  ownWrappedObject = own;
+}
 
 NAN_METHOD(AudioAnalyzer::New) {
   NanScope();
 
-  AudioAnalyzer* obj = new AudioAnalyzer();
+  AudioAnalyzer* obj = new AudioAnalyzer(new dogatech::soulsifter::AudioAnalyzer());
   obj->Wrap(args.This());
 
   NanReturnValue(args.This());
@@ -38,21 +40,20 @@ void AudioAnalyzer::Init(v8::Handle<v8::Object> exports) {
   tpl->SetClassName(NanNew<v8::String>("AudioAnalyzer"));
   tpl->InstanceTemplate()->SetInternalFieldCount(1);
 
+  // Unable to process analyzeKey
+  // Unable to process analyzeBpm
   NanSetTemplate(tpl, "analyzeBpms", NanNew<v8::FunctionTemplate>(analyzeBpms)->GetFunction());
-
-  // Prototype
-
-  // Accessors
 
   NanAssignPersistent<v8::Function>(constructor, tpl->GetFunction());
   exports->Set(NanNew<v8::String>("AudioAnalyzer"), tpl->GetFunction());
 }
 
-
 NAN_METHOD(AudioAnalyzer::analyzeBpms) {
   NanScope();
 
-  dogatech::soulsifter::AudioAnalyzer::analyzeBpms();
+
+      dogatech::soulsifter::AudioAnalyzer::analyzeBpms();
 
   NanReturnUndefined();
 }
+

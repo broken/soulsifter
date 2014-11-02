@@ -1,25 +1,34 @@
 #include <iostream>
 #include <node.h>
 #include <nan.h>
+#include "Song_wrap.h"
+#include "Album.h"
+#include "AlbumPart.h"
+#include "AlbumPart_wrap.h"
+#include "Album_wrap.h"
+#include "ResultSetIterator.h"
 #include "Song.h"
 #include "Song_wrap.h"
 #include "Style.h"
 #include "Style_wrap.h"
-#include "AlbumPart.h"
-#include "AlbumPart_wrap.h"
-#include "Album.h"
-#include "Album_wrap.h"
 
 v8::Persistent<v8::Function> Song::constructor;
 
-Song::Song() : ObjectWrap(), song(new dogatech::soulsifter::Song()) {};
-Song::Song(dogatech::soulsifter::Song* o) : ObjectWrap(), song(o) {};
-Song::~Song() { delete song; };
+Song::Song() : ObjectWrap(), song(NULL), ownWrappedObject(true) {};
+Song::Song(dogatech::soulsifter::Song* o) : ObjectWrap(), song(o), ownWrappedObject(true) {};
+Song::~Song() { if (ownWrappedObject) delete song; };
+
+void Song::setNwcpValue(dogatech::soulsifter::Song* v, bool own) {
+  if (ownWrappedObject)
+    delete song;
+  song = v;
+  ownWrappedObject = own;
+}
 
 NAN_METHOD(Song::New) {
   NanScope();
 
-  Song* obj = new Song();
+  Song* obj = new Song(new dogatech::soulsifter::Song());
   obj->Wrap(args.This());
 
   NanReturnValue(args.This());
@@ -40,25 +49,19 @@ void Song::Init(v8::Handle<v8::Object> exports) {
   tpl->SetClassName(NanNew<v8::String>("Song"));
   tpl->InstanceTemplate()->SetInternalFieldCount(1);
 
+  NanSetPrototypeTemplate(tpl, "clear", NanNew<v8::FunctionTemplate>(clear)->GetFunction());
   NanSetTemplate(tpl, "findById", NanNew<v8::FunctionTemplate>(findById)->GetFunction());
   NanSetTemplate(tpl, "findByFilepath", NanNew<v8::FunctionTemplate>(findByFilepath)->GetFunction());
   NanSetTemplate(tpl, "findByRESongId", NanNew<v8::FunctionTemplate>(findByRESongId)->GetFunction());
   NanSetTemplate(tpl, "findAll", NanNew<v8::FunctionTemplate>(findAll)->GetFunction());
-
-  // Prototype
-  NanSetPrototypeTemplate(tpl, "clear", NanNew<v8::FunctionTemplate>(clear)->GetFunction());
   NanSetPrototypeTemplate(tpl, "sync", NanNew<v8::FunctionTemplate>(sync)->GetFunction());
   NanSetPrototypeTemplate(tpl, "update", NanNew<v8::FunctionTemplate>(update)->GetFunction());
   NanSetPrototypeTemplate(tpl, "save", NanNew<v8::FunctionTemplate>(save)->GetFunction());
+  // Unable to process findSongsByStyle
+  // Unable to process createRESongFromSong
   NanSetPrototypeTemplate(tpl, "reAlbum", NanNew<v8::FunctionTemplate>(reAlbum)->GetFunction());
-  NanSetPrototypeTemplate(tpl, "setDateAddedToNow", NanNew<v8::FunctionTemplate>(setDateAddedToNow)->GetFunction());
-  NanSetPrototypeTemplate(tpl, "addTonicKey", NanNew<v8::FunctionTemplate>(addTonicKey)->GetFunction());
-  NanSetPrototypeTemplate(tpl, "removeTonicKey", NanNew<v8::FunctionTemplate>(removeTonicKey)->GetFunction());
-  NanSetPrototypeTemplate(tpl, "addStyleById", NanNew<v8::FunctionTemplate>(addStyleById)->GetFunction());
-  NanSetPrototypeTemplate(tpl, "removeStyleById", NanNew<v8::FunctionTemplate>(removeStyleById)->GetFunction());
-
-  // Accessors
   tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("dateAddedString"), getDateAddedString);
+  NanSetPrototypeTemplate(tpl, "setDateAddedToNow", NanNew<v8::FunctionTemplate>(setDateAddedToNow)->GetFunction());
   tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("id"), getId, setId);
   tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("artist"), getArtist, setArtist);
   tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("track"), getTrack, setTrack);
@@ -69,20 +72,27 @@ void Song::Init(v8::Handle<v8::Object> exports) {
   tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("rating"), getRating, setRating);
   tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("dateAdded"), getDateAdded, setDateAdded);
   tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("bpm"), getBpm, setBpm);
+  // Unable to process getTonicKeys
+  // Unable to process setTonicKeys
+  NanSetPrototypeTemplate(tpl, "addTonicKey", NanNew<v8::FunctionTemplate>(addTonicKey)->GetFunction());
+  NanSetPrototypeTemplate(tpl, "removeTonicKey", NanNew<v8::FunctionTemplate>(removeTonicKey)->GetFunction());
   tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("comments"), getComments, setComments);
   tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("trashed"), getTrashed, setTrashed);
   tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("lowQuality"), getLowQuality, setLowQuality);
   tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("rESongId"), getRESongId, setRESongId);
+  // Unable to process getRESong
+  // Unable to process setRESong
   tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("albumId"), getAlbumId, setAlbumId);
-  tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("album"), getAlbum);
+  tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("album"), getAlbum, setAlbum);
   tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("albumPartId"), getAlbumPartId, setAlbumPartId);
-  tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("albumPart"), getAlbumPart);
+  tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("albumPart"), getAlbumPart, setAlbumPart);
   tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("styles"), getStyles, setStyles);
+  NanSetPrototypeTemplate(tpl, "addStyleById", NanNew<v8::FunctionTemplate>(addStyleById)->GetFunction());
+  NanSetPrototypeTemplate(tpl, "removeStyleById", NanNew<v8::FunctionTemplate>(removeStyleById)->GetFunction());
 
   NanAssignPersistent<v8::Function>(constructor, tpl->GetFunction());
   exports->Set(NanNew<v8::String>("Song"), tpl->GetFunction());
 }
-
 
 NAN_METHOD(Song::clear) {
   NanScope();
@@ -97,13 +107,13 @@ NAN_METHOD(Song::findById) {
   NanScope();
 
   int a0(args[0]->Uint32Value());
-  dogatech::soulsifter::Song* song =
+  dogatech::soulsifter::Song* result =
       dogatech::soulsifter::Song::findById(a0);
-  v8::Local<v8::Function> cons = NanNew<v8::Function>(constructor);
-  v8::Local<v8::Object> instance = cons->NewInstance();
 
-  Song* obj = ObjectWrap::Unwrap<Song>(instance);
-  obj->song = song;
+  if (result == NULL) NanReturnUndefined();
+  v8::Local<v8::Object> instance = Song::NewInstance();
+  Song* r = ObjectWrap::Unwrap<Song>(instance);
+  r->setNwcpValue(result, true);
 
   NanReturnValue(instance);
 }
@@ -112,13 +122,13 @@ NAN_METHOD(Song::findByFilepath) {
   NanScope();
 
   string a0(*v8::String::Utf8Value(args[0]->ToString()));
-  dogatech::soulsifter::Song* song =
+  dogatech::soulsifter::Song* result =
       dogatech::soulsifter::Song::findByFilepath(a0);
-  v8::Local<v8::Function> cons = NanNew<v8::Function>(constructor);
-  v8::Local<v8::Object> instance = cons->NewInstance();
 
-  Song* obj = ObjectWrap::Unwrap<Song>(instance);
-  obj->song = song;
+  if (result == NULL) NanReturnUndefined();
+  v8::Local<v8::Object> instance = Song::NewInstance();
+  Song* r = ObjectWrap::Unwrap<Song>(instance);
+  r->setNwcpValue(result, true);
 
   NanReturnValue(instance);
 }
@@ -127,13 +137,13 @@ NAN_METHOD(Song::findByRESongId) {
   NanScope();
 
   int a0(args[0]->Uint32Value());
-  dogatech::soulsifter::Song* song =
+  dogatech::soulsifter::Song* result =
       dogatech::soulsifter::Song::findByRESongId(a0);
-  v8::Local<v8::Function> cons = NanNew<v8::Function>(constructor);
-  v8::Local<v8::Object> instance = cons->NewInstance();
 
-  Song* obj = ObjectWrap::Unwrap<Song>(instance);
-  obj->song = song;
+  if (result == NULL) NanReturnUndefined();
+  v8::Local<v8::Object> instance = Song::NewInstance();
+  Song* r = ObjectWrap::Unwrap<Song>(instance);
+  r->setNwcpValue(result, true);
 
   NanReturnValue(instance);
 }
@@ -369,7 +379,7 @@ NAN_GETTER(Song::getDateAdded) {
   Song* obj = ObjectWrap::Unwrap<Song>(args.This());
   const time_t result =  obj->song->getDateAdded();
 
-  NanReturnValue(NanNew<v8::Number>(result* 1000));
+  NanReturnValue(NanNew<v8::Number>(result * 1000));
 }
 
 NAN_SETTER(Song::setDateAdded) {
@@ -521,12 +531,24 @@ NAN_GETTER(Song::getAlbum) {
 
   Song* obj = ObjectWrap::Unwrap<Song>(args.This());
   dogatech::soulsifter::Album* result =  obj->song->getAlbum();
-  if (result == NULL) NanReturnUndefined();
 
+  if (result == NULL) NanReturnUndefined();
   v8::Local<v8::Object> instance = Album::NewInstance();
   Album* r = ObjectWrap::Unwrap<Album>(instance);
-  r->setNwcpValue(result);
+  r->setNwcpValue(result, false);
+
   NanReturnValue(instance);
+}
+
+NAN_SETTER(Song::setAlbum) {
+  NanScope();
+
+  Song* obj = ObjectWrap::Unwrap<Song>(args.This());
+  dogatech::soulsifter::Album* a0tmp(node::ObjectWrap::Unwrap<Album>(value->ToObject())->getNwcpValue());
+  dogatech::soulsifter::Album& a0 = *a0tmp;
+  obj->song->setAlbum(a0);
+
+  NanReturnUndefined();
 }
 
 NAN_GETTER(Song::getAlbumPartId) {
@@ -553,25 +575,37 @@ NAN_GETTER(Song::getAlbumPart) {
 
   Song* obj = ObjectWrap::Unwrap<Song>(args.This());
   dogatech::soulsifter::AlbumPart* result =  obj->song->getAlbumPart();
-  if (result == NULL) NanReturnUndefined();
 
+  if (result == NULL) NanReturnUndefined();
   v8::Local<v8::Object> instance = AlbumPart::NewInstance();
   AlbumPart* r = ObjectWrap::Unwrap<AlbumPart>(instance);
-  r->setNwcpValue(result);
+  r->setNwcpValue(result, false);
+
   NanReturnValue(instance);
+}
+
+NAN_SETTER(Song::setAlbumPart) {
+  NanScope();
+
+  Song* obj = ObjectWrap::Unwrap<Song>(args.This());
+  dogatech::soulsifter::AlbumPart* a0tmp(node::ObjectWrap::Unwrap<AlbumPart>(value->ToObject())->getNwcpValue());
+  dogatech::soulsifter::AlbumPart& a0 = *a0tmp;
+  obj->song->setAlbumPart(a0);
+
+  NanReturnUndefined();
 }
 
 NAN_GETTER(Song::getStyles) {
   NanScope();
 
   Song* obj = ObjectWrap::Unwrap<Song>(args.This());
-  const vector<dogatech::soulsifter::Style*> result =  obj->song->getStyles();
+  const std::vector<dogatech::soulsifter::Style*> result =  obj->song->getStyles();
 
   v8::Handle<v8::Array> a = NanNew<v8::Array>((int) result.size());
   for (int i = 0; i < (int) result.size(); i++) {
     v8::Local<v8::Object> instance = Style::NewInstance();
-    Style* o = ObjectWrap::Unwrap<Style>(instance);
-    o->setNwcpValue((result)[i]);
+    Style* r = ObjectWrap::Unwrap<Style>(instance);
+    r->setNwcpValue((result)[i], false);
     a->Set(NanNew<v8::Number>(i), instance);
   }
   NanReturnValue(a);
@@ -581,10 +615,10 @@ NAN_SETTER(Song::setStyles) {
   NanScope();
 
   Song* obj = ObjectWrap::Unwrap<Song>(args.This());
-  v8::Local<v8::Array> array = v8::Local<v8::Array>::Cast(value);
+  v8::Local<v8::Array> a0Array = v8::Local<v8::Array>::Cast(value);
   std::vector<dogatech::soulsifter::Style*> a0;
-  for (int i = 0; i < array->Length(); ++i) {
-    v8::Local<v8::Value> tmp = array->Get(i);
+  for (int i = 0; i < a0Array->Length(); ++i) {
+    v8::Local<v8::Value> tmp = a0Array->Get(i);
     dogatech::soulsifter::Style* x(node::ObjectWrap::Unwrap<Style>(tmp->ToObject())->getNwcpValue());
     a0.push_back(x);
   }

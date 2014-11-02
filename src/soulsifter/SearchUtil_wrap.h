@@ -10,7 +10,7 @@ class SearchUtil : public node::ObjectWrap {
   static void Init(v8::Handle<v8::Object> exports);
   static v8::Local<v8::Object> NewInstance();
 
-  void setNwcpValue(dogatech::soulsifter::SearchUtil* v) { searchutil = v; }
+  void setNwcpValue(dogatech::soulsifter::SearchUtil* v, bool own);
   dogatech::soulsifter::SearchUtil* getNwcpValue() const { return searchutil; }
 
  private:
@@ -24,6 +24,7 @@ class SearchUtil : public node::ObjectWrap {
 
   static v8::Persistent<v8::Function> constructor;
   dogatech::soulsifter::SearchUtil* searchutil;
+  bool ownWrappedObject;
 };
 
 #endif

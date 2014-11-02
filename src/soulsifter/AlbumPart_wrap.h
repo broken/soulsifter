@@ -10,7 +10,7 @@ class AlbumPart : public node::ObjectWrap {
   static void Init(v8::Handle<v8::Object> exports);
   static v8::Local<v8::Object> NewInstance();
 
-  void setNwcpValue(dogatech::soulsifter::AlbumPart* v) { albumpart = v; }
+  void setNwcpValue(dogatech::soulsifter::AlbumPart* v, bool own);
   dogatech::soulsifter::AlbumPart* getNwcpValue() const { return albumpart; }
 
  private:
@@ -36,9 +36,11 @@ class AlbumPart : public node::ObjectWrap {
   static NAN_GETTER(getAlbumId);
   static NAN_SETTER(setAlbumId);
   static NAN_GETTER(getAlbum);
+  static NAN_SETTER(setAlbum);
 
   static v8::Persistent<v8::Function> constructor;
   dogatech::soulsifter::AlbumPart* albumpart;
+  bool ownWrappedObject;
 };
 
 #endif

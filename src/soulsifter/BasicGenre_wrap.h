@@ -10,7 +10,7 @@ class BasicGenre : public node::ObjectWrap {
   static void Init(v8::Handle<v8::Object> exports);
   static v8::Local<v8::Object> NewInstance();
 
-  void setNwcpValue(dogatech::soulsifter::BasicGenre* v) { basicgenre = v; }
+  void setNwcpValue(dogatech::soulsifter::BasicGenre* v, bool own);
   dogatech::soulsifter::BasicGenre* getNwcpValue() const { return basicgenre; }
 
  private:
@@ -35,6 +35,7 @@ class BasicGenre : public node::ObjectWrap {
 
   static v8::Persistent<v8::Function> constructor;
   dogatech::soulsifter::BasicGenre* basicgenre;
+  bool ownWrappedObject;
 };
 
 #endif

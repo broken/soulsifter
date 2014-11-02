@@ -1,19 +1,30 @@
 #include <iostream>
 #include <node.h>
 #include <nan.h>
+#include "Album_wrap.h"
 #include "Album.h"
 #include "Album_wrap.h"
+#include "BasicGenre.h"
+#include "BasicGenre_wrap.h"
+#include "ResultSetIterator.h"
 
 v8::Persistent<v8::Function> Album::constructor;
 
-Album::Album() : ObjectWrap(), album(new dogatech::soulsifter::Album()), ownership(true) {};
-Album::Album(dogatech::soulsifter::Album* o) : ObjectWrap(), album(o), ownership(true) {};
-Album::~Album() { if (ownership) delete album; };
+Album::Album() : ObjectWrap(), album(NULL), ownWrappedObject(true) {};
+Album::Album(dogatech::soulsifter::Album* o) : ObjectWrap(), album(o), ownWrappedObject(true) {};
+Album::~Album() { if (ownWrappedObject) delete album; };
+
+void Album::setNwcpValue(dogatech::soulsifter::Album* v, bool own) {
+  if (ownWrappedObject)
+    delete album;
+  album = v;
+  ownWrappedObject = own;
+}
 
 NAN_METHOD(Album::New) {
   NanScope();
 
-  Album* obj = new Album();
+  Album* obj = new Album(new dogatech::soulsifter::Album());
   obj->Wrap(args.This());
 
   NanReturnValue(args.This());
@@ -34,19 +45,15 @@ void Album::Init(v8::Handle<v8::Object> exports) {
   tpl->SetClassName(NanNew<v8::String>("Album"));
   tpl->InstanceTemplate()->SetInternalFieldCount(1);
 
+  NanSetPrototypeTemplate(tpl, "clear", NanNew<v8::FunctionTemplate>(clear)->GetFunction());
   NanSetTemplate(tpl, "findById", NanNew<v8::FunctionTemplate>(findById)->GetFunction());
   NanSetTemplate(tpl, "findByCoverFilepath", NanNew<v8::FunctionTemplate>(findByCoverFilepath)->GetFunction());
   NanSetTemplate(tpl, "findByNameAndArtist", NanNew<v8::FunctionTemplate>(findByNameAndArtist)->GetFunction());
   NanSetTemplate(tpl, "findAll", NanNew<v8::FunctionTemplate>(findAll)->GetFunction());
-
-  // Prototype
-  NanSetPrototypeTemplate(tpl, "clear", NanNew<v8::FunctionTemplate>(clear)->GetFunction());
   NanSetPrototypeTemplate(tpl, "sync", NanNew<v8::FunctionTemplate>(sync)->GetFunction());
   NanSetPrototypeTemplate(tpl, "update", NanNew<v8::FunctionTemplate>(update)->GetFunction());
   NanSetPrototypeTemplate(tpl, "save", NanNew<v8::FunctionTemplate>(save)->GetFunction());
   NanSetPrototypeTemplate(tpl, "reReleaseDate", NanNew<v8::FunctionTemplate>(reReleaseDate)->GetFunction());
-
-  // Accessors
   tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("id"), getId, setId);
   tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("name"), getName, setName);
   tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("artist"), getArtist, setArtist);
@@ -58,11 +65,11 @@ void Album::Init(v8::Handle<v8::Object> exports) {
   tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("releaseDateMonth"), getReleaseDateMonth, setReleaseDateMonth);
   tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("releaseDateDay"), getReleaseDateDay, setReleaseDateDay);
   tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("basicGenreId"), getBasicGenreId, setBasicGenreId);
+  tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("basicGenre"), getBasicGenre, setBasicGenre);
 
   NanAssignPersistent<v8::Function>(constructor, tpl->GetFunction());
   exports->Set(NanNew<v8::String>("Album"), tpl->GetFunction());
 }
-
 
 NAN_METHOD(Album::clear) {
   NanScope();
@@ -77,13 +84,13 @@ NAN_METHOD(Album::findById) {
   NanScope();
 
   int a0(args[0]->Uint32Value());
-  dogatech::soulsifter::Album* album =
+  dogatech::soulsifter::Album* result =
       dogatech::soulsifter::Album::findById(a0);
-  v8::Local<v8::Function> cons = NanNew<v8::Function>(constructor);
-  v8::Local<v8::Object> instance = cons->NewInstance();
 
-  Album* obj = ObjectWrap::Unwrap<Album>(instance);
-  obj->album = album;
+  if (result == NULL) NanReturnUndefined();
+  v8::Local<v8::Object> instance = Album::NewInstance();
+  Album* r = ObjectWrap::Unwrap<Album>(instance);
+  r->setNwcpValue(result, true);
 
   NanReturnValue(instance);
 }
@@ -92,13 +99,13 @@ NAN_METHOD(Album::findByCoverFilepath) {
   NanScope();
 
   string a0(*v8::String::Utf8Value(args[0]->ToString()));
-  dogatech::soulsifter::Album* album =
+  dogatech::soulsifter::Album* result =
       dogatech::soulsifter::Album::findByCoverFilepath(a0);
-  v8::Local<v8::Function> cons = NanNew<v8::Function>(constructor);
-  v8::Local<v8::Object> instance = cons->NewInstance();
 
-  Album* obj = ObjectWrap::Unwrap<Album>(instance);
-  obj->album = album;
+  if (result == NULL) NanReturnUndefined();
+  v8::Local<v8::Object> instance = Album::NewInstance();
+  Album* r = ObjectWrap::Unwrap<Album>(instance);
+  r->setNwcpValue(result, true);
 
   NanReturnValue(instance);
 }
@@ -108,13 +115,13 @@ NAN_METHOD(Album::findByNameAndArtist) {
 
   string a0(*v8::String::Utf8Value(args[0]->ToString()));
   string a1(*v8::String::Utf8Value(args[1]->ToString()));
-  dogatech::soulsifter::Album* album =
+  dogatech::soulsifter::Album* result =
       dogatech::soulsifter::Album::findByNameAndArtist(a0, a1);
-  v8::Local<v8::Function> cons = NanNew<v8::Function>(constructor);
-  v8::Local<v8::Object> instance = cons->NewInstance();
 
-  Album* obj = ObjectWrap::Unwrap<Album>(instance);
-  obj->album = album;
+  if (result == NULL) NanReturnUndefined();
+  v8::Local<v8::Object> instance = Album::NewInstance();
+  Album* r = ObjectWrap::Unwrap<Album>(instance);
+  r->setNwcpValue(result, true);
 
   NanReturnValue(instance);
 }
@@ -379,6 +386,31 @@ NAN_SETTER(Album::setBasicGenreId) {
   Album* obj = ObjectWrap::Unwrap<Album>(args.This());
   int a0(value->Uint32Value());
   obj->album->setBasicGenreId(a0);
+
+  NanReturnUndefined();
+}
+
+NAN_GETTER(Album::getBasicGenre) {
+  NanScope();
+
+  Album* obj = ObjectWrap::Unwrap<Album>(args.This());
+  dogatech::soulsifter::BasicGenre* result =  obj->album->getBasicGenre();
+
+  if (result == NULL) NanReturnUndefined();
+  v8::Local<v8::Object> instance = BasicGenre::NewInstance();
+  BasicGenre* r = ObjectWrap::Unwrap<BasicGenre>(instance);
+  r->setNwcpValue(result, false);
+
+  NanReturnValue(instance);
+}
+
+NAN_SETTER(Album::setBasicGenre) {
+  NanScope();
+
+  Album* obj = ObjectWrap::Unwrap<Album>(args.This());
+  dogatech::soulsifter::BasicGenre* a0tmp(node::ObjectWrap::Unwrap<BasicGenre>(value->ToObject())->getNwcpValue());
+  dogatech::soulsifter::BasicGenre& a0 = *a0tmp;
+  obj->album->setBasicGenre(a0);
 
   NanReturnUndefined();
 }
