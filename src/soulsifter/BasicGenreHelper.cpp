@@ -21,7 +21,7 @@
 namespace dogatech {
 namespace soulsifter {
     
-    const BasicGenre* BasicGenre::findByFilepath(const string& filepath) {
+    BasicGenre* BasicGenre::findByFilepath(const string& filepath) {
         unsigned long pos = filepath.find("/mp3/");
         if (pos != string::npos) {
             pos += 5;
