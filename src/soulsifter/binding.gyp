@@ -20,8 +20,6 @@
           "REAlbumCover.cpp",
           "RESetting.cpp",
           "RESettingHelper.cpp",
-          "SearchUtil.cpp",
-          "SearchUtil_wrap.cpp",
           "Song.cpp",
           "Song_wrap.cpp",
           "SongHelper.cpp",
@@ -37,6 +35,8 @@
           # organization
           "MusicManager.cpp",
           #"MusicManager_wrap.cpp",
+          "SearchUtil.cpp",
+          "SearchUtil_wrap.cpp",
           "SoulSifterSettings.h",
           #"TagWriter.cpp",
           # persistence
