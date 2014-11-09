@@ -17,7 +17,7 @@
     <core-style ref="main"></core-style>
 
     <global-state values="{{global}}"></global-state>
-    <core-scroll-header-panel fixed headerHeight="256" id="scroll_header_panel">
+    <core-scroll-header-panel fixed headerHeight="256" id="scroll_header_panel" draggable="true" on-dragstart="{{dragSong}}">
       <div class="core-header" id="header"></div>
       <div vertical layout fit class="content">
         <div class="title">{{song.title}}</div>
@@ -51,6 +51,10 @@
         this.$.scroll_header_panel.shadowRoot.querySelector('#headerBg').style.backgroundImage = 'url("' + this.song.album.coverFilepath + '")';
       },
 
+      dragSong: function(e) {
+        e.dataTransfer.effectAllowed = 'move';
+        e.dataTransfer.setData('text/plain', 'extensis-filenames-type:' + this.song.filepath);
+      },
     });
   </script>
 </polymer-element>
