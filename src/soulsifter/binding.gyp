@@ -17,6 +17,8 @@
           "Mix.cpp",
           "Mix_wrap.cpp",
           "MixHelper.cpp",
+          "Playlist.cpp",
+          "Playlist_wrap.cpp",
           "REAlbumCover.cpp",
           "RESetting.cpp",
           "RESettingHelper.cpp",
