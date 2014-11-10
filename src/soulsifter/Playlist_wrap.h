@@ -33,10 +33,6 @@ class Playlist : public node::ObjectWrap {
   static NAN_SETTER(setName);
   static NAN_GETTER(getQuery);
   static NAN_SETTER(setQuery);
-  static NAN_GETTER(getSongs);
-  static NAN_SETTER(setSongs);
-  static NAN_METHOD(addSongById);
-  static NAN_METHOD(removeSongById);
 
   static v8::Persistent<v8::Function> constructor;
   dogatech::soulsifter::Playlist* playlist;

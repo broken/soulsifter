@@ -34,37 +34,28 @@ namespace soulsifter {
     Playlist::Playlist() :
     id(0),
     name(),
-    query(),
-    songs(),
-    songsIds() {
+    query() {
     }
 
     Playlist::Playlist(const Playlist& playlist) :
     id(playlist.getId()),
     name(playlist.getName()),
-    query(playlist.getQuery()),
-    songs(),
-    songsIds(playlist.songsIds) {
+    query(playlist.getQuery()) {
     }
 
     void Playlist::operator=(const Playlist& playlist) {
         id = playlist.getId();
         name = playlist.getName();
         query = playlist.getQuery();
-        songsIds = playlist.songsIds;
-        deleteVectorPointers(&songs);
     }
 
     Playlist::~Playlist() {
-        while (!songs.empty()) delete songs.back(), songs.pop_back();
     }
 
     void Playlist::clear() {
         id = 0;
         name.clear();
         query.clear();
-        deleteVectorPointers(&songs);
-        songsIds.clear();
     }
 
 # pragma mark static methods
@@ -73,18 +64,6 @@ namespace soulsifter {
         playlist->setId(rs->getInt("id"));
         playlist->setName(rs->getString("name"));
         playlist->setQuery(rs->getString("query"));
-        populateSongsIds(playlist);
-    }
-
-    void Playlist::populateSongsIds(Playlist* playlist) {
-        sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select songId from PlaylistSongs where playlistId = ?");
-        ps->setInt(1, playlist->getId());
-        sql::ResultSet *rs = ps->executeQuery();
-        while (rs->next()) {
-            playlist->songsIds.push_back(rs->getInt(1));
-        }
-        rs->close();
-        delete rs;
     }
 
     Playlist* Playlist::findById(int id) {
@@ -179,14 +158,6 @@ namespace soulsifter {
                 query = playlist->getQuery();
             }
         }
-        if (!equivalentVectors<int>(songsIds, playlist->songsIds)) {
-            if (!containsVector<int>(songsIds, playlist->songsIds)) {
-                cout << "updating playlist " << id << " songsIds" << endl;
-                needsUpdate = true;
-            }
-            appendUniqueVector<int>(playlist->songsIds, &songsIds);
-            songs.clear();
-        }
         return needsUpdate;
     }
 
@@ -197,14 +168,6 @@ namespace soulsifter {
             ps->setString(2, query);
             ps->setInt(3, id);
             int result = ps->executeUpdate();
-            if (!songsIds.empty()) {
-                ps = MysqlAccess::getInstance().getPreparedStatement("insert ignore into PlaylistSongs (playlistId, songId) values (?, ?)");
-                for (vector<int>::const_iterator it = songsIds.begin(); it != songsIds.end(); ++it) {
-                    ps->setInt(1, id);
-                    ps->setInt(2, *it);
-                    ps->executeUpdate();
-                }
-            }
             return result;
         } catch (sql::SQLException &e) {
             cerr << "ERROR: SQLException in " << __FILE__;
@@ -231,14 +194,6 @@ namespace soulsifter {
                     cerr << "Inserted playlist, but unable to retreive inserted ID." << endl;
                     return saved;
                 }
-                ps = MysqlAccess::getInstance().getPreparedStatement("insert ignore into PlaylistSongs (playlistId, songId) values (?, ?)");
-                for (vector<int>::iterator it = songsIds.begin(); it != songsIds.end(); ++it) {
-                    ps->setInt(1, id);
-                    ps->setInt(2, *it);
-                    if (!ps->executeUpdate()) {
-                        cerr << "Did not save song for playlist " << id << endl;
-                    }
-                }
                 return saved;
             }
         } catch (sql::SQLException &e) {
@@ -262,42 +217,6 @@ namespace soulsifter {
 
     const string& Playlist::getQuery() const { return query; }
     void Playlist::setQuery(const string& query) { this->query = query; }
-
-    const vector<Song*>& Playlist::getSongs() {
-        if (songs.empty() && !songsIds.empty()) {
-            for (vector<int>::const_iterator it = songsIds.begin(); it != songsIds.end(); ++it) {
-                songs.push_back(Song::findById(*it));
-            }
-        }
-        return songs;
-    }
-    void Playlist::setSongs(const vector<Song*>& songs) {
-        deleteVectorPointers<Song*>(&this->songs);
-        this->songs = songs;
-        this->songsIds.clear();
-        for (vector<Song*>::const_iterator it = songs.begin(); it != songs.end(); ++it) {
-            this->songsIds.push_back((*it)->getId());
-        }
-    }
-    void Playlist::addSongById(int songId) {
-        if (std::find(songsIds.begin(), songsIds.end(), songId) == songsIds.end()) {
-                songsIds.push_back(songId);
-                if (!songs.empty()) songs.push_back(Song::findById(songId));
-        }
-    }
-    void Playlist::removeSongById(int songId) {
-        for (vector<Song*>::iterator it = songs.begin(); it != songs.end(); ++it) {
-            if (songId == (*it)->getId()) {
-                delete (*it);
-                songs.erase(it);
-            }
-        }
-        for (vector<int>::iterator it = songsIds.begin(); it != songsIds.end(); ++it) {
-            if (songId == *it) {
-                songsIds.erase(it);
-            }
-        }
-    }
 
 }
 }

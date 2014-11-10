@@ -46,6 +46,8 @@ def single(n)
     return "mix"
   elsif (n.downcase == "children")
     return "child"
+  elsif (n.downcase == "entries")
+    return "entry"
   else
     return n[0..-2]
   end
@@ -58,6 +60,8 @@ def plural(x)
     return "children"
   elsif (x.downcase == "rexml")
     return "reXml"
+  elsif (x.downcase == "playlistentry")
+    return "playlistEntries"
   else
     return "#{x}s"
   end
@@ -699,10 +703,18 @@ playlistFields = [
   [:int, "id", Attrib::FIND],
   [:string, "name", Attrib::FIND],
   [:string, "query", 0],
-  ["vector<Song*>", "songs", 0],
 ]
 playlistAttribs = 0
-playlistCustomHeaders = "#include \"Song.h\"\n"
+playlistEntryFields = [
+  [:int, "id", Attrib::FIND],
+  [:int, "playlistId", Attrib::ID | Attrib::KEY2],
+  ["Playlist", "playlist", Attrib::PTR],
+  [:int, "songId", Attrib::ID | Attrib::KEY2],
+  ["Song", "song", Attrib::PTR],
+  [:int, "position", 0],
+  [:string, "time", 0],
+]
+playlistEntryAttribs = 0
 reSongFields = [
   [:int, "id", Attrib::FIND],
   [:string, "songidWinfo", 0],
@@ -830,10 +842,16 @@ output = File.open("src/soulsifter/Mix.cpp", "w")
 output << writeCode("mix", mixFields, mixAttribs)
 output.close
 output = File.open("src/soulsifter/Playlist.h", "w")
-output << writeHeader("playlist", playlistFields, playlistAttribs, "", playlistCustomHeaders)
+output << writeHeader("playlist", playlistFields, playlistAttribs, "", "")
 output.close
 output = File.open("src/soulsifter/Playlist.cpp", "w")
 output << writeCode("playlist", playlistFields, playlistAttribs)
+output.close
+output = File.open("src/soulsifter/PlaylistEntry.h", "w")
+output << writeHeader("playlistEntry", playlistEntryFields, playlistEntryAttribs, "", "")
+output.close
+output = File.open("src/soulsifter/PlaylistEntry.cpp", "w")
+output << writeCode("playlistEntry", playlistEntryFields, playlistEntryAttribs)
 output.close
 output = File.open("src/soulsifter/RESong.h", "w")
 output << writeHeader("reSong", reSongFields, reSongAttribs, reSongCustomMethods, reSongCustomHeaders)

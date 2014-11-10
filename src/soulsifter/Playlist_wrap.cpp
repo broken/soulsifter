@@ -2,8 +2,6 @@
 #include <node.h>
 #include <nan.h>
 #include "Playlist_wrap.h"
-#include "Song.h"
-#include "Song_wrap.h"
 
 v8::Persistent<v8::Function> Playlist::constructor;
 
@@ -52,9 +50,6 @@ void Playlist::Init(v8::Handle<v8::Object> exports) {
   tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("id"), getId, setId);
   tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("name"), getName, setName);
   tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("query"), getQuery, setQuery);
-  tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("songs"), getSongs, setSongs);
-  NanSetPrototypeTemplate(tpl, "addSongById", NanNew<v8::FunctionTemplate>(addSongById)->GetFunction());
-  NanSetPrototypeTemplate(tpl, "removeSongById", NanNew<v8::FunctionTemplate>(removeSongById)->GetFunction());
 
   NanAssignPersistent<v8::Function>(constructor, tpl->GetFunction());
   exports->Set(NanNew<v8::String>("Playlist"), tpl->GetFunction());
@@ -149,58 +144,6 @@ NAN_SETTER(Playlist::setQuery) {
   Playlist* obj = ObjectWrap::Unwrap<Playlist>(args.This());
   string a0(*v8::String::Utf8Value(value->ToString()));
   obj->playlist->setQuery(a0);
-
-  NanReturnUndefined();
-}
-
-NAN_GETTER(Playlist::getSongs) {
-  NanScope();
-
-  Playlist* obj = ObjectWrap::Unwrap<Playlist>(args.This());
-  const std::vector<dogatech::soulsifter::Song*> result =  obj->playlist->getSongs();
-
-  v8::Handle<v8::Array> a = NanNew<v8::Array>((int) result.size());
-  for (int i = 0; i < (int) result.size(); i++) {
-    v8::Local<v8::Object> instance = Song::NewInstance();
-    Song* r = ObjectWrap::Unwrap<Song>(instance);
-    r->setNwcpValue((result)[i], false);
-    a->Set(NanNew<v8::Number>(i), instance);
-  }
-  NanReturnValue(a);
-}
-
-NAN_SETTER(Playlist::setSongs) {
-  NanScope();
-
-  Playlist* obj = ObjectWrap::Unwrap<Playlist>(args.This());
-  v8::Local<v8::Array> a0Array = v8::Local<v8::Array>::Cast(value);
-  std::vector<dogatech::soulsifter::Song*> a0;
-  for (int i = 0; i < a0Array->Length(); ++i) {
-    v8::Local<v8::Value> tmp = a0Array->Get(i);
-    dogatech::soulsifter::Song* x(node::ObjectWrap::Unwrap<Song>(tmp->ToObject())->getNwcpValue());
-    a0.push_back(x);
-  }
-  obj->playlist->setSongs(a0);
-
-  NanReturnUndefined();
-}
-
-NAN_METHOD(Playlist::addSongById) {
-  NanScope();
-
-  Playlist* obj = ObjectWrap::Unwrap<Playlist>(args.This());
-  int a0(args[0]->Uint32Value());
-  obj->playlist->addSongById(a0);
-
-  NanReturnUndefined();
-}
-
-NAN_METHOD(Playlist::removeSongById) {
-  NanScope();
-
-  Playlist* obj = ObjectWrap::Unwrap<Playlist>(args.This());
-  int a0(args[0]->Uint32Value());
-  obj->playlist->removeSongById(a0);
 
   NanReturnUndefined();
 }
