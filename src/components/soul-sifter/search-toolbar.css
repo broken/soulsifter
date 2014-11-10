@@ -22,3 +22,10 @@ core-toolbar::shadow .toolbar-tools {
 #bpm {
   width: 64px;
 }
+#bpm::shadow .input-container {
+  bottom: 0;
+  top: 0;
+}
+#bpm::shadow .mirror-text, #bpm::shadow .label {
+  padding: 0;
+}

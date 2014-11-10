@@ -17,6 +17,7 @@
     <core-style ref="main"></core-style>
 
     <global-state values="{{global}}"></global-state>
+
     <core-scroll-header-panel fixed headerHeight="256" id="scroll_header_panel" draggable="true" on-dragstart="{{dragSong}}">
       <div class="core-header" id="header"></div>
       <div vertical layout fit class="content">
@@ -32,6 +33,10 @@
         <div class="comments" flex>{{song.comments}}</div>
         <div class="bpm">{{song.bpm}} bpm</div>
         <time class="added">{{localeDateTime}}</time>
+        <div horizontal layout center>
+          <div>pitch</div>
+          <pitch-slider></pitch-slider>
+        </div>
       </div>
     </core-scroll-header-panel>
   </template>

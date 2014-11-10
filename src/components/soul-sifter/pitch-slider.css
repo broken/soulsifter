@@ -1,0 +1,7 @@
+paper-slider::shadow paper-input {
+  padding: 0;
+}
+
+paper-slider::shadow #sliderContainer {
+  margin: 0;
+}
