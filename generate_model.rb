@@ -695,6 +695,14 @@ mixFields = [
 ]
 mixAttribs = 0
 mixCustomMethods = "        friend class RapidEvolutionDatabaseMixoutsMixoutHandler;\n\n        static int mixoutCountForRESongId(int outSongId);\n\n"
+playlistFields = [
+  [:int, "id", Attrib::FIND],
+  [:string, "name", Attrib::FIND],
+  [:string, "query", 0],
+  ["vector<Song*>", "songs", 0],
+]
+playlistAttribs = 0
+playlistCustomHeaders = "#include \"Song.h\"\n"
 reSongFields = [
   [:int, "id", Attrib::FIND],
   [:string, "songidWinfo", 0],
@@ -820,6 +828,12 @@ output << writeHeader("mix", mixFields, mixAttribs, mixCustomMethods, "")
 output.close
 output = File.open("src/soulsifter/Mix.cpp", "w")
 output << writeCode("mix", mixFields, mixAttribs)
+output.close
+output = File.open("src/soulsifter/Playlist.h", "w")
+output << writeHeader("playlist", playlistFields, playlistAttribs, "", playlistCustomHeaders)
+output.close
+output = File.open("src/soulsifter/Playlist.cpp", "w")
+output << writeCode("playlist", playlistFields, playlistAttribs)
 output.close
 output = File.open("src/soulsifter/RESong.h", "w")
 output << writeHeader("reSong", reSongFields, reSongAttribs, reSongCustomMethods, reSongCustomHeaders)
