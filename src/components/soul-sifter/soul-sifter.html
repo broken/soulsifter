@@ -9,6 +9,7 @@
 <link href="../paper-tabs/paper-tabs.html" rel="import">
 
 <link href="genre-list.html" rel="import">
+<link href="playlist-list.html" rel="import">
 <link href="song-list.html" rel="import">
 <link href="song-section.html" rel="import">
 <link href="search-toolbar.html" rel="import">
@@ -26,10 +27,12 @@
         <paper-tabs selected="1" id="paper_tabs">
           <paper-tab id="paper_tab-song">Song</paper-tab>
           <paper-tab id="paper_tab-genres" active>Genres</paper-tab>
+          <paper-tab id="paper_tab-playlists">Playlists</paper-tab>
         </paper-tabs>
         <core-animated-pages selected="{{ $.paper_tabs.selected }}" id="core_animated_pages">
           <song-section></song-section>
           <genre-list></genre-list>
+          <playlist-list></playlist-list>
         </core-animated-pages>
       </section>
       <core-header-panel main>

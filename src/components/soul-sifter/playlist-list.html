@@ -1,0 +1,33 @@
+<link href="../polymer/polymer.html" rel="import">
+
+<link href="../core-ajax/core-ajax.html" rel="import">
+<link href="../core-collapse/core-collapse.html" rel="import">
+<link href="../core-selection/core-selection.html" rel="import">
+<link href="../core-style/core-style.html" rel="import">
+<link href="../paper-icon-button/paper-icon-button.html" rel="import">
+
+<link href="themes.html" rel="import">
+
+
+<polymer-element name="playlist-list">
+
+  <template>
+    <link href="playlist-list.css" rel="stylesheet">
+    <core-style ref="main"></core-style>
+
+    <template repeat="{{p in playlists}}">
+      <!-- <playlist-list-item playlist="{{p}}" on-playlist-select="{{selectAction}}"></playlist-list-item> -->
+    </template>
+    <core-selection multi id="selection"></core-selection>
+  </template>
+
+<script>
+    Polymer('playlist-list', {
+
+      domReady: function() {
+        this.playlists = [];//ss.Playlist.findAll();
+      },
+      
+    });
+  </script>
+</polymer-element>
