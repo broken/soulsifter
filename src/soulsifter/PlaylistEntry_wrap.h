@@ -21,9 +21,9 @@ class PlaylistEntry : public node::ObjectWrap {
   static NAN_METHOD(New);
 
   static NAN_METHOD(clear);
-  // Unable to process findById
-  // Unable to process findByPlaylistIdAndSongId
-  // Unable to process findAll
+  static NAN_METHOD(findById);
+  static NAN_METHOD(findByPlaylistIdAndSongId);
+  static NAN_METHOD(findAll);
   static NAN_METHOD(sync);
   static NAN_METHOD(update);
   static NAN_METHOD(save);
@@ -31,8 +31,8 @@ class PlaylistEntry : public node::ObjectWrap {
   static NAN_SETTER(setId);
   static NAN_GETTER(getPlaylistId);
   static NAN_SETTER(setPlaylistId);
-  // Unable to process getPlaylist
-  // Unable to process setPlaylist
+  static NAN_GETTER(getPlaylist);
+  static NAN_SETTER(setPlaylist);
   static NAN_GETTER(getSongId);
   static NAN_SETTER(setSongId);
   static NAN_GETTER(getSong);

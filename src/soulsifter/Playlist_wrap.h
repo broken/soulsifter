@@ -21,9 +21,9 @@ class Playlist : public node::ObjectWrap {
   static NAN_METHOD(New);
 
   static NAN_METHOD(clear);
-  // Unable to process findById
-  // Unable to process findByName
-  // Unable to process findAll
+  static NAN_METHOD(findById);
+  static NAN_METHOD(findByName);
+  static NAN_METHOD(findAll);
   static NAN_METHOD(sync);
   static NAN_METHOD(update);
   static NAN_METHOD(save);
