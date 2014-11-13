@@ -1,10 +1,12 @@
 <link href="../polymer/polymer.html" rel="import">
 
-<link href="../core-ajax/core-ajax.html" rel="import">
-<link href="../core-collapse/core-collapse.html" rel="import">
+<link href="../core-icons/core-icons.html" rel="import">
 <link href="../core-selection/core-selection.html" rel="import">
 <link href="../core-style/core-style.html" rel="import">
-<link href="../paper-icon-button/paper-icon-button.html" rel="import">
+<link href="../paper-button/paper-button.html" rel="import">
+<link href="../paper-dialog/paper-dialog.html" rel="import">
+<link href="../paper-fab/paper-fab.html" rel="import">
+<link href="../paper-input/paper-input.html" rel="import">
 
 <link href="themes.html" rel="import">
 
@@ -19,13 +21,46 @@
       <!-- <playlist-list-item playlist="{{p}}" on-playlist-select="{{selectAction}}"></playlist-list-item> -->
     </template>
     <core-selection multi id="selection"></core-selection>
+    <paper-fab mini icon="add" on-click="{{createPlaylist}}"></paper-fab>
+
+    <paper-dialog backdrop layered id="createPlaylistDialog" heading="Playlist edit">
+      <paper-input floatingLabel label="Name" value="{{playlistName}}"></paper-input>
+      <paper-input floatingLabel label="Query" value="{{playlistQuery}}"></paper-input>
+      <paper-button affirmative>Cancel</paper-button>
+      <paper-button affirmative autofocus on-click="{{savePlaylist}}">Accept</paper-button>
+    </paper-dialog>
   </template>
 
 <script>
     Polymer('playlist-list', {
 
       domReady: function() {
-        this.playlists = [];//ss.Playlist.findAll();
+        this.playlists = ss.Playlist.findAll();
+      },
+
+      togglePlaylistDialog: function(e, detail, sender) {
+        this.$.createPlaylistDialog.toggle();
+      },
+
+      createPlaylist: function(e, detail, sender) {
+        this.playlistName = "";
+        this.playlistQuery = "";
+        this.togglePlaylistDialog();
+      },
+
+      savePlaylist: function(e, detail, sender) {
+        var pl = new ss.Playlist();
+        pl.name = this.playlistName;
+        if (this.playlistQuery) {
+          pl.query = this.playlistQuery;
+        } else {
+          pl.query = null;
+        }
+        if (pl.id) {
+          pl.update();
+        } else {
+          pl.save();
+        }
       },
       
     });

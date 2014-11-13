@@ -40,6 +40,8 @@
     sl_hover: 'rgb(20,20,20)',
     sl_fadeout: 'linear-gradient(to right, rgba(41,41,41,0), rgba(41,41,41,1))',
     sl_hoverfadeout: 'linear-gradient(to right, rgba(20,20,20,0), rgba(20,20,20,1))',
+    // playlist list
+    pl_fab: sl_brown,
   }
   CoreStyle.g.light = {
     bg: '#EEE',
@@ -144,5 +146,11 @@
   }
   .text {
     color: {{g.theme.clr}};
+  }
+
+  <!-- playlist list -->
+  paper-fab {
+    background-color: {{g.theme.pl_fab}};
+    color: {{g.theme.clr_bold}};
   }
 </core-style>

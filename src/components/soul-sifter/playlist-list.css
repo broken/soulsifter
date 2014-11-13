@@ -1,3 +1,10 @@
 :host {
   overflow: scroll;
 }
+
+
+paper-fab {
+  bottom: 12px;
+  position: absolute;
+  right: 12px;
+}
