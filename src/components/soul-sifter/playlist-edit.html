@@ -1,8 +1,8 @@
 <link href="../polymer/polymer.html" rel="import">
 
-<link href="../paper-button/paper-button.html" rel="import">
 <link href="../paper-input/paper-input.html" rel="import">
 
+<link href="abstract-action-page.html" rel="import">
 <link href="themes.html" rel="import">
 
 
@@ -11,17 +11,11 @@
   <template>
     <link href="playlist-edit.css" rel="stylesheet">
     <core-style ref="main"></core-style>
-   
-    <div vertical layout center center-justified id="layout">
-      <div id="container">
-        <paper-input floatingLabel label="Name" value="{{playlist.name}}"></paper-input>
-        <paper-input floatingLabel label="Query" value="{{playlist.query}}"></paper-input>
-        <div horizontal layout end-justified id="actions">
-          <paper-button affirmative on-click="{{exit}}">Cancel</paper-button>
-          <paper-button affirmative autofocus on-click="{{save}}">Accept</paper-button>
-        </div>
-      </div>
-    </div>
+
+    <abstract-action-page acceptAction="{{save}}">
+      <paper-input floatingLabel label="Name" value="{{playlist.name}}"></paper-input>
+      <paper-input floatingLabel label="Query" value="{{playlist.query}}"></paper-input>
+    </abstract-action-page>
   </template>
 
   <script>
@@ -33,13 +27,8 @@
         } else {
           this.playlist.save();
         }
-        this.exit();
       },
 
-      exit: function(e, detail, sender) {
-        this.asyncFire('page-main');
-      },
-      
     });
   </script>
 </polymer-element>

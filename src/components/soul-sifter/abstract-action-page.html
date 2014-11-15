@@ -1,0 +1,39 @@
+<link href="../polymer/polymer.html" rel="import">
+
+<link href="../paper-button/paper-button.html" rel="import">
+
+<link href="themes.html" rel="import">
+
+
+<polymer-element name="abstract-action-page" attributes="acceptAction">
+
+  <template>
+    <link href="abstract-action-page.css" rel="stylesheet">
+    <core-style ref="main"></core-style>
+   
+    <div vertical layout center center-justified id="layout">
+      <div id="container">
+        <content></content>
+        <div horizontal layout end-justified id="abstractActions">
+          <paper-button affirmative on-click="{{exit}}">Cancel</paper-button>
+          <paper-button affirmative autofocus on-click="{{accept}}">Accept</paper-button>
+        </div>
+      </div>
+    </div>
+  </template>
+
+  <script>
+    Polymer('abstract-action-page', {
+
+      accept: function(e, detail, sender) {
+        this.acceptAction.call(this.parentNode.host);
+        this.exit();
+      },
+
+      exit: function(e, detail, sender) {
+        this.asyncFire('page-main');
+      },
+      
+    });
+  </script>
+</polymer-element>
