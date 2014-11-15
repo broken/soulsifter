@@ -28,9 +28,6 @@
     Polymer('playlist-edit', {
 
       save: function(e, detail, sender) {
-        if (!this.playlist.query) {
-          this.playlist.query = null;
-        }
         if (this.playlist.id) {
           this.playlist.update();
         } else {
