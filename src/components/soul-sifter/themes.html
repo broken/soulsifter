@@ -19,6 +19,8 @@
     bg: sl_grey,
     clr: '#999999',
     clr_bold: '#CCCCCC',
+    // paper input
+    pi_accent: sl_blue,
     // drawer tabs
     dt_bg: '#1F1F1F',
     dt_clr: inherit,
@@ -42,7 +44,9 @@
     sl_hoverfadeout: 'linear-gradient(to right, rgba(20,20,20,0), rgba(20,20,20,1))',
     // playlist list
     pl_fab: sl_brown,
-  }
+    // playlist edit
+    pe_ok: sl_orange,
+  };
   CoreStyle.g.light = {
     bg: '#EEE',
     clr: '#777',
@@ -53,7 +57,7 @@
     // search toolbar
     st_bg: '#E56FF2',
     // song list
-  }
+  };
   CoreStyle.g.theme = CoreStyle.g.scratchlive;
 </script>
 
@@ -61,10 +65,17 @@
   <!-- main -->
   core-drawer-panel {
     color: {{g.theme.clr}};
+  }
+  core-animated-pages section {
     background-color: {{g.theme.bg}};
   }
-  #core_drawer_panel-drawer {
-    background-color: {{g.theme.bg}};
+
+  <!-- paper input -->
+  section /deep/ paper-input::shadow .focused-underline {
+    background-color: {{g.theme.pi_accent}};
+  }
+  section /deep/ paper-input[focused]::shadow .floated-label {
+    color: {{g.theme.pi_accent}};
   }
 
   <!-- drawer tabs -->
@@ -152,5 +163,13 @@
   paper-fab {
     background-color: {{g.theme.pl_fab}};
     color: {{g.theme.clr_bold}};
+  }
+
+  <!-- playlist edit -->
+  #actions paper-button {
+    color: {{g.theme.clr}};
+  }
+  #actions paper-button[autofocus] {
+    color: {{g.theme.pe_ok}};
   }
 </core-style>

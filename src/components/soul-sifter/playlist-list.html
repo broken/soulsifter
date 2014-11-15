@@ -22,13 +22,6 @@
     </template>
     <core-selection multi id="selection"></core-selection>
     <paper-fab mini icon="add" on-click="{{createPlaylist}}"></paper-fab>
-
-    <paper-dialog backdrop layered id="createPlaylistDialog" heading="Playlist edit">
-      <paper-input floatingLabel label="Name" value="{{playlistName}}"></paper-input>
-      <paper-input floatingLabel label="Query" value="{{playlistQuery}}"></paper-input>
-      <paper-button affirmative>Cancel</paper-button>
-      <paper-button affirmative autofocus on-click="{{savePlaylist}}">Accept</paper-button>
-    </paper-dialog>
   </template>
 
 <script>
@@ -43,24 +36,8 @@
       },
 
       createPlaylist: function(e, detail, sender) {
-        this.playlistName = "";
-        this.playlistQuery = "";
-        this.togglePlaylistDialog();
-      },
-
-      savePlaylist: function(e, detail, sender) {
-        var pl = new ss.Playlist();
-        pl.name = this.playlistName;
-        if (this.playlistQuery) {
-          pl.query = this.playlistQuery;
-        } else {
-          pl.query = null;
-        }
-        if (pl.id) {
-          pl.update();
-        } else {
-          pl.save();
-        }
+        var playlist = new ss.Playlist();
+        this.fire('page-playlist-edit', {playlist: playlist});
       },
       
     });
