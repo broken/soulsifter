@@ -112,6 +112,7 @@ struct Atom {
     A_LABEL,
     A_YEAR,
     CUSTOM_QUERY_PREDICATE,
+    LIMIT,
   };
   enum Property {
     NONE = 0x00,
@@ -138,7 +139,7 @@ void splitString(const string& query, vector<string>* atoms) {
 
 bool parse(const string& queryFragment, Atom* atom) {
   atom->clear();
-  boost::regex regex("^(-)?((id|a|artist|t|title|r|remixer|rating|comment|trashed|lowq|aid|n|album|m|mixed|l|label|y|year|q|query):)?(.+)$");
+  boost::regex regex("^(-)?((id|a|artist|t|title|r|remixer|rating|comment|trashed|lowq|aid|n|album|m|mixed|l|label|y|year|q|query|limit):)?(.+)$");
   boost::smatch match;
   if (!boost::regex_match(queryFragment, match, regex)) {
     return false;
@@ -175,6 +176,8 @@ bool parse(const string& queryFragment, Atom* atom) {
       atom->type = Atom::A_YEAR;
     } else if (!match[3].compare("q") || !match[3].compare("query")) {
       atom->type = Atom::CUSTOM_QUERY_PREDICATE;
+    } else if (!match[3].compare("limit")) {
+      atom->type = Atom::LIMIT;
     } else {
       // error
       return false;
@@ -222,6 +225,8 @@ string buildQueryPredicate(const vector<Atom>& atoms) {
       ss << "a.releaseDateYear = " << atom.value;
     } else if (atom.type == Atom::CUSTOM_QUERY_PREDICATE) {
       ss << atom.value;
+    } else if (atom.type == Atom::LIMIT) {
+      ss << "true";
     }
   }
   return ss.str();
@@ -322,6 +327,10 @@ string buildOptionPredicate(int min_bpm, int max_bpm, const string& key, const v
   return ss.str();
 }
 
+bool isLimit(const Atom& a) {
+  return a.type == Atom::Type::LIMIT;
+}
+
 }  // anon namespace
 
 vector<Song*>* SearchUtil::searchSongs(const string& query, int min_bpm, int max_bpm, const string& key, const vector<Style*>& styles, int limit) {
@@ -332,8 +341,17 @@ vector<Song*>* SearchUtil::searchSongs(const string& query, int min_bpm, int max
   vector<Atom> atoms;
   for (string fragment : fragments) {
     Atom atom;
-    parse(fragment, &atom);
-    atoms.push_back(atom);
+    if (parse(fragment, &atom)) {
+      atoms.push_back(atom);
+    } else {
+      cerr << "ERROR: Unable to parse query fragment '" << fragment << "'" << endl;
+    }
+  }
+
+  // update options from atoms
+  vector<Atom>::iterator it = std::find_if(atoms.begin(), atoms.end(), isLimit);
+  if (it != atoms.end()) {
+    limit = atoi(it->value.c_str());
   }
   
   stringstream ss;
