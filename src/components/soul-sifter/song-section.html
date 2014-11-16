@@ -3,7 +3,6 @@
 <link href="../core-ajax/core-ajax.html" rel="import">
 <link href="../core-scroll-header-panel/core-scroll-header-panel.html" rel="import">
 <link href="../core-style/core-style.html" rel="import">
-<link href="../css/roboto.css" rel="stylesheet">
 <link href="../polymer-ui-ratings/polymer-ui-ratings.html" rel="import">
 
 <link href="global-state.html" rel="import">
@@ -18,15 +17,13 @@
 
     <global-state values="{{global}}"></global-state>
 
-    <core-scroll-header-panel fixed headerHeight="256" id="scroll_header_panel" draggable="true" on-dragstart="{{dragSong}}">
-      <div class="core-header" id="header"></div>
-      <div vertical layout fit class="content">
+    <!-- core-scroll-header-panel does not appear to work with my current 10.5 version of nodewebkit; try this again later when I upgrade it. -->
+    <div vertical layout fit>
+      <div id="header" draggable="true" on-dragstart="{{dragSong}}"></div>
+      <section vertical layout class="content">
         <div class="title">{{song.title}}</div>
         <div class="artist">{{song.artist}}</div>
-        <!-- this is a crappy theming method that is deprecated, but required for the ratings atm -->
-        <div theme="polymer-ui-dark-theme">
-          <polymer-ui-ratings value="{{song.rating}}"></polymer-ui-ratings>
-        </div>
+        <polymer-ui-ratings value="{{song.rating}}"></polymer-ui-ratings>
         <div class="track" self-end>{{song.album.track}}</div>
         <div class="track" self-end>{{song.album.name}}</div>
         <div class="released" self-end>{{song.album.releaseDateYear}}-{{song.album.releaseDateMonth}}-{{song.album.releaseDateDay}}</div>
@@ -37,8 +34,8 @@
           <div>pitch</div>
           <pitch-slider></pitch-slider>
         </div>
-      </div>
-    </core-scroll-header-panel>
+      </section>
+    </div>
   </template>
 
   <script>
@@ -53,7 +50,7 @@
       globalSongChanged: function(oldSong, song) {
         this.song = song;
         this.localeDateTime = new Date(this.song.dateAdded).toLocaleString();
-        this.$.scroll_header_panel.shadowRoot.querySelector('#headerBg').style.backgroundImage = 'url("' + this.song.album.coverFilepath + '")';
+        this.$.header.style.backgroundImage = 'url("' + this.song.album.coverFilepath + '")';
       },
 
       dragSong: function(e) {

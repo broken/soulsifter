@@ -3,7 +3,6 @@
 <link href="../core-collapse/core-collapse.html" rel="import">
 <link href="../core-selection/core-selection.html" rel="import">
 <link href="../core-style/core-style.html" rel="import">
-<link href="../css/roboto.css" rel="stylesheet">
 <link href="../paper-icon-button/paper-icon-button.html" rel="import">
 <link href="../paper-ripple/paper-ripple.html" rel="import">
 <link href="../paper-shadow/paper-shadow.html" rel="import">
@@ -17,11 +16,14 @@
     <link href="genre-list-item.css" rel="stylesheet">
     <core-style ref="main"></core-style>
 
-    <div horizontal layout center id="item" class="{{ {'selected': isSelected} | tokenList }}" style="padding-left: {{indent}}px;" on-tap="{{selectTapAction}}">
-      <paper-shadow animated z="{{z}}"></paper-shadow>
-      <paper-ripple fit></paper-ripple>
-      <paper-icon-button icon="{{icon}}" on-tap="{{expandTapAction}}"></paper-icon-button>
-      <div flex>{{genre.name}}</div>
+    <div id="itemContainer">
+      <paper-shadow animated id="shadow" z="0">
+        <div horizontal layout center class="{{ {'selected': isSelected} | tokenList }}" style="padding-left: {{indent}}px;" on-tap="{{selectTapAction}}" id="item">
+          <paper-ripple fit></paper-ripple>
+          <paper-icon-button icon="{{icon}}" on-tap="{{expandTapAction}}"></paper-icon-button>
+          <div flex>{{genre.name}}</div>
+        </div>
+      </paper-shadow>
     </div>
     <core-collapse id="collapse">
       <template repeat="{{g in genre.subGenre}}" id="subGenreTpl">
@@ -59,8 +61,6 @@
         }
       },
 
-      z: 0,
-
       ready: function() {
         var children = this.genre.children;
         if (children.length > 0) {
@@ -85,7 +85,7 @@
       },
 
       selectGenreAction: function(e, detail, sender) {
-        this.z = detail.isSelected ? 1 : 0;
+        this.$.shadow.setZ(detail.isSelected ? 1 : 0);
         this.isSelected = detail.isSelected;
         this.asyncFire('genre-select', this.genre);
       },

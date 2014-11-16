@@ -1,5 +1,4 @@
 :host {
-  font-family: RobotoDraft;
   font-size: 13px;
 }
 
@@ -12,8 +11,10 @@ core-collapse {
   margin-bottom: -7px;
 }
 
-#item {
+#itemContainer {
   margin: 7px 20px 7px 20px;
   height: 30px;
-  position: relative;
+}
+#item {
+  height: 30px;
 }

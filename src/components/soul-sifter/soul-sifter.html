@@ -3,10 +3,10 @@
 <link href="../core-animated-pages/core-animated-pages.html" rel="import">
 <link href="../core-drawer-panel/core-drawer-panel.html" rel="import">
 <link href="../core-header-panel/core-header-panel.html" rel="import">
-<link href="../paper-icon-button/paper-icon-button.html" rel="import">
 <link href="../core-style/core-style.html" rel="import">
-<link href="../css/roboto.css" rel="stylesheet">
+<link href="../paper-tabs/paper-tab.html" rel="import">
 <link href="../paper-tabs/paper-tabs.html" rel="import">
+<link href="../paper-icon-button/paper-icon-button.html" rel="import">
 
 <link href="genre-list.html" rel="import">
 <link href="playlist-edit.html" rel="import">
@@ -23,7 +23,7 @@
     <link href="soul-sifter.css" rel="stylesheet">
     <core-style ref="main"></core-style>
 
-    <core-animated-pages transitions="slide-from-right" selected="{{section}}">
+    <core-animated-pages transitions="slide-from-right" selected="{{section}}" id="main">
       <section>
         <core-drawer-panel id="core_drawer_panel">
           <section id="core_drawer_panel-drawer" drawer layout vertical>
@@ -32,7 +32,7 @@
               <paper-tab id="paper_tab-genres" active>Genres</paper-tab>
               <paper-tab id="paper_tab-playlists">Playlists</paper-tab>
             </paper-tabs>
-            <core-animated-pages selected="{{ $.paper_tabs.selected }}" id="core_animated_pages">
+            <core-animated-pages selected="{{ $.paper_tabs.selected }}" id="core_animated_pages" flex>
               <song-section></song-section>
               <genre-list></genre-list>
               <playlist-list></playlist-list>
@@ -56,6 +56,10 @@
     Polymer('soul-sifter', {
 
       domReady: function() {
+        /* theming */
+        CoreStyle.g.theme.init();
+
+        /* setup listeners */
         this.addEventListener('page-main', function(e) {
           this.section = 0;
         });

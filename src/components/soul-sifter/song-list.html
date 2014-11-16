@@ -69,7 +69,14 @@
       },
 
       queryChanged: function(e, detail, sender) {
-        this.searchAction(e, detail, sender);
+        // only search if it's not actively being changed
+        setTimeout(function(self, query, e, detail, sender) {
+          return function() {
+            if (self.query == query) {
+              self.searchAction(e, detail, sender);
+            }
+          };
+        }(this, this.query, e, detail, sender), 750);
       },
 
       searchAction: function(e, detail, sender) {

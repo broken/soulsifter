@@ -3,13 +3,12 @@
 <link href="../core-field/core-field.html" rel="import">
 <link href="../core-icon-button/core-icon-button.html" rel="import">
 <link href="../core-icons/core-icons.html" rel="import">
-<link href="../core-input/core-input.html" rel="import">
 <link href="../core-localstorage/core-localstorage.html" rel="import">
 <link href="../core-signals/core-signals.html" rel="import">
 <link href="../core-style/core-style.html" rel="import">
 <link href="../core-toolbar/core-toolbar.html" rel="import">
-<link href="../css/roboto.css" rel="stylesheet">
 <link href="../paper-dialog/paper-dialog.html" rel="import">
+<link href="../paper-input/paper-input.html" rel="import">
 
 <!-- <link href="create-song.html" rel="import"> -->
 <link href="global-state.html" rel="import">
@@ -28,16 +27,15 @@
 
     <core-toolbar class="{{ {'medium-tall': isTall} | tokenList }}">
       <content></content>
-      <core-field class="indent">
+      <core-field class="indent" flex>
         <core-icon-button icon="search" on-click="{{searchAction}}"></core-icon-button>
-        <core-input id="search_input" placeholder="search" flex value="{{query}}"></core-input>
+        <paper-input id="searchInput" label="search" flex value="{{query}}"></paper-input>
         <core-icon-button icon="info-outline" on-click="{{toggleSearchInfoDialog}}"></core-icon-button>
       </core-field>
       <paper-input label="bpm" floatingLabel value="{{global.bpm}}" id="bpm"></paper-input>
-      <div flex></div>
       <core-icon-button icon="add-circle" on-click="{{toggleCreateSongDialog}}" id="createSongButton"></core-icon-button>
       <core-icon-button icon="settings" on-click="{{toggleSettingsDialog}}"></core-icon-button>
-      <core-icon-button icon="filter" on-click="{{toggleIsTall}}"></core-icon-button>
+      <core-icon-button icon="unfold-more" on-click="{{toggleIsTall}}"></core-icon-button>
       <!-- middle row -->
       <!-- bottom row -->
       <div flex class="bottom {{ {hide: !isTall} | tokenList }}"></div>

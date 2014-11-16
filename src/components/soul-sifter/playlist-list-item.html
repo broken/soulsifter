@@ -3,7 +3,6 @@
 <link href="../core-icon/core-icon.html" rel="import">
 <link href="../core-icons/core-icons.html" rel="import">
 <link href="../core-style/core-style.html" rel="import">
-<link href="../css/roboto.css" rel="stylesheet">
 <link href="../paper-ripple/paper-ripple.html" rel="import">
 <link href="../paper-shadow/paper-shadow.html" rel="import">
 
@@ -16,13 +15,16 @@
     <link href="playlist-list-item.css" rel="stylesheet">
     <core-style ref="main"></core-style>
 
-    <div horizontal layout center id="item" class="{{ {'selected': isSelected} | tokenList }}">
-      <paper-shadow animated z="{{z}}"></paper-shadow>
-      <paper-ripple fit></paper-ripple>
-      <div flex>
-        {{playlist.name}}
-        <core-icon icon="find-replace" alt="smart playlist"></core-icon>
-      </div>
+    <div id="itemContainer">
+      <paper-shadow animated id="shadow" z="0">
+        <div horizontal layout center id="item" class="{{ {'selected': isSelected} | tokenList }}">
+          <paper-ripple fit></paper-ripple>
+          <div flex>
+            {{playlist.name}}
+            <core-icon icon="find-replace" alt="smart playlist"></core-icon>
+          </div>
+        </div>
+      </paper-shadow>
     </div>
   </template>
 
@@ -34,8 +36,6 @@
 
       /** @attribute selected */
       isSelected: false,
-
-      z: 0,
 
     });
   </script>

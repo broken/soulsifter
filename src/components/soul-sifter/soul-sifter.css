@@ -1,5 +1,4 @@
 :host {
-  font-family: RobotoDraft;
   position: absolute;
   top: 0;
   right: 0;
@@ -15,27 +14,15 @@
 :host /deep/ core-field {
   color: inherit;
 }
-:host /deep/ core-input {
-  color: inherit;
-}
 :host /deep/ core-toolbar {
   background-color: inherit;
   font-size: 1em;
 }
-
-
-#core_drawer_panel-drawer {
-  box-shadow: rgba(0, 0, 0, 0.1) 0px 2px 4px, rgba(0, 0, 0, 0.1) 0px 0px 3px;
-  z-index: 2;
+:host /deep/ paper-input {
+  color: inherit;
 }
 
-
-paper-tabs {
-  box-shadow: rgba(0, 0, 0, 0.2) 0px 3px 2px;
-  z-index: 3;  /* above core-list for box-shadow */
-}
-
-core-animated-pages {
+core-animated-pages#main {
   overflow: hidden;
   height: 100%;
 }

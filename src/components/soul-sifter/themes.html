@@ -19,6 +19,7 @@
     bg: sl_grey,
     clr: '#999999',
     clr_bold: '#CCCCCC',
+    rating: 'light',
     // paper input
     pi_accent: sl_blue,
     // abstract actions
@@ -51,6 +52,7 @@
     bg: '#EEE',
     clr: '#777',
     clr_bold: '#000',
+    rating: 'dark',
     // drawer tabs
     dt_bg: 'rgb(0, 188, 212)',
     dt_clr: '#FFF',
@@ -61,6 +63,13 @@
   CoreStyle.g.theme = CoreStyle.g.scratchlive;
 </script>
 
+<script>
+  CoreStyle.g.theme.init = function() {
+    CoreStyle.g.paperInput.labelColor = CoreStyle.g.theme.clr;
+    CoreStyle.g.paperInput.focusedColor = CoreStyle.g.theme.pi_accent;
+  };
+</script>
+
 <core-style id="main">
   <!-- main -->
   core-drawer-panel {
@@ -68,6 +77,12 @@
   }
   core-animated-pages section {
     background-color: {{g.theme.bg}};
+  }
+  polymer-ui-ratings::shadow #star.full {
+    background-image: url('../components/polymer-ui-ratings/assets/ic_star_rate_{{g.theme.rating}}reg.png');
+  }
+  polymer-ui-ratings::shadow #star {
+    background-image: url('../components/polymer-ui-ratings/assets/ic_star_rate_{{g.theme.rating}}alt.png');
   }
 
   <!-- paper input -->
@@ -110,10 +125,10 @@
   search-toolbar {
     background-color: {{g.theme.st_bg}};
   }
-  #search_input {
+  #searchInput {
     color: {{g.theme.clr_bold}};
   }
-  #search_input::shadow input::-webkit-input-placeholder {
+  #searchInput::shadow input::-webkit-input-placeholder {
     color: {{g.theme.clr}};
   }
 

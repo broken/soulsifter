@@ -1,20 +1,7 @@
-:host {
-  font-family: RobotoDraft;
-}
-
-
-core-scroll-header-panel {
-  height: 100%;
-}
-
-core-scroll-header-panel::shadow #headerContent {
+#header {
+  background-size: cover;
   height: 256px;
 }
-
-.core-header {
-  height: 256px;
-}
-
 
 .content {
   margin: 5px 15px 10px 15px;
