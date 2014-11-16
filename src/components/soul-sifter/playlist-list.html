@@ -18,10 +18,10 @@
     <link href="playlist-list.css" rel="stylesheet">
     <core-style ref="main"></core-style>
 
-    <template repeat="{{p in playlists}}">
-      <playlist-list-item playlist="{{p}}" on-playlist-select="{{selectAction}}"></playlist-list-item>
+    <template repeat="{{p in playlists}}" id="playlistTpl">
+      <playlist-list-item playlist="{{p}}" on-playlist-select="{{selectPlaylist}}"></playlist-list-item>
     </template>
-    <core-selection multi id="selection"></core-selection>
+    <core-selection multi id="selection" on-core-select="{{selectAction}}"></core-selection>
     <paper-fab mini icon="add" on-click="{{createPlaylist}}"></paper-fab>
   </template>
 
@@ -39,6 +39,29 @@
       createPlaylist: function(e, detail, sender) {
         var playlist = new ss.Playlist();
         this.asyncFire('page-playlist-edit', {playlist: playlist});
+      },
+
+      selectPlaylist: function(e, detail, sender) {
+        this.$.selection.toggle(sender);
+      },
+
+      selectAction: function(e, detail, sender) {
+        // unselect all
+        for (var i = 0, item = this.$.playlistTpl.nextElementSibling;
+            item && i < this.playlists.length;
+            item = item.nextElementSibling, ++i) {
+          if (item != detail.item && this.$.selection.isSelected(item)) {
+            item.select(false);
+            this.$.selection.toggle(item);
+          }
+        }
+        // (de)select the selected
+        detail.item.select(detail.isSelected);
+        // update the query
+        // TODO: get to work for non-smart playlists
+        if (detail.isSelected) {
+          this.asyncFire('query-change', detail.item.playlist.query);
+        }
       },
       
     });

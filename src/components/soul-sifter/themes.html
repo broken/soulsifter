@@ -32,6 +32,8 @@
     // genre list
     gl_ink: sl_orange,
     gl_select: sl_brown,
+    // playlist list
+    pl_fab: sl_brown,
     // search toolbar
     st_bg: black,
     // pitch slider
@@ -45,8 +47,6 @@
     sl_hover: 'rgb(20,20,20)',
     sl_fadeout: 'linear-gradient(to right, rgba(41,41,41,0), rgba(41,41,41,1))',
     sl_hoverfadeout: 'linear-gradient(to right, rgba(20,20,20,0), rgba(20,20,20,1))',
-    // playlist list
-    pl_fab: sl_brown,
   };
   CoreStyle.g.light = {
     bg: '#EEE',
@@ -121,6 +121,18 @@
     color: {{g.theme.gl_ink}};
   }
 
+  <!-- playlist list -->
+  paper-fab {
+    background-color: {{g.theme.pl_fab}};
+    color: {{g.theme.clr_bold}};
+  }
+  playlist-list-item::shadow #item.selected {
+    background-color: {{g.theme.gl_select}};
+  }
+  playlist-list-item::shadow paper-ripple {
+    color: {{g.theme.gl_ink}};
+  }
+
   <!-- search toolbar -->
   search-toolbar {
     background-color: {{g.theme.st_bg}};
@@ -180,11 +192,5 @@
   }
   .text {
     color: {{g.theme.clr}};
-  }
-
-  <!-- playlist list -->
-  paper-fab {
-    background-color: {{g.theme.pl_fab}};
-    color: {{g.theme.clr_bold}};
   }
 </core-style>

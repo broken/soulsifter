@@ -6,14 +6,21 @@ paper-shadow {
   height: 100%;
   width: 100%;
 }
-core-icon {
-}
 
 #itemContainer {
   margin: 7px 20px 7px 20px;
-  padding-left: 40px;
   height: 30px;
 }
 #item {
   height: 30px;
+  padding-left: 40px;
+}
+#item core-icon {
+  display: none;
+  height: 16px;
+  width: 16px;
+  vertical-align: top;
+}
+#item core-icon.smart {
+  display: inline-block;
 }

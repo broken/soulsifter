@@ -17,11 +17,11 @@
 
     <div id="itemContainer">
       <paper-shadow animated id="shadow" z="0">
-        <div horizontal layout center id="item" class="{{ {'selected': isSelected} | tokenList }}">
+        <div horizontal layout center id="item" class="{{ {'selected': isSelected} | tokenList }}" on-click="{{clickAction}}">
           <paper-ripple fit></paper-ripple>
           <div flex>
             {{playlist.name}}
-            <core-icon icon="find-replace" alt="smart playlist"></core-icon>
+            <core-icon icon="find-replace" alt="smart playlist" class="{{ {'smart': playlist.query} | tokenList }}"></core-icon>
           </div>
         </div>
       </paper-shadow>
@@ -36,6 +36,16 @@
 
       /** @attribute selected */
       isSelected: false,
+
+      clickAction: function(e, detail, sender) {
+        this.asyncFire('playlist-select', this);
+      },
+
+      /** @method select */
+      select: function(isSelected) {
+        this.$.shadow.setZ(isSelected ? 1 : 0);
+        this.isSelected = isSelected;
+      },
 
     });
   </script>

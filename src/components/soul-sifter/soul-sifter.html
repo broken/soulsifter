@@ -35,7 +35,7 @@
             <core-animated-pages selected="{{ $.paper_tabs.selected }}" id="core_animated_pages" flex>
               <song-section></song-section>
               <genre-list></genre-list>
-              <playlist-list></playlist-list>
+              <playlist-list on-query-change="{{changeQuery}}"></playlist-list>
             </core-animated-pages>
           </section>
           <core-header-panel main>
@@ -67,6 +67,10 @@
           this.section = 1;
           this.playlist = e.detail.playlist;
         });
+      },
+
+      changeQuery: function(e, detail, sender) {
+        this.query = detail;
       },
     });
   </script>
