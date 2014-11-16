@@ -21,21 +21,23 @@
     <!-- core-scroll-header-panel does not appear to work with my current 10.5 version of nodewebkit; try this again later when I upgrade it. -->
     <div vertical layout fit>
       <div id="header" draggable="true" on-dragstart="{{dragSong}}"></div>
-      <section vertical layout class="content">
-        <div class="title">{{song.title}}</div>
-        <div class="artist">{{song.artist}}</div>
-        <polymer-ui-ratings value="{{song.rating}}"></polymer-ui-ratings>
-        <div class="track" self-end>{{song.album.track}}</div>
-        <div class="track" self-end>{{song.album.name}}</div>
-        <div class="released" self-end>{{song.album.releaseDateYear}}-{{song.album.releaseDateMonth}}-{{song.album.releaseDateDay}}</div>
-        <div class="comments" flex>{{song.comments}}</div>
-        <div class="bpm">{{song.bpm}} bpm</div>
-        <time class="added">{{localeDateTime}}</time>
-        <div horizontal layout center>
-          <div>pitch</div>
-          <pitch-slider></pitch-slider>
-        </div>
-      </section>
+      <div flex id="contentContainer">
+        <section vertical layout fit class="content">
+          <div class="title">{{song.title}}</div>
+          <div class="artist">{{song.artist}}</div>
+          <polymer-ui-ratings value="{{song.rating}}"></polymer-ui-ratings>
+          <div class="track" self-end>{{song.album.track}}</div>
+          <div class="track" self-end>{{song.album.name}}</div>
+          <div class="released" self-end>{{song.album.releaseDateYear}}-{{song.album.releaseDateMonth}}-{{song.album.releaseDateDay}}</div>
+          <div class="comments" flex>{{song.comments}}</div>
+          <div class="bpm">{{song.bpm}} bpm</div>
+          <time class="added">{{localeDateTime}}</time>
+          <div horizontal layout center>
+            <div>pitch</div>
+            <pitch-slider></pitch-slider>
+          </div>
+        </section>
+      </div>
     </div>
   </template>
 
