@@ -49,7 +49,7 @@ module.exports = function(grunt) {
     },
     spawn: {
       run: {
-        command: './build/soulsifter/osx/soulsifter.app/Contents/MacOS/node-webkit',
+        command: './build/soulsifter/osx/soulsifter.app/Contents/MacOS/node-webkit build/soulsifter/osx/soulsifter.app/Contents/Resources/app.nw',
       },
       ulimit: {
         command: 'ulimit -n 10240',
