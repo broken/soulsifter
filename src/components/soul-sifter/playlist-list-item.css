@@ -1,0 +1,14 @@
+:host {
+  font-family: RobotoDraft;
+  font-size: 13px;
+}
+
+core-icon {
+}
+
+#item {
+  margin: 7px 20px 7px 20px;
+  padding-left: 40px;
+  height: 30px;
+  position: relative;
+}

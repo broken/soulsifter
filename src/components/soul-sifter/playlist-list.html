@@ -8,6 +8,7 @@
 <link href="../paper-fab/paper-fab.html" rel="import">
 <link href="../paper-input/paper-input.html" rel="import">
 
+<link href="playlist-list-item.html" rel="import">
 <link href="themes.html" rel="import">
 
 
@@ -18,7 +19,7 @@
     <core-style ref="main"></core-style>
 
     <template repeat="{{p in playlists}}">
-      <!-- <playlist-list-item playlist="{{p}}" on-playlist-select="{{selectAction}}"></playlist-list-item> -->
+      <playlist-list-item playlist="{{p}}" on-playlist-select="{{selectAction}}"></playlist-list-item>
     </template>
     <core-selection multi id="selection"></core-selection>
     <paper-fab mini icon="add" on-click="{{createPlaylist}}"></paper-fab>
@@ -37,7 +38,7 @@
 
       createPlaylist: function(e, detail, sender) {
         var playlist = new ss.Playlist();
-        this.fire('page-playlist-edit', {playlist: playlist});
+        this.asyncFire('page-playlist-edit', {playlist: playlist});
       },
       
     });
