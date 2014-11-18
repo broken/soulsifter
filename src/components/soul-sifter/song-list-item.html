@@ -1,6 +1,12 @@
 <link href="../polymer/polymer.html" rel="import">
 
+<link href="../core-icons/core-icons.html" rel="import">
+<link href="../core-menu/core-menu.html" rel="import">
 <link href="../core-style/core-style.html" rel="import">
+<link href="../paper-dropdown/paper-dropdown.html" rel="import">
+<link href="../paper-icon-button/paper-icon-button.html" rel="import">
+<link href="../paper-item/paper-item.html" rel="import">
+<link href="../paper-menu-button/paper-menu-button.html" rel="import">
 <link href="../polymer-ui-ratings/polymer-ui-ratings.html" rel="import">
 
 <link href="global-state.html" rel="import">
@@ -22,6 +28,14 @@
         <span> - </span>
         <span class="title">{{song.title}}</span>
       </div>
+      <paper-menu-button on-click="{{stopPropagation}}">
+        <paper-icon-button icon="more-vert"></paper-icon-button>
+        <paper-dropdown class="dropdown" transition="cascade">
+          <core-menu>
+            <paper-item on-click="{{clickEditAction}}">Edit info</paper-item>
+          </core-menu>
+        </paper-dropdown>
+      </paper-menu-button>
       <div class="bpmDiff">{{bpmDiff}}</div>
       <polymer-ui-ratings value="{{song.rating}}"></polymer-ui-ratings>
       <time class="added">{{localeDate}}</time>
@@ -66,6 +80,15 @@
       dragSong: function(e) {
         e.dataTransfer.effectAllowed = 'move';
         e.dataTransfer.setData('text/plain', 'extensis-filenames-type:' + this.song.filepath);
+      },
+
+      clickEditAction: function(e, detail, sender) {
+        e.stopPropagation();
+        this.asyncFire('page-song-edit', {song: this.song});
+      },
+
+      stopPropagation: function(e, detail, sender) {
+        e.stopPropagation();
       },
     });
   </script>

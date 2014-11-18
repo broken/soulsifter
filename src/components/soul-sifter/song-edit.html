@@ -1,0 +1,43 @@
+<link href="../polymer/polymer.html" rel="import">
+
+<link href="../paper-button/paper-button.html" rel="import">
+<link href="../paper-checkbox/paper-checkbox.html" rel="import">
+<link href="../paper-input/paper-input.html" rel="import">
+
+<polymer-element name="song-edit" attributes="song">
+  <template>
+    <paper-input label="Artist" value="{{song.artist}}" required="true" floatingLabel></paper-input>
+    <paper-input label="Track Num" floatingLabel></paper-input>
+    <paper-input label="Title" required="true" floatingLabel></paper-input>
+    <paper-input label="Remixer" floatingLabel></paper-input>
+    <paper-input label="Comments" floatingLabel></paper-input>
+    <paper-input label="Rating" floatingLabel></paper-input>
+    <paper-input label="Album Artist" floatingLabel></paper-input>
+    <paper-input label="Album" required="true" floatingLabel></paper-input>
+    <paper-input label="POS" floatingLabel></paper-input>
+    <paper-input label="Subtitle" floatingLabel></paper-input>
+    <paper-input label="Label" floatingLabel></paper-input>
+    <paper-input label="Catalog ID" floatingLabel></paper-input>
+    <paper-input label="Genre" required="true" floatingLabel></paper-input>
+    <paper-input label="Release Year" required="true" type="number" min="1600" max="2099" floatingLabel></paper-input>
+    <paper-input label="Release Month" type="number" min="1" max="12" floatingLabel></paper-input>
+    <paper-input label="Release Day" type="number" min="1" max="31" floatingLabel></paper-input>
+    <paper-input label="BPM" floatingLabel></paper-input>
+    <paper-input label="Key" floatingLabel></paper-input>
+    <paper-checkbox label="Compilation" checked="{{song.compilation}}" floatingLabel></paper-checkbox>
+    <paper-checkbox label="Low Quality" checked="{{song.lowQuality}}" floatingLabel></paper-checkbox>
+    <paper-checkbox label="Mixed" checked="{{song.mixed}}" floatingLabel></paper-checkbox>
+
+    <paper-button label="Process" on-click="{{processAction}}" raisedButton></paper-button>
+  </template>
+  <script>
+    var ss = require('../soulsifter/build/Release/soulsifter');
+
+    Polymer('song-edit', {
+
+      processAction: function() {
+        window.console.log(this.song);
+      },
+    });
+  </script>
+</polymer-element>

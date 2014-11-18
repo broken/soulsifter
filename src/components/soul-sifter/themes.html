@@ -20,6 +20,9 @@
     clr: '#999999',
     clr_bold: '#CCCCCC',
     rating: 'light',
+    // paper menu
+    pm_bg: '#111',
+    pm_bghover: black,
     // paper input
     pi_accent: sl_blue,
     // abstract actions
@@ -47,6 +50,8 @@
     sl_hover: 'rgb(20,20,20)',
     sl_fadeout: 'linear-gradient(to right, rgba(41,41,41,0), rgba(41,41,41,1))',
     sl_hoverfadeout: 'linear-gradient(to right, rgba(20,20,20,0), rgba(20,20,20,1))',
+    sl_btnborder: '1px solid rgb(20,20,20)',
+    sl_btnborderhover: '1px solid #999999',
   };
   CoreStyle.g.light = {
     bg: '#EEE',
@@ -83,6 +88,20 @@
   }
   polymer-ui-ratings::shadow #star {
     background-image: url('../components/polymer-ui-ratings/assets/ic_star_rate_{{g.theme.rating}}alt.png');
+  }
+
+  <!-- paper menus -->
+  paper-menu-button paper-dropdown::shadow #background {
+    background-color: {{g.theme.pm_bg}};
+  }
+  paper-menu-button paper-dropdown core-menu {
+    margin: 0;
+  }
+  paper-menu-button paper-dropdown core-menu paper-item {
+    font-size: 1em;
+  }
+  paper-menu-button paper-dropdown core-menu paper-item:hover {
+    background-color: {{g.theme.pm_bghover}};
   }
 
   <!-- paper input -->
@@ -176,6 +195,12 @@
   }
   .song-item:hover .fade-out:after {
     background: {{g.theme.sl_hoverfadeout}};
+  }
+  .song-item paper-menu-button paper-icon-button {
+    border: {{g.theme.sl_btnborder}};
+  }
+  .song-item paper-menu-button paper-icon-button:hover {
+    border: {{g.theme.sl_btnborderhover}};
   }
 
   <!-- song section -->

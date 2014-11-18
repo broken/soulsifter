@@ -19,6 +19,16 @@ polymer-ui-ratings::shadow #star {
 .song-item div {
   margin: 3px;
 }
+.song-item paper-menu-button {
+  display: none;
+}
+.song-item:hover paper-menu-button {
+  display: inline-block;
+}
+.song-item paper-menu-button paper-icon-button {
+  margin-top: 4px;
+  padding: 0;
+}
 
 #cover {
   background-size: cover;

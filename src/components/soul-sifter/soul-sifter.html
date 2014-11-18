@@ -11,6 +11,7 @@
 <link href="genre-list.html" rel="import">
 <link href="playlist-edit.html" rel="import">
 <link href="playlist-list.html" rel="import">
+<link href="song-edit.html" rel="import">
 <link href="song-list.html" rel="import">
 <link href="song-section.html" rel="import">
 <link href="search-toolbar.html" rel="import">
@@ -49,6 +50,9 @@
       <section>
         <playlist-edit playlist="{{playlist}}"></playlist-edit>
       </section>
+      <section>
+        <song-edit song="{{song}}"></song-edit>
+      </section>
     </core-animated-pages>
   </template>
 
@@ -66,6 +70,10 @@
         this.addEventListener('page-playlist-edit', function(e) {
           this.section = 1;
           this.playlist = e.detail.playlist;
+        });
+        this.addEventListener('page-song-edit', function(e) {
+          this.section = 2;
+          this.song = e.detail.song;
         });
       },
 
