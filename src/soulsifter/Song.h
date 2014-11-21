@@ -77,6 +77,8 @@ namespace soulsifter {
         void setTonicKeys(const set<string>& tonicKeys);
         void addTonicKey(const string& tonicKey);
         void removeTonicKey(const string& tonicKey);
+        const string& getTonicKey() const;
+        void setTonicKey(const string& tonicKey);
         const string& getComments() const;
         void setComments(const string& comments);
         const bool getTrashed() const;
@@ -117,6 +119,7 @@ namespace soulsifter {
         time_t dateAdded;
         string bpm;
         set<string> tonicKeys;
+        string tonicKey;
         string comments;
         bool trashed;
         bool lowQuality;

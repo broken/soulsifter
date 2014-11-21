@@ -765,6 +765,7 @@ songFields = [
   [:time_t, "dateAdded", 0],
   [:string, "bpm", 0],
   ["set<string>", "tonicKeys", 0],
+  [:string, "tonicKey", 0],
   [:string, "comments", 0],
   [:bool, "trashed", 0],
   [:bool, "lowQuality", 0],

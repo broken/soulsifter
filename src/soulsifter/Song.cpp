@@ -43,6 +43,7 @@ namespace soulsifter {
     dateAdded(NULL),
     bpm(),
     tonicKeys(),
+    tonicKey(),
     comments(),
     trashed(false),
     lowQuality(false),
@@ -68,6 +69,7 @@ namespace soulsifter {
     dateAdded(song.getDateAdded()),
     bpm(song.getBpm()),
     tonicKeys(song.getTonicKeys()),
+    tonicKey(song.getTonicKey()),
     comments(song.getComments()),
     trashed(song.getTrashed()),
     lowQuality(song.getLowQuality()),
@@ -96,6 +98,7 @@ namespace soulsifter {
         dateAdded = song.getDateAdded();
         bpm = song.getBpm();
         tonicKeys = song.getTonicKeys();
+        tonicKey = song.getTonicKey();
         comments = song.getComments();
         trashed = song.getTrashed();
         lowQuality = song.getLowQuality();
@@ -131,6 +134,7 @@ namespace soulsifter {
         dateAdded = 0;
         bpm.clear();
         tonicKeys.clear();
+        tonicKey.clear();
         comments.clear();
         trashed = false;
         lowQuality = false;
@@ -160,6 +164,7 @@ namespace soulsifter {
         song->setRating(rs->getInt("rating"));
         song->setDateAdded(timeFromString(rs->getString("dateAdded")));
         song->setBpm(rs->getString("bpm"));
+        song->setTonicKey(rs->getString("tonicKey"));
         song->setComments(rs->getString("comments"));
         song->setTrashed(rs->getBoolean("trashed"));
         song->setLowQuality(rs->getBoolean("lowQuality"));
@@ -365,6 +370,14 @@ namespace soulsifter {
             }
             tonicKeys.insert(song->tonicKeys.begin(), song->tonicKeys.end());
         }
+        if (tonicKey.compare(song->getTonicKey())  && (!boost::regex_match(tonicKey, match1, decimal) || !boost::regex_match(song->getTonicKey(), match2, decimal) || match1[1].str().compare(match2[1].str()))) {
+            if (!tonicKey.empty()) {
+                cout << "updating song " << id << " tonicKey from " << song->getTonicKey() << " to " << tonicKey << endl;
+                needsUpdate = true;
+            } else {
+                tonicKey = song->getTonicKey();
+            }
+        }
         if (comments.compare(song->getComments())  && (!boost::regex_match(comments, match1, decimal) || !boost::regex_match(song->getComments(), match2, decimal) || match1[1].str().compare(match2[1].str()))) {
             if (!comments.empty()) {
                 cout << "updating song " << id << " comments from " << song->getComments() << " to " << comments << endl;
@@ -438,7 +451,7 @@ namespace soulsifter {
             if (albumPart && albumPart->sync()) {
                 albumPart->update();
             }
-            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("update Songs set artist=?, track=?, title=?, remixer=?, featuring=?, filepath=?, rating=?, dateAdded=?, bpm=?, tonicKeys=?, comments=?, trashed=?, lowQuality=?, reSongId=?, albumId=?, albumPartId=? where id=?");
+            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("update Songs set artist=?, track=?, title=?, remixer=?, featuring=?, filepath=?, rating=?, dateAdded=?, bpm=?, tonicKeys=?, tonicKey=?, comments=?, trashed=?, lowQuality=?, reSongId=?, albumId=?, albumPartId=? where id=?");
             ps->setString(1, artist);
             ps->setString(2, track);
             ps->setString(3, title);
@@ -449,14 +462,15 @@ namespace soulsifter {
             ps->setString(8, stringFromTime(dateAdded));
             ps->setString(9, bpm);
             ps->setString(10, setToCsv(tonicKeys));
-            ps->setString(11, comments);
-            ps->setBoolean(12, trashed);
-            ps->setBoolean(13, lowQuality);
-            ps->setInt(14, reSongId);
-            ps->setInt(15, albumId);
-            if (albumPartId > 0) ps->setInt(16, albumPartId);
-            else ps->setNull(16, sql::DataType::INTEGER);
-            ps->setInt(17, id);
+            ps->setString(11, tonicKey);
+            ps->setString(12, comments);
+            ps->setBoolean(13, trashed);
+            ps->setBoolean(14, lowQuality);
+            ps->setInt(15, reSongId);
+            ps->setInt(16, albumId);
+            if (albumPartId > 0) ps->setInt(17, albumPartId);
+            else ps->setNull(17, sql::DataType::INTEGER);
+            ps->setInt(18, id);
             int result = ps->executeUpdate();
             if (!stylesIds.empty()) {
                 ps = MysqlAccess::getInstance().getPreparedStatement("insert ignore into SongStyles (songId, styleId) values (?, ?)");
@@ -515,7 +529,7 @@ namespace soulsifter {
                     cerr << "Unable to save albumPart" << endl;
                 }
             }
-            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("insert into Songs (artist, track, title, remixer, featuring, filepath, rating, dateAdded, bpm, tonicKeys, comments, trashed, lowQuality, reSongId, albumId, albumPartId) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("insert into Songs (artist, track, title, remixer, featuring, filepath, rating, dateAdded, bpm, tonicKeys, tonicKey, comments, trashed, lowQuality, reSongId, albumId, albumPartId) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
             ps->setString(1, artist);
             ps->setString(2, track);
             ps->setString(3, title);
@@ -526,13 +540,14 @@ namespace soulsifter {
             ps->setString(8, stringFromTime(dateAdded));
             ps->setString(9, bpm);
             ps->setString(10, setToCsv(tonicKeys));
-            ps->setString(11, comments);
-            ps->setBoolean(12, trashed);
-            ps->setBoolean(13, lowQuality);
-            ps->setInt(14, reSongId);
-            ps->setInt(15, albumId);
-            if (albumPartId > 0) ps->setInt(16, albumPartId);
-            else ps->setNull(16, sql::DataType::INTEGER);
+            ps->setString(11, tonicKey);
+            ps->setString(12, comments);
+            ps->setBoolean(13, trashed);
+            ps->setBoolean(14, lowQuality);
+            ps->setInt(15, reSongId);
+            ps->setInt(16, albumId);
+            if (albumPartId > 0) ps->setInt(17, albumPartId);
+            else ps->setNull(17, sql::DataType::INTEGER);
             int saved = ps->executeUpdate();
             if (!saved) {
                 cerr << "Not able to save song" << endl;
@@ -608,6 +623,9 @@ namespace soulsifter {
     void Song::removeTonicKey(const string& tonicKey) {
         this->tonicKeys.erase(tonicKey);
     }
+
+    const string& Song::getTonicKey() const { return tonicKey; }
+    void Song::setTonicKey(const string& tonicKey) { this->tonicKey = tonicKey; }
 
     const string& Song::getComments() const { return comments; }
     void Song::setComments(const string& comments) { this->comments = comments; }

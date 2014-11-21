@@ -57,6 +57,8 @@ class Song : public node::ObjectWrap {
   // Unable to process setTonicKeys
   static NAN_METHOD(addTonicKey);
   static NAN_METHOD(removeTonicKey);
+  static NAN_GETTER(getTonicKey);
+  static NAN_SETTER(setTonicKey);
   static NAN_GETTER(getComments);
   static NAN_SETTER(setComments);
   static NAN_GETTER(getTrashed);

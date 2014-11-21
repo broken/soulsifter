@@ -76,6 +76,7 @@ void Song::Init(v8::Handle<v8::Object> exports) {
   // Unable to process setTonicKeys
   NanSetPrototypeTemplate(tpl, "addTonicKey", NanNew<v8::FunctionTemplate>(addTonicKey)->GetFunction());
   NanSetPrototypeTemplate(tpl, "removeTonicKey", NanNew<v8::FunctionTemplate>(removeTonicKey)->GetFunction());
+  tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("tonicKey"), getTonicKey, setTonicKey);
   tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("comments"), getComments, setComments);
   tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("trashed"), getTrashed, setTrashed);
   tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("lowQuality"), getLowQuality, setLowQuality);
@@ -427,6 +428,25 @@ NAN_METHOD(Song::removeTonicKey) {
   Song* obj = ObjectWrap::Unwrap<Song>(args.This());
   string a0(*v8::String::Utf8Value(args[0]->ToString()));
   obj->song->removeTonicKey(a0);
+
+  NanReturnUndefined();
+}
+
+NAN_GETTER(Song::getTonicKey) {
+  NanScope();
+
+  Song* obj = ObjectWrap::Unwrap<Song>(args.This());
+  const string result =  obj->song->getTonicKey();
+
+  NanReturnValue(NanNew<v8::String>(result.c_str(), result.length()));
+}
+
+NAN_SETTER(Song::setTonicKey) {
+  NanScope();
+
+  Song* obj = ObjectWrap::Unwrap<Song>(args.This());
+  string a0(*v8::String::Utf8Value(value->ToString()));
+  obj->song->setTonicKey(a0);
 
   NanReturnUndefined();
 }
