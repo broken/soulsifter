@@ -12,12 +12,10 @@
     <core-style ref="main"></core-style>
    
     <div vertical layout center center-justified id="layout">
-      <div id="container">
-        <content></content>
-        <div horizontal layout end-justified id="abstractActions">
-          <paper-button affirmative on-click="{{exit}}">Cancel</paper-button>
-          <paper-button affirmative autofocus on-click="{{accept}}">Accept</paper-button>
-        </div>
+      <content></content>
+      <div horizontal layout end-justified id="abstractActions">
+        <paper-button affirmative on-click="{{exit}}">Cancel</paper-button>
+        <paper-button affirmative autofocus on-click="{{accept}}">Accept</paper-button>
       </div>
     </div>
   </template>

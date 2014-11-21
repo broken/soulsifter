@@ -1,42 +1,61 @@
 <link href="../polymer/polymer.html" rel="import">
 
-<link href="../paper-button/paper-button.html" rel="import">
 <link href="../paper-checkbox/paper-checkbox.html" rel="import">
 <link href="../paper-input/paper-input.html" rel="import">
+<link href="../polymer-ui-ratings/polymer-ui-ratings.html" rel="import">
+
+<link href="themes.html" rel="import">
 
 <polymer-element name="song-edit" attributes="song">
   <template>
-    <paper-input label="Artist" value="{{song.artist}}" required="true" floatingLabel></paper-input>
-    <paper-input label="Track Num" floatingLabel></paper-input>
-    <paper-input label="Title" required="true" floatingLabel></paper-input>
-    <paper-input label="Remixer" floatingLabel></paper-input>
-    <paper-input label="Comments" floatingLabel></paper-input>
-    <paper-input label="Rating" floatingLabel></paper-input>
-    <paper-input label="Album Artist" floatingLabel></paper-input>
-    <paper-input label="Album" required="true" floatingLabel></paper-input>
-    <paper-input label="POS" floatingLabel></paper-input>
-    <paper-input label="Subtitle" floatingLabel></paper-input>
-    <paper-input label="Label" floatingLabel></paper-input>
-    <paper-input label="Catalog ID" floatingLabel></paper-input>
-    <paper-input label="Genre" required="true" floatingLabel></paper-input>
-    <paper-input label="Release Year" required="true" type="number" min="1600" max="2099" floatingLabel></paper-input>
-    <paper-input label="Release Month" type="number" min="1" max="12" floatingLabel></paper-input>
-    <paper-input label="Release Day" type="number" min="1" max="31" floatingLabel></paper-input>
-    <paper-input label="BPM" floatingLabel></paper-input>
-    <paper-input label="Key" floatingLabel></paper-input>
-    <paper-checkbox label="Compilation" checked="{{song.compilation}}" floatingLabel></paper-checkbox>
-    <paper-checkbox label="Low Quality" checked="{{song.lowQuality}}" floatingLabel></paper-checkbox>
-    <paper-checkbox label="Mixed" checked="{{song.mixed}}" floatingLabel></paper-checkbox>
+    <link href="song-edit.css" rel="stylesheet">
+    <core-style ref="main"></core-style>
 
-    <paper-button label="Process" on-click="{{processAction}}" raisedButton></paper-button>
+    <abstract-action-page acceptAction="{{save}}">
+      <div horizontal layout around-justified id="pageContainer">
+        <div vertical layout>
+          <paper-input label="Artist" value="{{song.artist}}" required="true" floatingLabel></paper-input>
+          <paper-input label="Track Num" value="{{song.track}}" floatingLabel></paper-input>
+          <paper-input label="Title" value="{{song.title}}" required="true" floatingLabel></paper-input>
+          <paper-input label="Remixer" value="{{song.remixer}}" floatingLabel></paper-input>
+          <paper-input label="Comments" value="{{song.comments}}" floatingLabel></paper-input>
+          <div id="ratingContainer">
+            <div class="label">rating</div>
+            <polymer-ui-ratings value="{{song.rating}}"></polymer-ui-ratings>
+          </div>
+          <paper-input label="BPM" value="{{song.bpm}}" floatingLabel></paper-input>
+          <paper-input label="Key" value="{{song.tonicKey}}" floatingLabel></paper-input>
+          <paper-checkbox label="Low Quality" checked="{{song.lowQuality}}" floatingLabel></paper-checkbox>
+          <paper-checkbox label="Mixed" checked="{{song.album.mixed}}" floatingLabel></paper-checkbox>
+        </div>
+        <div vertical layout>
+          <paper-input label="Album Artist" value="{{song.album.artist}}" floatingLabel></paper-input>
+          <paper-input label="Album Name" value="{{song.album.name}}" required="true" floatingLabel></paper-input>
+          <paper-input label="POS" value="{{song.albumPart.pos}}" floatingLabel></paper-input>
+          <paper-input label="Subtitle" value="{{song.albumPart.name}}" floatingLabel></paper-input>
+          <paper-input label="Label" value="{{song.album.label}}" floatingLabel></paper-input>
+          <paper-input label="Catalog ID" value="{{song.album.catalogId}}" floatingLabel></paper-input>
+          <paper-input label="Genre" required="true" floatingLabel></paper-input>
+          <paper-input label="Release Year" value="{{song.album.releaseDateYear}}" required="true" type="number" min="1600" max="2099" floatingLabel></paper-input>
+          <paper-input label="Release Month" value="{{song.album.releaseDateMonth}}" type="number" min="1" max="12" floatingLabel></paper-input>
+          <paper-input label="Release Day" value="{{song.album.releaseDateDay}}" type="number" min="1" max="31" floatingLabel></paper-input>
+        </div>
+        <div vertical layout>
+        </div>
+      </div>
+    </abstract-action-page>
   </template>
   <script>
     var ss = require('../soulsifter/build/Release/soulsifter');
 
     Polymer('song-edit', {
 
-      processAction: function() {
-        window.console.log(this.song);
+      save: function(e, detail, sender) {
+        if (this.song.id) {
+          this.song.update();
+        } else {
+          this.song.save();
+        }
       },
     });
   </script>
