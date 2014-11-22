@@ -77,10 +77,10 @@ class Song : public node::ObjectWrap {
   static NAN_SETTER(setAlbumPartId);
   static NAN_GETTER(getAlbumPart);
   static NAN_SETTER(setAlbumPart);
+  static NAN_GETTER(getStyleIds);
+  static NAN_SETTER(setStyleIds);
   static NAN_GETTER(getStyles);
   static NAN_SETTER(setStyles);
-  static NAN_METHOD(addStyleById);
-  static NAN_METHOD(removeStyleById);
 
   static v8::Persistent<v8::Function> constructor;
   dogatech::soulsifter::Song* song;

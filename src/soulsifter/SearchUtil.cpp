@@ -323,7 +323,7 @@ string buildOptionPredicate(int min_bpm, int max_bpm, const string& key, const v
     ss << "))";
   }
   
-  ss << " order by dateAdded desc limit " << limit;
+  ss << " group by s.id order by dateAdded desc limit " << limit;
   return ss.str();
 }
 
@@ -355,7 +355,7 @@ vector<Song*>* SearchUtil::searchSongs(const string& query, int min_bpm, int max
   }
   
   stringstream ss;
-  ss << "select s.*, s.id as songid, s.artist as songartist, a.*, a.id as albumid, a.artist as albumartist from Songs s inner join Albums a on s.albumid = a.id where true";
+  ss << "select s.*, s.id as songid, s.artist as songartist, group_concat(ss.styleid) as styleIds, a.*, a.id as albumid, a.artist as albumartist from Songs s inner join Albums a on s.albumid = a.id left outer join SongStyles ss on ss.songid=s.id where true";
   ss << buildQueryPredicate(atoms);
   ss << buildOptionPredicate(min_bpm, max_bpm, key, styles, limit);
   
@@ -378,6 +378,7 @@ vector<Song*>* SearchUtil::searchSongs(const string& query, int min_bpm, int max
       song->setRating(rs->getInt("rating"));
       song->setDateAdded(timeFromString(rs->getString("dateAdded")));
       song->setBpm(rs->getString("bpm"));
+      song->setTonicKey(rs->getString("tonicKey"));
       song->setComments(rs->getString("comments"));
       song->setTrashed(rs->getBoolean("trashed"));
       song->setLowQuality(rs->getBoolean("lowQuality"));
@@ -385,7 +386,16 @@ vector<Song*>* SearchUtil::searchSongs(const string& query, int min_bpm, int max
       song->setAlbumId(rs->getInt("albumId"));
       if (rs->isNull("albumPartId")) song->setAlbumPartId(0);
       else song->setAlbumPartId(rs->getInt("albumPartId"));
-      //populateStylesIds(song);
+      vector<int> styleIds;
+      if (!rs->isNull("styleIds")) {
+          string csv = rs->getString("styleIds");
+          istringstream iss(csv);
+          string id;
+          while (getline(iss, id, ',')) {
+            styleIds.push_back(atoi(id.c_str()));
+          }
+      }
+      song->setStyleIds(styleIds);
       /*if (!rs->isNull("s.tonicKeys")) {
           string dbSet = rs->getString("s.tonicKeys");
           boost::split(song->tonicKeys, dbSet, boost::is_any_of(","));

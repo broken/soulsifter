@@ -100,10 +100,10 @@ namespace soulsifter {
         AlbumPart* getAlbumPart() const;
         void setAlbumPart(const AlbumPart& albumPart);
         void setAlbumPart(AlbumPart* albumPart);  // takes ownership
+        const vector<int>& getStyleIds() const;
+        void setStyleIds(const vector<int>& styleIds);
         const vector<Style*>& getStyles();
         void setStyles(const vector<Style*>& styles);
-        void addStyleById(int styleId);
-        void removeStyleById(int styleId);
 
         friend ResultSetIterator<Song>;
 
@@ -129,11 +129,10 @@ namespace soulsifter {
         Album* album;
         int albumPartId;
         AlbumPart* albumPart;
+        vector<int> styleIds;
         vector<Style*> styles;
-        vector<int> stylesIds;
 
         static void populateFields(const sql::ResultSet* rs, Song* song);
-        static void populateStylesIds(Song* song);
 
         void operator=(const Song& song);
     };

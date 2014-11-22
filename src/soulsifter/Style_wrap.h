@@ -38,14 +38,14 @@ class Style : public node::ObjectWrap {
   static NAN_SETTER(setREId);
   static NAN_GETTER(getRELabel);
   static NAN_SETTER(setRELabel);
+  static NAN_GETTER(getChildIds);
+  static NAN_SETTER(setChildIds);
   static NAN_GETTER(getChildren);
   static NAN_SETTER(setChildren);
-  static NAN_METHOD(addChildById);
-  static NAN_METHOD(removeChildById);
+  static NAN_GETTER(getParentIds);
+  static NAN_SETTER(setParentIds);
   static NAN_GETTER(getParents);
   static NAN_SETTER(setParents);
-  static NAN_METHOD(addParentById);
-  static NAN_METHOD(removeParentById);
 
   static v8::Persistent<v8::Function> constructor;
   dogatech::soulsifter::Style* style;

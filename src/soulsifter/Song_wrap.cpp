@@ -87,9 +87,8 @@ void Song::Init(v8::Handle<v8::Object> exports) {
   tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("album"), getAlbum, setAlbum);
   tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("albumPartId"), getAlbumPartId, setAlbumPartId);
   tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("albumPart"), getAlbumPart, setAlbumPart);
+  tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("styleIds"), getStyleIds, setStyleIds);
   tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("styles"), getStyles, setStyles);
-  NanSetPrototypeTemplate(tpl, "addStyleById", NanNew<v8::FunctionTemplate>(addStyleById)->GetFunction());
-  NanSetPrototypeTemplate(tpl, "removeStyleById", NanNew<v8::FunctionTemplate>(removeStyleById)->GetFunction());
 
   NanAssignPersistent<v8::Function>(constructor, tpl->GetFunction());
   exports->Set(NanNew<v8::String>("Song"), tpl->GetFunction());
@@ -615,6 +614,35 @@ NAN_SETTER(Song::setAlbumPart) {
   NanReturnUndefined();
 }
 
+NAN_GETTER(Song::getStyleIds) {
+  NanScope();
+
+  Song* obj = ObjectWrap::Unwrap<Song>(args.This());
+  const std::vector<int> result =  obj->song->getStyleIds();
+
+  v8::Handle<v8::Array> a = NanNew<v8::Array>((int) result.size());
+  for (int i = 0; i < (int) result.size(); i++) {
+    a->Set(NanNew<v8::Number>(i), NanNew<v8::Number>(result[i]));
+  }
+  NanReturnValue(a);
+}
+
+NAN_SETTER(Song::setStyleIds) {
+  NanScope();
+
+  Song* obj = ObjectWrap::Unwrap<Song>(args.This());
+  v8::Local<v8::Array> a0Array = v8::Local<v8::Array>::Cast(value);
+  std::vector<int> a0;
+  for (int i = 0; i < a0Array->Length(); ++i) {
+    v8::Local<v8::Value> tmp = a0Array->Get(i);
+    int x(tmp->Uint32Value());
+    a0.push_back(x);
+  }
+  obj->song->setStyleIds(a0);
+
+  NanReturnUndefined();
+}
+
 NAN_GETTER(Song::getStyles) {
   NanScope();
 
@@ -643,26 +671,6 @@ NAN_SETTER(Song::setStyles) {
     a0.push_back(x);
   }
   obj->song->setStyles(a0);
-
-  NanReturnUndefined();
-}
-
-NAN_METHOD(Song::addStyleById) {
-  NanScope();
-
-  Song* obj = ObjectWrap::Unwrap<Song>(args.This());
-  int a0(args[0]->Uint32Value());
-  obj->song->addStyleById(a0);
-
-  NanReturnUndefined();
-}
-
-NAN_METHOD(Song::removeStyleById) {
-  NanScope();
-
-  Song* obj = ObjectWrap::Unwrap<Song>(args.This());
-  int a0(args[0]->Uint32Value());
-  obj->song->removeStyleById(a0);
 
   NanReturnUndefined();
 }

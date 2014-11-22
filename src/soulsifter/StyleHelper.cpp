@@ -60,7 +60,7 @@ namespace soulsifter {
     }
 
     ResultSetIterator<Style>* Style::findAllParents() {
-        sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select * from Styles where id not in (select childId from StyleChildren)");
+        sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select *, group_concat(children.childId) as childIds, group_concat(parents.parentId) as parentIds from Styles left outer join StyleChildren children on Styles.id = children.parentId left outer join StyleChildren parents on Styles.id = parents.childId group by Styles.id having parentIds is null");
         sql::ResultSet *rs = ps->executeQuery();
         ResultSetIterator<Style> *dtrs = new ResultSetIterator<Style>(rs);
         return dtrs;

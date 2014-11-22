@@ -57,12 +57,10 @@ void Style::Init(v8::Handle<v8::Object> exports) {
   tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("name"), getName, setName);
   tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("rEId"), getREId, setREId);
   tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("rELabel"), getRELabel, setRELabel);
+  tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("childIds"), getChildIds, setChildIds);
   tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("children"), getChildren, setChildren);
-  NanSetPrototypeTemplate(tpl, "addChildById", NanNew<v8::FunctionTemplate>(addChildById)->GetFunction());
-  NanSetPrototypeTemplate(tpl, "removeChildById", NanNew<v8::FunctionTemplate>(removeChildById)->GetFunction());
+  tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("parentIds"), getParentIds, setParentIds);
   tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("parents"), getParents, setParents);
-  NanSetPrototypeTemplate(tpl, "addParentById", NanNew<v8::FunctionTemplate>(addParentById)->GetFunction());
-  NanSetPrototypeTemplate(tpl, "removeParentById", NanNew<v8::FunctionTemplate>(removeParentById)->GetFunction());
 
   NanAssignPersistent<v8::Function>(constructor, tpl->GetFunction());
   exports->Set(NanNew<v8::String>("Style"), tpl->GetFunction());
@@ -248,6 +246,35 @@ NAN_SETTER(Style::setRELabel) {
   NanReturnUndefined();
 }
 
+NAN_GETTER(Style::getChildIds) {
+  NanScope();
+
+  Style* obj = ObjectWrap::Unwrap<Style>(args.This());
+  const std::vector<int> result =  obj->style->getChildIds();
+
+  v8::Handle<v8::Array> a = NanNew<v8::Array>((int) result.size());
+  for (int i = 0; i < (int) result.size(); i++) {
+    a->Set(NanNew<v8::Number>(i), NanNew<v8::Number>(result[i]));
+  }
+  NanReturnValue(a);
+}
+
+NAN_SETTER(Style::setChildIds) {
+  NanScope();
+
+  Style* obj = ObjectWrap::Unwrap<Style>(args.This());
+  v8::Local<v8::Array> a0Array = v8::Local<v8::Array>::Cast(value);
+  std::vector<int> a0;
+  for (int i = 0; i < a0Array->Length(); ++i) {
+    v8::Local<v8::Value> tmp = a0Array->Get(i);
+    int x(tmp->Uint32Value());
+    a0.push_back(x);
+  }
+  obj->style->setChildIds(a0);
+
+  NanReturnUndefined();
+}
+
 NAN_GETTER(Style::getChildren) {
   NanScope();
 
@@ -280,22 +307,31 @@ NAN_SETTER(Style::setChildren) {
   NanReturnUndefined();
 }
 
-NAN_METHOD(Style::addChildById) {
+NAN_GETTER(Style::getParentIds) {
   NanScope();
 
   Style* obj = ObjectWrap::Unwrap<Style>(args.This());
-  int a0(args[0]->Uint32Value());
-  obj->style->addChildById(a0);
+  const std::vector<int> result =  obj->style->getParentIds();
 
-  NanReturnUndefined();
+  v8::Handle<v8::Array> a = NanNew<v8::Array>((int) result.size());
+  for (int i = 0; i < (int) result.size(); i++) {
+    a->Set(NanNew<v8::Number>(i), NanNew<v8::Number>(result[i]));
+  }
+  NanReturnValue(a);
 }
 
-NAN_METHOD(Style::removeChildById) {
+NAN_SETTER(Style::setParentIds) {
   NanScope();
 
   Style* obj = ObjectWrap::Unwrap<Style>(args.This());
-  int a0(args[0]->Uint32Value());
-  obj->style->removeChildById(a0);
+  v8::Local<v8::Array> a0Array = v8::Local<v8::Array>::Cast(value);
+  std::vector<int> a0;
+  for (int i = 0; i < a0Array->Length(); ++i) {
+    v8::Local<v8::Value> tmp = a0Array->Get(i);
+    int x(tmp->Uint32Value());
+    a0.push_back(x);
+  }
+  obj->style->setParentIds(a0);
 
   NanReturnUndefined();
 }
@@ -328,26 +364,6 @@ NAN_SETTER(Style::setParents) {
     a0.push_back(x);
   }
   obj->style->setParents(a0);
-
-  NanReturnUndefined();
-}
-
-NAN_METHOD(Style::addParentById) {
-  NanScope();
-
-  Style* obj = ObjectWrap::Unwrap<Style>(args.This());
-  int a0(args[0]->Uint32Value());
-  obj->style->addParentById(a0);
-
-  NanReturnUndefined();
-}
-
-NAN_METHOD(Style::removeParentById) {
-  NanScope();
-
-  Style* obj = ObjectWrap::Unwrap<Style>(args.This());
-  int a0(args[0]->Uint32Value());
-  obj->style->removeParentById(a0);
 
   NanReturnUndefined();
 }

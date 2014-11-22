@@ -68,7 +68,11 @@ def plural(x)
 end
 
 def vectorIds(f)
-  "#{f[$name]}Ids"
+  "#{single(f[$name])}Ids"
+end
+
+def vectorObjs(f)
+  "#{plural(f[$name][0..-4])}"
 end
 
 def vectorRelationTable(name, f)
@@ -89,6 +93,30 @@ def vectorRelationTable(name, f)
   return t
 end
 
+def selectStar(fields)
+  str = "*";
+  fields.select{|f| isVector(f[$type]) && f[$attrib] & Attrib::ID > 0}.each do |f|
+    str << ", group_concat(#{plural(f[$name][0..-4])}.#{single(f[$name])}) as #{f[$name]}"
+  end
+  return str
+end
+
+def fromTable(name, fields)
+  str = "#{cap(plural(name))}";
+  fields.select{|f| isVector(f[$type]) && f[$attrib] & Attrib::ID == 0}.each do |f|
+    t = vectorRelationTable(name, f)
+    str << " left outer join #{t[0]} #{f[$name]} on #{cap(plural(name))}.id = #{f[$name]}.#{t[2]}"
+  end
+  return str
+end
+
+def groupBy(name, fields)
+  fields.select{|f| isVector(f[$type]) && f[$attrib] & Attrib::ID == 0}.each do |f|
+    return " group by #{cap(plural(name))}.id"
+  end
+  return ""
+end
+
 ######################### h & cc outputs
 
 def sqlCatchBlock()
@@ -98,9 +126,6 @@ end
 def hFieldDeclaration(f)
   str = "        #{f[$type]}#{'*' if (f[$attrib] & Attrib::PTR > 0)} #{f[$name]};"
   str << "  // transient" if (f[$attrib] & Attrib::TRANSIENT > 0)
-  if (isVector(f[$type]))
-    str << "\n        vector<int> #{vectorIds(f)};"
-  end
   str << "\n"
 end
 
@@ -117,8 +142,6 @@ def cConstructor(name, fields)
       str << "    #{f[$name]}(false),\n"
     elsif (f[$attrib] & Attrib::PTR > 0 || f[$type] == :time_t)
       str << "    #{f[$name]}(NULL),\n"
-    elsif (isVector(f[$type]))
-      str << "    #{f[$name]}(),\n    #{vectorIds(f)}(),\n"
     else
       str << "    #{f[$name]}(),\n"
     end
@@ -136,8 +159,8 @@ def cCopyConstructor(name, fields)
   fields.each do |f|
     if (f[$attrib] & Attrib::PTR > 0)
       str << "    #{f[$name]}(NULL),\n"
-    elsif (isVector(f[$type]))
-      str << "    #{f[$name]}(),\n    #{vectorIds(f)}(#{name}.#{vectorIds(f)}),\n"
+    elsif (isVector(f[$type]) && f[$attrib] & Attrib::ID == 0)
+      str << "    #{f[$name]}(),\n"
     else
       str << "    #{f[$name]}(#{name}.get#{cap(f[$name])}()),\n"
     end
@@ -161,8 +184,7 @@ def cAssignmentConstructor(name, fields)
   fields.each do |f|
     if (f[$attrib] & Attrib::PTR > 0)
       str << "        #{f[$name]} = NULL;\n"
-    elsif (isVector(f[$type]))
-      str << "        #{vectorIds(f)} = #{name}.#{vectorIds(f)};\n"
+    elsif (isVector(f[$type]) && f[$attrib] & Attrib::ID == 0)
       str << "        deleteVectorPointers(&#{f[$name]});\n"
     else
       str << "        #{f[$name]} = #{name}.get#{cap(f[$name])}();\n"
@@ -181,7 +203,7 @@ def cDestructor(name, fields)
     if (f[$attrib] & Attrib::PTR > 0)
       str << "        delete #{f[$name]};\n"
       str << "        #{f[$name]} = NULL;\n"
-    elsif (isVector(f[$type]))
+    elsif (isVector(f[$type]) && f[$attrib] & Attrib::ID == 0)
       str << "        while (!#{f[$name]}.empty()) delete #{f[$name]}.back(), #{f[$name]}.pop_back();\n"
     end
   end
@@ -197,15 +219,15 @@ def cClearFunction(name, fields)
   fields.each do |f|
     if (f[$type] == :int || f[$type] == :time_t)
       str << "        #{f[$name]} = 0;\n"
-    elsif (f[$type] == :string || isSet(f[$type]))
+    elsif (isVector(f[$type]) && f[$attrib] & Attrib::ID == 0)
+      str << "        deleteVectorPointers(&#{f[$name]});\n"
+    elsif (f[$type] == :string || isSet(f[$type]) || isVector(f[$type]))
       str << "        #{f[$name]}.clear();\n"
     elsif (f[$type] == :bool)
       str << "        #{f[$name]} = false;\n"
     elsif (f[$attrib] & Attrib::PTR > 0)
       str << "        delete #{f[$name]};\n"
       str << "        #{f[$name]} = NULL;\n"
-    elsif (isVector(f[$type]))
-      str << "        deleteVectorPointers(&#{f[$name]});\n        #{vectorIds(f)}.clear();\n"
     else
       str << "        // TODO #{f[$name]}\n"
     end
@@ -229,7 +251,7 @@ def cFindFunction(name, f, fields)
     str << "    #{cap(name)}* #{cap(name)}::findBy#{cap(f[$name])}(const #{f[$type]}& #{f[$name]}) {\n"
   end
   str << "        try {\n"
-  str << "            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement(\"select * from #{cap(plural(name))} where #{f[$name]} = ?\");\n"
+  str << "            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement(\"select #{selectStar(fields)} from #{fromTable(name, fields)} where #{f[$name]} = ?#{groupBy(name,fields)}\");\n"
   str << "            ps->set#{cap(f[$type].to_s)}(1, #{f[$name]});\n            sql::ResultSet *rs = ps->executeQuery();\n            #{cap(name)} *#{name} = NULL;\n            if (rs->next()) {\n                #{name} = new #{cap(name)}();\n                populateFields(rs, #{name});\n            }\n            rs->close();\n            delete rs;\n\n"
   str << "            return #{name};\n"
   str << sqlCatchBlock()
@@ -258,7 +280,7 @@ def hSecondaryKeysFindFunction(name, secondaryKeys)
   str << ");\n"
 end
 
-def cSecondaryKeysFindFunction(name, secondaryKeys)
+def cSecondaryKeysFindFunction(name, secondaryKeys, fields)
   str = "    #{cap(name)}* #{cap(name)}::findBy"
   secondaryKeys.each_with_index do |f,idx|
     if (idx > 0)
@@ -279,14 +301,14 @@ def cSecondaryKeysFindFunction(name, secondaryKeys)
   end
   str << ") {\n"
   str << "        try {\n"
-  str << "            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement(\"select * from #{cap(plural(name))} where "
+  str << "            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement(\"select #{selectStar(fields)} from #{fromTable(name, fields)} where "
   secondaryKeys.each_with_index do |f,idx|
     if (idx > 0)
       str << " and "
     end
     str << "#{f[$name]} = ?"
   end
-  str << "\");\n"
+  str << "#{groupBy(name,fields)}\");\n"
   secondaryKeys.each_with_index do |f,idx|
     str << "            ps->set#{cap(f[$type].to_s)}(#{idx+1}, #{f[$name]});\n"
   end
@@ -299,8 +321,8 @@ def hFindAllFunction(name)
   return "        static ResultSetIterator<#{cap(name)}>* findAll();\n"
 end
 
-def cFindAllFunction(name)
-  return "    ResultSetIterator<#{cap(name)}>* #{cap(name)}::findAll() {\n        sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement(\"select * from #{cap(plural(name))}\");\n        sql::ResultSet *rs = ps->executeQuery();\n        ResultSetIterator<#{cap(name)}> *dtrs = new ResultSetIterator<#{cap(name)}>(rs);\n        return dtrs;\n    }\n"
+def cFindAllFunction(name, fields)
+  return "    ResultSetIterator<#{cap(name)}>* #{cap(name)}::findAll() {\n        sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement(\"select #{selectStar(fields)} from #{fromTable(name, fields)}#{groupBy(name,fields)}\");\n        sql::ResultSet *rs = ps->executeQuery();\n        ResultSetIterator<#{cap(name)}> *dtrs = new ResultSetIterator<#{cap(name)}>(rs);\n        return dtrs;\n    }\n"
 end
 
 def hSyncFunction()
@@ -345,10 +367,10 @@ def cSyncFunction(name, fields, secondaryKeys)
       str << "            if (!#{f[$name]}.empty()) {\n"
       str << "                cout << \"updating #{name} \" << id << \" #{f[$name]} from \" << #{name}->get#{cap(f[$name])}() << \" to \" << #{f[$name]} << endl;\n                needsUpdate = true;\n            } else {\n"
       str << "                #{f[$name]} = #{name}->get#{cap(f[$name])}();\n            }\n        }\n"
-    elsif (isVector(f[$type]))
-      str << "        if (!equivalentVectors<int>(#{vectorIds(f)}, #{name}->#{vectorIds(f)})) {\n            if (!containsVector<int>(#{vectorIds(f)}, #{name}->#{vectorIds(f)})) {\n"
-      str << "                cout << \"updating #{name} \" << id << \" #{vectorIds(f)}\" << endl;\n                needsUpdate = true;\n            }\n"
-      str << "            appendUniqueVector<int>(#{name}->#{vectorIds(f)}, &#{vectorIds(f)});\n            #{f[$name]}.clear();\n        }\n"
+    elsif (isVector(f[$type]) && f[$attrib] & Attrib::ID > 0)
+      str << "        if (!equivalentVectors<int>(#{f[$name]}, #{name}->get#{cap(f[$name])}())) {\n            if (!containsVector<int>(#{f[$name]}, #{name}->get#{cap(f[$name])}())) {\n"
+      str << "                cout << \"updating #{name} \" << id << \" #{f[$name]}\" << endl;\n                needsUpdate = true;\n            }\n"
+      str << "            appendUniqueVector<int>(#{name}->get#{cap(f[$name])}(), &#{f[$name]});\n        }\n"
     elsif (isSet(f[$type]))
       str << "        if (!equivalentSets<#{getSetGeneric(f[$type])}>(#{f[$name]}, #{name}->#{f[$name]})) {\n            if (!containsSet<#{getSetGeneric(f[$type])}>(#{f[$name]}, #{name}->#{f[$name]})) {\n"
       str << "                cout << \"updating #{name} \" << id << \" #{f[$name]}\" << endl;\n                needsUpdate = true;\n            }\n"
@@ -396,7 +418,7 @@ def cUpdateFunction(name, fields)
     end
   end
   str << "            ps->setInt(#{i + 1}, id);\n            int result = ps->executeUpdate();\n"
-  fields.select{|f| isVector(f[$type])}.each do |f|
+  fields.select{|f| isVector(f[$type]) && f[$attrib] & Attrib::ID == 0}.each do |f|
     t = vectorRelationTable(name, f)
     str << "            if (!#{vectorIds(f)}.empty()) {\n"
     str << "                ps = MysqlAccess::getInstance().getPreparedStatement(\"insert ignore into #{t[0]} (#{t[2]}, #{t[1]}) values (?, ?)\");\n"
@@ -465,7 +487,7 @@ def cSaveFunction(name, fields, attribs)
     str << "                    cerr << \"Inserted #{name}, but unable to retreive inserted ID.\" << endl;\n                    return saved;\n                }\n"
   end
   fields.each do |f|
-    if (isVector(f[$type]))
+    if (isVector(f[$type]) && f[$attrib] & Attrib::ID == 0)
       str << "                ps = MysqlAccess::getInstance().getPreparedStatement(\"insert ignore into #{cap(name)}#{cap(f[$name])} (#{name}Id, #{single(f[$name])}Id) values (?, ?)\");\n                for (vector<int>::iterator it = #{vectorIds(f)}.begin(); it != #{vectorIds(f)}.end(); ++it) {\n"
       str << "                    ps->setInt(1, id);\n                    ps->setInt(2, *it);\n                    if (!ps->executeUpdate()) {\n                        cerr << \"Did not save #{single(f[$name])} for #{name} \" << id << endl;\n                    }\n                }\n"
     end
@@ -477,9 +499,6 @@ end
 
 def hPopulateFieldFunctions(name, fields)
   str = "        static void populateFields(const sql::ResultSet* rs, #{cap(name)}* #{name});\n"
-  fields.select{|f| isVector(f[$type])}.each do |f|
-    str << "        static void populate#{cap(vectorIds(f))}(#{cap(name)}* #{name});\n"
-  end
   return str
 end
 
@@ -499,20 +518,13 @@ def cPopulateFieldFunctions(name, fields)
       str << "        #{name}->set#{cap(f[$name])}(rs->get#{cap(f[$type].to_s)}(\"#{f[$name]}\"));\n"
     end
   end
-  fields.select{|f| isVector(f[$type])}.each do |f|
-    str << "        populate#{cap(vectorIds(f))}(#{name});\n"
+  fields.select{|f| isVector(f[$type]) && f[$attrib] & Attrib::ID > 0}.each do |f|
+    str << "        if (!rs->isNull(\"#{f[$name]}\")) {\n            string csv = rs->getString(\"#{f[$name]}\");\n            istringstream iss(csv);\n            string id;\n            while (getline(iss, id, ',')) {\n              #{name}->#{f[$name]}.push_back(atoi(id.c_str()));\n            }\n        }\n"
   end
   fields.select{|f| isSet(f[$type])}.each do |f|
-    str << "        if (!rs->isNull(\"#{f[$name]}\")) {\n            #{getSetGeneric(f[$type])} dbSet = rs->getString(\"#{f[$name]}\");\n            boost::split(song->#{f[$name]}, dbSet, boost::is_any_of(\",\"));\n        }\n"
+    str << "        if (!rs->isNull(\"#{f[$name]}\")) {\n            #{getSetGeneric(f[$type])} dbSet = rs->getString(\"#{f[$name]}\");\n            boost::split(#{name}->#{f[$name]}, dbSet, boost::is_any_of(\",\"));\n        }\n"
   end
   str << "    }\n\n"
-  # populate vector fields
-  fields.select{|f| isVector(f[$type])}.each do |f|
-    str << "    void #{cap(name)}::populate#{cap(vectorIds(f))}(#{cap(name)}* #{name}) {\n"
-    t = vectorRelationTable(name, f)
-    str << "        sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement(\"select #{t[1]} from #{t[0]} where #{t[2]} = ?\");\n"
-    str << "        ps->setInt(1, #{name}->getId());\n        sql::ResultSet *rs = ps->executeQuery();\n        while (rs->next()) {\n            #{name}->#{vectorIds(f)}.push_back(rs->getInt(1));\n        }\n        rs->close();\n        delete rs;\n    }\n\n"
-  end
   return str
 end
 
@@ -526,11 +538,14 @@ def hAccessor(f)
     str << "        void set#{cap(f[$name])}(const #{f[$type]}& #{f[$name]});\n"
     str << "        void set#{cap(f[$name])}(#{f[$type]}* #{f[$name]});  // takes ownership\n"
   elsif (isVector(f[$type]))
-    str << "        const #{f[$type]}& get#{cap(f[$name])}();\n"
+    if (f[$attrib] & Attrib::ID > 0)
+      str << "        const #{f[$type]}& get#{cap(f[$name])}() const;\n"
+    else
+      str << "        const #{f[$type]}& get#{cap(f[$name])}();\n"
+    end
     str << "        void set#{cap(f[$name])}(const #{f[$type]}& #{f[$name]});\n"
     #str << "        void add#{cap(single(f[$name]))}(const #{vectorGeneric(f[$type])}& #{single(f[$name])});\n"
-    str << "        void add#{cap(single(f[$name]))}ById(int #{single(f[$name])}Id);\n"
-    str << "        void remove#{cap(single(f[$name]))}ById(int #{single(f[$name])}Id);\n"
+    #str << "        void remove#{cap(single(f[$name]))}(const #{vectorGeneric(f[$type])}& #{single(f[$name])});\n"
   elsif (isSet(f[$type]))
     str << "        const #{f[$type]}& get#{cap(f[$name])}() const;\n"
     str << "        void set#{cap(f[$name])}(const #{f[$type]}& #{f[$name]});\n"
@@ -552,11 +567,17 @@ def cAccessor(name, f)
     str << "    #{f[$type]}* #{cap(name)}::get#{cap(f[$name])}() const {\n        if (!#{f[$name]} && #{f[$name]}Id)\n            return #{f[$type][0..-1]}::findById(#{f[$name]}Id);\n        return #{f[$name]};\n    }\n"
     str << "    void #{cap(name)}::set#{cap(f[$name])}(const #{f[$type]}& #{f[$name]}) {\n        this->#{f[$name]}Id = #{f[$name]}.getId();\n        delete this->#{f[$name]};\n        this->#{f[$name]} = new #{f[$type]}(#{f[$name]});\n    }\n"
     str << "    void #{cap(name)}::set#{cap(f[$name])}(#{f[$type]}* #{f[$name]}) {\n        this->#{f[$name]}Id = #{f[$name]}->getId();\n        delete this->#{f[$name]};\n        this->#{f[$name]} = #{f[$name]};\n    }\n"
-  elsif (isVector(f[$type]))
+  elsif (isVector(f[$type]) && f[$attrib] & Attrib::ID == 0)
     str << "    const #{f[$type]}& #{cap(name)}::get#{cap(f[$name])}() {\n        if (#{f[$name]}.empty() && !#{vectorIds(f)}.empty()) {\n            for (vector<int>::const_iterator it = #{vectorIds(f)}.begin(); it != #{vectorIds(f)}.end(); ++it) {\n                #{f[$name]}.push_back(#{vectorGeneric(f[$type])}::findById(*it));\n            }\n        }\n        return #{f[$name]};\n    }\n"
     str << "    void #{cap(name)}::set#{cap(f[$name])}(const #{f[$type]}& #{f[$name]}) {\n        deleteVectorPointers<#{vectorGeneric(f[$type])}*>(&this->#{f[$name]});\n        this->#{f[$name]} = #{f[$name]};\n        this->#{vectorIds(f)}.clear();\n        for (#{f[$type]}::const_iterator it = #{f[$name]}.begin(); it != #{f[$name]}.end(); ++it) {\n            this->#{vectorIds(f)}.push_back((*it)->getId());\n        }\n    }\n"
-    str << "    void #{cap(name)}::add#{cap(single(f[$name]))}ById(int #{single(f[$name])}Id) {\n        if (std::find(#{vectorIds(f)}.begin(), #{vectorIds(f)}.end(), #{single(f[$name])}Id) == #{vectorIds(f)}.end()) {\n                #{vectorIds(f)}.push_back(#{single(f[$name])}Id);\n                if (!#{f[$name]}.empty()) #{f[$name]}.push_back(#{vectorGeneric(f[$type])}::findById(#{single(f[$name])}Id));\n        }\n    }\n"
-    str << "    void #{cap(name)}::remove#{cap(single(f[$name]))}ById(int #{single(f[$name])}Id) {\n        for (#{f[$type]}::iterator it = #{f[$name]}.begin(); it != #{f[$name]}.end(); ++it) {\n            if (#{single(f[$name])}Id == (*it)->getId()) {\n                delete (*it);\n                #{f[$name]}.erase(it);\n            }\n        }\n        for (vector<int>::iterator it = #{vectorIds(f)}.begin(); it != #{vectorIds(f)}.end(); ++it) {\n            if (#{single(f[$name])}Id == *it) {\n                #{vectorIds(f)}.erase(it);\n            }\n        }\n    }\n"
+    #str << "    void #{cap(name)}::add#{cap(single(f[$name]))}(const #{vectorGeneric(f[$type])}& #{single(f[$name])}) {\n        if (std::find(#{vectorIds(f)}.begin(), #{vectorIds(f)}.end(), #{single(f[$name])}Id) == #{vectorIds(f)}.end()) {\n                #{vectorIds(f)}.push_back(#{single(f[$name])}Id);\n                if (!#{f[$name]}.empty()) #{f[$name]}.push_back(#{vectorGeneric(f[$type])}::findById(#{single(f[$name])}Id));\n        }\n    }\n"
+    #str << "    void #{cap(name)}::remove#{cap(single(f[$name]))}(const #{vectorGeneric(f[$type])}& #{single(f[$name])}) {\n        for (#{f[$type]}::iterator it = #{f[$name]}.begin(); it != #{f[$name]}.end(); ++it) {\n            if (#{single(f[$name])}Id == (*it)->getId()) {\n                delete (*it);\n                #{f[$name]}.erase(it);\n            }\n        }\n        for (vector<int>::iterator it = #{vectorIds(f)}.begin(); it != #{vectorIds(f)}.end(); ++it) {\n            if (#{single(f[$name])}Id == *it) {\n                #{vectorIds(f)}.erase(it);\n            }\n        }\n    }\n"
+  elsif (isVector(f[$type]) && f[$attrib] & Attrib::ID > 0)
+    objVec = plural(f[$name][0..-4])
+    str << "    const #{f[$type]}& #{cap(name)}::get#{cap(f[$name])}() const { return #{f[$name]}; }\n"
+    str << "    void #{cap(name)}::set#{cap(f[$name])}(const #{f[$type]}& #{f[$name]}) {\n        while (!#{objVec}.empty()) delete #{objVec}.back(), #{objVec}.pop_back();\n        this->#{f[$name]}.clear();\n        this->#{f[$name]} = #{f[$name]};\n    }\n"
+    #str << "    void #{cap(name)}::add#{cap(single(f[$name]))}(const #{vectorGeneric(f[$type])} #{single(f[$name])}) {\n        if (std::find(#{vectorIds(f)}.begin(), #{vectorIds(f)}.end(), #{single(f[$name])}Id) == #{vectorIds(f)}.end()) {\n                #{vectorIds(f)}.push_back(#{single(f[$name])}Id);\n                if (!#{f[$name]}.empty()) #{f[$name]}.push_back(#{vectorGeneric(f[$type])}::findById(#{single(f[$name])}Id));\n        }\n    }\n"
+    #str << "    void #{cap(name)}::remove#{cap(single(f[$name]))}(const #{vectorGeneric(f[$type])} #{single(f[$name])}) {\n        for (#{f[$type]}::iterator it = #{f[$name]}.begin(); it != #{f[$name]}.end(); ++it) {\n            if (#{single(f[$name])}Id == (*it)->getId()) {\n                delete (*it);\n                #{f[$name]}.erase(it);\n            }\n        }\n        for (vector<int>::iterator it = #{vectorIds(f)}.begin(); it != #{vectorIds(f)}.end(); ++it) {\n            if (#{single(f[$name])}Id == *it) {\n                #{vectorIds(f)}.erase(it);\n            }\n        }\n    }\n"
   elsif (isSet(f[$type]))
     str << "    const #{f[$type]}& #{cap(name)}::get#{cap(f[$name])}() const {\n        return #{f[$name]};\n    }\n"
     str << "    void #{cap(name)}::set#{cap(f[$name])}(const #{f[$type]}& #{f[$name]}) {\n        this->#{f[$name]} = #{f[$name]};\n    }\n"
@@ -642,9 +663,9 @@ def writeCode (name, fields, attribs)
     str << cFindFunction(name, f, fields)
   end
   if (!secondaryKeys.empty?)
-    str << cSecondaryKeysFindFunction(name, secondaryKeys)
+    str << cSecondaryKeysFindFunction(name, secondaryKeys, fields)
   end
-  str << cFindAllFunction(name)
+  str << cFindAllFunction(name, fields)
   str << "\n# pragma mark persistence\n\n"
   str << cSyncFunction(name, fields, secondaryKeys)
   str << cUpdateFunction(name, fields)
@@ -775,6 +796,7 @@ songFields = [
   ["Album", "album", Attrib::PTR],
   [:int, "albumPartId", Attrib::ID | Attrib::NULLABLE],
   ["AlbumPart", "albumPart", Attrib::PTR],
+  ["vector<int>", "styleIds", Attrib::ID],
   ["vector<Style*>", "styles", 0],
 ]
 songAttribs = 0
@@ -785,7 +807,9 @@ styleFields = [
   [:string, "name", 0],
   [:int, "reId", Attrib::KEY2],
   [:string, "reLabel", 0],
+  ["vector<int>", "childIds", Attrib::ID],
   ["vector<Style*>", "children", 0],
+  ["vector<int>", "parentIds", Attrib::ID],
   ["vector<Style*>", "parents", 0],
 ]
 styleAttribs = 0

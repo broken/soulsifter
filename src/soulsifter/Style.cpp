@@ -36,10 +36,10 @@ namespace soulsifter {
     name(),
     reId(0),
     reLabel(),
+    childIds(),
     children(),
-    childrenIds(),
-    parents(),
-    parentsIds() {
+    parentIds(),
+    parents() {
     }
 
     Style::Style(const Style& style) :
@@ -47,10 +47,10 @@ namespace soulsifter {
     name(style.getName()),
     reId(style.getREId()),
     reLabel(style.getRELabel()),
+    childIds(style.getChildIds()),
     children(),
-    childrenIds(style.childrenIds),
-    parents(),
-    parentsIds(style.parentsIds) {
+    parentIds(style.getParentIds()),
+    parents() {
     }
 
     void Style::operator=(const Style& style) {
@@ -58,9 +58,9 @@ namespace soulsifter {
         name = style.getName();
         reId = style.getREId();
         reLabel = style.getRELabel();
-        childrenIds = style.childrenIds;
+        childIds = style.getChildIds();
         deleteVectorPointers(&children);
-        parentsIds = style.parentsIds;
+        parentIds = style.getParentIds();
         deleteVectorPointers(&parents);
     }
 
@@ -74,10 +74,10 @@ namespace soulsifter {
         name.clear();
         reId = 0;
         reLabel.clear();
+        childIds.clear();
         deleteVectorPointers(&children);
-        childrenIds.clear();
+        parentIds.clear();
         deleteVectorPointers(&parents);
-        parentsIds.clear();
     }
 
 # pragma mark static methods
@@ -87,35 +87,27 @@ namespace soulsifter {
         style->setName(rs->getString("name"));
         style->setREId(rs->getInt("reId"));
         style->setRELabel(rs->getString("reLabel"));
-        populateChildrenIds(style);
-        populateParentsIds(style);
-    }
-
-    void Style::populateChildrenIds(Style* style) {
-        sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select childId from StyleChildren where parentId = ?");
-        ps->setInt(1, style->getId());
-        sql::ResultSet *rs = ps->executeQuery();
-        while (rs->next()) {
-            style->childrenIds.push_back(rs->getInt(1));
+        if (!rs->isNull("childIds")) {
+            string csv = rs->getString("childIds");
+            istringstream iss(csv);
+            string id;
+            while (getline(iss, id, ',')) {
+              style->childIds.push_back(atoi(id.c_str()));
+            }
         }
-        rs->close();
-        delete rs;
-    }
-
-    void Style::populateParentsIds(Style* style) {
-        sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select parentId from StyleChildren where childId = ?");
-        ps->setInt(1, style->getId());
-        sql::ResultSet *rs = ps->executeQuery();
-        while (rs->next()) {
-            style->parentsIds.push_back(rs->getInt(1));
+        if (!rs->isNull("parentIds")) {
+            string csv = rs->getString("parentIds");
+            istringstream iss(csv);
+            string id;
+            while (getline(iss, id, ',')) {
+              style->parentIds.push_back(atoi(id.c_str()));
+            }
         }
-        rs->close();
-        delete rs;
     }
 
     Style* Style::findById(int id) {
         try {
-            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select * from Styles where id = ?");
+            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select *, group_concat(children.childId) as childIds, group_concat(parents.parentId) as parentIds from Styles left outer join StyleChildren children on Styles.id = children.parentId left outer join StyleChildren parents on Styles.id = parents.childId where id = ? group by Styles.id");
             ps->setInt(1, id);
             sql::ResultSet *rs = ps->executeQuery();
             Style *style = NULL;
@@ -139,7 +131,7 @@ namespace soulsifter {
 
     Style* Style::findByREId(int reId) {
         try {
-            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select * from Styles where reId = ?");
+            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select *, group_concat(children.childId) as childIds, group_concat(parents.parentId) as parentIds from Styles left outer join StyleChildren children on Styles.id = children.parentId left outer join StyleChildren parents on Styles.id = parents.childId where reId = ? group by Styles.id");
             ps->setInt(1, reId);
             sql::ResultSet *rs = ps->executeQuery();
             Style *style = NULL;
@@ -162,7 +154,7 @@ namespace soulsifter {
     }
 
     ResultSetIterator<Style>* Style::findAll() {
-        sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select * from Styles");
+        sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select *, group_concat(children.childId) as childIds, group_concat(parents.parentId) as parentIds from Styles left outer join StyleChildren children on Styles.id = children.parentId left outer join StyleChildren parents on Styles.id = parents.childId group by Styles.id");
         sql::ResultSet *rs = ps->executeQuery();
         ResultSetIterator<Style> *dtrs = new ResultSetIterator<Style>(rs);
         return dtrs;
@@ -214,21 +206,19 @@ namespace soulsifter {
                 reLabel = style->getRELabel();
             }
         }
-        if (!equivalentVectors<int>(childrenIds, style->childrenIds)) {
-            if (!containsVector<int>(childrenIds, style->childrenIds)) {
-                cout << "updating style " << id << " childrenIds" << endl;
+        if (!equivalentVectors<int>(childIds, style->getChildIds())) {
+            if (!containsVector<int>(childIds, style->getChildIds())) {
+                cout << "updating style " << id << " childIds" << endl;
                 needsUpdate = true;
             }
-            appendUniqueVector<int>(style->childrenIds, &childrenIds);
-            children.clear();
+            appendUniqueVector<int>(style->getChildIds(), &childIds);
         }
-        if (!equivalentVectors<int>(parentsIds, style->parentsIds)) {
-            if (!containsVector<int>(parentsIds, style->parentsIds)) {
-                cout << "updating style " << id << " parentsIds" << endl;
+        if (!equivalentVectors<int>(parentIds, style->getParentIds())) {
+            if (!containsVector<int>(parentIds, style->getParentIds())) {
+                cout << "updating style " << id << " parentIds" << endl;
                 needsUpdate = true;
             }
-            appendUniqueVector<int>(style->parentsIds, &parentsIds);
-            parents.clear();
+            appendUniqueVector<int>(style->getParentIds(), &parentIds);
         }
         return needsUpdate;
     }
@@ -241,17 +231,17 @@ namespace soulsifter {
             ps->setString(3, reLabel);
             ps->setInt(4, id);
             int result = ps->executeUpdate();
-            if (!childrenIds.empty()) {
+            if (!childIds.empty()) {
                 ps = MysqlAccess::getInstance().getPreparedStatement("insert ignore into StyleChildren (parentId, childId) values (?, ?)");
-                for (vector<int>::const_iterator it = childrenIds.begin(); it != childrenIds.end(); ++it) {
+                for (vector<int>::const_iterator it = childIds.begin(); it != childIds.end(); ++it) {
                     ps->setInt(1, id);
                     ps->setInt(2, *it);
                     ps->executeUpdate();
                 }
             }
-            if (!parentsIds.empty()) {
+            if (!parentIds.empty()) {
                 ps = MysqlAccess::getInstance().getPreparedStatement("insert ignore into StyleChildren (childId, parentId) values (?, ?)");
-                for (vector<int>::const_iterator it = parentsIds.begin(); it != parentsIds.end(); ++it) {
+                for (vector<int>::const_iterator it = parentIds.begin(); it != parentIds.end(); ++it) {
                     ps->setInt(1, id);
                     ps->setInt(2, *it);
                     ps->executeUpdate();
@@ -285,7 +275,7 @@ namespace soulsifter {
                     return saved;
                 }
                 ps = MysqlAccess::getInstance().getPreparedStatement("insert ignore into StyleChildren (styleId, childId) values (?, ?)");
-                for (vector<int>::iterator it = childrenIds.begin(); it != childrenIds.end(); ++it) {
+                for (vector<int>::iterator it = childIds.begin(); it != childIds.end(); ++it) {
                     ps->setInt(1, id);
                     ps->setInt(2, *it);
                     if (!ps->executeUpdate()) {
@@ -293,7 +283,7 @@ namespace soulsifter {
                     }
                 }
                 ps = MysqlAccess::getInstance().getPreparedStatement("insert ignore into StyleParents (styleId, parentId) values (?, ?)");
-                for (vector<int>::iterator it = parentsIds.begin(); it != parentsIds.end(); ++it) {
+                for (vector<int>::iterator it = parentIds.begin(); it != parentIds.end(); ++it) {
                     ps->setInt(1, id);
                     ps->setInt(2, *it);
                     if (!ps->executeUpdate()) {
@@ -327,9 +317,16 @@ namespace soulsifter {
     const string& Style::getRELabel() const { return reLabel; }
     void Style::setRELabel(const string& reLabel) { this->reLabel = reLabel; }
 
+    const vector<int>& Style::getChildIds() const { return childIds; }
+    void Style::setChildIds(const vector<int>& childIds) {
+        while (!children.empty()) delete children.back(), children.pop_back();
+        this->childIds.clear();
+        this->childIds = childIds;
+    }
+
     const vector<Style*>& Style::getChildren() {
-        if (children.empty() && !childrenIds.empty()) {
-            for (vector<int>::const_iterator it = childrenIds.begin(); it != childrenIds.end(); ++it) {
+        if (children.empty() && !childIds.empty()) {
+            for (vector<int>::const_iterator it = childIds.begin(); it != childIds.end(); ++it) {
                 children.push_back(Style::findById(*it));
             }
         }
@@ -338,34 +335,22 @@ namespace soulsifter {
     void Style::setChildren(const vector<Style*>& children) {
         deleteVectorPointers<Style*>(&this->children);
         this->children = children;
-        this->childrenIds.clear();
+        this->childIds.clear();
         for (vector<Style*>::const_iterator it = children.begin(); it != children.end(); ++it) {
-            this->childrenIds.push_back((*it)->getId());
-        }
-    }
-    void Style::addChildById(int childId) {
-        if (std::find(childrenIds.begin(), childrenIds.end(), childId) == childrenIds.end()) {
-                childrenIds.push_back(childId);
-                if (!children.empty()) children.push_back(Style::findById(childId));
-        }
-    }
-    void Style::removeChildById(int childId) {
-        for (vector<Style*>::iterator it = children.begin(); it != children.end(); ++it) {
-            if (childId == (*it)->getId()) {
-                delete (*it);
-                children.erase(it);
-            }
-        }
-        for (vector<int>::iterator it = childrenIds.begin(); it != childrenIds.end(); ++it) {
-            if (childId == *it) {
-                childrenIds.erase(it);
-            }
+            this->childIds.push_back((*it)->getId());
         }
     }
 
+    const vector<int>& Style::getParentIds() const { return parentIds; }
+    void Style::setParentIds(const vector<int>& parentIds) {
+        while (!parents.empty()) delete parents.back(), parents.pop_back();
+        this->parentIds.clear();
+        this->parentIds = parentIds;
+    }
+
     const vector<Style*>& Style::getParents() {
-        if (parents.empty() && !parentsIds.empty()) {
-            for (vector<int>::const_iterator it = parentsIds.begin(); it != parentsIds.end(); ++it) {
+        if (parents.empty() && !parentIds.empty()) {
+            for (vector<int>::const_iterator it = parentIds.begin(); it != parentIds.end(); ++it) {
                 parents.push_back(Style::findById(*it));
             }
         }
@@ -374,28 +359,9 @@ namespace soulsifter {
     void Style::setParents(const vector<Style*>& parents) {
         deleteVectorPointers<Style*>(&this->parents);
         this->parents = parents;
-        this->parentsIds.clear();
+        this->parentIds.clear();
         for (vector<Style*>::const_iterator it = parents.begin(); it != parents.end(); ++it) {
-            this->parentsIds.push_back((*it)->getId());
-        }
-    }
-    void Style::addParentById(int parentId) {
-        if (std::find(parentsIds.begin(), parentsIds.end(), parentId) == parentsIds.end()) {
-                parentsIds.push_back(parentId);
-                if (!parents.empty()) parents.push_back(Style::findById(parentId));
-        }
-    }
-    void Style::removeParentById(int parentId) {
-        for (vector<Style*>::iterator it = parents.begin(); it != parents.end(); ++it) {
-            if (parentId == (*it)->getId()) {
-                delete (*it);
-                parents.erase(it);
-            }
-        }
-        for (vector<int>::iterator it = parentsIds.begin(); it != parentsIds.end(); ++it) {
-            if (parentId == *it) {
-                parentsIds.erase(it);
-            }
+            this->parentIds.push_back((*it)->getId());
         }
     }
 

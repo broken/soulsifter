@@ -53,8 +53,8 @@ namespace soulsifter {
     album(NULL),
     albumPartId(0),
     albumPart(NULL),
-    styles(),
-    stylesIds() {
+    styleIds(),
+    styles() {
     }
 
     Song::Song(const Song& song) :
@@ -79,8 +79,8 @@ namespace soulsifter {
     album(NULL),
     albumPartId(song.getAlbumPartId()),
     albumPart(NULL),
-    styles(),
-    stylesIds(song.stylesIds) {
+    styleIds(song.getStyleIds()),
+    styles() {
         if (song.getRESong()) setRESong(*song.getRESong());
         if (song.getAlbum()) setAlbum(*song.getAlbum());
         if (song.getAlbumPart()) setAlbumPart(*song.getAlbumPart());
@@ -108,7 +108,7 @@ namespace soulsifter {
         album = NULL;
         albumPartId = song.getAlbumPartId();
         albumPart = NULL;
-        stylesIds = song.stylesIds;
+        styleIds = song.getStyleIds();
         deleteVectorPointers(&styles);
     }
 
@@ -147,8 +147,8 @@ namespace soulsifter {
         albumPartId = 0;
         delete albumPart;
         albumPart = NULL;
+        styleIds.clear();
         deleteVectorPointers(&styles);
-        stylesIds.clear();
     }
 
 # pragma mark static methods
@@ -172,27 +172,23 @@ namespace soulsifter {
         song->setAlbumId(rs->getInt("albumId"));
         if (rs->isNull("albumPartId")) song->setAlbumPartId(0);
         else song->setAlbumPartId(rs->getInt("albumPartId"));
-        populateStylesIds(song);
+        if (!rs->isNull("styleIds")) {
+            string csv = rs->getString("styleIds");
+            istringstream iss(csv);
+            string id;
+            while (getline(iss, id, ',')) {
+              song->styleIds.push_back(atoi(id.c_str()));
+            }
+        }
         if (!rs->isNull("tonicKeys")) {
             string dbSet = rs->getString("tonicKeys");
             boost::split(song->tonicKeys, dbSet, boost::is_any_of(","));
         }
     }
 
-    void Song::populateStylesIds(Song* song) {
-        sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select styleId from SongStyles where songId = ?");
-        ps->setInt(1, song->getId());
-        sql::ResultSet *rs = ps->executeQuery();
-        while (rs->next()) {
-            song->stylesIds.push_back(rs->getInt(1));
-        }
-        rs->close();
-        delete rs;
-    }
-
     Song* Song::findById(int id) {
         try {
-            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select * from Songs where id = ?");
+            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select *, group_concat(styles.styleId) as styleIds from Songs left outer join SongStyles styles on Songs.id = styles.songId where id = ? group by Songs.id");
             ps->setInt(1, id);
             sql::ResultSet *rs = ps->executeQuery();
             Song *song = NULL;
@@ -216,7 +212,7 @@ namespace soulsifter {
 
     Song* Song::findByFilepath(const string& filepath) {
         try {
-            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select * from Songs where filepath = ?");
+            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select *, group_concat(styles.styleId) as styleIds from Songs left outer join SongStyles styles on Songs.id = styles.songId where filepath = ? group by Songs.id");
             ps->setString(1, filepath);
             sql::ResultSet *rs = ps->executeQuery();
             Song *song = NULL;
@@ -240,7 +236,7 @@ namespace soulsifter {
 
     Song* Song::findByRESongId(int reSongId) {
         try {
-            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select * from Songs where reSongId = ?");
+            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select *, group_concat(styles.styleId) as styleIds from Songs left outer join SongStyles styles on Songs.id = styles.songId where reSongId = ? group by Songs.id");
             ps->setInt(1, reSongId);
             sql::ResultSet *rs = ps->executeQuery();
             Song *song = NULL;
@@ -263,7 +259,7 @@ namespace soulsifter {
     }
 
     ResultSetIterator<Song>* Song::findAll() {
-        sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select * from Songs");
+        sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select *, group_concat(styles.styleId) as styleIds from Songs left outer join SongStyles styles on Songs.id = styles.songId group by Songs.id");
         sql::ResultSet *rs = ps->executeQuery();
         ResultSetIterator<Song> *dtrs = new ResultSetIterator<Song>(rs);
         return dtrs;
@@ -429,13 +425,12 @@ namespace soulsifter {
             }
         }
         if (albumPart) needsUpdate |= albumPart->sync();
-        if (!equivalentVectors<int>(stylesIds, song->stylesIds)) {
-            if (!containsVector<int>(stylesIds, song->stylesIds)) {
-                cout << "updating song " << id << " stylesIds" << endl;
+        if (!equivalentVectors<int>(styleIds, song->getStyleIds())) {
+            if (!containsVector<int>(styleIds, song->getStyleIds())) {
+                cout << "updating song " << id << " styleIds" << endl;
                 needsUpdate = true;
             }
-            appendUniqueVector<int>(song->stylesIds, &stylesIds);
-            styles.clear();
+            appendUniqueVector<int>(song->getStyleIds(), &styleIds);
         }
         return needsUpdate;
     }
@@ -472,9 +467,9 @@ namespace soulsifter {
             else ps->setNull(17, sql::DataType::INTEGER);
             ps->setInt(18, id);
             int result = ps->executeUpdate();
-            if (!stylesIds.empty()) {
+            if (!styleIds.empty()) {
                 ps = MysqlAccess::getInstance().getPreparedStatement("insert ignore into SongStyles (songId, styleId) values (?, ?)");
-                for (vector<int>::const_iterator it = stylesIds.begin(); it != stylesIds.end(); ++it) {
+                for (vector<int>::const_iterator it = styleIds.begin(); it != styleIds.end(); ++it) {
                     ps->setInt(1, id);
                     ps->setInt(2, *it);
                     ps->executeUpdate();
@@ -559,7 +554,7 @@ namespace soulsifter {
                     return saved;
                 }
                 ps = MysqlAccess::getInstance().getPreparedStatement("insert ignore into SongStyles (songId, styleId) values (?, ?)");
-                for (vector<int>::iterator it = stylesIds.begin(); it != stylesIds.end(); ++it) {
+                for (vector<int>::iterator it = styleIds.begin(); it != styleIds.end(); ++it) {
                     ps->setInt(1, id);
                     ps->setInt(2, *it);
                     if (!ps->executeUpdate()) {
@@ -705,9 +700,16 @@ namespace soulsifter {
         this->albumPart = albumPart;
     }
 
+    const vector<int>& Song::getStyleIds() const { return styleIds; }
+    void Song::setStyleIds(const vector<int>& styleIds) {
+        while (!styles.empty()) delete styles.back(), styles.pop_back();
+        this->styleIds.clear();
+        this->styleIds = styleIds;
+    }
+
     const vector<Style*>& Song::getStyles() {
-        if (styles.empty() && !stylesIds.empty()) {
-            for (vector<int>::const_iterator it = stylesIds.begin(); it != stylesIds.end(); ++it) {
+        if (styles.empty() && !styleIds.empty()) {
+            for (vector<int>::const_iterator it = styleIds.begin(); it != styleIds.end(); ++it) {
                 styles.push_back(Style::findById(*it));
             }
         }
@@ -716,28 +718,9 @@ namespace soulsifter {
     void Song::setStyles(const vector<Style*>& styles) {
         deleteVectorPointers<Style*>(&this->styles);
         this->styles = styles;
-        this->stylesIds.clear();
+        this->styleIds.clear();
         for (vector<Style*>::const_iterator it = styles.begin(); it != styles.end(); ++it) {
-            this->stylesIds.push_back((*it)->getId());
-        }
-    }
-    void Song::addStyleById(int styleId) {
-        if (std::find(stylesIds.begin(), stylesIds.end(), styleId) == stylesIds.end()) {
-                stylesIds.push_back(styleId);
-                if (!styles.empty()) styles.push_back(Style::findById(styleId));
-        }
-    }
-    void Song::removeStyleById(int styleId) {
-        for (vector<Style*>::iterator it = styles.begin(); it != styles.end(); ++it) {
-            if (styleId == (*it)->getId()) {
-                delete (*it);
-                styles.erase(it);
-            }
-        }
-        for (vector<int>::iterator it = stylesIds.begin(); it != stylesIds.end(); ++it) {
-            if (styleId == *it) {
-                stylesIds.erase(it);
-            }
+            this->styleIds.push_back((*it)->getId());
         }
     }
 
