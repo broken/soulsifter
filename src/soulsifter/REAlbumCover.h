@@ -35,7 +35,6 @@ namespace soulsifter {
         static REAlbumCover* findByREId(const string& reId);
         static ResultSetIterator<REAlbumCover>* findAll();
 
-        bool sync();
         int update();
         int save();
 

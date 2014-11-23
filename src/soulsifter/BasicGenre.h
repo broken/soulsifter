@@ -35,7 +35,6 @@ namespace soulsifter {
         static BasicGenre* findByName(const string& name);
         static ResultSetIterator<BasicGenre>* findAll();
 
-        bool sync();
         int update();
         int save();
 

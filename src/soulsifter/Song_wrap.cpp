@@ -54,7 +54,6 @@ void Song::Init(v8::Handle<v8::Object> exports) {
   NanSetTemplate(tpl, "findByFilepath", NanNew<v8::FunctionTemplate>(findByFilepath)->GetFunction());
   NanSetTemplate(tpl, "findByRESongId", NanNew<v8::FunctionTemplate>(findByRESongId)->GetFunction());
   NanSetTemplate(tpl, "findAll", NanNew<v8::FunctionTemplate>(findAll)->GetFunction());
-  NanSetPrototypeTemplate(tpl, "sync", NanNew<v8::FunctionTemplate>(sync)->GetFunction());
   NanSetPrototypeTemplate(tpl, "update", NanNew<v8::FunctionTemplate>(update)->GetFunction());
   NanSetPrototypeTemplate(tpl, "save", NanNew<v8::FunctionTemplate>(save)->GetFunction());
   // Unable to process findSongsByStyle
@@ -165,15 +164,6 @@ NAN_METHOD(Song::findAll) {
   }
   delete v;
   NanReturnValue(a);
-}
-
-NAN_METHOD(Song::sync) {
-  NanScope();
-
-  Song* obj = ObjectWrap::Unwrap<Song>(args.This());
-  bool result =  obj->song->sync();
-
-  NanReturnValue(NanNew<v8::Boolean>(result));
 }
 
 NAN_METHOD(Song::update) {

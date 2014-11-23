@@ -162,67 +162,6 @@ namespace soulsifter {
 
 # pragma mark persistence
 
-    bool Style::sync() {
-        Style* style = findById(id);
-        if (!style) style = findByREId(reId);
-        if (!style) {
-            return true;
-        }
-
-        // check fields
-        bool needsUpdate = false;
-        boost::regex decimal("(-?\\d+)\\.?\\d*");
-        boost::smatch match1;
-        boost::smatch match2;
-        if (id != style->getId()) {
-            if (id) {
-                cout << "updating style " << id << " id from " << style->getId() << " to " << id << endl;
-                needsUpdate = true;
-            } else {
-                id = style->getId();
-            }
-        }
-        if (name.compare(style->getName())  && (!boost::regex_match(name, match1, decimal) || !boost::regex_match(style->getName(), match2, decimal) || match1[1].str().compare(match2[1].str()))) {
-            if (!name.empty()) {
-                cout << "updating style " << id << " name from " << style->getName() << " to " << name << endl;
-                needsUpdate = true;
-            } else {
-                name = style->getName();
-            }
-        }
-        if (reId != style->getREId()) {
-            if (reId) {
-                cout << "updating style " << id << " reId from " << style->getREId() << " to " << reId << endl;
-                needsUpdate = true;
-            } else {
-                reId = style->getREId();
-            }
-        }
-        if (reLabel.compare(style->getRELabel())  && (!boost::regex_match(reLabel, match1, decimal) || !boost::regex_match(style->getRELabel(), match2, decimal) || match1[1].str().compare(match2[1].str()))) {
-            if (!reLabel.empty()) {
-                cout << "updating style " << id << " reLabel from " << style->getRELabel() << " to " << reLabel << endl;
-                needsUpdate = true;
-            } else {
-                reLabel = style->getRELabel();
-            }
-        }
-        if (!equivalentVectors<int>(childIds, style->getChildIds())) {
-            if (!containsVector<int>(childIds, style->getChildIds())) {
-                cout << "updating style " << id << " childIds" << endl;
-                needsUpdate = true;
-            }
-            appendUniqueVector<int>(style->getChildIds(), &childIds);
-        }
-        if (!equivalentVectors<int>(parentIds, style->getParentIds())) {
-            if (!containsVector<int>(parentIds, style->getParentIds())) {
-                cout << "updating style " << id << " parentIds" << endl;
-                needsUpdate = true;
-            }
-            appendUniqueVector<int>(style->getParentIds(), &parentIds);
-        }
-        return needsUpdate;
-    }
-
     int Style::update() {
         try {
             sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("update Styles set name=?, reId=?, reLabel=? where id=?");

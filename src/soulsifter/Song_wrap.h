@@ -25,7 +25,6 @@ class Song : public node::ObjectWrap {
   static NAN_METHOD(findByFilepath);
   static NAN_METHOD(findByRESongId);
   static NAN_METHOD(findAll);
-  static NAN_METHOD(sync);
   static NAN_METHOD(update);
   static NAN_METHOD(save);
   // Unable to process findSongsByStyle

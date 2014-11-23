@@ -50,7 +50,6 @@ void Album::Init(v8::Handle<v8::Object> exports) {
   NanSetTemplate(tpl, "findByCoverFilepath", NanNew<v8::FunctionTemplate>(findByCoverFilepath)->GetFunction());
   NanSetTemplate(tpl, "findByNameAndArtist", NanNew<v8::FunctionTemplate>(findByNameAndArtist)->GetFunction());
   NanSetTemplate(tpl, "findAll", NanNew<v8::FunctionTemplate>(findAll)->GetFunction());
-  NanSetPrototypeTemplate(tpl, "sync", NanNew<v8::FunctionTemplate>(sync)->GetFunction());
   NanSetPrototypeTemplate(tpl, "update", NanNew<v8::FunctionTemplate>(update)->GetFunction());
   NanSetPrototypeTemplate(tpl, "save", NanNew<v8::FunctionTemplate>(save)->GetFunction());
   NanSetPrototypeTemplate(tpl, "reReleaseDate", NanNew<v8::FunctionTemplate>(reReleaseDate)->GetFunction());
@@ -143,15 +142,6 @@ NAN_METHOD(Album::findAll) {
   }
   delete v;
   NanReturnValue(a);
-}
-
-NAN_METHOD(Album::sync) {
-  NanScope();
-
-  Album* obj = ObjectWrap::Unwrap<Album>(args.This());
-  bool result =  obj->album->sync();
-
-  NanReturnValue(NanNew<v8::Boolean>(result));
 }
 
 NAN_METHOD(Album::update) {

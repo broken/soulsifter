@@ -35,7 +35,6 @@ namespace soulsifter {
         static Playlist* findByName(const string& name);
         static ResultSetIterator<Playlist>* findAll();
 
-        bool sync();
         int update();
         int save();
 

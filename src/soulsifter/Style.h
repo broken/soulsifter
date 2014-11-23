@@ -35,7 +35,6 @@ namespace soulsifter {
         static Style* findByREId(int reId);
         static ResultSetIterator<Style>* findAll();
 
-        bool sync();
         int update();
         int save();
 

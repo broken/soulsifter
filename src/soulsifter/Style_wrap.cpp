@@ -47,7 +47,6 @@ void Style::Init(v8::Handle<v8::Object> exports) {
   NanSetTemplate(tpl, "findById", NanNew<v8::FunctionTemplate>(findById)->GetFunction());
   NanSetTemplate(tpl, "findByREId", NanNew<v8::FunctionTemplate>(findByREId)->GetFunction());
   NanSetTemplate(tpl, "findAll", NanNew<v8::FunctionTemplate>(findAll)->GetFunction());
-  NanSetPrototypeTemplate(tpl, "sync", NanNew<v8::FunctionTemplate>(sync)->GetFunction());
   NanSetPrototypeTemplate(tpl, "update", NanNew<v8::FunctionTemplate>(update)->GetFunction());
   NanSetPrototypeTemplate(tpl, "save", NanNew<v8::FunctionTemplate>(save)->GetFunction());
   NanSetTemplate(tpl, "findAllParents", NanNew<v8::FunctionTemplate>(findAllParents)->GetFunction());
@@ -122,15 +121,6 @@ NAN_METHOD(Style::findAll) {
   }
   delete v;
   NanReturnValue(a);
-}
-
-NAN_METHOD(Style::sync) {
-  NanScope();
-
-  Style* obj = ObjectWrap::Unwrap<Style>(args.This());
-  bool result =  obj->style->sync();
-
-  NanReturnValue(NanNew<v8::Boolean>(result));
 }
 
 NAN_METHOD(Style::update) {

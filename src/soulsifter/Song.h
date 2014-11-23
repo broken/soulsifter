@@ -40,7 +40,6 @@ namespace soulsifter {
         static Song* findByRESongId(int reSongId);
         static ResultSetIterator<Song>* findAll();
 
-        bool sync();
         int update();
         int save();
 

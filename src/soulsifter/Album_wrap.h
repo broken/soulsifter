@@ -25,7 +25,6 @@ class Album : public node::ObjectWrap {
   static NAN_METHOD(findByCoverFilepath);
   static NAN_METHOD(findByNameAndArtist);
   static NAN_METHOD(findAll);
-  static NAN_METHOD(sync);
   static NAN_METHOD(update);
   static NAN_METHOD(save);
   static NAN_METHOD(reReleaseDate);

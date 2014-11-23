@@ -35,7 +35,6 @@ namespace soulsifter {
         static REXml* findByName(const string& name);
         static ResultSetIterator<REXml>* findAll();
 
-        bool sync();
         int update();
         int save();
 

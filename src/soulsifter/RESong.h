@@ -36,7 +36,6 @@ namespace soulsifter {
         static RESong* findBySongid(const string& songid);
         static ResultSetIterator<RESong>* findAll();
 
-        bool sync();
         int update();
         int save();
 

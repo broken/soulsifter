@@ -390,9 +390,6 @@ end
 
 def cUpdateFunction(name, fields)
   str = "    int #{cap(name)}::update() {\n        try {\n"
-  fields.select{|f| f[$attrib] & Attrib::PTR > 0}.each do |f|
-    str << "            if (#{f[$name]} && #{f[$name]}->sync()) {\n                #{f[$name]}->update();\n            }\n"
-  end
   str << "            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement(\"update #{cap(plural(name))} set "
   fields.each do |f|
     next if (f[$name] == "id" || f[$attrib] & Attrib::PTR > 0 || isVector(f[$type]) || f[$attrib] & Attrib::TRANSIENT > 0)
@@ -623,7 +620,6 @@ def writeHeader (name, fields, attribs, customMethods, customHeaders)
   end
   str << hFindAllFunction(name)
   str << "\n"
-  str << hSyncFunction()
   str << hUpdateFunction()
   str << hSaveFunction()
   str << "\n"
@@ -667,7 +663,6 @@ def writeCode (name, fields, attribs)
   end
   str << cFindAllFunction(name, fields)
   str << "\n# pragma mark persistence\n\n"
-  str << cSyncFunction(name, fields, secondaryKeys)
   str << cUpdateFunction(name, fields)
   str << cSaveFunction(name, fields, attribs)
   str << "\n# pragma mark accessors\n\n"

@@ -123,45 +123,6 @@ namespace soulsifter {
 
 # pragma mark persistence
 
-    bool REXml::sync() {
-        REXml* reXml = findById(id);
-        if (!reXml) reXml = findByName(name);
-        if (!reXml) {
-            return true;
-        }
-
-        // check fields
-        bool needsUpdate = false;
-        boost::regex decimal("(-?\\d+)\\.?\\d*");
-        boost::smatch match1;
-        boost::smatch match2;
-        if (id != reXml->getId()) {
-            if (id) {
-                cout << "updating reXml " << id << " id from " << reXml->getId() << " to " << id << endl;
-                needsUpdate = true;
-            } else {
-                id = reXml->getId();
-            }
-        }
-        if (name.compare(reXml->getName())  && (!boost::regex_match(name, match1, decimal) || !boost::regex_match(reXml->getName(), match2, decimal) || match1[1].str().compare(match2[1].str()))) {
-            if (!name.empty()) {
-                cout << "updating reXml " << id << " name from " << reXml->getName() << " to " << name << endl;
-                needsUpdate = true;
-            } else {
-                name = reXml->getName();
-            }
-        }
-        if (xml.compare(reXml->getXml())  && (!boost::regex_match(xml, match1, decimal) || !boost::regex_match(reXml->getXml(), match2, decimal) || match1[1].str().compare(match2[1].str()))) {
-            if (!xml.empty()) {
-                cout << "updating reXml " << id << " xml from " << reXml->getXml() << " to " << xml << endl;
-                needsUpdate = true;
-            } else {
-                xml = reXml->getXml();
-            }
-        }
-        return needsUpdate;
-    }
-
     int REXml::update() {
         try {
             sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("update REXml set name=?, xml=? where id=?");

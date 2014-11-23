@@ -160,87 +160,8 @@ namespace soulsifter {
 
 # pragma mark persistence
 
-    bool Mix::sync() {
-        Mix* mix = findById(id);
-        if (!mix) mix = findByOutSongIdAndInSongId(outSongId, inSongId);
-        if (!mix) {
-            return true;
-        }
-
-        // check fields
-        bool needsUpdate = false;
-        boost::regex decimal("(-?\\d+)\\.?\\d*");
-        boost::smatch match1;
-        boost::smatch match2;
-        if (id != mix->getId()) {
-            if (id) {
-                cout << "updating mix " << id << " id from " << mix->getId() << " to " << id << endl;
-                needsUpdate = true;
-            } else {
-                id = mix->getId();
-            }
-        }
-        if (outSongId != mix->getOutSongId()) {
-            if (outSongId) {
-                cout << "updating mix " << id << " outSongId from " << mix->getOutSongId() << " to " << outSongId << endl;
-                needsUpdate = true;
-            } else {
-                outSongId = mix->getOutSongId();
-            }
-        }
-        if (outSong) needsUpdate |= outSong->sync();
-        if (inSongId != mix->getInSongId()) {
-            if (inSongId) {
-                cout << "updating mix " << id << " inSongId from " << mix->getInSongId() << " to " << inSongId << endl;
-                needsUpdate = true;
-            } else {
-                inSongId = mix->getInSongId();
-            }
-        }
-        if (inSong) needsUpdate |= inSong->sync();
-        if (bpmDiff.compare(mix->getBpmDiff())  && (!boost::regex_match(bpmDiff, match1, decimal) || !boost::regex_match(mix->getBpmDiff(), match2, decimal) || match1[1].str().compare(match2[1].str()))) {
-            if (!bpmDiff.empty()) {
-                cout << "updating mix " << id << " bpmDiff from " << mix->getBpmDiff() << " to " << bpmDiff << endl;
-                needsUpdate = true;
-            } else {
-                bpmDiff = mix->getBpmDiff();
-            }
-        }
-        if (rank != mix->getRank()) {
-            if (rank) {
-                cout << "updating mix " << id << " rank from " << mix->getRank() << " to " << rank << endl;
-                needsUpdate = true;
-            } else {
-                rank = mix->getRank();
-            }
-        }
-        if (comments.compare(mix->getComments())  && (!boost::regex_match(comments, match1, decimal) || !boost::regex_match(mix->getComments(), match2, decimal) || match1[1].str().compare(match2[1].str()))) {
-            if (!comments.empty()) {
-                cout << "updating mix " << id << " comments from " << mix->getComments() << " to " << comments << endl;
-                needsUpdate = true;
-            } else {
-                comments = mix->getComments();
-            }
-        }
-        if (addon != mix->getAddon()) {
-            if (addon) {
-                cout << "updating mix " << id << " addon from " << mix->getAddon() << " to " << addon << endl;
-                needsUpdate = true;
-            } else {
-                addon = mix->getAddon();
-            }
-        }
-        return needsUpdate;
-    }
-
     int Mix::update() {
         try {
-            if (outSong && outSong->sync()) {
-                outSong->update();
-            }
-            if (inSong && inSong->sync()) {
-                inSong->update();
-            }
             sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("update Mixes set outSongId=?, inSongId=?, bpmDiff=?, rank=?, comments=?, addon=? where id=?");
             ps->setInt(1, outSongId);
             ps->setInt(2, inSongId);

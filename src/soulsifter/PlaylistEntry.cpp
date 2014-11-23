@@ -150,71 +150,8 @@ namespace soulsifter {
 
 # pragma mark persistence
 
-    bool PlaylistEntry::sync() {
-        PlaylistEntry* playlistEntry = findById(id);
-        if (!playlistEntry) playlistEntry = findByPlaylistIdAndSongId(playlistId, songId);
-        if (!playlistEntry) {
-            return true;
-        }
-
-        // check fields
-        bool needsUpdate = false;
-        boost::regex decimal("(-?\\d+)\\.?\\d*");
-        boost::smatch match1;
-        boost::smatch match2;
-        if (id != playlistEntry->getId()) {
-            if (id) {
-                cout << "updating playlistEntry " << id << " id from " << playlistEntry->getId() << " to " << id << endl;
-                needsUpdate = true;
-            } else {
-                id = playlistEntry->getId();
-            }
-        }
-        if (playlistId != playlistEntry->getPlaylistId()) {
-            if (playlistId) {
-                cout << "updating playlistEntry " << id << " playlistId from " << playlistEntry->getPlaylistId() << " to " << playlistId << endl;
-                needsUpdate = true;
-            } else {
-                playlistId = playlistEntry->getPlaylistId();
-            }
-        }
-        if (playlist) needsUpdate |= playlist->sync();
-        if (songId != playlistEntry->getSongId()) {
-            if (songId) {
-                cout << "updating playlistEntry " << id << " songId from " << playlistEntry->getSongId() << " to " << songId << endl;
-                needsUpdate = true;
-            } else {
-                songId = playlistEntry->getSongId();
-            }
-        }
-        if (song) needsUpdate |= song->sync();
-        if (position != playlistEntry->getPosition()) {
-            if (position) {
-                cout << "updating playlistEntry " << id << " position from " << playlistEntry->getPosition() << " to " << position << endl;
-                needsUpdate = true;
-            } else {
-                position = playlistEntry->getPosition();
-            }
-        }
-        if (time.compare(playlistEntry->getTime())  && (!boost::regex_match(time, match1, decimal) || !boost::regex_match(playlistEntry->getTime(), match2, decimal) || match1[1].str().compare(match2[1].str()))) {
-            if (!time.empty()) {
-                cout << "updating playlistEntry " << id << " time from " << playlistEntry->getTime() << " to " << time << endl;
-                needsUpdate = true;
-            } else {
-                time = playlistEntry->getTime();
-            }
-        }
-        return needsUpdate;
-    }
-
     int PlaylistEntry::update() {
         try {
-            if (playlist && playlist->sync()) {
-                playlist->update();
-            }
-            if (song && song->sync()) {
-                song->update();
-            }
             sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("update PlaylistEntries set playlistId=?, songId=?, position=?, time=? where id=?");
             ps->setInt(1, playlistId);
             ps->setInt(2, songId);

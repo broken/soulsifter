@@ -24,7 +24,6 @@ class Style : public node::ObjectWrap {
   static NAN_METHOD(findById);
   static NAN_METHOD(findByREId);
   static NAN_METHOD(findAll);
-  static NAN_METHOD(sync);
   static NAN_METHOD(update);
   static NAN_METHOD(save);
   static NAN_METHOD(findAllParents);

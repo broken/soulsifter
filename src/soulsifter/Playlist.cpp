@@ -123,44 +123,6 @@ namespace soulsifter {
 
 # pragma mark persistence
 
-    bool Playlist::sync() {
-        Playlist* playlist = findById(id);
-        if (!playlist) {
-            return true;
-        }
-
-        // check fields
-        bool needsUpdate = false;
-        boost::regex decimal("(-?\\d+)\\.?\\d*");
-        boost::smatch match1;
-        boost::smatch match2;
-        if (id != playlist->getId()) {
-            if (id) {
-                cout << "updating playlist " << id << " id from " << playlist->getId() << " to " << id << endl;
-                needsUpdate = true;
-            } else {
-                id = playlist->getId();
-            }
-        }
-        if (name.compare(playlist->getName())  && (!boost::regex_match(name, match1, decimal) || !boost::regex_match(playlist->getName(), match2, decimal) || match1[1].str().compare(match2[1].str()))) {
-            if (!name.empty()) {
-                cout << "updating playlist " << id << " name from " << playlist->getName() << " to " << name << endl;
-                needsUpdate = true;
-            } else {
-                name = playlist->getName();
-            }
-        }
-        if (query.compare(playlist->getQuery())  && (!boost::regex_match(query, match1, decimal) || !boost::regex_match(playlist->getQuery(), match2, decimal) || match1[1].str().compare(match2[1].str()))) {
-            if (!query.empty()) {
-                cout << "updating playlist " << id << " query from " << playlist->getQuery() << " to " << query << endl;
-                needsUpdate = true;
-            } else {
-                query = playlist->getQuery();
-            }
-        }
-        return needsUpdate;
-    }
-
     int Playlist::update() {
         try {
             sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("update Playlists set name=?, query=? where id=?");

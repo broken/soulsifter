@@ -36,7 +36,6 @@ namespace soulsifter {
         static AlbumPart* findByPosAndAlbumId(const string& pos, int albumId);
         static ResultSetIterator<AlbumPart>* findAll();
 
-        bool sync();
         int update();
         int save();
 
