@@ -45,7 +45,6 @@ namespace soulsifter {
 
         explicit Song(RESong* song);
 
-        static void findSongsByStyle(const Style& style, vector<Song*>** songsPtr);
         static RESong* createRESongFromSong(const Song& song);
 
         const string reAlbum() const;

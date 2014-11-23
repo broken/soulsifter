@@ -27,7 +27,6 @@ class Song : public node::ObjectWrap {
   static NAN_METHOD(findAll);
   static NAN_METHOD(update);
   static NAN_METHOD(save);
-  // Unable to process findSongsByStyle
   // Unable to process createRESongFromSong
   static NAN_METHOD(reAlbum);
   static NAN_GETTER(getDateAddedString);

@@ -56,7 +56,6 @@ void Song::Init(v8::Handle<v8::Object> exports) {
   NanSetTemplate(tpl, "findAll", NanNew<v8::FunctionTemplate>(findAll)->GetFunction());
   NanSetPrototypeTemplate(tpl, "update", NanNew<v8::FunctionTemplate>(update)->GetFunction());
   NanSetPrototypeTemplate(tpl, "save", NanNew<v8::FunctionTemplate>(save)->GetFunction());
-  // Unable to process findSongsByStyle
   // Unable to process createRESongFromSong
   NanSetPrototypeTemplate(tpl, "reAlbum", NanNew<v8::FunctionTemplate>(reAlbum)->GetFunction());
   tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("dateAddedString"), getDateAddedString);

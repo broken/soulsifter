@@ -795,7 +795,7 @@ songFields = [
   ["vector<Style*>", "styles", 0],
 ]
 songAttribs = 0
-songCustomMethods = "        explicit Song(RESong* song);\n\n        static void findSongsByStyle(const Style& style, vector<Song*>** songsPtr);\n        static RESong* createRESongFromSong(const Song& song);\n\n        const string reAlbum() const;\n        const string getDateAddedString() const;\n        void setDateAddedToNow();\n\n"
+songCustomMethods = "        explicit Song(RESong* song);\n\n        static RESong* createRESongFromSong(const Song& song);\n\n        const string reAlbum() const;\n        const string getDateAddedString() const;\n        void setDateAddedToNow();\n\n"
 songCustomHeaders = "#include \"Style.h\"\n"
 styleFields = [
   [:int, "id", Attrib::FIND],
