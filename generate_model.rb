@@ -488,8 +488,9 @@ def cSaveFunction(name, fields, attribs)
   end
   fields.each do |f|
     if (isVector(f[$type]) && f[$attrib] & Attrib::ID == 0)
-      str << "                ps = MysqlAccess::getInstance().getPreparedStatement(\"insert ignore into #{cap(name)}#{cap(f[$name])} (#{name}Id, #{single(f[$name])}Id) values (?, ?)\");\n                for (vector<int>::iterator it = #{vectorIds(f)}.begin(); it != #{vectorIds(f)}.end(); ++it) {\n"
-      str << "                    ps->setInt(1, id);\n                    ps->setInt(2, *it);\n                    if (!ps->executeUpdate()) {\n                        cerr << \"Did not save #{single(f[$name])} for #{name} \" << id << endl;\n                    }\n                }\n"
+    t = vectorRelationTable(name, f)
+    str << "                if (!#{vectorIds(f)}.empty()) {\n                    stringstream ss(\"insert ignore into #{t[0]} (#{t[2]}, #{t[1]}) values (?, ?)\");\n                    for (int i = 1; i < #{vectorIds(f)}.size(); ++i) {\n                        ss << \", (?, ?)\";\n                    }\n                    ps = MysqlAccess::getInstance().getPreparedStatement(ss.str());\n"
+    str << "                    for (int i = 0; i < #{vectorIds(f)}.size(); ++i) {\n                        ps->setInt(i * 2 + 1, id);\n                        ps->setInt(i * 2 + 2, #{vectorIds(f)}[i]);\n                    }\n                    if (!ps->executeUpdate()) {\n                        cerr << \"Did not save #{single(f[$name])} for #{name} \" << id << endl;\n                    }\n                }\n"
     end
   end
   str << "                return saved;\n            }\n"

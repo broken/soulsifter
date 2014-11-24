@@ -396,10 +396,16 @@ namespace soulsifter {
                     cerr << "Inserted song, but unable to retreive inserted ID." << endl;
                     return saved;
                 }
-                ps = MysqlAccess::getInstance().getPreparedStatement("insert ignore into SongStyles (songId, styleId) values (?, ?)");
-                for (vector<int>::iterator it = styleIds.begin(); it != styleIds.end(); ++it) {
-                    ps->setInt(1, id);
-                    ps->setInt(2, *it);
+                if (!styleIds.empty()) {
+                    stringstream ss("insert ignore into SongStyles (songId, styleId) values (?, ?)");
+                    for (int i = 1; i < styleIds.size(); ++i) {
+                        ss << ", (?, ?)";
+                    }
+                    ps = MysqlAccess::getInstance().getPreparedStatement(ss.str());
+                    for (int i = 0; i < styleIds.size(); ++i) {
+                        ps->setInt(i * 2 + 1, id);
+                        ps->setInt(i * 2 + 2, styleIds[i]);
+                    }
                     if (!ps->executeUpdate()) {
                         cerr << "Did not save style for song " << id << endl;
                     }

@@ -253,18 +253,30 @@ namespace soulsifter {
                     cerr << "Inserted style, but unable to retreive inserted ID." << endl;
                     return saved;
                 }
-                ps = MysqlAccess::getInstance().getPreparedStatement("insert ignore into StyleChildren (styleId, childId) values (?, ?)");
-                for (vector<int>::iterator it = childIds.begin(); it != childIds.end(); ++it) {
-                    ps->setInt(1, id);
-                    ps->setInt(2, *it);
+                if (!childIds.empty()) {
+                    stringstream ss("insert ignore into StyleChildren (parentId, childId) values (?, ?)");
+                    for (int i = 1; i < childIds.size(); ++i) {
+                        ss << ", (?, ?)";
+                    }
+                    ps = MysqlAccess::getInstance().getPreparedStatement(ss.str());
+                    for (int i = 0; i < childIds.size(); ++i) {
+                        ps->setInt(i * 2 + 1, id);
+                        ps->setInt(i * 2 + 2, childIds[i]);
+                    }
                     if (!ps->executeUpdate()) {
                         cerr << "Did not save child for style " << id << endl;
                     }
                 }
-                ps = MysqlAccess::getInstance().getPreparedStatement("insert ignore into StyleParents (styleId, parentId) values (?, ?)");
-                for (vector<int>::iterator it = parentIds.begin(); it != parentIds.end(); ++it) {
-                    ps->setInt(1, id);
-                    ps->setInt(2, *it);
+                if (!parentIds.empty()) {
+                    stringstream ss("insert ignore into StyleChildren (childId, parentId) values (?, ?)");
+                    for (int i = 1; i < parentIds.size(); ++i) {
+                        ss << ", (?, ?)";
+                    }
+                    ps = MysqlAccess::getInstance().getPreparedStatement(ss.str());
+                    for (int i = 0; i < parentIds.size(); ++i) {
+                        ps->setInt(i * 2 + 1, id);
+                        ps->setInt(i * 2 + 2, parentIds[i]);
+                    }
                     if (!ps->executeUpdate()) {
                         cerr << "Did not save parent for style " << id << endl;
                     }
