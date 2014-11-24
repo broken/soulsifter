@@ -291,12 +291,32 @@ namespace soulsifter {
             ps->setInt(18, id);
             int result = ps->executeUpdate();
             if (!styleIds.empty()) {
-                ps = MysqlAccess::getInstance().getPreparedStatement("insert ignore into SongStyles (songId, styleId) values (?, ?)");
-                for (vector<int>::const_iterator it = styleIds.begin(); it != styleIds.end(); ++it) {
-                    ps->setInt(1, id);
-                    ps->setInt(2, *it);
-                    ps->executeUpdate();
+                stringstream ss("insert ignore into SongStyles (songId, styleId) values (?, ?)");
+                for (int i = 1; i < styleIds.size(); ++i) {
+                    ss << ", (?, ?)";
                 }
+                ps = MysqlAccess::getInstance().getPreparedStatement(ss.str());
+                for (int i = 0; i < styleIds.size(); ++i) {
+                    ps->setInt(i * 2 + 1, id);
+                    ps->setInt(i * 2 + 2, styleIds[i]);
+                }
+                ps->executeUpdate();
+                ss.clear();
+                ss << "delete from SongStyles where songId = ? and styleId not in (?";
+                for (int i = 1; i < styleIds.size(); ++i) {
+                    ss << ", ?";
+                }
+                ss << ")";
+                ps = MysqlAccess::getInstance().getPreparedStatement(ss.str());
+                ps->setInt(1, id);
+                for (int i = 0; i < styleIds.size(); ++i) {
+                    ps->setInt(i + 2, styleIds[i]);
+                }
+                ps->executeUpdate();
+            } else {
+                ps = MysqlAccess::getInstance().getPreparedStatement("delete from SongStyles where songId = ?");
+                ps->setInt(1, id);
+                ps->executeUpdate();
             }
             return result;
         } catch (sql::SQLException &e) {

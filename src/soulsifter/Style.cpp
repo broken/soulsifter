@@ -171,20 +171,60 @@ namespace soulsifter {
             ps->setInt(4, id);
             int result = ps->executeUpdate();
             if (!childIds.empty()) {
-                ps = MysqlAccess::getInstance().getPreparedStatement("insert ignore into StyleChildren (parentId, childId) values (?, ?)");
-                for (vector<int>::const_iterator it = childIds.begin(); it != childIds.end(); ++it) {
-                    ps->setInt(1, id);
-                    ps->setInt(2, *it);
-                    ps->executeUpdate();
+                stringstream ss("insert ignore into StyleChildren (parentId, childId) values (?, ?)");
+                for (int i = 1; i < childIds.size(); ++i) {
+                    ss << ", (?, ?)";
                 }
+                ps = MysqlAccess::getInstance().getPreparedStatement(ss.str());
+                for (int i = 0; i < childIds.size(); ++i) {
+                    ps->setInt(i * 2 + 1, id);
+                    ps->setInt(i * 2 + 2, childIds[i]);
+                }
+                ps->executeUpdate();
+                ss.clear();
+                ss << "delete from StyleChildren where parentId = ? and childId not in (?";
+                for (int i = 1; i < childIds.size(); ++i) {
+                    ss << ", ?";
+                }
+                ss << ")";
+                ps = MysqlAccess::getInstance().getPreparedStatement(ss.str());
+                ps->setInt(1, id);
+                for (int i = 0; i < childIds.size(); ++i) {
+                    ps->setInt(i + 2, childIds[i]);
+                }
+                ps->executeUpdate();
+            } else {
+                ps = MysqlAccess::getInstance().getPreparedStatement("delete from StyleChildren where parentId = ?");
+                ps->setInt(1, id);
+                ps->executeUpdate();
             }
             if (!parentIds.empty()) {
-                ps = MysqlAccess::getInstance().getPreparedStatement("insert ignore into StyleChildren (childId, parentId) values (?, ?)");
-                for (vector<int>::const_iterator it = parentIds.begin(); it != parentIds.end(); ++it) {
-                    ps->setInt(1, id);
-                    ps->setInt(2, *it);
-                    ps->executeUpdate();
+                stringstream ss("insert ignore into StyleChildren (childId, parentId) values (?, ?)");
+                for (int i = 1; i < parentIds.size(); ++i) {
+                    ss << ", (?, ?)";
                 }
+                ps = MysqlAccess::getInstance().getPreparedStatement(ss.str());
+                for (int i = 0; i < parentIds.size(); ++i) {
+                    ps->setInt(i * 2 + 1, id);
+                    ps->setInt(i * 2 + 2, parentIds[i]);
+                }
+                ps->executeUpdate();
+                ss.clear();
+                ss << "delete from StyleChildren where childId = ? and parentId not in (?";
+                for (int i = 1; i < parentIds.size(); ++i) {
+                    ss << ", ?";
+                }
+                ss << ")";
+                ps = MysqlAccess::getInstance().getPreparedStatement(ss.str());
+                ps->setInt(1, id);
+                for (int i = 0; i < parentIds.size(); ++i) {
+                    ps->setInt(i + 2, parentIds[i]);
+                }
+                ps->executeUpdate();
+            } else {
+                ps = MysqlAccess::getInstance().getPreparedStatement("delete from StyleChildren where childId = ?");
+                ps->setInt(1, id);
+                ps->executeUpdate();
             }
             return result;
         } catch (sql::SQLException &e) {
