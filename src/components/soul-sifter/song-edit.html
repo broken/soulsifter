@@ -40,8 +40,7 @@
           <paper-input label="Release Month" value="{{song.album.releaseDateMonth}}" type="number" min="1" max="12" floatingLabel></paper-input>
           <paper-input label="Release Day" value="{{song.album.releaseDateDay}}" type="number" min="1" max="31" floatingLabel></paper-input>
         </div>
-        <div vertical layout>
-        </div>
+        <genre-list id="genreList" selection="{{genreSelection}}"></genre-list>
       </div>
     </abstract-action-page>
   </template>
@@ -50,7 +49,12 @@
 
     Polymer('song-edit', {
 
+      songChanged: function(oldValue, newValue) {
+        this.$.genreList.setSelection(newValue.styles);
+      },
+
       save: function(e, detail, sender) {
+        this.song.styles = this.genreSelection;
         if (this.song.id) {
           this.song.update();
         } else {

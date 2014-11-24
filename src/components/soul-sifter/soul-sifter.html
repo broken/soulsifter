@@ -36,7 +36,7 @@
               </paper-tabs>
               <core-animated-pages selected="{{ $.paper_tabs.selected }}" id="core_animated_pages" flex>
                 <song-section></song-section>
-                <genre-list></genre-list>
+                <genre-list selection="{{genres}}"></genre-list>
                 <playlist-list on-query-change="{{changeQuery}}"></playlist-list>
               </core-animated-pages>
             </section>
@@ -81,6 +81,11 @@
 
       changeQuery: function(e, detail, sender) {
         this.query = detail;
+      },
+
+      genresChanged: function(spliceOrOldValue, undefOrNewValue) {
+        // The first selection uses a property observer, while subsequent calls use an array observer and calls this method with splice changes rather than the old & new values
+        this.asyncFire('core-signal', {name: 'genres-changed', data: this.genres});
       },
     });
   </script>

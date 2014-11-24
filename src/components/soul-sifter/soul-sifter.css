@@ -6,6 +6,16 @@
   left: 0;
 }
 
+#soulSifter {
+  margin: 0;
+  padding: 0;
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+}
+
 
 /* remove preset colors */
 :host /deep/ input {
@@ -20,16 +30,6 @@
 }
 :host /deep/ paper-input {
   color: inherit;
-}
-
-#soulSifter {
-  margin: 0;
-  padding: 0;
-  position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
 }
 
 core-animated-pages#main {
