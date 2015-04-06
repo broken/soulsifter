@@ -11,6 +11,7 @@
 /resources
 /tmp
 /src/soulsifter/build
+/libraries
 
 # grunt-node-webkit-builder
 /build
