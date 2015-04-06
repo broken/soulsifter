@@ -10,3 +10,8 @@
 #contentContainer {
   position: relative;
 }
+
+audio {
+  height: 30px;
+  width: 100%;
+}
