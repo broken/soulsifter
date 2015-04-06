@@ -12,7 +12,8 @@ module.exports = function(grunt) {
       src: [
           './src/**/*', // Your node-webkit app
           './components/**/*',
-          './fonts/**/*'
+          './fonts/**/*',
+          './node_modules/playmusic/**/*'
       ]
     },
     shell: {
