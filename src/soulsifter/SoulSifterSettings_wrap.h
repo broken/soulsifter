@@ -23,7 +23,11 @@ class SoulSifterSettings : public node::ObjectWrap {
 
   static NAN_METHOD(New);
 
+  static NAN_METHOD(save);
   static NAN_METHOD(getString);
+  static NAN_METHOD(putString);
+  static NAN_METHOD(getInt);
+  static NAN_METHOD(putInt);
 
   static v8::Persistent<v8::Function> constructor;
   dogatech::soulsifter::SoulSifterSettings* soulsiftersettings;

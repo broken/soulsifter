@@ -16,6 +16,7 @@
 namespace dogatech {
 namespace soulsifter {
     
+    // TODO make this a static class?
     class SoulSifterSettings {
     public:
         ~SoulSifterSettings() { }
