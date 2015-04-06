@@ -9,6 +9,7 @@
 #include "PlaylistEntry_wrap.h"
 #include "SearchUtil_wrap.h"
 #include "Song_wrap.h"
+#include "SoulSifterSettings_wrap.h"
 #include "Style_wrap.h"
 
 void InitAll(v8::Handle<v8::Object> exports) {
@@ -21,8 +22,12 @@ void InitAll(v8::Handle<v8::Object> exports) {
   Song::Init(exports);
   Style::Init(exports);
 
+  // statics
   AudioAnalyzer::Init(exports);
   SearchUtil::Init(exports);
+
+  // not auto-generated
+  SoulSifterSettings::Init(exports);
 }
 
 NODE_MODULE(soulsifter, InitAll)

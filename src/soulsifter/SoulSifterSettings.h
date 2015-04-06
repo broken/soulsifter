@@ -11,7 +11,7 @@
 
 #include <string>
 
-using namespace std;
+#include <boost/property_tree/ptree.hpp>
 
 namespace dogatech {
 namespace soulsifter {
@@ -24,23 +24,38 @@ namespace soulsifter {
             // instantiated on first use
             return instance;
         }
+
+        void save();
+
+        template <typename T>
+        const T get(const std::string& label) const;
+
+        template <typename T>
+        void put(const std::string& label, const T& value);
         
-        const string& getMusicPath() const { return musicPath; }
-        void setMusicPath(const string& path) { musicPath = path; }
-        const string& getREPath() const { return rePath; }
-        void setREPath(const string& path) { rePath = path; }
-        const string& getStagingPath() const { return stagingPath; }
-        void setStagingPath(const string& path) { stagingPath = path; }
+        /* deprecated */
+        const std::string& getMusicPath() const { return musicPath; }
+        void setMusicPath(const std::string& path) { musicPath = path; }
+        const std::string& getREPath() const { return rePath; }
+        void setREPath(const std::string& path) { rePath = path; }
+        const std::string& getStagingPath() const { return stagingPath; }
+        void setStagingPath(const std::string& path) { stagingPath = path; }
         
     private:
         // singleton
-        SoulSifterSettings() { }
+        SoulSifterSettings();
         SoulSifterSettings(SoulSifterSettings const&);
         void operator=(SoulSifterSettings const&);
+
+        boost::property_tree::ptree ptree;
+
+        // TODO settings file stored in os place
+        const std::string filename = "/Users/rneale/soulsiftersettings.json";
         
-        string musicPath;
-        string rePath;
-        string stagingPath;
+        /* deprecated */
+        std::string musicPath;
+        std::string rePath;
+        std::string stagingPath;
     };
     
 }

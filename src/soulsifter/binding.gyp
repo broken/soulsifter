@@ -41,7 +41,8 @@
           #"MusicManager_wrap.cpp",
           "SearchUtil.cpp",
           "SearchUtil_wrap.cpp",
-          "SoulSifterSettings.h",
+          "SoulSifterSettings.cpp",
+          "SoulSifterSettings_wrap.cpp",
           #"TagWriter.cpp",
           # persistence
           "MysqlAccess.h",
