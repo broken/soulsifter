@@ -3,7 +3,7 @@ module.exports = function(grunt) {
   grunt.initConfig({
     nodewebkit: {
       options: {
-        version: '0.10.5', // Version of node-webkit
+        version: '0.12.0', // Version of node-webkit
         buildDir: './build', // Where the build version of my node-webkit app is saved
         credits: './src/credits.html', // Mac credits
         macIcns: './DVDRipper.icns', // Path to the Mac icon file
@@ -25,7 +25,7 @@ module.exports = function(grunt) {
         },
       },
       nwgypconfigure: {
-        command: 'nw-gyp configure --arch=x64 --target=0.10.5',
+        command: 'nw-gyp configure --arch=x64 --target=0.12.0',
         options: {
           execOptions: {
             cwd: 'src/soulsifter',
@@ -41,10 +41,10 @@ module.exports = function(grunt) {
         },
       },
       updateviews: {
-        command: 'cp src/views/*.html build/soulsifter/osx/soulsifter.app/Contents/Resources/app.nw/views/',
+        command: 'cp src/views/*.html build/soulsifter/osx64/soulsifter.app/Contents/Resources/app.nw/views/',
       },
       updatecomponents: {
-        command: 'cp -r src/components/soul-sifter build/soulsifter/osx/soulsifter.app/Contents/Resources/app.nw/components/',
+        command: 'cp -r src/components/soul-sifter build/soulsifter/osx64/soulsifter.app/Contents/Resources/app.nw/components/',
       },
     },
     replace: {
