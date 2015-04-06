@@ -1,5 +1,6 @@
 <link href="../polymer/polymer.html" rel="import">
 
+<link href="../core-style/core-style.html" rel="import">
 <link href="../paper-checkbox/paper-checkbox.html" rel="import">
 <link href="../paper-input/paper-input.html" rel="import">
 <link href="../polymer-ui-ratings/polymer-ui-ratings.html" rel="import">
@@ -45,8 +46,6 @@
     </abstract-action-page>
   </template>
   <script>
-    var ss = require('../soulsifter/build/Release/soulsifter');
-
     Polymer('song-edit', {
 
       songChanged: function(oldValue, newValue) {

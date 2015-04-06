@@ -15,6 +15,7 @@
 <link href="song-list.html" rel="import">
 <link href="song-section.html" rel="import">
 <link href="search-toolbar.html" rel="import">
+<link href="ss-settings.html" rel="import">
 <link href="themes.html" rel="import">
 
 
@@ -54,6 +55,9 @@
         <section>
           <song-edit song="{{song}}"></song-edit>
         </section>
+        <section>
+          <ss-settings></ss-settings>
+        </section>
       </core-animated-pages>
     </div>
   </template>
@@ -76,6 +80,9 @@
         this.addEventListener('page-song-edit', function(e) {
           this.section = 2;
           this.song = e.detail.song;
+        });
+        this.addEventListener('page-settings', function(e) {
+          this.section = 3;
         });
       },
 

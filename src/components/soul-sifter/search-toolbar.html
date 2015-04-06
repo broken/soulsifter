@@ -34,7 +34,7 @@
       </core-field>
       <paper-input label="bpm" floatingLabel value="{{global.bpm}}" id="bpm"></paper-input>
       <core-icon-button icon="add-circle" on-click="{{toggleCreateSongDialog}}" id="createSongButton"></core-icon-button>
-      <core-icon-button icon="settings" on-click="{{toggleSettingsDialog}}"></core-icon-button>
+      <core-icon-button icon="settings" on-click="{{clickSettingsAction}}"></core-icon-button>
       <core-icon-button icon="unfold-more" on-click="{{toggleIsTall}}"></core-icon-button>
       <!-- middle row -->
       <!-- bottom row -->
@@ -46,9 +46,6 @@
     </core-toolbar>
     <paper-dialog backdrop layered id="searchInfoDialog">
       <search-info></search-info>
-    </paper-dialog>
-    <paper-dialog backdrop layered heading="Settings" id="settingsDialog">
-      <paper-input floatingLabel label="Music directory" value="{{musicDir}}"></paper-input>
     </paper-dialog>
     <paper-dialog backdrop layered heading="Create Song" id="createSongDialog">
       <!-- <create-song></create-song> -->
@@ -90,8 +87,9 @@
         this.$.searchInfoDialog.toggle();
       },
 
-      toggleSettingsDialog: function(e, detail, sender) {
-        this.$.settingsDialog.toggle();
+      clickSettingsAction: function(e, detail, sender) {
+        e.stopPropagation();
+        this.asyncFire('page-settings');
       },
 
       toggleCreateSongDialog: function(e, detail, sender) {

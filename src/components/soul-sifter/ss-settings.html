@@ -1,0 +1,40 @@
+<link href="../polymer/polymer.html" rel="import">
+
+<link href="../core-style/core-style.html" rel="import">
+<link href="../paper-checkbox/paper-checkbox.html" rel="import">
+<link href="../paper-input/paper-input.html" rel="import">
+
+<link href="themes.html" rel="import">
+
+
+<polymer-element name="ss-settings">
+
+  <template>
+    <link href="ss-settings.css" rel="stylesheet">
+    <core-style ref="main"></core-style>
+
+    <abstract-action-page acceptAction="{{save}}">
+      <div horizontal layout around-justified id="pageContainer">
+        <div vertical layout>
+          <paper-input floatingLabel label="Google Music App Key" value="{{gmKey}}"></paper-input>
+        </div>
+      </div>
+    </abstract-action-page>
+  </template>
+
+  <script>
+
+    Polymer('ss-settings', {
+
+      created: function() {
+        this.settings = new ss.SoulSifterSettings();
+        this.gmKey = this.settings.getString('GoogleMusicKey');
+      },
+
+      save: function(e, detail, sender) {
+        this.settings.putString('GoogleMusicKey', this.gmKey);
+        this.settings.save();
+      },
+    });
+  </script>
+</polymer-element>
