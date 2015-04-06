@@ -5,7 +5,8 @@
     "grunt": "^0.4.5",
     "grunt-node-webkit-builder": "^0.2.1",
     "grunt-shell": "^1.0.1",
-    "grunt-spawn": "^1.1.62"
+    "grunt-spawn": "^1.1.62",
+    "grunt-text-replace": "^0.4.0"
   },
   "dependencies": {
     "async": "^0.9.0",
