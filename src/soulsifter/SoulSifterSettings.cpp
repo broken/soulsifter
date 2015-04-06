@@ -29,8 +29,12 @@ namespace soulsifter {
   const T SoulSifterSettings::get(const string& label) const {
     return ptree.get<T>(label);
   }
-  template const int SoulSifterSettings::get<int>(const std::string& label) const;
-  template const string SoulSifterSettings::get<string>(const std::string& label) const;
+  template<> const int SoulSifterSettings::get<int>(const std::string& label) const {
+    return ptree.get(label, 0);
+  }
+  template<> const string SoulSifterSettings::get<string>(const std::string& label) const {
+    return ptree.get(label, "");
+  }
 
   template <typename T>
   void SoulSifterSettings::put(const string& label, const T& value) {
