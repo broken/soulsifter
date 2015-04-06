@@ -57,6 +57,17 @@ module.exports = function(grunt) {
         }]
       }
     },
+    copy: {
+      ffmpegsumo: {
+        files: [
+          {
+            src: 'libraries/ffmpegsumo.so',
+            dest: 'build/soulsifter/osx64/soulsifter.app/Contents/Frameworks/nwjs Framework.framework/Libraries/ffmpegsumo.so',
+            flatten: true
+          },
+        ]
+      }
+    },
     spawn: {
       run: {
         command: './build/soulsifter/osx/soulsifter.app/Contents/MacOS/node-webkit build/soulsifter/osx/soulsifter.app/Contents/Resources/app.nw',
@@ -67,13 +78,14 @@ module.exports = function(grunt) {
     },
   });
 
+  grunt.loadNpmTasks('grunt-contrib-copy');
   grunt.loadNpmTasks('grunt-node-webkit-builder');
   grunt.loadNpmTasks('grunt-shell');
   grunt.loadNpmTasks('grunt-spawn');
   grunt.loadNpmTasks('grunt-text-replace');
 
-  grunt.registerTask('default', ['nodewebkit']);
+  grunt.registerTask('default', ['nodewebkit', 'copy:ffmpegsumo']);
   grunt.registerTask('nw-gyp', ['shell:nwgypclean', 'shell:nwgypconfigure', 'replace:rtti', 'shell:nwgypbuild']);
   grunt.registerTask('up', ['shell:updateviews', 'shell:updatecomponents']);
-  grunt.registerTask('all', ['nw-gyp', 'nodewebkit']);
+  grunt.registerTask('all', ['nw-gyp', 'nodewebkit', 'copy:ffmpegsumo']);
 };
