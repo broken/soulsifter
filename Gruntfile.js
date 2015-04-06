@@ -47,6 +47,16 @@ module.exports = function(grunt) {
         command: 'cp -r src/components/soul-sifter build/soulsifter/osx/soulsifter.app/Contents/Resources/app.nw/components/',
       },
     },
+    replace: {
+      rtti: {
+        src: 'src/soulsifter/build/soulsifter.target.mk',
+        overwrite: true,
+        replacements: [{
+          from: /\t*-fno-rtti \\\n/g,
+          to: ''
+        }]
+      }
+    },
     spawn: {
       run: {
         command: './build/soulsifter/osx/soulsifter.app/Contents/MacOS/node-webkit build/soulsifter/osx/soulsifter.app/Contents/Resources/app.nw',
@@ -59,9 +69,11 @@ module.exports = function(grunt) {
 
   grunt.loadNpmTasks('grunt-node-webkit-builder');
   grunt.loadNpmTasks('grunt-shell');
-  grunt.loadNpmTasks("grunt-spawn");
+  grunt.loadNpmTasks('grunt-spawn');
+  grunt.loadNpmTasks('grunt-text-replace');
+
   grunt.registerTask('default', ['nodewebkit']);
-  grunt.registerTask('nw-gyp', ['shell:nwgypclean', 'shell:nwgypconfigure', 'shell:nwgypbuild']);
+  grunt.registerTask('nw-gyp', ['shell:nwgypclean', 'shell:nwgypconfigure', 'replace:rtti', 'shell:nwgypbuild']);
   grunt.registerTask('up', ['shell:updateviews', 'shell:updatecomponents']);
   grunt.registerTask('all', ['nw-gyp', 'nodewebkit']);
 };
