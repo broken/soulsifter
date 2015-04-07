@@ -7,6 +7,7 @@
 
 <link href="global-state.html" rel="import">
 <link href="pitch-slider.html" rel="import">
+<link href="ss-googleplaymusic.html" rel="import">
 <link href="themes.html" rel="import">
 
 
@@ -17,6 +18,7 @@
     <core-style ref="main"></core-style>
 
     <global-state values="{{global}}"></global-state>
+    <ss-googleplaymusic id="gpm"></ss-googleplaymusic>
 
     <!-- core-scroll-header-panel does not appear to work with my current 10.5 version of nodewebkit; try this again later when I upgrade it. -->
     <div vertical layout fit>
@@ -54,23 +56,6 @@
 
       ready: function() {
         this.fs = require('fs');
-        var PlayMusic = require('playmusic');
-        this.pm = new PlayMusic();
-      },
-
-      attached: function() {
-        var settings = new ss.SoulSifterSettings();
-        var key = settings.getString('GoogleMusicKey');
-        this.pm.init({email: "brokenbeat@gmail.com", password: key},
-            function() {
-              console.log("Succesfully connected to Google Music.");
-            },
-            function(message, data, err, res) {
-              console.warn("Login to Google Music failed: " + message);
-              console.warn("Data: " + data);
-              console.warn("Err: " +  err);
-              console.warn("Response: " + res);
-            });
       },
 
       globalSongChanged: function(oldSong, song) {
@@ -83,26 +68,9 @@
           if (!err) {
             this.$.audio.src = "file://" + this.song.filepath;
           } else {
-            this.pm.search(this.song.artist + ' ' + this.song.title, 3,
-                function(data) {
-                  if (!data.entries) {
-                    console.log("No results in Google Play Music for " + this.song.artist + " - " + this.song.title);
-                    return;
-                  }
-                  var song = data.entries.filter(function(val) { return val.type == 1; }).sort(function(a, b) { return a.score < b.score; }).shift();
-                  if (!song) {
-                    console.log("Results did not include a song for " + this.song.artist + " - " + this.song.title);
-                    return;
-                  }
-                  this.pm.getStreamUrl(song.track.nid, function(url) { this.$.audio.src = url; }.bind(this));
-                }.bind(this),
-                function(message, body, err, httpResponse) {
-                  console.log("Error searching for " + this.song.artist + " - " + this.song.title);
-                  console.log("Msg: " + message);
-                  console.log("Body: " + body);
-                  console.log("Err: " + err);
-                  console.log("Response: " + httpResponse);
-                }.bind(this));
+            this.$.gpm.findSongStreamUrl(this.song,
+                function(url) { this.$.audio.src = url; }.bind(this),
+                function(msg, body, err, resp) { console.warn(msg); this.$.audio.src = ''; }.bind(this));
           }
         }.bind(this));
       },

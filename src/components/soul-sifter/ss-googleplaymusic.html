@@ -1,0 +1,67 @@
+<link href="../polymer/polymer.html" rel="import">
+
+
+<polymer-element name="ss-googleplaymusic" attributes="values">
+  <script>
+    Polymer('ss-googleplaymusic', {
+
+      ready: function() {
+        var PlayMusic = require('playmusic');
+        this.pm = new PlayMusic();
+      },
+
+      attached: function() {
+        var settings = new ss.SoulSifterSettings();
+        var email = settings.getString('google.email');
+        var appKey = settings.getString('google.appKey');
+        this.pm.init({email: email, password: appKey},
+            function() {
+              console.log("Succesfully connected to Google Music.");
+            },
+            function(message, data, err, res) {
+              console.warn("Login to Google Music failed: " + message);
+              console.warn("Data: " + data);
+              console.warn("Err: " +  err);
+              console.warn("Response: " + res);
+            });
+      },
+
+      /**
+       * Success callback return a stream url
+       * Failure callback returns message, body, err, httpResonse
+       */
+      findSongStreamUrl: function(song, success, failure) {
+        var maxResults = 3;
+        this.pm.search(song.artist + ' ' + song.title, maxResults,
+            function(data) {
+              console.log(data);
+              if (!data.entries) {
+                failure('No results in Google Play Music for ' + song.artist + ' - ' + song.title, '', 1);
+                return;
+              }
+              // We first filter by type. Types are:
+              // 1 : track result
+              // 2 : artist result
+              // 3 : album result
+              // Then we take the result with the highest score.
+              var track = data.entries
+                  .filter(function(val) { return val.type == 1; })
+                  .sort(function(a, b) { return a.score < b.score; })
+                  .shift();
+              if (!track) {
+                failure('No track results in Google Play Music for ' + song.artist + ' - ' + song.title, '', 2);
+                return;
+              }
+              console.log(track);
+              console.log(success);
+              this.pm.getStreamUrl(track.track.nid, success);
+            }.bind(this),
+            function(message, body, err, httpResponse) {
+              console.warn('Error searching Google Play Music for ' + song.artist + ' - ' + song.title + '.  ' + message + '\n' + body + '\n' + err + '\n' + httpResponse);
+              failure(message, body, err, httpResonse);
+            }
+        );
+      },
+    });
+  </script>
+</polymer-element>

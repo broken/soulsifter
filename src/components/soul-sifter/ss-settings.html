@@ -16,7 +16,8 @@
     <abstract-action-page acceptAction="{{save}}">
       <div horizontal layout around-justified id="pageContainer">
         <div vertical layout>
-          <paper-input floatingLabel label="Google Music App Key" value="{{gmKey}}"></paper-input>
+          <paper-input floatingLabel label="Google Music Email" value="{{googleEmail}}"></paper-input>
+          <paper-input floatingLabel label="Google Music App Key" value="{{googleAppKey}}"></paper-input>
         </div>
       </div>
     </abstract-action-page>
@@ -28,11 +29,13 @@
 
       created: function() {
         this.settings = new ss.SoulSifterSettings();
-        this.gmKey = this.settings.getString('GoogleMusicKey');
+        this.googleAppKey = this.settings.getString('google.appKey');
+        this.googleEmail = this.settings.getString('google.email');
       },
 
       save: function(e, detail, sender) {
-        this.settings.putString('GoogleMusicKey', this.gmKey);
+        this.settings.putString('google.appKey', this.googleAppKey);
+        this.settings.putString('google.email', this.googleEmail);
         this.settings.save();
       },
     });
