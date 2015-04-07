@@ -17,11 +17,13 @@
   <template>
     <link href="playlist-list.css" rel="stylesheet">
     <core-style ref="main"></core-style>
-
-    <template repeat="{{p in playlists}}" id="playlistTpl">
-      <playlist-list-item playlist="{{p}}" on-playlist-select="{{selectPlaylist}}"></playlist-list-item>
-    </template>
-    <core-selection multi id="selection" on-core-select="{{selectAction}}"></core-selection>
+    
+    <div id="wrapper">
+      <template repeat="{{p in playlists}}" id="playlistTpl">
+        <playlist-list-item playlist="{{p}}" on-playlist-select="{{selectPlaylist}}"></playlist-list-item>
+      </template>
+      <core-selection multi id="selection" on-core-select="{{selectAction}}"></core-selection>
+    </div>
     <paper-fab mini icon="add" on-click="{{createPlaylist}}"></paper-fab>
   </template>
 

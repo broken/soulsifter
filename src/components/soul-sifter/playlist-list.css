@@ -1,5 +1,10 @@
 :host {
-  overflow: scroll;
+  overflow-x: visible;
+}
+
+
+#wrapp {
+  overflow-y: scroll;
 }
 
 

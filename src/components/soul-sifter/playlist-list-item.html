@@ -1,8 +1,12 @@
 <link href="../polymer/polymer.html" rel="import">
 
 <link href="../core-icon/core-icon.html" rel="import">
-<link href="../core-icons/core-icons.html" rel="import">
+<link href="../core-menu/core-menu.html" rel="import">
 <link href="../core-style/core-style.html" rel="import">
+<link href="../paper-dropdown/paper-dropdown.html" rel="import">
+<link href="../paper-icon-button/paper-icon-button.html" rel="import">
+<link href="../paper-item/paper-item.html" rel="import">
+<link href="../paper-menu-button/paper-menu-button.html" rel="import">
 <link href="../paper-ripple/paper-ripple.html" rel="import">
 <link href="../paper-shadow/paper-shadow.html" rel="import">
 
@@ -23,6 +27,14 @@
             {{playlist.name}}
             <core-icon icon="find-replace" alt="smart playlist" class="{{ {'smart': playlist.query} | tokenList }}"></core-icon>
           </div>
+          <paper-menu-button on-click="{{stopPropagation}}">
+            <paper-icon-button icon="more-vert"></paper-icon-button>
+            <paper-dropdown class="dropdown" transition="cascade">
+              <core-menu>
+                <paper-item on-click="{{clickEditAction}}">Edit info</paper-item>
+              </core-menu>
+            </paper-dropdown>
+          </paper-menu-button>
         </div>
       </paper-shadow>
     </div>
@@ -45,6 +57,15 @@
       select: function(isSelected) {
         this.$.shadow.setZ(isSelected ? 1 : 0);
         this.isSelected = isSelected;
+      },
+
+      clickEditAction: function(e, detail, sender) {
+        e.stopPropagation();
+        this.asyncFire('page-playlist-edit', {playlist: this.playlist});
+      },
+
+      stopPropagation: function(e, detail, sender) {
+        e.stopPropagation();
       },
 
     });

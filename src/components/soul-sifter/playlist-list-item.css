@@ -24,3 +24,14 @@ paper-shadow {
 #item core-icon.smart {
   display: inline-block;
 }
+
+#item paper-menu-button {
+  display: none;
+}
+#item:hover paper-menu-button {
+  display: inline-block;
+}
+#item paper-menu-button paper-icon-button {
+  margin-top: 4px;
+  padding: 0;
+}
