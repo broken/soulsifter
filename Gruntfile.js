@@ -13,6 +13,7 @@ module.exports = function(grunt) {
           './src/**/*', // Your node-webkit app
           './components/**/*',
           './fonts/**/*',
+          './node_modules/async/**/*',
           './node_modules/playmusic/**/*'
       ]
     },

@@ -10,6 +10,7 @@
 <link href="../paper-ripple/paper-ripple.html" rel="import">
 <link href="../paper-shadow/paper-shadow.html" rel="import">
 
+<link href="ss-googleplaymusic.html" rel="import">
 <link href="themes.html" rel="import">
 
 
@@ -18,6 +19,8 @@
   <template>
     <link href="playlist-list-item.css" rel="stylesheet">
     <core-style ref="main"></core-style>
+
+    <ss-googleplaymusic id="gpm"></ss-googleplaymusic>
 
     <div id="itemContainer">
       <paper-shadow animated id="shadow" z="0">
@@ -31,7 +34,8 @@
             <paper-icon-button icon="more-vert"></paper-icon-button>
             <paper-dropdown class="dropdown" transition="cascade">
               <core-menu>
-                <paper-item on-click="{{clickEditAction}}">Edit info</paper-item>
+                <paper-item on-click="{{editAction}}">Edit info</paper-item>
+                <paper-item on-click="{{exportAction}}">Export to Google Play Music</paper-button>
               </core-menu>
             </paper-dropdown>
           </paper-menu-button>
@@ -59,9 +63,14 @@
         this.isSelected = isSelected;
       },
 
-      clickEditAction: function(e, detail, sender) {
+      editAction: function(e, detail, sender) {
         e.stopPropagation();
         this.asyncFire('page-playlist-edit', {playlist: this.playlist});
+      },
+
+      exportAction: function(e, detail, sender) {
+        e.stopPropagation();
+        this.$.gpm.savePlaylist(this.playlist, function() {}, function() {});
       },
 
       stopPropagation: function(e, detail, sender) {
