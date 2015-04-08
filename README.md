@@ -7,6 +7,7 @@ This is created by me for me.
 
 Would be awesome if others found use, but I'm focused on features I want versus making it available for others. However, hopefully the code samples or build steps will help somebody else.
 
+The mentions of RE are from where I previously housed my music - Rapid Evolution. It's a sweet music app, but ultimately I found I wanted more control. In the beginning there was a lot of syncing back & forth between its db and mine. However, I've completely moved off of RE now, so that code is deprecated & dusty, and will be removed when I find the need for code cleanup.
 
 OSX Build Instructions
 ======================
@@ -16,7 +17,10 @@ Presteps:
 * custom build of nwjs (for drag & drop & mp3 play support)
 * copy ffmpegsumo.so from Chrom into libraries/ directory (for mp3 play support)
 
+```
 grunt all
+./build/soulsifter/osx64/soulsifter.app/Contents/MacOS/nwjs build/soulsifter/osx/soulsifter.app/Contents/Resources/app.nw
+```
 
 Win / Linux Differences
 =======================
