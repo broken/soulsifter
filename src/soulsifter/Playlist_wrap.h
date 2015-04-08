@@ -32,6 +32,10 @@ class Playlist : public node::ObjectWrap {
   static NAN_SETTER(setName);
   static NAN_GETTER(getQuery);
   static NAN_SETTER(setQuery);
+  static NAN_GETTER(getStyleIds);
+  static NAN_SETTER(setStyleIds);
+  static NAN_GETTER(getStyles);
+  static NAN_SETTER(setStyles);
 
   static v8::Persistent<v8::Function> constructor;
   dogatech::soulsifter::Playlist* playlist;

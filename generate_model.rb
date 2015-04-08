@@ -723,8 +723,11 @@ playlistFields = [
   [:int, "id", Attrib::FIND],
   [:string, "name", Attrib::FIND],
   [:string, "query", 0],
+  ["vector<int>", "styleIds", Attrib::ID],
+  ["vector<Style*>", "styles", 0],
 ]
 playlistAttribs = 0
+playlistCustomHeaders = "#include \"Style.h\"\n"
 playlistEntryFields = [
   [:int, "id", Attrib::FIND],
   [:int, "playlistId", Attrib::ID | Attrib::KEY2],
@@ -866,7 +869,7 @@ output = File.open("src/soulsifter/Mix.cpp", "w")
 output << writeCode("mix", mixFields, mixAttribs)
 output.close
 output = File.open("src/soulsifter/Playlist.h", "w")
-output << writeHeader("playlist", playlistFields, playlistAttribs, "", "")
+output << writeHeader("playlist", playlistFields, playlistAttribs, "", playlistCustomHeaders)
 output.close
 output = File.open("src/soulsifter/Playlist.cpp", "w")
 output << writeCode("playlist", playlistFields, playlistAttribs)

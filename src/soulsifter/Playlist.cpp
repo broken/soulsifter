@@ -34,28 +34,37 @@ namespace soulsifter {
     Playlist::Playlist() :
     id(0),
     name(),
-    query() {
+    query(),
+    styleIds(),
+    styles() {
     }
 
     Playlist::Playlist(const Playlist& playlist) :
     id(playlist.getId()),
     name(playlist.getName()),
-    query(playlist.getQuery()) {
+    query(playlist.getQuery()),
+    styleIds(playlist.getStyleIds()),
+    styles() {
     }
 
     void Playlist::operator=(const Playlist& playlist) {
         id = playlist.getId();
         name = playlist.getName();
         query = playlist.getQuery();
+        styleIds = playlist.getStyleIds();
+        deleteVectorPointers(&styles);
     }
 
     Playlist::~Playlist() {
+        while (!styles.empty()) delete styles.back(), styles.pop_back();
     }
 
     void Playlist::clear() {
         id = 0;
         name.clear();
         query.clear();
+        styleIds.clear();
+        deleteVectorPointers(&styles);
     }
 
 # pragma mark static methods
@@ -64,11 +73,19 @@ namespace soulsifter {
         playlist->setId(rs->getInt("id"));
         playlist->setName(rs->getString("name"));
         playlist->setQuery(rs->getString("query"));
+        if (!rs->isNull("styleIds")) {
+            string csv = rs->getString("styleIds");
+            istringstream iss(csv);
+            string id;
+            while (getline(iss, id, ',')) {
+              playlist->styleIds.push_back(atoi(id.c_str()));
+            }
+        }
     }
 
     Playlist* Playlist::findById(int id) {
         try {
-            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select * from Playlists where id = ?");
+            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select *, group_concat(styles.styleId) as styleIds from Playlists left outer join PlaylistStyles styles on Playlists.id = styles.playlistId where id = ? group by Playlists.id");
             ps->setInt(1, id);
             sql::ResultSet *rs = ps->executeQuery();
             Playlist *playlist = NULL;
@@ -92,7 +109,7 @@ namespace soulsifter {
 
     Playlist* Playlist::findByName(const string& name) {
         try {
-            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select * from Playlists where name = ?");
+            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select *, group_concat(styles.styleId) as styleIds from Playlists left outer join PlaylistStyles styles on Playlists.id = styles.playlistId where name = ? group by Playlists.id");
             ps->setString(1, name);
             sql::ResultSet *rs = ps->executeQuery();
             Playlist *playlist = NULL;
@@ -115,7 +132,7 @@ namespace soulsifter {
     }
 
     ResultSetIterator<Playlist>* Playlist::findAll() {
-        sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select * from Playlists");
+        sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select *, group_concat(styles.styleId) as styleIds from Playlists left outer join PlaylistStyles styles on Playlists.id = styles.playlistId group by Playlists.id");
         sql::ResultSet *rs = ps->executeQuery();
         ResultSetIterator<Playlist> *dtrs = new ResultSetIterator<Playlist>(rs);
         return dtrs;
@@ -130,6 +147,34 @@ namespace soulsifter {
             ps->setString(2, query);
             ps->setInt(3, id);
             int result = ps->executeUpdate();
+            if (!styleIds.empty()) {
+                stringstream ss("insert ignore into PlaylistStyles (playlistId, styleId) values (?, ?)");
+                for (int i = 1; i < styleIds.size(); ++i) {
+                    ss << ", (?, ?)";
+                }
+                ps = MysqlAccess::getInstance().getPreparedStatement(ss.str());
+                for (int i = 0; i < styleIds.size(); ++i) {
+                    ps->setInt(i * 2 + 1, id);
+                    ps->setInt(i * 2 + 2, styleIds[i]);
+                }
+                ps->executeUpdate();
+                ss.clear();
+                ss << "delete from PlaylistStyles where playlistId = ? and styleId not in (?";
+                for (int i = 1; i < styleIds.size(); ++i) {
+                    ss << ", ?";
+                }
+                ss << ")";
+                ps = MysqlAccess::getInstance().getPreparedStatement(ss.str());
+                ps->setInt(1, id);
+                for (int i = 0; i < styleIds.size(); ++i) {
+                    ps->setInt(i + 2, styleIds[i]);
+                }
+                ps->executeUpdate();
+            } else {
+                ps = MysqlAccess::getInstance().getPreparedStatement("delete from PlaylistStyles where playlistId = ?");
+                ps->setInt(1, id);
+                ps->executeUpdate();
+            }
             return result;
         } catch (sql::SQLException &e) {
             cerr << "ERROR: SQLException in " << __FILE__;
@@ -156,6 +201,20 @@ namespace soulsifter {
                     cerr << "Inserted playlist, but unable to retreive inserted ID." << endl;
                     return saved;
                 }
+                if (!styleIds.empty()) {
+                    stringstream ss("insert ignore into PlaylistStyles (playlistId, styleId) values (?, ?)");
+                    for (int i = 1; i < styleIds.size(); ++i) {
+                        ss << ", (?, ?)";
+                    }
+                    ps = MysqlAccess::getInstance().getPreparedStatement(ss.str());
+                    for (int i = 0; i < styleIds.size(); ++i) {
+                        ps->setInt(i * 2 + 1, id);
+                        ps->setInt(i * 2 + 2, styleIds[i]);
+                    }
+                    if (!ps->executeUpdate()) {
+                        cerr << "Did not save style for playlist " << id << endl;
+                    }
+                }
                 return saved;
             }
         } catch (sql::SQLException &e) {
@@ -179,6 +238,30 @@ namespace soulsifter {
 
     const string& Playlist::getQuery() const { return query; }
     void Playlist::setQuery(const string& query) { this->query = query; }
+
+    const vector<int>& Playlist::getStyleIds() const { return styleIds; }
+    void Playlist::setStyleIds(const vector<int>& styleIds) {
+        while (!styles.empty()) delete styles.back(), styles.pop_back();
+        this->styleIds.clear();
+        this->styleIds = styleIds;
+    }
+
+    const vector<Style*>& Playlist::getStyles() {
+        if (styles.empty() && !styleIds.empty()) {
+            for (vector<int>::const_iterator it = styleIds.begin(); it != styleIds.end(); ++it) {
+                styles.push_back(Style::findById(*it));
+            }
+        }
+        return styles;
+    }
+    void Playlist::setStyles(const vector<Style*>& styles) {
+        deleteVectorPointers<Style*>(&this->styles);
+        this->styles = styles;
+        this->styleIds.clear();
+        for (vector<Style*>::const_iterator it = styles.begin(); it != styles.end(); ++it) {
+            this->styleIds.push_back((*it)->getId());
+        }
+    }
 
 }
 }

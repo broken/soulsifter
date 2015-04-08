@@ -13,6 +13,7 @@
 #include <string>
 #include <vector>
 
+#include "Style.h"
 #include "ResultSetIterator.h"
 
 namespace sql {
@@ -44,6 +45,10 @@ namespace soulsifter {
         void setName(const string& name);
         const string& getQuery() const;
         void setQuery(const string& query);
+        const vector<int>& getStyleIds() const;
+        void setStyleIds(const vector<int>& styleIds);
+        const vector<Style*>& getStyles();
+        void setStyles(const vector<Style*>& styles);
 
         friend ResultSetIterator<Playlist>;
 
@@ -51,6 +56,8 @@ namespace soulsifter {
         int id;
         string name;
         string query;
+        vector<int> styleIds;
+        vector<Style*> styles;
 
         static void populateFields(const sql::ResultSet* rs, Playlist* playlist);
 
