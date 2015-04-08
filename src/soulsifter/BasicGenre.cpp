@@ -10,6 +10,7 @@
 
 #include <cmath>
 #include <string>
+#include <sstream>
 
 #include <boost/regex.hpp>
 #include <boost/algorithm/string.hpp>

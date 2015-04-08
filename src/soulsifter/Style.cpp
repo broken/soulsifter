@@ -10,6 +10,7 @@
 
 #include <cmath>
 #include <string>
+#include <sstream>
 
 #include <boost/regex.hpp>
 #include <boost/algorithm/string.hpp>
@@ -171,7 +172,7 @@ namespace soulsifter {
             ps->setInt(4, id);
             int result = ps->executeUpdate();
             if (!childIds.empty()) {
-                stringstream ss("insert ignore into StyleChildren (parentId, childId) values (?, ?)");
+                stringstream ss("insert ignore into StyleChildren (parentId, childId) values (?, ?)", ios_base::app | ios_base::out | ios_base::ate);
                 for (int i = 1; i < childIds.size(); ++i) {
                     ss << ", (?, ?)";
                 }
@@ -181,7 +182,7 @@ namespace soulsifter {
                     ps->setInt(i * 2 + 2, childIds[i]);
                 }
                 ps->executeUpdate();
-                ss.clear();
+                ss.str(std::string());
                 ss << "delete from StyleChildren where parentId = ? and childId not in (?";
                 for (int i = 1; i < childIds.size(); ++i) {
                     ss << ", ?";
@@ -199,7 +200,7 @@ namespace soulsifter {
                 ps->executeUpdate();
             }
             if (!parentIds.empty()) {
-                stringstream ss("insert ignore into StyleChildren (childId, parentId) values (?, ?)");
+                stringstream ss("insert ignore into StyleChildren (childId, parentId) values (?, ?)", ios_base::app | ios_base::out | ios_base::ate);
                 for (int i = 1; i < parentIds.size(); ++i) {
                     ss << ", (?, ?)";
                 }
@@ -209,7 +210,7 @@ namespace soulsifter {
                     ps->setInt(i * 2 + 2, parentIds[i]);
                 }
                 ps->executeUpdate();
-                ss.clear();
+                ss.str(std::string());
                 ss << "delete from StyleChildren where childId = ? and parentId not in (?";
                 for (int i = 1; i < parentIds.size(); ++i) {
                     ss << ", ?";
@@ -254,7 +255,7 @@ namespace soulsifter {
                     return saved;
                 }
                 if (!childIds.empty()) {
-                    stringstream ss("insert ignore into StyleChildren (parentId, childId) values (?, ?)");
+                    stringstream ss("insert ignore into StyleChildren (parentId, childId) values (?, ?)", ios_base::app | ios_base::out | ios_base::ate);
                     for (int i = 1; i < childIds.size(); ++i) {
                         ss << ", (?, ?)";
                     }
@@ -268,7 +269,7 @@ namespace soulsifter {
                     }
                 }
                 if (!parentIds.empty()) {
-                    stringstream ss("insert ignore into StyleChildren (childId, parentId) values (?, ?)");
+                    stringstream ss("insert ignore into StyleChildren (childId, parentId) values (?, ?)", ios_base::app | ios_base::out | ios_base::ate);
                     for (int i = 1; i < parentIds.size(); ++i) {
                         ss << ", (?, ?)";
                     }

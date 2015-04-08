@@ -10,6 +10,7 @@
 
 #include <cmath>
 #include <string>
+#include <sstream>
 
 #include <boost/regex.hpp>
 #include <boost/algorithm/string.hpp>
@@ -148,7 +149,7 @@ namespace soulsifter {
             ps->setInt(3, id);
             int result = ps->executeUpdate();
             if (!styleIds.empty()) {
-                stringstream ss("insert ignore into PlaylistStyles (playlistId, styleId) values (?, ?)");
+                stringstream ss("insert ignore into PlaylistStyles (playlistId, styleId) values (?, ?)", ios_base::app | ios_base::out | ios_base::ate);
                 for (int i = 1; i < styleIds.size(); ++i) {
                     ss << ", (?, ?)";
                 }
@@ -158,7 +159,7 @@ namespace soulsifter {
                     ps->setInt(i * 2 + 2, styleIds[i]);
                 }
                 ps->executeUpdate();
-                ss.clear();
+                ss.str(std::string());
                 ss << "delete from PlaylistStyles where playlistId = ? and styleId not in (?";
                 for (int i = 1; i < styleIds.size(); ++i) {
                     ss << ", ?";
@@ -202,7 +203,7 @@ namespace soulsifter {
                     return saved;
                 }
                 if (!styleIds.empty()) {
-                    stringstream ss("insert ignore into PlaylistStyles (playlistId, styleId) values (?, ?)");
+                    stringstream ss("insert ignore into PlaylistStyles (playlistId, styleId) values (?, ?)", ios_base::app | ios_base::out | ios_base::ate);
                     for (int i = 1; i < styleIds.size(); ++i) {
                         ss << ", (?, ?)";
                     }
