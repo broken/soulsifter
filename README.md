@@ -43,6 +43,7 @@ There are two reasons I need to manually build nwjs:
 
 There is a massive thread on nwjs's project discussions, but this is what I needed to do:
 
+```
 Following: https://github.com/nwjs/nw.js/wiki/Building-nw.js
 mkdir nw.js
 cd nw.js
@@ -80,3 +81,4 @@ export GYP_GENERATORS=ninja
 ./build/gyp_chromium -Dproprietary_codecs=1 content/content.gyp --no-circular-check
 ninja -C out/Release -j4 ffmpegsumo
 ninja -C out/Release nw -j4
+```
