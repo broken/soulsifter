@@ -45,6 +45,10 @@ namespace soulsifter {
         void setName(const string& name);
         const string& getQuery() const;
         void setQuery(const string& query);
+        const vector<int>& getPlaylistEntryIds() const;
+        void setPlaylistEntryIds(const vector<int>& playlistEntryIds);
+        const vector<PlaylistEntry*>& getPlaylistEntries();
+        void setPlaylistEntries(const vector<PlaylistEntry*>& playlistEntries);
         const vector<int>& getStyleIds() const;
         void setStyleIds(const vector<int>& styleIds);
         const vector<Style*>& getStyles();
@@ -56,6 +60,8 @@ namespace soulsifter {
         int id;
         string name;
         string query;
+        vector<int> playlistEntryIds;
+        vector<PlaylistEntry*> playlistEntries;
         vector<int> styleIds;
         vector<Style*> styles;
 

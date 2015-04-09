@@ -32,6 +32,10 @@ class Playlist : public node::ObjectWrap {
   static NAN_SETTER(setName);
   static NAN_GETTER(getQuery);
   static NAN_SETTER(setQuery);
+  static NAN_GETTER(getPlaylistEntryIds);
+  static NAN_SETTER(setPlaylistEntryIds);
+  static NAN_GETTER(getPlaylistEntries);
+  static NAN_SETTER(setPlaylistEntries);
   static NAN_GETTER(getStyleIds);
   static NAN_SETTER(setStyleIds);
   static NAN_GETTER(getStyles);

@@ -3,6 +3,8 @@
 #include <nan.h>
 #include "Playlist_wrap.h"
 #include "Playlist.h"
+#include "PlaylistEntry.h"
+#include "PlaylistEntry_wrap.h"
 #include "Playlist_wrap.h"
 #include "ResultSetIterator.h"
 #include "Style.h"
@@ -54,6 +56,8 @@ void Playlist::Init(v8::Handle<v8::Object> exports) {
   tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("id"), getId, setId);
   tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("name"), getName, setName);
   tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("query"), getQuery, setQuery);
+  tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("playlistEntryIds"), getPlaylistEntryIds, setPlaylistEntryIds);
+  tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("playlistEntries"), getPlaylistEntries, setPlaylistEntries);
   tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("styleIds"), getStyleIds, setStyleIds);
   tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("styles"), getStyles, setStyles);
 
@@ -190,6 +194,67 @@ NAN_SETTER(Playlist::setQuery) {
   Playlist* obj = ObjectWrap::Unwrap<Playlist>(args.This());
   string a0(*v8::String::Utf8Value(value->ToString()));
   obj->playlist->setQuery(a0);
+
+  NanReturnUndefined();
+}
+
+NAN_GETTER(Playlist::getPlaylistEntryIds) {
+  NanScope();
+
+  Playlist* obj = ObjectWrap::Unwrap<Playlist>(args.This());
+  const std::vector<int> result =  obj->playlist->getPlaylistEntryIds();
+
+  v8::Handle<v8::Array> a = NanNew<v8::Array>((int) result.size());
+  for (int i = 0; i < (int) result.size(); i++) {
+    a->Set(NanNew<v8::Number>(i), NanNew<v8::Number>(result[i]));
+  }
+  NanReturnValue(a);
+}
+
+NAN_SETTER(Playlist::setPlaylistEntryIds) {
+  NanScope();
+
+  Playlist* obj = ObjectWrap::Unwrap<Playlist>(args.This());
+  v8::Local<v8::Array> a0Array = v8::Local<v8::Array>::Cast(value);
+  std::vector<int> a0;
+  for (int i = 0; i < a0Array->Length(); ++i) {
+    v8::Local<v8::Value> tmp = a0Array->Get(i);
+    int x(tmp->Uint32Value());
+    a0.push_back(x);
+  }
+  obj->playlist->setPlaylistEntryIds(a0);
+
+  NanReturnUndefined();
+}
+
+NAN_GETTER(Playlist::getPlaylistEntries) {
+  NanScope();
+
+  Playlist* obj = ObjectWrap::Unwrap<Playlist>(args.This());
+  const std::vector<dogatech::soulsifter::PlaylistEntry*> result =  obj->playlist->getPlaylistEntries();
+
+  v8::Handle<v8::Array> a = NanNew<v8::Array>((int) result.size());
+  for (int i = 0; i < (int) result.size(); i++) {
+    v8::Local<v8::Object> instance = PlaylistEntry::NewInstance();
+    PlaylistEntry* r = ObjectWrap::Unwrap<PlaylistEntry>(instance);
+    r->setNwcpValue((result)[i], false);
+    a->Set(NanNew<v8::Number>(i), instance);
+  }
+  NanReturnValue(a);
+}
+
+NAN_SETTER(Playlist::setPlaylistEntries) {
+  NanScope();
+
+  Playlist* obj = ObjectWrap::Unwrap<Playlist>(args.This());
+  v8::Local<v8::Array> a0Array = v8::Local<v8::Array>::Cast(value);
+  std::vector<dogatech::soulsifter::PlaylistEntry*> a0;
+  for (int i = 0; i < a0Array->Length(); ++i) {
+    v8::Local<v8::Value> tmp = a0Array->Get(i);
+    dogatech::soulsifter::PlaylistEntry* x(node::ObjectWrap::Unwrap<PlaylistEntry>(tmp->ToObject())->getNwcpValue());
+    a0.push_back(x);
+  }
+  obj->playlist->setPlaylistEntries(a0);
 
   NanReturnUndefined();
 }

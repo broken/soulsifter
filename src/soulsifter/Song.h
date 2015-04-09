@@ -102,6 +102,10 @@ namespace soulsifter {
         void setStyleIds(const vector<int>& styleIds);
         const vector<Style*>& getStyles();
         void setStyles(const vector<Style*>& styles);
+        const vector<int>& getPlaylistEntryIds() const;
+        void setPlaylistEntryIds(const vector<int>& playlistEntryIds);
+        const vector<PlaylistEntry*>& getPlaylistEntries();
+        void setPlaylistEntries(const vector<PlaylistEntry*>& playlistEntries);
 
         friend ResultSetIterator<Song>;
 
@@ -129,6 +133,8 @@ namespace soulsifter {
         AlbumPart* albumPart;
         vector<int> styleIds;
         vector<Style*> styles;
+        vector<int> playlistEntryIds;
+        vector<PlaylistEntry*> playlistEntries;
 
         static void populateFields(const sql::ResultSet* rs, Song* song);
 

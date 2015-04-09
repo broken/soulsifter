@@ -723,6 +723,8 @@ playlistFields = [
   [:int, "id", Attrib::FIND],
   [:string, "name", Attrib::FIND],
   [:string, "query", 0],
+  ["vector<int>", "playlistEntryIds", Attrib::ID],
+  ["vector<PlaylistEntry*>", "playlistEntries", 0],
   ["vector<int>", "styleIds", Attrib::ID],
   ["vector<Style*>", "styles", 0],
 ]
@@ -800,6 +802,8 @@ songFields = [
   ["AlbumPart", "albumPart", Attrib::PTR],
   ["vector<int>", "styleIds", Attrib::ID],
   ["vector<Style*>", "styles", 0],
+  ["vector<int>", "playlistEntryIds", Attrib::ID],
+  ["vector<PlaylistEntry*>", "playlistEntries", 0],
 ]
 songAttribs = 0
 songCustomMethods = "        explicit Song(RESong* song);\n\n        static RESong* createRESongFromSong(const Song& song);\n\n        const string reAlbum() const;\n        const string getDateAddedString() const;\n        void setDateAddedToNow();\n\n"

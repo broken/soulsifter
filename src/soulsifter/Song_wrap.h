@@ -79,6 +79,10 @@ class Song : public node::ObjectWrap {
   static NAN_SETTER(setStyleIds);
   static NAN_GETTER(getStyles);
   static NAN_SETTER(setStyles);
+  static NAN_GETTER(getPlaylistEntryIds);
+  static NAN_SETTER(setPlaylistEntryIds);
+  static NAN_GETTER(getPlaylistEntries);
+  static NAN_SETTER(setPlaylistEntries);
 
   static v8::Persistent<v8::Function> constructor;
   dogatech::soulsifter::Song* song;
