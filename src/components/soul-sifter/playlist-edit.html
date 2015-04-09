@@ -3,6 +3,7 @@
 <link href="../paper-input/paper-input.html" rel="import">
 
 <link href="abstract-action-page.html" rel="import">
+<link href="genre-list.html" rel="import">
 <link href="themes.html" rel="import">
 
 
@@ -13,15 +14,25 @@
     <core-style ref="main"></core-style>
 
     <abstract-action-page acceptAction="{{save}}">
-      <paper-input floatingLabel label="Name" value="{{playlist.name}}"></paper-input>
-      <paper-input floatingLabel label="Query" value="{{playlist.query}}"></paper-input>
+      <div horizontal layout around-justified id="pageContainer">
+        <div vertical layout>
+          <paper-input floatingLabel label="Name" value="{{playlist.name}}"></paper-input>
+          <paper-input floatingLabel label="Query" value="{{playlist.query}}"></paper-input>
+        </div>
+        <genre-list id="genreList" selection="{{genreSelection}}"></genre-list>
+      </div>
     </abstract-action-page>
   </template>
 
   <script>
     Polymer('playlist-edit', {
 
+      playlistChanged: function(oldValue, newValue) {
+        this.$.genreList.setSelection(newValue.styles);
+      },
+
       save: function(e, detail, sender) {
+        this.playlist.styles = this.genreSelection;
         if (this.playlist.id) {
           this.playlist.update();
         } else {

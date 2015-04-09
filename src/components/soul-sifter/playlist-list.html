@@ -62,6 +62,7 @@
         // update the query
         // TODO: get to work for non-smart playlists
         if (detail.isSelected) {
+          this.asyncFire('genre-change', detail.item.playlist.styles);
           this.asyncFire('query-change', detail.item.playlist.query);
         }
       },
