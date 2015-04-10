@@ -14,6 +14,8 @@
 
 #include "MysqlAccess.h"
 
+#include "Song.h"
+
 namespace dogatech {
 namespace soulsifter {
     

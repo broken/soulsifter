@@ -19,6 +19,8 @@
 #include <boost/unordered_map.hpp>
 #include <boost/algorithm/string.hpp>
 
+#include "Album.h"
+#include "AlbumPart.h"
 #include "MysqlAccess.h"
 #include "Song.h"
 #include "Style.h"

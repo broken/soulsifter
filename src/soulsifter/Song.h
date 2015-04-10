@@ -13,11 +13,7 @@
 #include <string>
 #include <vector>
 
-#include "Style.h"
 #include "ResultSetIterator.h"
-#include "RESong.h"
-#include "Album.h"
-#include "AlbumPart.h"
 
 namespace sql {
     class ResultSet;
@@ -27,6 +23,11 @@ using namespace std;
 
 namespace dogatech {
 namespace soulsifter {
+
+    class RESong;
+    class Album;
+    class AlbumPart;
+    class Style;
 
     class Song {
     public:
@@ -102,10 +103,6 @@ namespace soulsifter {
         void setStyleIds(const vector<int>& styleIds);
         const vector<Style*>& getStyles();
         void setStyles(const vector<Style*>& styles);
-        const vector<int>& getPlaylistEntryIds() const;
-        void setPlaylistEntryIds(const vector<int>& playlistEntryIds);
-        const vector<PlaylistEntry*>& getPlaylistEntries();
-        void setPlaylistEntries(const vector<PlaylistEntry*>& playlistEntries);
 
         friend ResultSetIterator<Song>;
 
@@ -133,8 +130,6 @@ namespace soulsifter {
         AlbumPart* albumPart;
         vector<int> styleIds;
         vector<Style*> styles;
-        vector<int> playlistEntryIds;
-        vector<PlaylistEntry*> playlistEntries;
 
         static void populateFields(const sql::ResultSet* rs, Song* song);
 

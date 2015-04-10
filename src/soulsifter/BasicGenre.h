@@ -24,6 +24,7 @@ using namespace std;
 namespace dogatech {
 namespace soulsifter {
 
+
     class BasicGenre {
     public:
         BasicGenre();

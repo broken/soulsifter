@@ -13,7 +13,6 @@
 #include <string>
 #include <vector>
 
-#include "Style.h"
 #include "ResultSetIterator.h"
 
 namespace sql {
@@ -24,6 +23,7 @@ using namespace std;
 
 namespace dogatech {
 namespace soulsifter {
+
 
     class RESong {
     public:

@@ -24,6 +24,7 @@ using namespace std;
 namespace dogatech {
 namespace soulsifter {
 
+
     class REXml {
     public:
         REXml();

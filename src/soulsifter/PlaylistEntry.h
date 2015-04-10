@@ -14,8 +14,6 @@
 #include <vector>
 
 #include "ResultSetIterator.h"
-#include "Playlist.h"
-#include "Song.h"
 
 namespace sql {
     class ResultSet;
@@ -25,6 +23,9 @@ using namespace std;
 
 namespace dogatech {
 namespace soulsifter {
+
+    class Playlist;
+    class Song;
 
     class PlaylistEntry {
     public:

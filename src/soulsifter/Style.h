@@ -24,6 +24,8 @@ using namespace std;
 namespace dogatech {
 namespace soulsifter {
 
+    class Style;
+
     class Style {
     public:
         Style();

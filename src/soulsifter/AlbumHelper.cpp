@@ -10,6 +10,8 @@
 
 #include <sstream>
 
+#include "BasicGenre.h"
+
 namespace dogatech {
 namespace soulsifter {
     

@@ -40,10 +40,13 @@
 #include <taglib/tstring.h>
 #include <taglib/tstringlist.h>
 
+#include "Album.h"
+#include "AlbumPart.h"
 #include "BasicGenre.h"
 //#import "Constants.h"
 #include "Song.h"
 #include "SoulSifterSettings.h"
+#include "Style.h"
 
 using namespace boost;
 using namespace std;

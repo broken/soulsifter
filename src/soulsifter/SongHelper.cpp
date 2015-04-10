@@ -15,8 +15,11 @@
 #include <cppconn/resultset.h>
 
 #include "Album.h"
+#include "AlbumPart.h"
+#include "BasicGenre.h"
 #include "MysqlAccess.h"
 #include "RESong.h"
+#include "Style.h"
 
 namespace dogatech {
 namespace soulsifter {

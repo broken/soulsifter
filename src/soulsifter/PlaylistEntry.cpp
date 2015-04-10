@@ -24,6 +24,8 @@
 
 #include "MysqlAccess.h"
 #include "DTVectorUtil.h"
+#include "Playlist.h"
+#include "Song.h"
 
 using namespace std;
 

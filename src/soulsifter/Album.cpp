@@ -24,6 +24,7 @@
 
 #include "MysqlAccess.h"
 #include "DTVectorUtil.h"
+#include "BasicGenre.h"
 
 using namespace std;
 

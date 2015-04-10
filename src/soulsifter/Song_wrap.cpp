@@ -6,8 +6,6 @@
 #include "AlbumPart.h"
 #include "AlbumPart_wrap.h"
 #include "Album_wrap.h"
-#include "PlaylistEntry.h"
-#include "PlaylistEntry_wrap.h"
 #include "ResultSetIterator.h"
 #include "Song.h"
 #include "Song_wrap.h"
@@ -89,8 +87,6 @@ void Song::Init(v8::Handle<v8::Object> exports) {
   tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("albumPart"), getAlbumPart, setAlbumPart);
   tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("styleIds"), getStyleIds, setStyleIds);
   tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("styles"), getStyles, setStyles);
-  tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("playlistEntryIds"), getPlaylistEntryIds, setPlaylistEntryIds);
-  tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("playlistEntries"), getPlaylistEntries, setPlaylistEntries);
 
   NanAssignPersistent<v8::Function>(constructor, tpl->GetFunction());
   exports->Set(NanNew<v8::String>("Song"), tpl->GetFunction());
@@ -664,67 +660,6 @@ NAN_SETTER(Song::setStyles) {
     a0.push_back(x);
   }
   obj->song->setStyles(a0);
-
-  NanReturnUndefined();
-}
-
-NAN_GETTER(Song::getPlaylistEntryIds) {
-  NanScope();
-
-  Song* obj = ObjectWrap::Unwrap<Song>(args.This());
-  const std::vector<int> result =  obj->song->getPlaylistEntryIds();
-
-  v8::Handle<v8::Array> a = NanNew<v8::Array>((int) result.size());
-  for (int i = 0; i < (int) result.size(); i++) {
-    a->Set(NanNew<v8::Number>(i), NanNew<v8::Number>(result[i]));
-  }
-  NanReturnValue(a);
-}
-
-NAN_SETTER(Song::setPlaylistEntryIds) {
-  NanScope();
-
-  Song* obj = ObjectWrap::Unwrap<Song>(args.This());
-  v8::Local<v8::Array> a0Array = v8::Local<v8::Array>::Cast(value);
-  std::vector<int> a0;
-  for (int i = 0; i < a0Array->Length(); ++i) {
-    v8::Local<v8::Value> tmp = a0Array->Get(i);
-    int x(tmp->Uint32Value());
-    a0.push_back(x);
-  }
-  obj->song->setPlaylistEntryIds(a0);
-
-  NanReturnUndefined();
-}
-
-NAN_GETTER(Song::getPlaylistEntries) {
-  NanScope();
-
-  Song* obj = ObjectWrap::Unwrap<Song>(args.This());
-  const std::vector<dogatech::soulsifter::PlaylistEntry*> result =  obj->song->getPlaylistEntries();
-
-  v8::Handle<v8::Array> a = NanNew<v8::Array>((int) result.size());
-  for (int i = 0; i < (int) result.size(); i++) {
-    v8::Local<v8::Object> instance = PlaylistEntry::NewInstance();
-    PlaylistEntry* r = ObjectWrap::Unwrap<PlaylistEntry>(instance);
-    r->setNwcpValue((result)[i], false);
-    a->Set(NanNew<v8::Number>(i), instance);
-  }
-  NanReturnValue(a);
-}
-
-NAN_SETTER(Song::setPlaylistEntries) {
-  NanScope();
-
-  Song* obj = ObjectWrap::Unwrap<Song>(args.This());
-  v8::Local<v8::Array> a0Array = v8::Local<v8::Array>::Cast(value);
-  std::vector<dogatech::soulsifter::PlaylistEntry*> a0;
-  for (int i = 0; i < a0Array->Length(); ++i) {
-    v8::Local<v8::Value> tmp = a0Array->Get(i);
-    dogatech::soulsifter::PlaylistEntry* x(node::ObjectWrap::Unwrap<PlaylistEntry>(tmp->ToObject())->getNwcpValue());
-    a0.push_back(x);
-  }
-  obj->song->setPlaylistEntries(a0);
 
   NanReturnUndefined();
 }
