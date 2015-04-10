@@ -105,7 +105,7 @@ namespace soulsifter {
 
     Playlist* Playlist::findById(int id) {
         try {
-            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select *, group_concat(playlistEntries.playlistEntryId) as playlistEntryIds, group_concat(styles.styleId) as styleIds from Playlists left outer join PlaylistPlaylistEntries playlistEntries on Playlists.id = playlistEntries.playlistId left outer join PlaylistStyles styles on Playlists.id = styles.playlistId where id = ? group by Playlists.id");
+            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select *, group_concat(playlistEntries.id) as playlistEntryIds, group_concat(styles.styleId) as styleIds from Playlists left outer join PlaylistEntries playlistEntries on Playlists.id = playlistEntries.playlistId left outer join PlaylistStyles styles on Playlists.id = styles.playlistId where id = ? group by Playlists.id");
             ps->setInt(1, id);
             sql::ResultSet *rs = ps->executeQuery();
             Playlist *playlist = NULL;
@@ -129,7 +129,7 @@ namespace soulsifter {
 
     Playlist* Playlist::findByName(const string& name) {
         try {
-            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select *, group_concat(playlistEntries.playlistEntryId) as playlistEntryIds, group_concat(styles.styleId) as styleIds from Playlists left outer join PlaylistPlaylistEntries playlistEntries on Playlists.id = playlistEntries.playlistId left outer join PlaylistStyles styles on Playlists.id = styles.playlistId where name = ? group by Playlists.id");
+            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select *, group_concat(playlistEntries.id) as playlistEntryIds, group_concat(styles.styleId) as styleIds from Playlists left outer join PlaylistEntries playlistEntries on Playlists.id = playlistEntries.playlistId left outer join PlaylistStyles styles on Playlists.id = styles.playlistId where name = ? group by Playlists.id");
             ps->setString(1, name);
             sql::ResultSet *rs = ps->executeQuery();
             Playlist *playlist = NULL;
@@ -152,7 +152,7 @@ namespace soulsifter {
     }
 
     ResultSetIterator<Playlist>* Playlist::findAll() {
-        sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select *, group_concat(playlistEntries.playlistEntryId) as playlistEntryIds, group_concat(styles.styleId) as styleIds from Playlists left outer join PlaylistPlaylistEntries playlistEntries on Playlists.id = playlistEntries.playlistId left outer join PlaylistStyles styles on Playlists.id = styles.playlistId group by Playlists.id");
+        sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select *, group_concat(playlistEntries.id) as playlistEntryIds, group_concat(styles.styleId) as styleIds from Playlists left outer join PlaylistEntries playlistEntries on Playlists.id = playlistEntries.playlistId left outer join PlaylistStyles styles on Playlists.id = styles.playlistId group by Playlists.id");
         sql::ResultSet *rs = ps->executeQuery();
         ResultSetIterator<Playlist> *dtrs = new ResultSetIterator<Playlist>(rs);
         return dtrs;
@@ -168,7 +168,7 @@ namespace soulsifter {
             ps->setInt(3, id);
             int result = ps->executeUpdate();
             if (!playlistEntryIds.empty()) {
-                stringstream ss("insert ignore into PlaylistPlaylistEntries (playlistId, playlistEntryId) values (?, ?)", ios_base::app | ios_base::out | ios_base::ate);
+                stringstream ss("insert ignore into PlaylistEntries (playlistId, playlistEntryId) values (?, ?)", ios_base::app | ios_base::out | ios_base::ate);
                 for (int i = 1; i < playlistEntryIds.size(); ++i) {
                     ss << ", (?, ?)";
                 }
@@ -179,7 +179,7 @@ namespace soulsifter {
                 }
                 ps->executeUpdate();
                 ss.str(std::string());
-                ss << "delete from PlaylistPlaylistEntries where playlistId = ? and playlistEntryId not in (?";
+                ss << "delete from PlaylistEntries where playlistId = ? and playlistEntryId not in (?";
                 for (int i = 1; i < playlistEntryIds.size(); ++i) {
                     ss << ", ?";
                 }
@@ -191,7 +191,7 @@ namespace soulsifter {
                 }
                 ps->executeUpdate();
             } else {
-                ps = MysqlAccess::getInstance().getPreparedStatement("delete from PlaylistPlaylistEntries where playlistId = ?");
+                ps = MysqlAccess::getInstance().getPreparedStatement("delete from PlaylistEntries where playlistId = ?");
                 ps->setInt(1, id);
                 ps->executeUpdate();
             }
@@ -250,7 +250,7 @@ namespace soulsifter {
                     return saved;
                 }
                 if (!playlistEntryIds.empty()) {
-                    stringstream ss("insert ignore into PlaylistPlaylistEntries (playlistId, playlistEntryId) values (?, ?)", ios_base::app | ios_base::out | ios_base::ate);
+                    stringstream ss("insert ignore into PlaylistEntries (playlistId, playlistEntryId) values (?, ?)", ios_base::app | ios_base::out | ios_base::ate);
                     for (int i = 1; i < playlistEntryIds.size(); ++i) {
                         ss << ", (?, ?)";
                     }

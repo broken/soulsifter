@@ -8,6 +8,7 @@ module Attrib
   TRANSIENT = 2**4  # field: not persistent
   KEY2 = 2**5  # field: secondary key, can be multiple fields which make it up
   NULLABLE = 2**6 # field: if this field is nullable
+  JOINTABLE = 2**7 # field: if this field is to a many-to-many join table versus though one
 end
 
 ######################### helpful functions & globals
@@ -46,8 +47,6 @@ def single(n)
     return "mix"
   elsif (n.downcase == "children")
     return "child"
-  elsif (n.downcase == "entries")
-    return "entry"
   elsif (n.downcase == "playlistentries")
     return "playlistEntry"
   else
@@ -87,6 +86,10 @@ def vectorRelationTable(name, f)
     t[0] = "#{cap(name)}Children"
     t[1] = "childId"
     t[2] = "parentId"
+  elsif (f[$attrib] & Attrib::JOINTABLE > 0)
+    t[0] = "#{cap(plural(getVectorGeneric(f[$type])))}"
+    t[1] = "#{single(f[$name])}Id"
+    t[2] = "#{name}Id"
   else
     t[0] = "#{cap(name)}#{cap(plural(getVectorGeneric(f[$type])))}"
     t[1] = "#{single(f[$name])}Id"
@@ -98,7 +101,7 @@ end
 def selectStar(fields)
   str = "*";
   fields.select{|f| isVector(f[$type]) && f[$attrib] & Attrib::ID > 0}.each do |f|
-    str << ", group_concat(#{plural(f[$name][0..-4])}.#{single(f[$name])}) as #{f[$name]}"
+    str << ", group_concat(#{plural(f[$name][0..-4])}.#{f[$attrib] & Attrib::JOINTABLE > 0 ? 'id' : single(f[$name])}) as #{f[$name]}"
   end
   return str
 end
@@ -743,8 +746,8 @@ playlistFields = [
   [:int, "id", Attrib::FIND],
   [:string, "name", Attrib::FIND],
   [:string, "query", 0],
-  ["vector<int>", "playlistEntryIds", Attrib::ID],
-  ["vector<PlaylistEntry*>", "playlistEntries", 0],
+  ["vector<int>", "playlistEntryIds", Attrib::ID | Attrib::JOINTABLE],
+  ["vector<PlaylistEntry*>", "playlistEntries", Attrib::JOINTABLE],
   ["vector<int>", "styleIds", Attrib::ID],
   ["vector<Style*>", "styles", 0],
 ]
