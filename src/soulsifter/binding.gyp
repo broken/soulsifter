@@ -24,6 +24,7 @@
           "REAlbumCover.cpp",
           "RESetting.cpp",
           "RESettingHelper.cpp",
+          "RESong.cpp",
           "Song.cpp",
           "Song_wrap.cpp",
           "SongHelper.cpp",

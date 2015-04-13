@@ -1,29 +1,34 @@
 <link href="../polymer/polymer.html" rel="import">
 
+<link href="global-state.html" rel="import">
+
 
 <polymer-element name="ss-googleplaymusic" attributes="values">
+  <template>
+    <global-state values="{{global}}"></global-state>
+  </template>
   <script>
     Polymer('ss-googleplaymusic', {
 
-      ready: function() {
-        var PlayMusic = require('playmusic');
-        this.pm = new PlayMusic();
-      },
-
       attached: function() {
-        var settings = new ss.SoulSifterSettings();
-        var email = settings.getString('google.email');
-        var appKey = settings.getString('google.appKey');
-        this.pm.init({email: email, password: appKey},
-            function() {
-              console.log("Succesfully connected to Google Music.");
-            },
-            function(message, data, err, res) {
-              console.warn("Login to Google Music failed: " + message);
-              console.warn("Data: " + data);
-              console.warn("Err: " +  err);
-              console.warn("Response: " + res);
-            });
+        if (!this.global.pm) {
+          var PlayMusic = require('playmusic');
+          this.pm = new PlayMusic();
+          var settings = new ss.SoulSifterSettings();
+          var email = settings.getString('google.email');
+          var appKey = settings.getString('google.appKey');
+          this.pm.init({email: email, password: appKey},
+              function() {
+                console.log("Succesfully connected to Google Music.");
+              },
+              function(message, data, err, res) {
+                console.warn("Login to Google Music failed: " + message);
+                console.warn("Data: " + data);
+                console.warn("Err: " +  err);
+                console.warn("Response: " + res);
+              });
+          this.global.pm = this.pm;
+        }
       },
 
       /**
