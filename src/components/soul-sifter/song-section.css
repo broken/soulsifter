@@ -7,6 +7,17 @@
   margin: 10px 15px;
 }
 
+#nav {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+}
+
+#nav paper-icon-button[disabled] {
+  visibility: hidden;
+}
+
 #contentContainer {
   position: relative;
 }

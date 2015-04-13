@@ -3,6 +3,7 @@
 <link href="../core-ajax/core-ajax.html" rel="import">
 <link href="../core-scroll-header-panel/core-scroll-header-panel.html" rel="import">
 <link href="../core-style/core-style.html" rel="import">
+<link href="../paper-icon-button/paper-icon-button.html" rel="import">
 <link href="../polymer-ui-ratings/polymer-ui-ratings.html" rel="import">
 
 <link href="global-state.html" rel="import">
@@ -22,6 +23,10 @@
 
     <!-- core-scroll-header-panel does not appear to work with my current 10.5 version of nodewebkit; try this again later when I upgrade it. -->
     <div vertical layout fit>
+      <div horizontal layout justified id="nav">
+        <paper-icon-button icon="arrow-back" on-click="{{backAction}}" disabled?="{{!songTrailIndex}}"></paper-icon-button>
+        <paper-icon-button icon="arrow-forward" on-click="{{forwardAction}}" disabled?="{{songTrailIndex == songTrail.length}}"></paper-icon-button>
+      </div>
       <div id="header" draggable="true" on-dragstart="{{dragSong}}"></div>
       <div flex id="contentContainer">
         <section vertical layout fit class="content">
@@ -50,8 +55,14 @@
 
       localeDateTime: '',
 
+      songTrailIndex: 0,
+
       observe: {
         'global.song': 'globalSongChanged'
+      },
+
+      created: function() {
+        this.songTrail = [];
       },
 
       ready: function() {
@@ -60,6 +71,16 @@
 
       globalSongChanged: function(oldSong, song) {
         this.song = song;
+        if (!song) {
+          this.$.header.style.backgroundImage = '';
+          return;
+        }
+
+        var entry = new ss.PlaylistEntry();
+        entry.song = song;
+        entry.position = this.songTrailIndex++;
+        this.songTrail[entry.position] = entry;
+
         this.localeDateTime = new Date(this.song.dateAdded).toLocaleString();
         this.$.header.style.backgroundImage = 'url("' + this.song.album.coverFilepath + '")';
 
@@ -78,6 +99,14 @@
       dragSong: function(e) {
         e.dataTransfer.effectAllowed = 'move';
         e.dataTransfer.setData('text/plain', 'extensis-filenames-type:' + this.song.filepath);
+      },
+
+      backAction: function(e, detail, sender) {
+        this.global.song = --this.songTrailIndex ? this.songTrail[--this.songTrailIndex].song : undefined;
+      },
+
+      forwardAction: function(e, detail, sender) {
+        this.global.song = this.songTrail[this.songTrailIndex].song;
       },
     });
   </script>
