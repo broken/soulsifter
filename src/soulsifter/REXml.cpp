@@ -69,7 +69,7 @@ namespace soulsifter {
 
     REXml* REXml::findById(int id) {
         try {
-            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select * from REXml where REXml.id = ?");
+            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select REXml.* from REXml where REXml.id = ?");
             ps->setInt(1, id);
             sql::ResultSet *rs = ps->executeQuery();
             REXml *reXml = NULL;
@@ -93,7 +93,7 @@ namespace soulsifter {
 
     REXml* REXml::findByName(const string& name) {
         try {
-            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select * from REXml where name = ?");
+            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select REXml.* from REXml where name = ?");
             ps->setString(1, name);
             sql::ResultSet *rs = ps->executeQuery();
             REXml *reXml = NULL;
@@ -116,7 +116,7 @@ namespace soulsifter {
     }
 
     ResultSetIterator<REXml>* REXml::findAll() {
-        sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select * from REXml");
+        sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select REXml.* from REXml");
         sql::ResultSet *rs = ps->executeQuery();
         ResultSetIterator<REXml> *dtrs = new ResultSetIterator<REXml>(rs);
         return dtrs;

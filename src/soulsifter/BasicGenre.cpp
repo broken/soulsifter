@@ -64,7 +64,7 @@ namespace soulsifter {
 
     BasicGenre* BasicGenre::findById(int id) {
         try {
-            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select * from BasicGenres where BasicGenres.id = ?");
+            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select BasicGenres.* from BasicGenres where BasicGenres.id = ?");
             ps->setInt(1, id);
             sql::ResultSet *rs = ps->executeQuery();
             BasicGenre *basicGenre = NULL;
@@ -88,7 +88,7 @@ namespace soulsifter {
 
     BasicGenre* BasicGenre::findByName(const string& name) {
         try {
-            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select * from BasicGenres where name = ?");
+            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select BasicGenres.* from BasicGenres where name = ?");
             ps->setString(1, name);
             sql::ResultSet *rs = ps->executeQuery();
             BasicGenre *basicGenre = NULL;
@@ -111,7 +111,7 @@ namespace soulsifter {
     }
 
     ResultSetIterator<BasicGenre>* BasicGenre::findAll() {
-        sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select * from BasicGenres");
+        sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select BasicGenres.* from BasicGenres");
         sql::ResultSet *rs = ps->executeQuery();
         ResultSetIterator<BasicGenre> *dtrs = new ResultSetIterator<BasicGenre>(rs);
         return dtrs;

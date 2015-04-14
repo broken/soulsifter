@@ -193,7 +193,7 @@ namespace soulsifter {
 
     Song* Song::findById(int id) {
         try {
-            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select *, group_concat(styles.styleId) as styleIds from Songs left outer join SongStyles styles on Songs.id = styles.songId where Songs.id = ? group by Songs.id");
+            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select Songs.*, group_concat(styles.styleId) as styleIds from Songs left outer join SongStyles styles on Songs.id = styles.songId where Songs.id = ? group by Songs.id");
             ps->setInt(1, id);
             sql::ResultSet *rs = ps->executeQuery();
             Song *song = NULL;
@@ -217,7 +217,7 @@ namespace soulsifter {
 
     Song* Song::findByFilepath(const string& filepath) {
         try {
-            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select *, group_concat(styles.styleId) as styleIds from Songs left outer join SongStyles styles on Songs.id = styles.songId where Songs.filepath = ? group by Songs.id");
+            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select Songs.*, group_concat(styles.styleId) as styleIds from Songs left outer join SongStyles styles on Songs.id = styles.songId where Songs.filepath = ? group by Songs.id");
             ps->setString(1, filepath);
             sql::ResultSet *rs = ps->executeQuery();
             Song *song = NULL;
@@ -241,7 +241,7 @@ namespace soulsifter {
 
     Song* Song::findByRESongId(int reSongId) {
         try {
-            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select *, group_concat(styles.styleId) as styleIds from Songs left outer join SongStyles styles on Songs.id = styles.songId where reSongId = ? group by Songs.id");
+            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select Songs.*, group_concat(styles.styleId) as styleIds from Songs left outer join SongStyles styles on Songs.id = styles.songId where reSongId = ? group by Songs.id");
             ps->setInt(1, reSongId);
             sql::ResultSet *rs = ps->executeQuery();
             Song *song = NULL;
@@ -264,7 +264,7 @@ namespace soulsifter {
     }
 
     ResultSetIterator<Song>* Song::findAll() {
-        sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select *, group_concat(styles.styleId) as styleIds from Songs left outer join SongStyles styles on Songs.id = styles.songId group by Songs.id");
+        sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select Songs.*, group_concat(styles.styleId) as styleIds from Songs left outer join SongStyles styles on Songs.id = styles.songId group by Songs.id");
         sql::ResultSet *rs = ps->executeQuery();
         ResultSetIterator<Song> *dtrs = new ResultSetIterator<Song>(rs);
         return dtrs;

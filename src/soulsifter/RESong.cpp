@@ -218,7 +218,7 @@ namespace soulsifter {
 
     RESong* RESong::findById(int id) {
         try {
-            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select * from RESongs where RESongs.id = ?");
+            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select RESongs.* from RESongs where RESongs.id = ?");
             ps->setInt(1, id);
             sql::ResultSet *rs = ps->executeQuery();
             RESong *reSong = NULL;
@@ -242,7 +242,7 @@ namespace soulsifter {
 
     RESong* RESong::findBySongid(const string& songid) {
         try {
-            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select * from RESongs where RESongs.songid = ?");
+            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select RESongs.* from RESongs where RESongs.songid = ?");
             ps->setString(1, songid);
             sql::ResultSet *rs = ps->executeQuery();
             RESong *reSong = NULL;
@@ -265,7 +265,7 @@ namespace soulsifter {
     }
 
     ResultSetIterator<RESong>* RESong::findAll() {
-        sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select * from RESongs");
+        sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select RESongs.* from RESongs");
         sql::ResultSet *rs = ps->executeQuery();
         ResultSetIterator<RESong> *dtrs = new ResultSetIterator<RESong>(rs);
         return dtrs;

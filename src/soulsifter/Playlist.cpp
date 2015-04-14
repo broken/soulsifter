@@ -105,7 +105,7 @@ namespace soulsifter {
 
     Playlist* Playlist::findById(int id) {
         try {
-            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select *, group_concat(playlistEntries.id) as playlistEntryIds, group_concat(styles.styleId) as styleIds from Playlists left outer join PlaylistEntries playlistEntries on Playlists.id = playlistEntries.playlistId left outer join PlaylistStyles styles on Playlists.id = styles.playlistId where Playlists.id = ? group by Playlists.id");
+            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select Playlists.*, group_concat(playlistEntries.id) as playlistEntryIds, group_concat(styles.styleId) as styleIds from Playlists left outer join PlaylistEntries playlistEntries on Playlists.id = playlistEntries.playlistId left outer join PlaylistStyles styles on Playlists.id = styles.playlistId where Playlists.id = ? group by Playlists.id");
             ps->setInt(1, id);
             sql::ResultSet *rs = ps->executeQuery();
             Playlist *playlist = NULL;
@@ -129,7 +129,7 @@ namespace soulsifter {
 
     Playlist* Playlist::findByName(const string& name) {
         try {
-            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select *, group_concat(playlistEntries.id) as playlistEntryIds, group_concat(styles.styleId) as styleIds from Playlists left outer join PlaylistEntries playlistEntries on Playlists.id = playlistEntries.playlistId left outer join PlaylistStyles styles on Playlists.id = styles.playlistId where Playlists.name = ? group by Playlists.id");
+            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select Playlists.*, group_concat(playlistEntries.id) as playlistEntryIds, group_concat(styles.styleId) as styleIds from Playlists left outer join PlaylistEntries playlistEntries on Playlists.id = playlistEntries.playlistId left outer join PlaylistStyles styles on Playlists.id = styles.playlistId where Playlists.name = ? group by Playlists.id");
             ps->setString(1, name);
             sql::ResultSet *rs = ps->executeQuery();
             Playlist *playlist = NULL;
@@ -152,7 +152,7 @@ namespace soulsifter {
     }
 
     ResultSetIterator<Playlist>* Playlist::findAll() {
-        sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select *, group_concat(playlistEntries.id) as playlistEntryIds, group_concat(styles.styleId) as styleIds from Playlists left outer join PlaylistEntries playlistEntries on Playlists.id = playlistEntries.playlistId left outer join PlaylistStyles styles on Playlists.id = styles.playlistId group by Playlists.id");
+        sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select Playlists.*, group_concat(playlistEntries.id) as playlistEntryIds, group_concat(styles.styleId) as styleIds from Playlists left outer join PlaylistEntries playlistEntries on Playlists.id = playlistEntries.playlistId left outer join PlaylistStyles styles on Playlists.id = styles.playlistId group by Playlists.id");
         sql::ResultSet *rs = ps->executeQuery();
         ResultSetIterator<Playlist> *dtrs = new ResultSetIterator<Playlist>(rs);
         return dtrs;

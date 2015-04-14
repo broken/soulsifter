@@ -118,7 +118,7 @@ namespace soulsifter {
 
     Album* Album::findById(int id) {
         try {
-            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select * from Albums where Albums.id = ?");
+            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select Albums.* from Albums where Albums.id = ?");
             ps->setInt(1, id);
             sql::ResultSet *rs = ps->executeQuery();
             Album *album = NULL;
@@ -142,7 +142,7 @@ namespace soulsifter {
 
     Album* Album::findByCoverFilepath(const string& coverFilepath) {
         try {
-            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select * from Albums where Albums.coverFilepath = ?");
+            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select Albums.* from Albums where Albums.coverFilepath = ?");
             ps->setString(1, coverFilepath);
             sql::ResultSet *rs = ps->executeQuery();
             Album *album = NULL;
@@ -166,7 +166,7 @@ namespace soulsifter {
 
     Album* Album::findByNameAndArtist(const string& name, const string& artist) {
         try {
-            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select * from Albums where name = ? and artist = ?");
+            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select Albums.* from Albums where name = ? and artist = ?");
             ps->setString(1, name);
             ps->setString(2, artist);
             sql::ResultSet *rs = ps->executeQuery();
@@ -190,7 +190,7 @@ namespace soulsifter {
     }
 
     ResultSetIterator<Album>* Album::findAll() {
-        sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select * from Albums");
+        sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select Albums.* from Albums");
         sql::ResultSet *rs = ps->executeQuery();
         ResultSetIterator<Album> *dtrs = new ResultSetIterator<Album>(rs);
         return dtrs;

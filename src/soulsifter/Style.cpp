@@ -109,7 +109,7 @@ namespace soulsifter {
 
     Style* Style::findById(int id) {
         try {
-            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select *, group_concat(children.childId) as childIds, group_concat(parents.parentId) as parentIds from Styles left outer join StyleChildren children on Styles.id = children.parentId left outer join StyleChildren parents on Styles.id = parents.childId where Styles.id = ? group by Styles.id");
+            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select Styles.*, group_concat(children.childId) as childIds, group_concat(parents.parentId) as parentIds from Styles left outer join StyleChildren children on Styles.id = children.parentId left outer join StyleChildren parents on Styles.id = parents.childId where Styles.id = ? group by Styles.id");
             ps->setInt(1, id);
             sql::ResultSet *rs = ps->executeQuery();
             Style *style = NULL;
@@ -133,7 +133,7 @@ namespace soulsifter {
 
     Style* Style::findByREId(int reId) {
         try {
-            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select *, group_concat(children.childId) as childIds, group_concat(parents.parentId) as parentIds from Styles left outer join StyleChildren children on Styles.id = children.parentId left outer join StyleChildren parents on Styles.id = parents.childId where reId = ? group by Styles.id");
+            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select Styles.*, group_concat(children.childId) as childIds, group_concat(parents.parentId) as parentIds from Styles left outer join StyleChildren children on Styles.id = children.parentId left outer join StyleChildren parents on Styles.id = parents.childId where reId = ? group by Styles.id");
             ps->setInt(1, reId);
             sql::ResultSet *rs = ps->executeQuery();
             Style *style = NULL;
@@ -156,7 +156,7 @@ namespace soulsifter {
     }
 
     ResultSetIterator<Style>* Style::findAll() {
-        sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select *, group_concat(children.childId) as childIds, group_concat(parents.parentId) as parentIds from Styles left outer join StyleChildren children on Styles.id = children.parentId left outer join StyleChildren parents on Styles.id = parents.childId group by Styles.id");
+        sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select Styles.*, group_concat(children.childId) as childIds, group_concat(parents.parentId) as parentIds from Styles left outer join StyleChildren children on Styles.id = children.parentId left outer join StyleChildren parents on Styles.id = parents.childId group by Styles.id");
         sql::ResultSet *rs = ps->executeQuery();
         ResultSetIterator<Style> *dtrs = new ResultSetIterator<Style>(rs);
         return dtrs;

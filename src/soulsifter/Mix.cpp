@@ -106,7 +106,7 @@ namespace soulsifter {
 
     Mix* Mix::findById(int id) {
         try {
-            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select * from Mixes where Mixes.id = ?");
+            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select Mixes.* from Mixes where Mixes.id = ?");
             ps->setInt(1, id);
             sql::ResultSet *rs = ps->executeQuery();
             Mix *mix = NULL;
@@ -130,7 +130,7 @@ namespace soulsifter {
 
     Mix* Mix::findByOutSongIdAndInSongId(int outSongId, int inSongId) {
         try {
-            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select * from Mixes where outSongId = ? and inSongId = ?");
+            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select Mixes.* from Mixes where outSongId = ? and inSongId = ?");
             ps->setInt(1, outSongId);
             ps->setInt(2, inSongId);
             sql::ResultSet *rs = ps->executeQuery();
@@ -154,7 +154,7 @@ namespace soulsifter {
     }
 
     ResultSetIterator<Mix>* Mix::findAll() {
-        sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select * from Mixes");
+        sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select Mixes.* from Mixes");
         sql::ResultSet *rs = ps->executeQuery();
         ResultSetIterator<Mix> *dtrs = new ResultSetIterator<Mix>(rs);
         return dtrs;

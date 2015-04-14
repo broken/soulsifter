@@ -83,7 +83,7 @@ namespace soulsifter {
 
     AlbumPart* AlbumPart::findById(int id) {
         try {
-            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select * from AlbumParts where AlbumParts.id = ?");
+            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select AlbumParts.* from AlbumParts where AlbumParts.id = ?");
             ps->setInt(1, id);
             sql::ResultSet *rs = ps->executeQuery();
             AlbumPart *albumPart = NULL;
@@ -107,7 +107,7 @@ namespace soulsifter {
 
     AlbumPart* AlbumPart::findByPosAndAlbumId(const string& pos, int albumId) {
         try {
-            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select * from AlbumParts where pos = ? and albumId = ?");
+            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select AlbumParts.* from AlbumParts where pos = ? and albumId = ?");
             ps->setString(1, pos);
             ps->setInt(2, albumId);
             sql::ResultSet *rs = ps->executeQuery();
@@ -131,7 +131,7 @@ namespace soulsifter {
     }
 
     ResultSetIterator<AlbumPart>* AlbumPart::findAll() {
-        sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select * from AlbumParts");
+        sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select AlbumParts.* from AlbumParts");
         sql::ResultSet *rs = ps->executeQuery();
         ResultSetIterator<AlbumPart> *dtrs = new ResultSetIterator<AlbumPart>(rs);
         return dtrs;

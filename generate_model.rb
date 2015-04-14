@@ -99,8 +99,8 @@ def vectorRelationTable(name, f)
   return t
 end
 
-def selectStar(fields)
-  str = "*";
+def selectStar(name, fields)
+  str = "#{cap(plural(name))}.*";
   fields.select{|f| isVector(f[$type]) && f[$attrib] & Attrib::ID > 0}.each do |f|
     str << ", group_concat(#{plural(f[$name][0..-4])}.#{f[$attrib] & Attrib::JOINTABLE > 0 ? 'id' : single(f[$name])}) as #{f[$name]}"
   end
@@ -257,7 +257,7 @@ def cFindFunction(name, f, fields)
     str << "    #{cap(name)}* #{cap(name)}::findBy#{cap(f[$name])}(const #{f[$type]}& #{f[$name]}) {\n"
   end
   str << "        try {\n"
-  str << "            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement(\"select #{selectStar(fields)} from #{fromTable(name, fields)} where #{cap(plural(name))}.#{f[$name]} = ?#{groupBy(name,fields)}\");\n"
+  str << "            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement(\"select #{selectStar(name, fields)} from #{fromTable(name, fields)} where #{cap(plural(name))}.#{f[$name]} = ?#{groupBy(name,fields)}\");\n"
   str << "            ps->set#{cap(f[$type].to_s)}(1, #{f[$name]});\n            sql::ResultSet *rs = ps->executeQuery();\n            #{cap(name)} *#{name} = NULL;\n            if (rs->next()) {\n                #{name} = new #{cap(name)}();\n                populateFields(rs, #{name});\n            }\n            rs->close();\n            delete rs;\n\n"
   str << "            return #{name};\n"
   str << sqlCatchBlock()
@@ -307,7 +307,7 @@ def cSecondaryKeysFindFunction(name, secondaryKeys, fields)
   end
   str << ") {\n"
   str << "        try {\n"
-  str << "            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement(\"select #{selectStar(fields)} from #{fromTable(name, fields)} where "
+  str << "            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement(\"select #{selectStar(name, fields)} from #{fromTable(name, fields)} where "
   secondaryKeys.each_with_index do |f,idx|
     if (idx > 0)
       str << " and "
@@ -328,7 +328,7 @@ def hFindAllFunction(name)
 end
 
 def cFindAllFunction(name, fields)
-  return "    ResultSetIterator<#{cap(name)}>* #{cap(name)}::findAll() {\n        sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement(\"select #{selectStar(fields)} from #{fromTable(name, fields)}#{groupBy(name,fields)}\");\n        sql::ResultSet *rs = ps->executeQuery();\n        ResultSetIterator<#{cap(name)}> *dtrs = new ResultSetIterator<#{cap(name)}>(rs);\n        return dtrs;\n    }\n"
+  return "    ResultSetIterator<#{cap(name)}>* #{cap(name)}::findAll() {\n        sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement(\"select #{selectStar(name, fields)} from #{fromTable(name, fields)}#{groupBy(name,fields)}\");\n        sql::ResultSet *rs = ps->executeQuery();\n        ResultSetIterator<#{cap(name)}> *dtrs = new ResultSetIterator<#{cap(name)}>(rs);\n        return dtrs;\n    }\n"
 end
 
 def hSyncFunction()

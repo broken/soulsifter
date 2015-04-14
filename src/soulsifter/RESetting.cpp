@@ -69,7 +69,7 @@ namespace soulsifter {
 
     RESetting* RESetting::findById(int id) {
         try {
-            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select * from RESettings where RESettings.id = ?");
+            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select RESettings.* from RESettings where RESettings.id = ?");
             ps->setInt(1, id);
             sql::ResultSet *rs = ps->executeQuery();
             RESetting *reSetting = NULL;
@@ -93,7 +93,7 @@ namespace soulsifter {
 
     RESetting* RESetting::findByName(const string& name) {
         try {
-            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select * from RESettings where name = ?");
+            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select RESettings.* from RESettings where name = ?");
             ps->setString(1, name);
             sql::ResultSet *rs = ps->executeQuery();
             RESetting *reSetting = NULL;
@@ -116,7 +116,7 @@ namespace soulsifter {
     }
 
     ResultSetIterator<RESetting>* RESetting::findAll() {
-        sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select * from RESettings");
+        sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select RESettings.* from RESettings");
         sql::ResultSet *rs = ps->executeQuery();
         ResultSetIterator<RESetting> *dtrs = new ResultSetIterator<RESetting>(rs);
         return dtrs;

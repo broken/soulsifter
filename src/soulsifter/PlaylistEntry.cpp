@@ -97,7 +97,7 @@ namespace soulsifter {
 
     PlaylistEntry* PlaylistEntry::findById(int id) {
         try {
-            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select * from PlaylistEntries where PlaylistEntries.id = ?");
+            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select PlaylistEntries.* from PlaylistEntries where PlaylistEntries.id = ?");
             ps->setInt(1, id);
             sql::ResultSet *rs = ps->executeQuery();
             PlaylistEntry *playlistEntry = NULL;
@@ -121,7 +121,7 @@ namespace soulsifter {
 
     PlaylistEntry* PlaylistEntry::findByPlaylistIdAndSongId(int playlistId, int songId) {
         try {
-            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select * from PlaylistEntries where playlistId = ? and songId = ?");
+            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select PlaylistEntries.* from PlaylistEntries where playlistId = ? and songId = ?");
             ps->setInt(1, playlistId);
             ps->setInt(2, songId);
             sql::ResultSet *rs = ps->executeQuery();
@@ -145,7 +145,7 @@ namespace soulsifter {
     }
 
     ResultSetIterator<PlaylistEntry>* PlaylistEntry::findAll() {
-        sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select * from PlaylistEntries");
+        sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select PlaylistEntries.* from PlaylistEntries");
         sql::ResultSet *rs = ps->executeQuery();
         ResultSetIterator<PlaylistEntry> *dtrs = new ResultSetIterator<PlaylistEntry>(rs);
         return dtrs;

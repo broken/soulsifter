@@ -69,7 +69,7 @@ namespace soulsifter {
 
     REAlbumCover* REAlbumCover::findById(int id) {
         try {
-            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select * from REAlbumCovers where REAlbumCovers.id = ?");
+            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select REAlbumCovers.* from REAlbumCovers where REAlbumCovers.id = ?");
             ps->setInt(1, id);
             sql::ResultSet *rs = ps->executeQuery();
             REAlbumCover *reAlbumCover = NULL;
@@ -93,7 +93,7 @@ namespace soulsifter {
 
     REAlbumCover* REAlbumCover::findByREId(const string& reId) {
         try {
-            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select * from REAlbumCovers where reId = ?");
+            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select REAlbumCovers.* from REAlbumCovers where reId = ?");
             ps->setString(1, reId);
             sql::ResultSet *rs = ps->executeQuery();
             REAlbumCover *reAlbumCover = NULL;
@@ -116,7 +116,7 @@ namespace soulsifter {
     }
 
     ResultSetIterator<REAlbumCover>* REAlbumCover::findAll() {
-        sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select * from REAlbumCovers");
+        sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select REAlbumCovers.* from REAlbumCovers");
         sql::ResultSet *rs = ps->executeQuery();
         ResultSetIterator<REAlbumCover> *dtrs = new ResultSetIterator<REAlbumCover>(rs);
         return dtrs;
