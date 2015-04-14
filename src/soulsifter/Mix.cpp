@@ -106,7 +106,7 @@ namespace soulsifter {
 
     Mix* Mix::findById(int id) {
         try {
-            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select * from Mixes where id = ?");
+            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select * from Mixes where Mixes.id = ?");
             ps->setInt(1, id);
             sql::ResultSet *rs = ps->executeQuery();
             Mix *mix = NULL;

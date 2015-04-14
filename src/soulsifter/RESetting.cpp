@@ -69,7 +69,7 @@ namespace soulsifter {
 
     RESetting* RESetting::findById(int id) {
         try {
-            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select * from RESettings where id = ?");
+            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select * from RESettings where RESettings.id = ?");
             ps->setInt(1, id);
             sql::ResultSet *rs = ps->executeQuery();
             RESetting *reSetting = NULL;

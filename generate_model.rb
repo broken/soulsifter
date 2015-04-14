@@ -256,7 +256,7 @@ def cFindFunction(name, f, fields)
     str << "    #{cap(name)}* #{cap(name)}::findBy#{cap(f[$name])}(const #{f[$type]}& #{f[$name]}) {\n"
   end
   str << "        try {\n"
-  str << "            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement(\"select #{selectStar(fields)} from #{fromTable(name, fields)} where #{f[$name]} = ?#{groupBy(name,fields)}\");\n"
+  str << "            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement(\"select #{selectStar(fields)} from #{fromTable(name, fields)} where #{cap(plural(name))}.#{f[$name]} = ?#{groupBy(name,fields)}\");\n"
   str << "            ps->set#{cap(f[$type].to_s)}(1, #{f[$name]});\n            sql::ResultSet *rs = ps->executeQuery();\n            #{cap(name)} *#{name} = NULL;\n            if (rs->next()) {\n                #{name} = new #{cap(name)}();\n                populateFields(rs, #{name});\n            }\n            rs->close();\n            delete rs;\n\n"
   str << "            return #{name};\n"
   str << sqlCatchBlock()

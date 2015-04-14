@@ -64,7 +64,7 @@ namespace soulsifter {
 
     BasicGenre* BasicGenre::findById(int id) {
         try {
-            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select * from BasicGenres where id = ?");
+            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select * from BasicGenres where BasicGenres.id = ?");
             ps->setInt(1, id);
             sql::ResultSet *rs = ps->executeQuery();
             BasicGenre *basicGenre = NULL;

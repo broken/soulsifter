@@ -218,7 +218,7 @@ namespace soulsifter {
 
     RESong* RESong::findById(int id) {
         try {
-            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select * from RESongs where id = ?");
+            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select * from RESongs where RESongs.id = ?");
             ps->setInt(1, id);
             sql::ResultSet *rs = ps->executeQuery();
             RESong *reSong = NULL;
@@ -242,7 +242,7 @@ namespace soulsifter {
 
     RESong* RESong::findBySongid(const string& songid) {
         try {
-            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select * from RESongs where songid = ?");
+            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select * from RESongs where RESongs.songid = ?");
             ps->setString(1, songid);
             sql::ResultSet *rs = ps->executeQuery();
             RESong *reSong = NULL;

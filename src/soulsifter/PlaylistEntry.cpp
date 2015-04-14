@@ -97,7 +97,7 @@ namespace soulsifter {
 
     PlaylistEntry* PlaylistEntry::findById(int id) {
         try {
-            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select * from PlaylistEntries where id = ?");
+            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select * from PlaylistEntries where PlaylistEntries.id = ?");
             ps->setInt(1, id);
             sql::ResultSet *rs = ps->executeQuery();
             PlaylistEntry *playlistEntry = NULL;

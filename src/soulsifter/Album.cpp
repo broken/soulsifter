@@ -118,7 +118,7 @@ namespace soulsifter {
 
     Album* Album::findById(int id) {
         try {
-            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select * from Albums where id = ?");
+            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select * from Albums where Albums.id = ?");
             ps->setInt(1, id);
             sql::ResultSet *rs = ps->executeQuery();
             Album *album = NULL;
@@ -142,7 +142,7 @@ namespace soulsifter {
 
     Album* Album::findByCoverFilepath(const string& coverFilepath) {
         try {
-            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select * from Albums where coverFilepath = ?");
+            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select * from Albums where Albums.coverFilepath = ?");
             ps->setString(1, coverFilepath);
             sql::ResultSet *rs = ps->executeQuery();
             Album *album = NULL;

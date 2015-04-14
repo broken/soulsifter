@@ -83,7 +83,7 @@ namespace soulsifter {
 
     AlbumPart* AlbumPart::findById(int id) {
         try {
-            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select * from AlbumParts where id = ?");
+            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select * from AlbumParts where AlbumParts.id = ?");
             ps->setInt(1, id);
             sql::ResultSet *rs = ps->executeQuery();
             AlbumPart *albumPart = NULL;
