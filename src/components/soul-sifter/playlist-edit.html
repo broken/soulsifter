@@ -45,6 +45,7 @@
             this.asyncFire('core-signal', {name: 'save-song-trail', data: {playlist: this.playlist} });
           }
         }
+        this.asyncFire('core-signal', {name: 'playlists-changed'});
       },
 
     });
