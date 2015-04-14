@@ -53,6 +53,7 @@ void Playlist::Init(v8::Handle<v8::Object> exports) {
   NanSetTemplate(tpl, "findAll", NanNew<v8::FunctionTemplate>(findAll)->GetFunction());
   NanSetPrototypeTemplate(tpl, "update", NanNew<v8::FunctionTemplate>(update)->GetFunction());
   NanSetPrototypeTemplate(tpl, "save", NanNew<v8::FunctionTemplate>(save)->GetFunction());
+  NanSetPrototypeTemplate(tpl, "erase", NanNew<v8::FunctionTemplate>(erase)->GetFunction());
   tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("id"), getId, setId);
   tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("name"), getName, setName);
   tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("query"), getQuery, setQuery);
@@ -137,6 +138,15 @@ NAN_METHOD(Playlist::save) {
 
   Playlist* obj = ObjectWrap::Unwrap<Playlist>(args.This());
   int result =  obj->playlist->save();
+
+  NanReturnValue(NanNew<v8::Number>(result));
+}
+
+NAN_METHOD(Playlist::erase) {
+  NanScope();
+
+  Playlist* obj = ObjectWrap::Unwrap<Playlist>(args.This());
+  int result =  obj->playlist->erase();
 
   NanReturnValue(NanNew<v8::Number>(result));
 }

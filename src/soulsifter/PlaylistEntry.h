@@ -40,6 +40,7 @@ namespace soulsifter {
 
         int update();
         int save();
+        int erase();
 
         const int getId() const;
         void setId(int id);

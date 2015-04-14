@@ -9,6 +9,7 @@ module Attrib
   KEY2 = 2**5  # field: secondary key, can be multiple fields which make it up
   NULLABLE = 2**6 # field: if this field is nullable
   JOINTABLE = 2**7 # field: if this field is to a many-to-many join table versus though one
+  DELETABLE = 2**8 # class: create delete method
 end
 
 ######################### helpful functions & globals
@@ -503,6 +504,27 @@ def cSaveFunction(name, fields, attribs)
   str << "    }\n\n"
 end
 
+def hEraseFunction()
+  return "        int erase();\n"
+end
+
+def cEraseFunction(name, fields)
+  str = "    int #{cap(name)}::erase() {\n        try {\n"
+  fields.each do |f|
+    next unless (isVector(f[$type]) && !["int", "string"].include?(getVectorGeneric(f[$type])) && f[$attrib] & Attrib::JOINTABLE > 0)
+    str << "            while (!get#{cap(f[$name])}().empty()) {\n"
+    str << "                #{f[$name]}.back()->erase();\n                delete #{f[$name]}.back();\n                #{f[$name]}.pop_back();\n            }\n"
+  end
+  str << "            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement(\"delete from #{cap(plural(name))} where id=?\");\n"
+  str << "            ps->setInt(1, id);\n"
+  str << "            int erased = ps->executeUpdate();\n            if (!erased) {\n"
+  str << "                cerr << \"Not able to erase #{name}\" << endl;\n"
+  str << "            }\n"
+  str << "            return erased;\n"
+  str << sqlCatchBlock()
+  str << "    }\n\n"
+end
+
 def hPopulateFieldFunctions(name, fields)
   str = "        static void populateFields(const sql::ResultSet* rs, #{cap(name)}* #{name});\n"
   return str
@@ -637,6 +659,9 @@ def writeHeader (name, fields, attribs, customMethods, customHeaders)
   str << "\n"
   str << hUpdateFunction()
   str << hSaveFunction()
+  if (attribs & Attrib::DELETABLE > 0)
+    str << hEraseFunction()
+  end
   str << "\n"
   str << customMethods
   fields.each do |f|
@@ -692,6 +717,9 @@ def writeCode (name, fields, attribs)
   str << "\n# pragma mark persistence\n\n"
   str << cUpdateFunction(name, fields)
   str << cSaveFunction(name, fields, attribs)
+  if (attribs & Attrib::DELETABLE > 0)
+    str << cEraseFunction(name, fields)
+  end
   str << "\n# pragma mark accessors\n\n"
   fields.each do |f|
     str << cAccessor(name, f)
@@ -751,7 +779,7 @@ playlistFields = [
   ["vector<int>", "styleIds", Attrib::ID],
   ["vector<Style*>", "styles", 0],
 ]
-playlistAttribs = 0
+playlistAttribs = Attrib::DELETABLE
 playlistCustomHeaders = ""
 playlistEntryFields = [
   [:int, "id", Attrib::FIND],
@@ -762,7 +790,7 @@ playlistEntryFields = [
   [:int, "position", 0],
   [:string, "time", 0],
 ]
-playlistEntryAttribs = 0
+playlistEntryAttribs = Attrib::DELETABLE
 reSongFields = [
   [:int, "id", Attrib::FIND],
   [:string, "songidWinfo", 0],

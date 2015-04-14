@@ -226,6 +226,25 @@ namespace soulsifter {
         }
     }
 
+    int PlaylistEntry::erase() {
+        try {
+            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("delete from PlaylistEntries where id=?");
+            ps->setInt(1, id);
+            int erased = ps->executeUpdate();
+            if (!erased) {
+                cerr << "Not able to erase playlistEntry" << endl;
+            }
+            return erased;
+        } catch (sql::SQLException &e) {
+            cerr << "ERROR: SQLException in " << __FILE__;
+            cerr << " (" << __func__<< ") on line " << __LINE__ << endl;
+            cerr << "ERROR: " << e.what();
+            cerr << " (MySQL error code: " << e.getErrorCode();
+            cerr << ", SQLState: " << e.getSQLState() << ")" << endl;
+            exit(1);
+        }
+    }
+
 
 # pragma mark accessors
 
