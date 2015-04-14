@@ -2,6 +2,7 @@
 
 <link href="../core-ajax/core-ajax.html" rel="import">
 <link href="../core-scroll-header-panel/core-scroll-header-panel.html" rel="import">
+<link href="../core-signals/core-signals.html" rel="import">
 <link href="../core-style/core-style.html" rel="import">
 <link href="../paper-icon-button/paper-icon-button.html" rel="import">
 <link href="../polymer-ui-ratings/polymer-ui-ratings.html" rel="import">
@@ -20,6 +21,7 @@
 
     <global-state values="{{global}}"></global-state>
     <ss-googleplaymusic id="gpm"></ss-googleplaymusic>
+    <core-signals on-core-signal-save-song-trail="{{saveSongTrail}}"></core-signals>
 
     <!-- core-scroll-header-panel does not appear to work with my current 10.5 version of nodewebkit; try this again later when I upgrade it. -->
     <div vertical layout fit>
@@ -107,6 +109,15 @@
 
       forwardAction: function(e, detail, sender) {
         this.global.song = this.songTrail[this.songTrailIndex].song;
+      },
+
+      saveSongTrail: function(e, detail, sender) {
+        var playlist = detail.playlist;
+        for (var i = 0; i < this.songTrailIndex; ++i) {
+          var entry = this.songTrail[i];
+          entry.playlist = playlist;
+          entry.save();
+        }
       },
     });
   </script>

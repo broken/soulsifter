@@ -1,5 +1,6 @@
 <link href="../polymer/polymer.html" rel="import">
 
+<link href="../paper-checkbox/paper-checkbox.html" rel="import">
 <link href="../paper-input/paper-input.html" rel="import">
 
 <link href="abstract-action-page.html" rel="import">
@@ -18,6 +19,7 @@
         <div vertical layout>
           <paper-input floatingLabel label="Name" value="{{playlist.name}}"></paper-input>
           <paper-input floatingLabel label="Query" value="{{playlist.query}}"></paper-input>
+          <paper-checkbox label="from Song Trail" checked="{{fromSongTrail}}"></paper-checkbox>
         </div>
         <genre-list id="genreList" selection="{{genreSelection}}"></genre-list>
       </div>
@@ -27,16 +29,21 @@
   <script>
     Polymer('playlist-edit', {
 
+      fromSongTrail: false,
+
       playlistChanged: function(oldValue, newValue) {
         this.$.genreList.setSelection(newValue.styles);
       },
 
       save: function(e, detail, sender) {
-        this.playlist.styles = this.genreSelection;
+        if (this.genreSelection) this.playlist.styles = this.genreSelection;
         if (this.playlist.id) {
           this.playlist.update();
         } else {
           this.playlist.save();
+          if (this.fromSongTrail) {
+            this.asyncFire('core-signal', {name: 'save-song-trail', data: {playlist: this.playlist} });
+          }
         }
       },
 
