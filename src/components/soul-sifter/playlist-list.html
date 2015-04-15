@@ -25,7 +25,7 @@
       <template repeat="{{p in playlists}}" id="playlistTpl">
         <playlist-list-item playlist="{{p}}" on-playlist-select="{{selectPlaylist}}"></playlist-list-item>
       </template>
-      <core-selection multi id="selection" on-core-select="{{selectAction}}"></core-selection>
+      <core-selection id="selection" on-core-select="{{selectAction}}"></core-selection>
     </div>
     <paper-fab mini icon="add" on-click="{{createPlaylist}}"></paper-fab>
   </template>
@@ -47,7 +47,7 @@
       },
 
       selectPlaylist: function(e, detail, sender) {
-        this.$.selection.toggle(sender);
+        this.$.selection.select(sender);
       },
 
       selectAction: function(e, detail, sender) {
@@ -55,10 +55,7 @@
         for (var i = 0, item = this.$.playlistTpl.nextElementSibling;
             item && i < this.playlists.length;
             item = item.nextElementSibling, ++i) {
-          if (item != detail.item && this.$.selection.isSelected(item)) {
-            item.select(false);
-            this.$.selection.toggle(item);
-          }
+          item.select(false);
         }
         // (de)select the selected
         detail.item.select(detail.isSelected);
