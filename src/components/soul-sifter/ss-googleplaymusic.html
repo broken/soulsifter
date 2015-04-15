@@ -78,6 +78,15 @@
         failure);
       },
 
+      /**
+       * Success callback takes a stream url
+       * Failure callback takes message, body, err, httpResonse
+       */
+      findStreamUrl: function(nid, success, failure) {
+        var pm = this.pm;
+        pm.getStreamUrl(nid, success, failure);
+      },
+
       findPlaylist: function(name, success, failure) {
         this.pm.getPlayLists(function(data) {
             console.log(data);

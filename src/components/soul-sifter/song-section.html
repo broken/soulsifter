@@ -84,18 +84,36 @@
         this.songTrail[entry.position] = entry;
 
         this.localeDateTime = new Date(this.song.dateAdded).toLocaleString();
-        this.$.header.style.backgroundImage = 'url("' + this.song.album.coverFilepath + '")';
 
         // audio source; use local, otherwise contact google api
+        var that = this;
         this.fs.access(this.song.filepath, this.fs.F_OK | this.fs.R_OK, function(err) {
-          if (!err) {
-            this.$.audio.src = "file://" + this.song.filepath;
-          } else {
-            this.$.gpm.findSongStreamUrl(this.song,
-                function(url) { this.$.audio.src = url; }.bind(this),
-                function(msg, body, err, resp) { console.warn(msg); this.$.audio.src = ''; }.bind(this));
-          }
-        }.bind(this));
+            if (!err) {
+              that.$.audio.src = "file://" + that.song.filepath;
+              that.$.header.style.backgroundImage = 'url("' + that.song.album.coverFilepath + '")';
+            } else {
+              that.$.gpm.findSong(that.song,
+                  function(s) {
+                    window.console.log(s);
+                    that.$.gpm.findStreamUrl(s.track.nid,
+                        function(url) {
+                          that.$.audio.src = url;
+                        },
+                        function(msg, body, err, resp) { console.warn(msg); that.$.audio.src = ''; });
+                    if (s.track.albumArtRef && s.track.albumArtRef.length) {
+                      that.$.header.style.backgroundImage = 'url("' + s.track.albumArtRef[0].url + '")';
+                    } else {
+                      that.$.header.style.backgroundImage = '';
+                    }
+                  },
+                  function(msg, body, err, resp) {
+                    console.warn(msg);
+                    that.$.audio.src = '';
+                    that.$.header.style.backgroundImage = '';
+                  }
+                );
+            }
+          });
       },
 
       dragSong: function(e) {
