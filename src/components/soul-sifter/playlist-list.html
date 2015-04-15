@@ -60,10 +60,14 @@
         // (de)select the selected
         detail.item.select(detail.isSelected);
         // update the query
-        // TODO: get to work for non-smart playlists
+        var playlist = detail.item.playlist;
         if (detail.isSelected) {
-          this.asyncFire('genre-change', detail.item.playlist.styles);
-          this.asyncFire('query-change', detail.item.playlist.query);
+          if (playlist.query) {
+            this.asyncFire('genre-change', playlist.styles);
+            this.asyncFire('query-change', playlist.query);
+          } else {
+            this.asyncFire('core-signal', {name: 'search', data: {playlist: playlist}});
+          }
         }
       },
 

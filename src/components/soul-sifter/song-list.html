@@ -80,14 +80,20 @@
       },
 
       searchAction: function(e, detail, sender) {
-        //this.$.core_tooltip.show = true;
-        var genreIds = this.genres.map(function(g) { return g.id; });
-        var p = {q: this.query, genres: genreIds.join(','), min: 0, max: 0};
-        if (this.minBpm) p.min = this.minBpm;
-        if (this.maxBpm) p.max = this.maxBpm;
-        if (this.global.song) p.key = this.global.song.tonicKey;  // todo
-        this.songs = ss.SearchUtil.searchSongs(p.q, p.min, p.max, p.key, this.genres, 200);
-        //this.$.core_tooltip.show = false;
+        if (detail.playlist) {
+          var entries = detail.playlist.playlistEntries;
+          this.songs = entries.sort(function(a, b) { return a.position - b.position; })
+                              .map(function(x) { return x.song; });
+        } else {
+          //this.$.core_tooltip.show = true;
+          var genreIds = this.genres.map(function(g) { return g.id; });
+          var p = {q: this.query, genres: genreIds.join(','), min: 0, max: 0};
+          if (this.minBpm) p.min = this.minBpm;
+          if (this.maxBpm) p.max = this.maxBpm;
+          if (this.global.song) p.key = this.global.song.tonicKey;  // todo
+          this.songs = ss.SearchUtil.searchSongs(p.q, p.min, p.max, p.key, this.genres, 200);
+          //this.$.core_tooltip.show = false;
+        }
       },
 
       /*genresChanged: function(e, detail, sender) {
