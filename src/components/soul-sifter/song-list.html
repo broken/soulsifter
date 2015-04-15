@@ -80,7 +80,7 @@
       },
 
       searchAction: function(e, detail, sender) {
-        if (detail.playlist) {
+        if (detail && detail.playlist) {
           var entries = detail.playlist.playlistEntries;
           this.songs = entries.sort(function(a, b) { return a.position - b.position; })
                               .map(function(x) { return x.song; });
