@@ -35,6 +35,7 @@
             <paper-dropdown class="dropdown" transition="cascade">
               <core-menu>
                 <paper-item on-click="{{editAction}}">Edit playlist</paper-item>
+                <paper-item on-click="{{deleteAction}}">Delete playlist</paper-item>
                 <paper-item on-click="{{exportAction}}">Export to Google Play Music</paper-button>
               </core-menu>
             </paper-dropdown>
@@ -66,6 +67,12 @@
       editAction: function(e, detail, sender) {
         e.stopPropagation();
         this.asyncFire('page-playlist-edit', {playlist: this.playlist});
+      },
+
+      deleteAction: function(e, detail, sender) {
+        e.stopPropagation();
+        this.playlist.erase();
+        this.asyncFire('core-signal', {name: 'playlists-changed'});
       },
 
       exportAction: function(e, detail, sender) {
