@@ -512,8 +512,7 @@ def cEraseFunction(name, fields)
   str = "    int #{cap(name)}::erase() {\n        try {\n"
   fields.each do |f|
     next unless (isVector(f[$type]) && !["int", "string"].include?(getVectorGeneric(f[$type])) && f[$attrib] & Attrib::JOINTABLE > 0)
-    str << "            while (!get#{cap(f[$name])}().empty()) {\n"
-    str << "                #{f[$name]}.back()->erase();\n                delete #{f[$name]}.back();\n                #{f[$name]}.pop_back();\n            }\n"
+    str << "            {\n                const #{f[$type]}& #{f[$name]} = get#{cap(f[$name])}();\n                for (#{f[$type]}::const_iterator it = #{f[$name]}.begin(); it != #{f[$name]}.end(); ++it) {\n                    (*it)->erase();\n                }\n                #{f[$type]} tmp;\n                set#{cap(f[$name])}(tmp);\n            }\n"
   end
   str << "            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement(\"delete from #{cap(plural(name))} where id=?\");\n"
   str << "            ps->setInt(1, id);\n"

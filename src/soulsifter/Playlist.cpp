@@ -291,10 +291,13 @@ namespace soulsifter {
 
     int Playlist::erase() {
         try {
-            while (!getPlaylistEntries().empty()) {
-                playlistEntries.back()->erase();
-                delete playlistEntries.back();
-                playlistEntries.pop_back();
+            {
+                const vector<PlaylistEntry*>& playlistEntries = getPlaylistEntries();
+                for (vector<PlaylistEntry*>::const_iterator it = playlistEntries.begin(); it != playlistEntries.end(); ++it) {
+                    (*it)->erase();
+                }
+                vector<PlaylistEntry*> tmp;
+                setPlaylistEntries(tmp);
             }
             sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("delete from Playlists where id=?");
             ps->setInt(1, id);
