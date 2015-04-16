@@ -1,3 +1,11 @@
+:host {
+  overflow: hidden;
+}
+
+core-scroll-header-panel {
+  position: static;
+}
+
 #header {
   background-size: cover;
   height: 256px;
@@ -12,14 +20,11 @@
   top: 0;
   left: 0;
   right: 0;
+  margin: 0;
 }
 
 #nav paper-icon-button[disabled] {
   visibility: hidden;
-}
-
-#contentContainer {
-  position: relative;
 }
 
 audio {

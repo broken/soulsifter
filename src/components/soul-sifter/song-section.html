@@ -4,6 +4,7 @@
 <link href="../core-scroll-header-panel/core-scroll-header-panel.html" rel="import">
 <link href="../core-signals/core-signals.html" rel="import">
 <link href="../core-style/core-style.html" rel="import">
+<link href="../core-toolbar/core-toolbar.html" rel="import">
 <link href="../paper-icon-button/paper-icon-button.html" rel="import">
 <link href="../polymer-ui-ratings/polymer-ui-ratings.html" rel="import">
 
@@ -23,32 +24,30 @@
     <ss-googleplaymusic id="gpm"></ss-googleplaymusic>
     <core-signals on-core-signal-save-song-trail="{{saveSongTrail}}"></core-signals>
 
-    <!-- core-scroll-header-panel does not appear to work with my current 10.5 version of nodewebkit; try this again later when I upgrade it. -->
-    <div vertical layout fit>
-      <div horizontal layout justified id="nav">
-        <paper-icon-button icon="arrow-back" on-click="{{backAction}}" disabled?="{{!songTrailIndex}}"></paper-icon-button>
-        <paper-icon-button icon="arrow-forward" on-click="{{forwardAction}}" disabled?="{{songTrailIndex == songTrail.length}}"></paper-icon-button>
-      </div>
-      <div id="header" draggable="true" on-dragstart="{{dragSong}}"></div>
-      <div flex id="contentContainer">
-        <section vertical layout fit class="content">
-          <div class="title">{{song.title}}</div>
-          <div class="artist">{{song.artist}}</div>
-          <polymer-ui-ratings value="{{song.rating}}"></polymer-ui-ratings>
-          <div class="track" self-end>{{song.album.track}}</div>
-          <div class="track" self-end>{{song.album.name}}</div>
-          <div class="released" self-end>{{song.album.releaseDateYear}}-{{song.album.releaseDateMonth}}-{{song.album.releaseDateDay}}</div>
-          <div class="comments" flex>{{song.comments}}</div>
-          <div class="bpm">{{song.bpm}} bpm</div>
-          <time class="added">{{localeDateTime}}</time>
-          <div horizontal layout center>
-            <div>pitch</div>
-            <pitch-slider></pitch-slider>
-          </div>
-          <audio controls id="audio"></audio>
-        </section>
-      </div>
-    </div>
+    <core-scroll-header-panel condenses keepCondensedHeader flex condensedHeaderHeight="40px" id="cshp">
+      <core-toolbar id="header" draggable="true" on-dragstart="{{dragSong}}">
+        <div horizontal layout justified id="nav">
+          <paper-icon-button icon="arrow-back" on-click="{{backAction}}" disabled?="{{!songTrailIndex}}"></paper-icon-button>
+          <paper-icon-button icon="arrow-forward" on-click="{{forwardAction}}" disabled?="{{songTrailIndex == songTrail.length}}"></paper-icon-button>
+        </div>
+      </core-toolbar>
+      <section vertical layout class="content">
+        <div class="title">{{song.title}}</div>
+        <div class="artist">{{song.artist}}</div>
+        <polymer-ui-ratings value="{{song.rating}}"></polymer-ui-ratings>
+        <div class="track" self-end>{{song.album.track}}</div>
+        <div class="track" self-end>{{song.album.name}}</div>
+        <div class="released" self-end>{{song.album.releaseDateYear}}-{{song.album.releaseDateMonth}}-{{song.album.releaseDateDay}}</div>
+        <div class="comments" flex>{{song.comments}}</div>
+        <div class="bpm">{{song.bpm}} bpm</div>
+        <time class="added">{{localeDateTime}}</time>
+        <div horizontal layout center>
+          <div>pitch</div>
+          <pitch-slider></pitch-slider>
+        </div>
+        <audio controls id="audio"></audio>
+      </section>
+    </core-scroll-header-panel>
   </template>
 
   <script>
@@ -74,7 +73,7 @@
       globalSongChanged: function(oldSong, song) {
         this.song = song;
         if (!song) {
-          this.$.header.style.backgroundImage = '';
+          this.setCoverImage();
           return;
         }
 
@@ -90,7 +89,7 @@
         this.fs.access(this.song.filepath, this.fs.F_OK | this.fs.R_OK, function(err) {
             if (!err) {
               that.$.audio.src = "file://" + that.song.filepath;
-              that.$.header.style.backgroundImage = 'url("' + that.song.album.coverFilepath + '")';
+              that.setCoverImage(that.song.album.coverFilepath);
             } else {
               that.$.gpm.findSong(that.song,
                   function(s) {
@@ -101,15 +100,15 @@
                         },
                         function(msg, body, err, resp) { console.warn(msg); that.$.audio.src = ''; });
                     if (s.track.albumArtRef && s.track.albumArtRef.length) {
-                      that.$.header.style.backgroundImage = 'url("' + s.track.albumArtRef[0].url + '")';
+                      that.setCoverImage(s.track.albumArtRef[0].url);
                     } else {
-                      that.$.header.style.backgroundImage = '';
+                      that.setCoverImage();
                     }
                   },
                   function(msg, body, err, resp) {
                     console.warn(msg);
                     that.$.audio.src = '';
-                    that.$.header.style.backgroundImage = '';
+                    that.setCoverImage();
                   }
                 );
             }
@@ -136,6 +135,14 @@
           entry.playlist = playlist;
           entry.save();
         }
+      },
+
+      setCoverImage: function(img) {
+        var url = '';
+        if (img) {
+          url = 'url("' + img + '")';
+        }
+        this.$.cshp.shadowRoot.getElementById('headerBg').style.backgroundImage = url;
       },
     });
   </script>
