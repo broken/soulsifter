@@ -64,9 +64,16 @@ NAN_METHOD(SearchUtil::searchSongs) {
     dogatech::soulsifter::Style* x(node::ObjectWrap::Unwrap<Style>(tmp->ToObject())->getNwcpValue());
     a4.push_back(x);
   }
-  int a5(args[5]->Uint32Value());
+  v8::Local<v8::Array> a5Array = v8::Local<v8::Array>::Cast(args[5]);
+  std::vector<dogatech::soulsifter::Song*> a5;
+  for (int i = 0; i < a5Array->Length(); ++i) {
+    v8::Local<v8::Value> tmp = a5Array->Get(i);
+    dogatech::soulsifter::Song* x(node::ObjectWrap::Unwrap<Song>(tmp->ToObject())->getNwcpValue());
+    a5.push_back(x);
+  }
+  int a6(args[6]->Uint32Value());
   std::vector<dogatech::soulsifter::Song*>* result =
-      dogatech::soulsifter::SearchUtil::searchSongs(a0, a1, a2, a3, a4, a5);
+      dogatech::soulsifter::SearchUtil::searchSongs(a0, a1, a2, a3, a4, a5, a6);
 
   v8::Handle<v8::Array> a = NanNew<v8::Array>((int) result->size());
   for (int i = 0; i < (int) result->size(); i++) {

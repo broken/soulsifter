@@ -11,7 +11,7 @@
 <link href="themes.html" rel="import">
 
 
-<polymer-element name="song-list" attributes="query djSearch">
+<polymer-element name="song-list" attributes="query djSearch songTrail">
 
   <template>
     <link href="song-list.css" rel="stylesheet">
@@ -40,11 +40,12 @@
         // init & hint lists & objects
         this.songs = [];
         this.genres = [];
+        this.songTrail = [];
       },
 
       domReady: function() {
         //this.$.core_tooltip.show = false;
-        this.songs = ss.SearchUtil.searchSongs('', 0, 0, '', [], 200);
+        this.searchAction();
         /*if (response.response.song) {
           this.songs = response.response.song;
         } else {
@@ -88,12 +89,14 @@
           //this.$.core_tooltip.show = true;
           var genreIds = this.genres.map(function(g) { return g.id; });
           var p = {q: this.query, genres: genreIds.join(','), min: 0, max: 0};
+          var omitSongs = [];
           if (this.djSearch) {
             if (this.minBpm) p.min = this.minBpm;
             if (this.maxBpm) p.max = this.maxBpm;
             if (this.global.song) p.key = this.global.song.tonicKey;  // todo
+            omitSongs = this.songTrail.map(function(e) { return e.song; });
           }
-          this.songs = ss.SearchUtil.searchSongs(p.q, p.min, p.max, p.key, this.genres, 200);
+          this.songs = ss.SearchUtil.searchSongs(p.q, p.min, p.max, p.key, this.genres, omitSongs, 200);
           //this.$.core_tooltip.show = false;
         }
       },

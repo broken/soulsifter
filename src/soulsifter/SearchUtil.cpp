@@ -234,7 +234,7 @@ string buildQueryPredicate(const vector<Atom>& atoms) {
   return ss.str();
 }
 
-string buildOptionPredicate(int min_bpm, int max_bpm, const string& key, const vector<Style*>& styles, int limit) {
+string buildOptionPredicate(int min_bpm, int max_bpm, const string& key, const vector<Style*>& styles, const vector<Song*>& songsToOmit, int limit) {
   stringstream ss;
   if (CamelotKeys::rmap.find(key) != CamelotKeys::rmap.end()) {
     // assume key lock always on for now
@@ -324,6 +324,15 @@ string buildOptionPredicate(int min_bpm, int max_bpm, const string& key, const v
     }
     ss << "))";
   }
+  if (songsToOmit.size() > 0) {
+    ss << " and s.id not in (";
+    string separator("");
+    for (Song* s : songsToOmit) {
+      ss << separator << s->getId();
+      separator = ",";
+    }
+    ss << ")";
+  }
   
   ss << " group by s.id order by dateAdded desc limit " << limit;
   return ss.str();
@@ -335,7 +344,7 @@ bool isLimit(const Atom& a) {
 
 }  // anon namespace
 
-vector<Song*>* SearchUtil::searchSongs(const string& query, int min_bpm, int max_bpm, const string& key, const vector<Style*>& styles, int limit) {
+vector<Song*>* SearchUtil::searchSongs(const string& query, int min_bpm, int max_bpm, const string& key, const vector<Style*>& styles, const vector<Song*>& songsToOmit, int limit) {
   cout << "q:" << query << ", min:" << min_bpm << ", max:" << max_bpm << ", key:" << key << ", styles:" << ", limit:" << limit << endl;
   vector<string> fragments;
   splitString(query, &fragments);
@@ -359,7 +368,7 @@ vector<Song*>* SearchUtil::searchSongs(const string& query, int min_bpm, int max
   stringstream ss;
   ss << "select s.*, s.id as songid, s.artist as songartist, group_concat(ss.styleid) as styleIds, a.*, a.id as albumid, a.artist as albumartist from Songs s inner join Albums a on s.albumid = a.id left outer join SongStyles ss on ss.songid=s.id where true";
   ss << buildQueryPredicate(atoms);
-  ss << buildOptionPredicate(min_bpm, max_bpm, key, styles, limit);
+  ss << buildOptionPredicate(min_bpm, max_bpm, key, styles, songsToOmit, limit);
   
   cout << "Query:" << endl << ss.str() << endl;
   

@@ -74,8 +74,9 @@ namespace dogatech {
       cout << "analyze bpms" << endl;
 
       vector<Style*> emptyStyles;
+      vector<Song*> emptySongs;
       string query = "id:\"(select max(id) from songs)\"";
-      vector<Song*>* songs = SearchUtil::searchSongs(query, 0, 0, "", emptyStyles, 1);
+      vector<Song*>* songs = SearchUtil::searchSongs(query, 0, 0, "", emptyStyles, emptySongs, 1);
       int maxId = 0;
       for (Song* song : *songs) {
         maxId = song->getId();
@@ -87,7 +88,7 @@ namespace dogatech {
         ss << "q:\"s.id >= " << i << "\" q:\"s.id < " << (i + span) << "\"";
         ss << " trashed:0";
         query = ss.str();
-        songs = SearchUtil::searchSongs(query, 0, 0, "", emptyStyles, span);
+        songs = SearchUtil::searchSongs(query, 0, 0, "", emptyStyles, emptySongs, span);
 
         for (Song* song : *songs) {
           string bpm = song->getBpm();

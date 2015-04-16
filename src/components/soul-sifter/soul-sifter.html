@@ -36,7 +36,7 @@
                 <paper-tab id="paper_tab-playlists">Playlists</paper-tab>
               </paper-tabs>
               <core-animated-pages selected="{{ $.paper_tabs.selected }}" id="core_animated_pages" flex>
-                <song-section></song-section>
+                <song-section songTrail="{{songTrail}}"></song-section>
                 <genre-list selection="{{genres}}"></genre-list>
                 <playlist-list on-query-change="{{changeQuery}}" on-genre-change="{{updateGenres}}"></playlist-list>
               </core-animated-pages>
@@ -45,7 +45,7 @@
               <search-toolbar query="{{query}}" djSearch="{{djSearch}}" class="core-header">
                 <paper-icon-button icon="menu" onclick="document.querySelector('soul-sifter::shadow core-drawer-panel').togglePanel();"></paper-icon-button>
               </search-toolbar>
-              <song-list query="{{query}}" djSearch="{{djSearch}}" class="content"></song-list>
+              <song-list query="{{query}}" djSearch="{{djSearch}}" songTrail="{{songTrail}}" class="content"></song-list>
             </core-header-panel>
           </core-drawer-panel>
         </section>
