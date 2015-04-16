@@ -9,6 +9,7 @@
 <link href="../core-toolbar/core-toolbar.html" rel="import">
 <link href="../paper-dialog/paper-dialog.html" rel="import">
 <link href="../paper-input/paper-input.html" rel="import">
+<link href="../paper-toggle-button/paper-toggle-button.html" rel="import">
 
 <!-- <link href="create-song.html" rel="import"> -->
 <link href="global-state.html" rel="import">
@@ -16,7 +17,7 @@
 <link href="themes.html" rel="import">
 
 
-<polymer-element name="search-toolbar" attributes="query">
+<polymer-element name="search-toolbar" attributes="query djSearch">
 
   <template>
     <link href="search-toolbar.css" rel="stylesheet">
@@ -38,6 +39,10 @@
       <core-icon-button icon="unfold-more" on-click="{{toggleIsTall}}"></core-icon-button>
       <!-- middle row -->
       <!-- bottom row -->
+      <div class="bottom {{ {hide: !isTall} | tokenList }}">
+        <paper-toggle-button checked="{{djSearch}}"></paper-toggle-button>
+        DJ Search Mode
+      </div>
       <div flex class="bottom {{ {hide: !isTall} | tokenList }}"></div>
       <div class="bottom {{ {hide: !isTall} | tokenList }}">
         <core-icon-button icon="query-builder" on-click="{{analyzeBpms}}"></core-icon-button>

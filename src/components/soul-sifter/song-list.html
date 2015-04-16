@@ -11,7 +11,7 @@
 <link href="themes.html" rel="import">
 
 
-<polymer-element name="song-list" attributes="query">
+<polymer-element name="song-list" attributes="query djSearch">
 
   <template>
     <link href="song-list.css" rel="stylesheet">
@@ -88,9 +88,11 @@
           //this.$.core_tooltip.show = true;
           var genreIds = this.genres.map(function(g) { return g.id; });
           var p = {q: this.query, genres: genreIds.join(','), min: 0, max: 0};
-          if (this.minBpm) p.min = this.minBpm;
-          if (this.maxBpm) p.max = this.maxBpm;
-          if (this.global.song) p.key = this.global.song.tonicKey;  // todo
+          if (this.djSearch) {
+            if (this.minBpm) p.min = this.minBpm;
+            if (this.maxBpm) p.max = this.maxBpm;
+            if (this.global.song) p.key = this.global.song.tonicKey;  // todo
+          }
           this.songs = ss.SearchUtil.searchSongs(p.q, p.min, p.max, p.key, this.genres, 200);
           //this.$.core_tooltip.show = false;
         }

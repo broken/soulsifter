@@ -25,6 +25,8 @@
     pm_bghover: black,
     // paper input
     pi_accent: sl_blue,
+    // paper toggle button
+    pt_clr: sl_blue,
     // abstract actions
     aa_ok: sl_orange,
     // drawer tabs
@@ -108,6 +110,14 @@
   }
   section /deep/ paper-input[focused]::shadow .floated-label {
     color: {{g.theme.pi_accent}};
+  }
+
+  <!-- paper toggle button -->
+  paper-toggle-button::shadow [checked] .toggle-ink {
+    color: {{g.theme.pt_clr}};
+  }
+  paper-toggle-button::shadow [checked] .toggle {
+    background-color: {{g.theme.pt_clr}};
   }
 
   <!-- abstract actions -->

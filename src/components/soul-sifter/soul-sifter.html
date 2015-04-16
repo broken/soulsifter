@@ -42,10 +42,10 @@
               </core-animated-pages>
             </section>
             <core-header-panel main>
-              <search-toolbar query="{{query}}" class="core-header">
+              <search-toolbar query="{{query}}" djSearch="{{djSearch}}" class="core-header">
                 <paper-icon-button icon="menu" onclick="document.querySelector('soul-sifter::shadow core-drawer-panel').togglePanel();"></paper-icon-button>
               </search-toolbar>
-              <song-list query="{{query}}" class="content"></song-list>
+              <song-list query="{{query}}" djSearch="{{djSearch}}" class="content"></song-list>
             </core-header-panel>
           </core-drawer-panel>
         </section>
@@ -64,6 +64,8 @@
 
   <script>
     Polymer('soul-sifter', {
+
+      djSearch: true,
 
       domReady: function() {
         /* theming */
