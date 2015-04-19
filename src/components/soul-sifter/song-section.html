@@ -6,11 +6,11 @@
 <link href="../core-style/core-style.html" rel="import">
 <link href="../core-toolbar/core-toolbar.html" rel="import">
 <link href="../paper-icon-button/paper-icon-button.html" rel="import">
-<link href="../polymer-ui-ratings/polymer-ui-ratings.html" rel="import">
 
 <link href="global-state.html" rel="import">
 <link href="pitch-slider.html" rel="import">
 <link href="ss-googleplaymusic.html" rel="import">
+<link href="ss-star-rating.html" rel="import">
 <link href="themes.html" rel="import">
 
 
@@ -24,7 +24,7 @@
     <ss-googleplaymusic id="gpm"></ss-googleplaymusic>
     <core-signals on-core-signal-save-song-trail="{{saveSongTrail}}"></core-signals>
 
-    <core-scroll-header-panel condenses keepCondensedHeader flex condensedHeaderHeight="40px" id="cshp">
+    <core-scroll-header-panel condenses keepCondensedHeader fit condensedHeaderHeight="40px" id="cshp">
       <core-toolbar id="header" draggable="true" on-dragstart="{{dragSong}}">
         <div horizontal layout justified id="nav">
           <paper-icon-button icon="arrow-back" on-click="{{backAction}}" disabled?="{{!songTrailIndex}}"></paper-icon-button>
@@ -34,7 +34,7 @@
       <section vertical layout class="content">
         <div class="title">{{song.title}}</div>
         <div class="artist">{{song.artist}}</div>
-        <polymer-ui-ratings value="{{song.rating}}"></polymer-ui-ratings>
+        <ss-star-rating value="{{song.rating}}"></ss-star-rating>
         <div class="track" self-end>{{song.album.track}}</div>
         <div class="track" self-end>{{song.album.name}}</div>
         <div class="released" self-end>{{song.album.releaseDateYear}}-{{song.album.releaseDateMonth}}-{{song.album.releaseDateDay}}</div>

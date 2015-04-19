@@ -7,9 +7,9 @@
 <link href="../paper-icon-button/paper-icon-button.html" rel="import">
 <link href="../paper-item/paper-item.html" rel="import">
 <link href="../paper-menu-button/paper-menu-button.html" rel="import">
-<link href="../polymer-ui-ratings/polymer-ui-ratings.html" rel="import">
 
 <link href="global-state.html" rel="import">
+<link href="ss-star-rating.html" rel="import">
 <link href="themes.html" rel="import">
 
 
@@ -37,7 +37,7 @@
         </paper-dropdown>
       </paper-menu-button>
       <div class="bpmDiff">{{bpmDiff}}</div>
-      <polymer-ui-ratings value="{{song.rating}}"></polymer-ui-ratings>
+      <ss-star-rating value="{{song.rating}}" readOnly></ss-star-rating>
       <time class="added">{{localeDate}}</time>
     </div>
   </template>

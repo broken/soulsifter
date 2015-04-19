@@ -19,7 +19,9 @@
     bg: sl_grey,
     clr: '#999999',
     clr_bold: '#CCCCCC',
-    rating: 'light',
+    // star rating
+    sr_clr: '#666',
+    sr_selected: '#EEE',
     // paper menu
     pm_bg: '#111',
     pm_bghover: black,
@@ -59,7 +61,6 @@
     bg: '#EEE',
     clr: '#777',
     clr_bold: '#000',
-    rating: 'dark',
     // drawer tabs
     dt_bg: 'rgb(0, 188, 212)',
     dt_clr: '#FFF',
@@ -83,11 +84,13 @@
     color: {{g.theme.clr}};
     background-color: {{g.theme.bg}};
   }
-  polymer-ui-ratings::shadow #star.full {
-    background-image: url('../components/polymer-ui-ratings/assets/ic_star_rate_{{g.theme.rating}}reg.png');
+
+  <!-- star rating -->
+  ss-star-rating::shadow core-icon {
+    color: {{g.theme.sr_clr}};
   }
-  polymer-ui-ratings::shadow #star {
-    background-image: url('../components/polymer-ui-ratings/assets/ic_star_rate_{{g.theme.rating}}alt.png');
+  ss-star-rating::shadow core-icon.selected {
+    color: {{g.theme.sr_selected}};
   }
 
   <!-- paper menus -->

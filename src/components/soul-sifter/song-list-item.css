@@ -3,11 +3,11 @@
 }
 
 
-polymer-ui-ratings {
+ss-star-rating {
   margin: 0 6px;
 }
-polymer-ui-ratings::shadow #star {
-  margin: 0 -6px;
+ss-star-rating::shadow core-icon {
+  margin: 0 -5px;
 }
 
 
