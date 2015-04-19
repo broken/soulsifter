@@ -33,7 +33,7 @@
       globalSongChanged: function(oldSong, song) {
         if (!song || !song.bpm) return;
         if (this.global.bpm == 0) {
-          this.global.bpm = song.bpm;
+          this.global.bpm = parseFloat(song.bpm).toFixed(1);
         } else {
           var pitch = this.global.bpm / song.bpm;
           pitch = (pitch - 1) * 100;
@@ -50,7 +50,7 @@
 
       pitchChanged: function(oldValue, newValue) {
         if (this.global.song && this.global.song.bpm)
-          this.global.bpm = (this.global.song.bpm * (this.pitch/100) + this.global.song.bpm * 1).toFixed(2);
+          this.global.bpm = (this.global.song.bpm * (this.pitch/100) + this.global.song.bpm * 1).toFixed(1);
       },
     });
   </script>
