@@ -21,7 +21,7 @@
     <core-signals on-core-signal-genres-changed="{{genresChanged}}"
                           on-core-signal-search="{{searchAction}}"></core-signals>
 
-    <core-selector selected="{{selectedRow}}" activateEvent="click">
+    <core-selector selected="{{selectedRow}}" activateEvent="click" id="selector">
       <template repeat="{{s in songs}}">
         <song-list-item song="{{s}}"></song-list-item>
       </template>
@@ -62,8 +62,11 @@
       },
 
       selectedRowChanged: function(e, detail, sender) {
-        var s = this.songs[detail];
-        this.global.song = s;
+        var selectedRowIndex = detail;
+        if (selectedRowIndex != -1) {
+          var s = this.songs[selectedRowIndex];
+          this.global.song = s;
+        }
       },
 
       queryChanged: function(e, detail, sender) {
@@ -99,6 +102,8 @@
           this.songs = ss.SearchUtil.searchSongs(p.q, p.min, p.max, p.key, this.genres, omitSongs, 200);
           //this.$.core_tooltip.show = false;
         }
+        // clear the row selection
+        this.$.selector.selected = -1;
       },
 
       /*genresChanged: function(e, detail, sender) {
