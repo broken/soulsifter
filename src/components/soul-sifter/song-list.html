@@ -21,12 +21,12 @@
     <core-signals on-core-signal-genres-changed="{{genresChanged}}"
                           on-core-signal-search="{{searchAction}}"></core-signals>
 
+    <core-tooltip id="tooltip" label="Searching..." noarrow position top></core-tooltip>
     <core-selector selected="{{selectedRow}}" activateEvent="click" id="selector">
       <template repeat="{{s in songs}}">
         <song-list-item song="{{s}}"></song-list-item>
       </template>
     </core-selector>
-    </core-list>
   </template>
 
   <script>
@@ -44,13 +44,7 @@
       },
 
       domReady: function() {
-        //this.$.core_tooltip.show = false;
         this.searchAction();
-        /*if (response.response.song) {
-          this.songs = response.response.song;
-        } else {
-          this.songs = [];
-        }*/
       },
 
       globalBpmChanged: function(oldValue, newValue) {
@@ -81,41 +75,38 @@
       },
 
       searchAction: function(e, detail, sender) {
-        if (detail && detail.playlist) {
-          var entries = detail.playlist.playlistEntries;
-          this.songs = entries.sort(function(a, b) { return a.position - b.position; })
-                              .map(function(x) { return x.song; });
-        } else {
-          //this.$.core_tooltip.show = true;
-          var genreIds = this.genres.map(function(g) { return g.id; });
-          var p = {q: this.query, genres: genreIds.join(','), min: 0, max: 0};
-          var omitSongs = [];
-          if (this.djSearch) {
-            if (this.global.bpm) {
-              var pitchPctMax = 8;
-              p.min  = this.global.bpm * (100 - pitchPctMax) / 100;
-              p.max = this.global.bpm * (100 + pitchPctMax) / 100;
+        this.$.tooltip.show = true;
+        var that = this;
+        // give the tooltip a chance to show
+        setTimeout(function() {
+          if (detail && detail.playlist) {
+            var entries = detail.playlist.playlistEntries;
+            that.songs = entries.sort(function(a, b) { return a.position - b.position; })
+                                .map(function(x) { return x.song; });
+          } else {
+            var genreIds = that.genres.map(function(g) { return g.id; });
+            var p = {q: that.query, genres: genreIds.join(','), min: 0, max: 0};
+            var omitSongs = [];
+            if (that.djSearch) {
+              if (that.global.bpm) {
+                var pitchPctMax = 8;
+                p.min  = that.global.bpm * (100 - pitchPctMax) / 100;
+                p.max = that.global.bpm * (100 + pitchPctMax) / 100;
+              }
+              if (that.global.song) p.key = that.global.song.tonicKey;  // todo
+              omitSongs = that.songTrail.map(function(e) { return e.song; });
             }
-            if (this.global.song) p.key = this.global.song.tonicKey;  // todo
-            omitSongs = this.songTrail.map(function(e) { return e.song; });
+            that.songs = ss.SearchUtil.searchSongs(p.q, p.min, p.max, p.key, that.genres, omitSongs, 200);
           }
-          this.songs = ss.SearchUtil.searchSongs(p.q, p.min, p.max, p.key, this.genres, omitSongs, 200);
-          //this.$.core_tooltip.show = false;
-        }
-        // clear the row selection
-        this.$.selector.selected = -1;
+          // clear the row selection
+          that.$.selector.selected = -1;
+          // A couple things to note here. First, this timeout will activate when the template repeat has finished loading, which is 99% of the wait time here. Next, I would love to use paper-toast, but it appears that loading the template repeat consumes all the resources that would allow it to animate in. I could set a timeout for the toast animation, but what a waste.
+          setTimeout(function() {
+            that.$.tooltip.show = false;
+          }, 1);
+        }, 1);
       },
 
-      /*genresChanged: function(e, detail, sender) {
-        this.genres = detail;
-      },
-
-      queryChanged: function(e, detail, sender) {
-        this.$.core_tooltip.show = true;
-        var genreIds = this.genres.map(function(g) { return g.id; });
-        var p = {q: this.query, min: this.minBpm, max: this.maxBpm, key: this.selectedSong.tonicKey, genres: genreIds.join(',')};
-        this.ajaxParams = JSON.stringify(p);
-      }*/
     });
   </script>
 </polymer-element>

@@ -1,13 +1,6 @@
-core-list div {
-  box-sizing: border-box;
-  cursor: default;
-  overflow: hidden;
-}
-
 core-tooltip {
   position: absolute;
   left: 50%;
-  top: 20px;
 }
 
 .song {
