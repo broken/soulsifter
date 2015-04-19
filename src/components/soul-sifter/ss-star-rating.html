@@ -1,0 +1,46 @@
+<link href="../polymer/polymer.html" rel="import">
+
+<link href="../core-icon/core-icon.html" rel="import">
+<link href="../core-selector/core-selector.html" rel="import">
+
+<polymer-element name="ss-star-rating" attributes="count value readOnly">
+
+  <template>
+    <link href="ss-star-rating.css" rel="stylesheet">
+    <core-style ref="main"></core-style>
+
+    <core-selector selected="{{selectedStar}}" activateEvent="click" id="selector">
+      <template repeat="{{n in stars}}">
+        <core-icon icon="star-rate" class="{{ {selected: n < value} | tokenList }}"></core-icon>
+      </template>
+    </core-selector>
+  </template>
+
+  <script>
+    Polymer('ss-star-rating', {
+
+      count: 5,
+
+      value: 0,
+
+      readOnly: false,
+
+      ready: function() {
+        this.countChanged(0, this.count);
+      },
+
+      countChanged: function(oldValue, newValue) {
+        this.stars = [];
+        for (var i = 0; i < this.count; ++i) {
+          this.stars.push(i);
+        }
+      },
+
+      selectedStarChanged: function(e, detail, sender) {
+        if (!this.readOnly) {
+          this.value = detail + 1;
+        }
+      },
+    });
+  </script>
+</polymer-element>
