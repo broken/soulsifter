@@ -54,10 +54,7 @@
       },
 
       globalBpmChanged: function(oldValue, newValue) {
-        var pitchPctMax = 8;
-        this.minBpm = this.global.bpm * (100 - pitchPctMax) / 100;
-        this.maxBpm = this.global.bpm * (100 + pitchPctMax) / 100;
-        this.searchAction();
+        if (this.djSearch) this.searchAction();
       },
 
       genresChanged: function(e, detail, sender) {
@@ -91,8 +88,11 @@
           var p = {q: this.query, genres: genreIds.join(','), min: 0, max: 0};
           var omitSongs = [];
           if (this.djSearch) {
-            if (this.minBpm) p.min = this.minBpm;
-            if (this.maxBpm) p.max = this.maxBpm;
+            if (this.global.bpm) {
+              var pitchPctMax = 8;
+              p.min  = this.global.bpm * (100 - pitchPctMax) / 100;
+              p.max = this.global.bpm * (100 + pitchPctMax) / 100;
+            }
             if (this.global.song) p.key = this.global.song.tonicKey;  // todo
             omitSongs = this.songTrail.map(function(e) { return e.song; });
           }
