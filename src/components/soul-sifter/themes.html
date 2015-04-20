@@ -56,6 +56,9 @@
     sl_hoverfadeout: 'linear-gradient(to right, rgba(20,20,20,0), rgba(20,20,20,1))',
     sl_btnborder: '1px solid rgb(20,20,20)',
     sl_btnborderhover: '1px solid #999999',
+    // audio
+    au_play: '#CCC',
+    au_disabled: '#999',
   };
   CoreStyle.g.light = {
     bg: '#EEE',
@@ -187,6 +190,9 @@
   paper-slider::shadow #sliderBar::shadow #secondaryProgress {
     background-color: {{g.theme.ps_bg}};
   }
+  paper-slider::shadow #sliderBar::shadow #progressContainer {
+    background-color: {{g.theme.ps_bg}};
+  }
 
   <!-- song list -->
   .song-item {
@@ -231,5 +237,13 @@
   }
   .text {
     color: {{g.theme.clr}};
+  }
+
+  <!-- audio -->
+  ss-audio::shadow core-icon {
+    color: {{g.theme.au_play}};
+  }
+  ss-audio::shadow .disabled core-icon {
+    color: {{g.theme.au_disabled}};
   }
 </core-style>

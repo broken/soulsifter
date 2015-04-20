@@ -51,7 +51,7 @@
         });
         this.audio.addEventListener('error', function (mediaError) {
           window.console.log('Audio error: ' + mediaError.code);
-          that.currentTimeStr: '--',
+          that.currentTimeStr = '--',
           that.disabled = true;
         });
         this.audio.addEventListener('timeupdate', function () {

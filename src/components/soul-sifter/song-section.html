@@ -9,6 +9,7 @@
 
 <link href="global-state.html" rel="import">
 <link href="pitch-slider.html" rel="import">
+<link href="ss-audio.html" rel="import">
 <link href="ss-googleplaymusic.html" rel="import">
 <link href="ss-star-rating.html" rel="import">
 <link href="themes.html" rel="import">
@@ -34,7 +35,7 @@
       <section vertical layout class="content">
         <div class="title">{{song.title}}</div>
         <div class="artist">{{song.artist}}</div>
-        <ss-star-rating value="{{song.rating}}"></ss-star-rating>
+        <ss-star-rating value="{{song.rating}}" readOnly></ss-star-rating>
         <div class="track" self-end>{{song.album.track}}</div>
         <div class="track" self-end>{{song.album.name}}</div>
         <div class="released" self-end>{{song.album.releaseDateYear}}-{{song.album.releaseDateMonth}}-{{song.album.releaseDateDay}}</div>
@@ -45,7 +46,7 @@
           <div>pitch</div>
           <pitch-slider></pitch-slider>
         </div>
-        <audio controls id="audio"></audio>
+        <ss-audio id="audio"></ss-audio>
       </section>
     </core-scroll-header-panel>
   </template>
