@@ -1,11 +1,14 @@
 <link href="../polymer/polymer.html" rel="import">
 
-<link href="../core-ajax/core-ajax.html" rel="import">
+<link href="../core-menu/core-menu.html" rel="import">
 <link href="../core-scroll-header-panel/core-scroll-header-panel.html" rel="import">
 <link href="../core-signals/core-signals.html" rel="import">
 <link href="../core-style/core-style.html" rel="import">
 <link href="../core-toolbar/core-toolbar.html" rel="import">
+<link href="../paper-dropdown/paper-dropdown.html" rel="import">
 <link href="../paper-icon-button/paper-icon-button.html" rel="import">
+<link href="../paper-item/paper-item.html" rel="import">
+<link href="../paper-menu-button/paper-menu-button.html" rel="import">
 
 <link href="global-state.html" rel="import">
 <link href="pitch-slider.html" rel="import">
@@ -46,7 +49,17 @@
           <div>pitch</div>
           <pitch-slider></pitch-slider>
         </div>
-        <ss-audio id="audio"></ss-audio>
+        <div horizontal layout flex>
+          <ss-audio flex id="audio"></ss-audio>
+          <paper-menu-button on-click="{{stopPropagation}}">
+            <paper-icon-button icon="more-vert"></paper-icon-button>
+            <paper-dropdown class="dropdown" transition="cascade" halign="right" valign="bottom">
+              <core-menu>
+                <paper-item on-click="{{editAction}}">Edit info</paper-item>
+              </core-menu>
+            </paper-dropdown>
+          </paper-menu-button>
+        </div>
       </section>
     </core-scroll-header-panel>
   </template>
@@ -144,6 +157,15 @@
           url = 'url("' + img + '")';
         }
         this.$.cshp.shadowRoot.getElementById('headerBg').style.backgroundImage = url;
+      },
+
+      editAction: function(e, detail, sender) {
+        e.stopPropagation();
+        this.asyncFire('page-song-edit', {song: this.song});
+      },
+
+      stopPropagation: function(e, detail, sender) {
+        e.stopPropagation();
       },
     });
   </script>
