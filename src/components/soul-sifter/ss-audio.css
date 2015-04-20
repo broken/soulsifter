@@ -1,0 +1,25 @@
+:host {
+  margin: 4px 0;
+}
+
+paper-slider {
+  width: 100%;
+}
+paper-slider::shadow #sliderContainer {
+  margin: 0;
+  height: 4px;
+  width: 100%;
+}
+paper-slider::shadow .bar-container {
+  left: 4px;
+  width: calc(100% - 4px);
+}
+paper-slider::shadow .bar-container #sliderBar{
+  top: 0;
+  height: 4px;
+  margin: 0;
+  padding: 0;
+}
+paper-slider::shadow #sliderKnob {
+  display: none;
+}

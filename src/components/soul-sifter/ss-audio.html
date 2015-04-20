@@ -1,0 +1,91 @@
+<link href="../polymer/polymer.html" rel="import">
+
+<link href="../core-icon/core-icon.html" rel="import">
+<link href="../core-icons/av-icons.html" rel="import">
+<link href="../paper-slider/paper-slider.html" rel="import">
+
+<polymer-element name="ss-audio" attributes="src">
+
+  <template>
+    <link href="ss-audio.css" rel="stylesheet">
+    <core-style ref="main"></core-style>
+
+    <div horizontal layout class="{{ {disabled: disabled} | tokenList }}">
+      <core-icon id="playPause" icon="av:play-arrow" on-click="{{playAction}}"></core-icon>
+      <div vertical layout flex>
+        <div id="time" self-end>{{currentTimeStr}}</div>
+        <paper-slider id="slider" min="0" max="{{duration}}" value="{{currentTime}}" on-change="{{changeCurrentTime}}" disabled="{{disabled}}"></paper-slider>
+      </div>
+    </div>
+  </template>
+
+  <script>
+
+    Polymer('ss-audio', {
+
+      src: '',
+
+      duration: 1,
+
+      currentTime: 0,
+
+      currentTimeStr: '--',
+
+      disabled: true,
+
+      srcChanged: function(oldValue, newValue) {
+        this.currentTime = 0;
+        if (!newValue) {
+          this.disabled = true;
+          return;
+        }
+
+        this.audio = new Audio(newValue);
+        var that = this;
+        this.audio.addEventListener('durationchange', function() {
+          that.duration = that.audio.duration;
+          that.disabled = false;
+        });
+        this.audio.addEventListener('ended', function() {
+          that.$.playPause.icon = 'av:play-arrow';
+        });
+        this.audio.addEventListener('error', function (mediaError) {
+          window.console.log('Audio error: ' + mediaError.code);
+          that.currentTimeStr: '--',
+          that.disabled = true;
+        });
+        this.audio.addEventListener('timeupdate', function () {
+          that.currentTime = that.audio.currentTime;
+
+          // set the current time in readable string format
+          var str = '';
+          var time = that.currentTime|0;
+          var hours = Math.floor(time / 3600);
+          if (hours) str += hours + ':';
+          time %= 3600;
+          var mins = Math.floor(time / 60);
+          if (hours || mins) str += (mins < 10 && hours ? '0' : '') + mins + ':';
+          var secs = time % 60;
+          str += (secs < 10 && (hours || mins) ? '0' : '') + secs;
+          that.currentTimeStr = str;
+        });
+      },
+
+      playAction: function() {
+        if (this.disabled) return;
+        if (this.$.playPause.icon === 'av:play-arrow') {
+          this.audio.play();
+          this.$.playPause.icon = 'av:pause';
+        } else {
+          this.audio.pause();
+          this.$.playPause.icon = 'av:play-arrow';
+        }
+      },
+
+      changeCurrentTime: function(event, detail, sender) {
+        this.audio.currentTime = this.$.slider.immediateValue;
+      },
+
+    }); 
+  </script>
+</polymer-element>
