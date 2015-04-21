@@ -1,5 +1,8 @@
 #include "SoulSifterSettings.h"
 
+#include <cstdlib>
+#include <iostream>
+
 #include <boost/filesystem.hpp>
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
@@ -11,13 +14,21 @@ namespace dogatech {
 namespace soulsifter {
 
   SoulSifterSettings::SoulSifterSettings() {
+    // TODO settings file stored in other OS place
+    filename.append(getenv("HOME"));
+    filename.append("/Library/Application Support/Soul Sifter");
+    if (!filesystem::exists(filename)) {
+      if (!filesystem::create_directory(filename)) {
+        cerr << "Unable to create settings directory " << filename << endl;
+      }
+    }
+    filename.append("/settings.json");
     if (filesystem::exists(filename)) {
       // Load the JSON file into the property tree. If reading fails
       // (cannot open file, parse error), an exception is thrown.
       read_json(filename, ptree);
     } else {
-      // TODO set defaults
-      ptree.put("something", "relax");
+      // defaults
     }
   }
   

@@ -49,8 +49,7 @@ namespace soulsifter {
 
         boost::property_tree::ptree ptree;
 
-        // TODO settings file stored in os place
-        const std::string filename = "/Users/rneale/soulsiftersettings.json";
+        std::string filename;
         
         /* deprecated */
         std::string musicPath;
