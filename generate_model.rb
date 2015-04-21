@@ -773,6 +773,7 @@ playlistFields = [
   [:int, "id", Attrib::FIND],
   [:string, "name", Attrib::FIND],
   [:string, "query", 0],
+  [:string, "gmusicId", 0],
   ["vector<int>", "playlistEntryIds", Attrib::ID | Attrib::JOINTABLE],
   ["vector<PlaylistEntry*>", "playlistEntries", Attrib::JOINTABLE],
   ["vector<int>", "styleIds", Attrib::ID],

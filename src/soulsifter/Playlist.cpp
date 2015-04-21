@@ -38,6 +38,7 @@ namespace soulsifter {
     id(0),
     name(),
     query(),
+    gmusicId(),
     playlistEntryIds(),
     playlistEntries(),
     styleIds(),
@@ -48,6 +49,7 @@ namespace soulsifter {
     id(playlist.getId()),
     name(playlist.getName()),
     query(playlist.getQuery()),
+    gmusicId(playlist.getGmusicId()),
     playlistEntryIds(playlist.getPlaylistEntryIds()),
     playlistEntries(),
     styleIds(playlist.getStyleIds()),
@@ -58,6 +60,7 @@ namespace soulsifter {
         id = playlist.getId();
         name = playlist.getName();
         query = playlist.getQuery();
+        gmusicId = playlist.getGmusicId();
         playlistEntryIds = playlist.getPlaylistEntryIds();
         deleteVectorPointers(&playlistEntries);
         styleIds = playlist.getStyleIds();
@@ -73,6 +76,7 @@ namespace soulsifter {
         id = 0;
         name.clear();
         query.clear();
+        gmusicId.clear();
         playlistEntryIds.clear();
         deleteVectorPointers(&playlistEntries);
         styleIds.clear();
@@ -85,6 +89,7 @@ namespace soulsifter {
         playlist->setId(rs->getInt("id"));
         playlist->setName(rs->getString("name"));
         playlist->setQuery(rs->getString("query"));
+        playlist->setGmusicId(rs->getString("gmusicId"));
         if (!rs->isNull("playlistEntryIds")) {
             string csv = rs->getString("playlistEntryIds");
             istringstream iss(csv);
@@ -162,10 +167,11 @@ namespace soulsifter {
 
     int Playlist::update() {
         try {
-            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("update Playlists set name=?, query=? where id=?");
+            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("update Playlists set name=?, query=?, gmusicId=? where id=?");
             ps->setString(1, name);
             ps->setString(2, query);
-            ps->setInt(3, id);
+            ps->setString(3, gmusicId);
+            ps->setInt(4, id);
             int result = ps->executeUpdate();
             if (!playlistEntryIds.empty()) {
                 stringstream ss("insert ignore into PlaylistEntries (playlistId, playlistEntryId) values (?, ?)", ios_base::app | ios_base::out | ios_base::ate);
@@ -236,9 +242,10 @@ namespace soulsifter {
 
     int Playlist::save() {
         try {
-            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("insert into Playlists (name, query) values (?, ?)");
+            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("insert into Playlists (name, query, gmusicId) values (?, ?, ?)");
             ps->setString(1, name);
             ps->setString(2, query);
+            ps->setString(3, gmusicId);
             int saved = ps->executeUpdate();
             if (!saved) {
                 cerr << "Not able to save playlist" << endl;
@@ -327,6 +334,9 @@ namespace soulsifter {
 
     const string& Playlist::getQuery() const { return query; }
     void Playlist::setQuery(const string& query) { this->query = query; }
+
+    const string& Playlist::getGmusicId() const { return gmusicId; }
+    void Playlist::setGmusicId(const string& gmusicId) { this->gmusicId = gmusicId; }
 
     const vector<int>& Playlist::getPlaylistEntryIds() const { return playlistEntryIds; }
     void Playlist::setPlaylistEntryIds(const vector<int>& playlistEntryIds) {

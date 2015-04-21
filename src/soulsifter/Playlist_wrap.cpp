@@ -57,6 +57,7 @@ void Playlist::Init(v8::Handle<v8::Object> exports) {
   tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("id"), getId, setId);
   tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("name"), getName, setName);
   tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("query"), getQuery, setQuery);
+  tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("gmusicId"), getGmusicId, setGmusicId);
   tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("playlistEntryIds"), getPlaylistEntryIds, setPlaylistEntryIds);
   tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("playlistEntries"), getPlaylistEntries, setPlaylistEntries);
   tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("styleIds"), getStyleIds, setStyleIds);
@@ -204,6 +205,25 @@ NAN_SETTER(Playlist::setQuery) {
   Playlist* obj = ObjectWrap::Unwrap<Playlist>(args.This());
   string a0(*v8::String::Utf8Value(value->ToString()));
   obj->playlist->setQuery(a0);
+
+  NanReturnUndefined();
+}
+
+NAN_GETTER(Playlist::getGmusicId) {
+  NanScope();
+
+  Playlist* obj = ObjectWrap::Unwrap<Playlist>(args.This());
+  const string result =  obj->playlist->getGmusicId();
+
+  NanReturnValue(NanNew<v8::String>(result.c_str(), result.length()));
+}
+
+NAN_SETTER(Playlist::setGmusicId) {
+  NanScope();
+
+  Playlist* obj = ObjectWrap::Unwrap<Playlist>(args.This());
+  string a0(*v8::String::Utf8Value(value->ToString()));
+  obj->playlist->setGmusicId(a0);
 
   NanReturnUndefined();
 }
