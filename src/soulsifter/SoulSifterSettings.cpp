@@ -29,6 +29,9 @@ namespace soulsifter {
       read_json(filename, ptree);
     } else {
       // defaults
+      ptree.put("db.url", "localhost");
+      ptree.put("db.user", "ss");
+      ptree.put("db.name", "music");
     }
   }
   

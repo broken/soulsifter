@@ -25,6 +25,8 @@
 #include <cppconn/warning.h>
 #include <mysql_driver.h>
 
+#include "SoulSifterSettings.h"
+
 namespace dogatech {
 namespace soulsifter {
     
@@ -74,10 +76,10 @@ MysqlAccess::~MysqlAccess() {
 
 bool MysqlAccess::connect() {
     // initiate url, user, password and database variables
-    const std::string url("localhost");
-    const std::string user("ss");
-    const std::string password("pw");
-    const std::string database("music");
+    const std::string url(SoulSifterSettings::getInstance().get<std::string>("db.url"));
+    const std::string user(SoulSifterSettings::getInstance().get<std::string>("db.user"));
+    const std::string password(SoulSifterSettings::getInstance().get<std::string>("db.password"));
+    const std::string database(SoulSifterSettings::getInstance().get<std::string>("db.name"));
     
     try {
         driver = get_driver_instance();

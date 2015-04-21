@@ -19,6 +19,12 @@
           <paper-input floatingLabel label="Google Music Email" value="{{googleEmail}}"></paper-input>
           <paper-input floatingLabel label="Google Music App Key" value="{{googleAppKey}}"></paper-input>
         </div>
+        <div vertical layout>
+          <paper-input floatingLabel label="Database Name" value="{{dbName}}"></paper-input>
+          <paper-input floatingLabel label="Database User" value="{{dbUser}}"></paper-input>
+          <paper-input floatingLabel label="Database Password" value="{{dbPassword}}"></paper-input>
+          <paper-input floatingLabel label="Database URL" value="{{dbUrl}}"></paper-input>
+        </div>
       </div>
     </abstract-action-page>
   </template>
@@ -31,11 +37,19 @@
         this.settings = new ss.SoulSifterSettings();
         this.googleAppKey = this.settings.getString('google.appKey');
         this.googleEmail = this.settings.getString('google.email');
+        this.dbName = this.settings.getString('db.name');
+        this.dbUser = this.settings.getString('db.user');
+        this.dbPassword = this.settings.getString('db.password');
+        this.dbUrl = this.settings.getString('db.url');
       },
 
       save: function(e, detail, sender) {
         this.settings.putString('google.appKey', this.googleAppKey);
         this.settings.putString('google.email', this.googleEmail);
+        this.settings.putString('db.name', this.dbName);
+        this.settings.putString('db.user', this.dbUser);
+        this.settings.putString('db.password', this.dbPassword);
+        this.settings.putString('db.url', this.dbUrl);
         this.settings.save();
       },
     });
