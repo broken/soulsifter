@@ -35,11 +35,7 @@ namespace soulsifter {
         
         /* deprecated */
         const std::string& getMusicPath() const { return musicPath; }
-        void setMusicPath(const std::string& path) { musicPath = path; }
-        const std::string& getREPath() const { return rePath; }
-        void setREPath(const std::string& path) { rePath = path; }
         const std::string& getStagingPath() const { return stagingPath; }
-        void setStagingPath(const std::string& path) { stagingPath = path; }
         
     private:
         // singleton
@@ -53,7 +49,6 @@ namespace soulsifter {
         
         /* deprecated */
         std::string musicPath;
-        std::string rePath;
         std::string stagingPath;
     };
     
