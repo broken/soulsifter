@@ -49,3 +49,8 @@ paper-icon-button {
 core-drawer-panel[narrow] paper-icon-button {
   display: inline-block
 }
+
+paper-toast {
+  left: auto;
+  right: 20px;
+}

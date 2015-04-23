@@ -6,6 +6,7 @@
 <link href="../core-style/core-style.html" rel="import">
 <link href="../paper-tabs/paper-tab.html" rel="import">
 <link href="../paper-tabs/paper-tabs.html" rel="import">
+<link href="../paper-toast/paper-toast.html" rel="import">
 <link href="../paper-icon-button/paper-icon-button.html" rel="import">
 
 <link href="genre-list.html" rel="import">
@@ -59,6 +60,7 @@
           <ss-settings></ss-settings>
         </section>
       </core-animated-pages>
+      <paper-toast id="toast" text="{{errorText}}" duration="5000" autoCloseDisabled></paper-toast>
     </div>
   </template>
 
@@ -72,19 +74,25 @@
         CoreStyle.g.theme.init();
 
         /* setup listeners */
+        var that = this;
         this.addEventListener('page-main', function(e) {
-          this.section = 0;
+          that.section = 0;
         });
         this.addEventListener('page-playlist-edit', function(e) {
-          this.section = 1;
-          this.playlist = e.detail.playlist;
+          that.section = 1;
+          that.playlist = e.detail.playlist;
         });
         this.addEventListener('page-song-edit', function(e) {
-          this.section = 2;
-          this.song = e.detail.song;
+          that.section = 2;
+          that.song = e.detail.song;
         });
         this.addEventListener('page-settings', function(e) {
-          this.section = 3;
+          that.section = 3;
+        });
+        this.addEventListener('error-alert', function(e) {
+          console.log(e.detail.msg);
+          that.errorText = e.detail.msg;
+          that.$.toast.show();
         });
       },
 

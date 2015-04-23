@@ -28,7 +28,10 @@
     // paper input
     pi_accent: sl_blue,
     // paper toggle button
-    pt_clr: sl_blue,
+    pb_clr: sl_blue,
+    // ppaert alert toast
+    pt_bg: sl_orange,
+    pt_clr: black,
     // abstract actions
     aa_ok: sl_orange,
     // drawer tabs
@@ -120,10 +123,16 @@
 
   <!-- paper toggle button -->
   paper-toggle-button::shadow [checked] .toggle-ink {
-    color: {{g.theme.pt_clr}};
+    color: {{g.theme.pb_clr}};
   }
   paper-toggle-button::shadow [checked] .toggle {
-    background-color: {{g.theme.pt_clr}};
+    background-color: {{g.theme.pb_clr}};
+  }
+
+  <!-- paper toast (alert) -->
+  paper-toast {
+    background-color: {{g.theme.pt_bg}};
+    color: {{g.theme.pt_clr}};
   }
 
   <!-- abstract actions -->
