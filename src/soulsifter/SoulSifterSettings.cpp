@@ -32,6 +32,7 @@ namespace soulsifter {
       ptree.put("db.url", "localhost");
       ptree.put("db.user", "ss");
       ptree.put("db.name", "music");
+      ptree.put("songList.limit", 128);
     }
   }
   

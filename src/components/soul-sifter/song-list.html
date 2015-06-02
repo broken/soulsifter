@@ -41,6 +41,7 @@
         this.songs = [];
         this.genres = [];
         this.songTrail = [];
+        this.settings = new ss.SoulSifterSettings();
       },
 
       domReady: function() {
@@ -96,7 +97,7 @@
               if (that.global.song) p.key = that.global.song.tonicKey;  // todo
               omitSongs = that.songTrail.map(function(e) { return e.song; });
             }
-            that.songs = ss.SearchUtil.searchSongs(p.q, p.min, p.max, p.key, that.genres, omitSongs, 200);
+            that.songs = ss.SearchUtil.searchSongs(p.q, p.min, p.max, p.key, that.genres, omitSongs, that.settings.getInt("songList.limit"));
           }
           // clear the row selection
           that.$.selector.selected = -1;

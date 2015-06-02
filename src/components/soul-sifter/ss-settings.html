@@ -18,6 +18,8 @@
         <div vertical layout>
           <paper-input floatingLabel label="Google Music Email" value="{{googleEmail}}"></paper-input>
           <paper-input floatingLabel label="Google Music App Key" value="{{googleAppKey}}"></paper-input>
+          <br>
+          <paper-input floatingLabel label="Default song list limit" value="{{songListLimit}}"></paper-input>
         </div>
         <div vertical layout>
           <paper-input floatingLabel label="Database Name" value="{{dbName}}"></paper-input>
@@ -41,6 +43,7 @@
         this.dbUser = this.settings.getString('db.user');
         this.dbPassword = this.settings.getString('db.password');
         this.dbUrl = this.settings.getString('db.url');
+        this.songListLimit = this.settings.getInt("songList.limit");
       },
 
       save: function(e, detail, sender) {
@@ -50,6 +53,7 @@
         this.settings.putString('db.user', this.dbUser);
         this.settings.putString('db.password', this.dbPassword);
         this.settings.putString('db.url', this.dbUrl);
+        this.settings.putInt("songList.limit", this.songListLimit);
         this.settings.save();
       },
     });
