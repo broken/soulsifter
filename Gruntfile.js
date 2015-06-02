@@ -78,16 +78,35 @@ module.exports = function(grunt) {
         command: 'ulimit -n 10240',
       },
     },
+    bump: {
+      options: {
+        files: ['src/package.json', 'bower.json'],
+        updateConfigs: [],
+        commit: false,
+        commitMessage: 'Release v%VERSION%',
+        commitFiles: [],
+        createTag: false,
+        tagName: 'v%VERSION%',
+        tagMessage: 'Version %VERSION%',
+        push: false,
+        pushTo: 'origin',
+        gitDescribeOptions: '--tags --always --abbrev=1 --dirty=-d',
+        globalReplace: false,
+        prereleaseName: false,
+        regExp: false
+      }
+    },
   });
 
+  grunt.loadNpmTasks('grunt-bump');
   grunt.loadNpmTasks('grunt-contrib-copy');
   grunt.loadNpmTasks('grunt-node-webkit-builder');
   grunt.loadNpmTasks('grunt-shell');
   grunt.loadNpmTasks('grunt-spawn');
   grunt.loadNpmTasks('grunt-text-replace');
 
-  grunt.registerTask('default', ['nodewebkit', 'copy:ffmpegsumo']);
+  grunt.registerTask('default', ['nodewebkit', 'copy:ffmpegsumo', 'bump']);
   grunt.registerTask('nw-gyp', ['shell:nwgypclean', 'shell:nwgypconfigure', 'replace:rtti', 'shell:nwgypbuild']);
   grunt.registerTask('up', ['shell:updateviews', 'shell:updatecomponents']);
-  grunt.registerTask('all', ['nw-gyp', 'nodewebkit', 'copy:ffmpegsumo']);
+  grunt.registerTask('all', ['nw-gyp', 'default']);
 };
