@@ -1,19 +1,22 @@
 <link href="../polymer/polymer.html" rel="import">
 
+<link href="../iron-flex-layout/iron-flex-layout.html" rel="import">
+
 <link href="themes.html" rel="import">
 
-<polymer-element name="search-info">
+
+<dom-module id="search-info">
+  <link href="search-info.css" rel="import" type="css">
   <template>
-    <link href="search-info.css" rel="stylesheet">
     <core-style ref="main"></core-style>
 
-    <div vertical layout class="text">
+    <div class="text vertical">
       <div class="heading">
         <span>Search atoms</span>
         <hr>
       </div>
-      <div horizontal layout>
-        <div flex class="right">
+      <div class="horizontal">
+        <div class="right flex">
           <span class="emphasis">id</span> : <br>
           <span class="emphasis">a</span> or <span class="emphasis">artist</span> : <br>
           <span class="emphasis">t</span> or <span class="emphasis">title</span> : <br>
@@ -22,7 +25,7 @@
           <span class="emphasis">comment</span> : <br>
           <span class="emphasis">q</span> or <span class="emphasis">query</span> : <br>
         </div>
-        <div flex>
+        <div class="flex">
           Internal song ID<br>
           Song artist<br>
           Song title<br>
@@ -31,7 +34,7 @@
           Song comment<br>
           Custom query predicate<br>
         </div>
-        <div flex class="right">
+        <div class="right flex">
           <span class="emphasis">aid</span> : <br>
           <span class="emphasis">n</span> or <span class="emphasis">album</span> : <br>
           <span class="emphasis">m</span> or <span class="emphasis">mixed</span> : <br>
@@ -41,7 +44,7 @@
           <span class="emphasis">lowq</span> : <br>
           <span class="emphasis">limit</span> : <br>
         </div>
-        <div flex>
+        <div class="flex">
           Internal album ID<br>
           Album name<br>
           Is album mixed<br>
@@ -56,28 +59,30 @@
         <span>Special characters</span>
         <hr>
       </div>
-      <div horizontal layout>
-        <div flex class="right">
+      <div class="horizontal">
+        <div class="right flex">
           <span class="emphasis">-</span> : <br>
           <span class="emphasis">"</span> : <br>
         </div>
-        <div flex>
+        <div class="flex">
           Negates a query atom<br>
           Used to group terms<br>
         </div>
-        <div flex class="right">
+        <div class="right flex">
           <span class="emphasis">0</span> or <span class="emphasis">1</span> : <br>
-          <span class="emphasis">\</span> : <br>
+          <span class="emphasis">\\</span> : <br>
         </div>
-        <div flex>
+        <div class="flex">
           Boolean values<br>
           Escape character<br>
         </div>
       </div>
     </div>
   </template>
-  <script>
-    Polymer('search-info', {
-    });
-  </script>
-</polymer-element>
+</dom-module>
+
+<script>
+  Polymer({
+    is: 'search-info'
+  });
+</script>

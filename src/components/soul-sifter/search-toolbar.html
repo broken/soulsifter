@@ -1,5 +1,6 @@
 <link href="../polymer/polymer.html" rel="import">
 
+<link href="../iron-flex-layout/iron-flex-layout.html" rel="import">
 <link href="../core-field/core-field.html" rel="import">
 <link href="../core-icon-button/core-icon-button.html" rel="import">
 <link href="../core-icons/core-icons.html" rel="import">
@@ -17,20 +18,19 @@
 <link href="themes.html" rel="import">
 
 
-<polymer-element name="search-toolbar" attributes="query djSearch">
-
+<dom-module id="search-toolbar">
+  <link href="search-toolbar.css" rel="import" type="css">
   <template>
-    <link href="search-toolbar.css" rel="stylesheet">
     <core-style ref="main"></core-style>
 
     <global-state values="{{global}}"></global-state>
     <core-localstorage name="soul-sifter-music-directory" value="{{musicDir}}"></core-localstorage>
 
-    <core-toolbar class="{{ {'medium-tall': isTall} | tokenList }}">
+    <core-toolbar class$="{{computeIsTall(isTall)}}">
       <content></content>
-      <core-field class="indent" flex>
+      <core-field class="indent flex">
         <core-icon-button icon="search" on-click="{{searchAction}}"></core-icon-button>
-        <paper-input id="searchInput" label="search" flex value="{{query}}"></paper-input>
+        <paper-input id="searchInput" label="search" class="flex" value="{{query}}"></paper-input>
         <core-icon-button icon="info-outline" on-click="{{toggleSearchInfoDialog}}"></core-icon-button>
       </core-field>
       <paper-input label="bpm" floatingLabel value="{{global.bpm}}" id="bpm"></paper-input>
@@ -43,7 +43,7 @@
         <paper-toggle-button checked="{{djSearch}}"></paper-toggle-button>
         DJ Search Mode
       </div>
-      <div flex class="bottom {{ {hide: !isTall} | tokenList }}"></div>
+      <div class="bottom flex {{ {hide: !isTall} | tokenList }}"></div>
       <div class="bottom {{ {hide: !isTall} | tokenList }}">
         <core-icon-button icon="query-builder" on-click="{{analyzeBpms}}"></core-icon-button>
         Analyze BPMs
@@ -56,69 +56,84 @@
       <!-- <create-song></create-song> -->
     </paper-dialog>
   </template>
+</dom-module>
 
-  <script>
-    Polymer('search-toolbar', {
+<script>
+  Polymer({
+    is: 'search-toolbar',
 
-      isTall: false,
-
-      musicDir: '',
-
-      domReady: function() {
-        this.$.createSongButton.ondragover = function() {
-          this.icon = 'add-circle-outline';
-        };
-        this.$.createSongButton.ondragend = function() {
-          this.icon = 'add-circle';
-        };
-        this.$.createSongButton.ondrop = function(e) {
-          e.preventDefault();
-          for (var i = 0; i < e.dataTransfer.files.length; ++i) {
-            var song = new ss.Song();
-            window.console.log(song);
-            /*song.setFilepath(e.dataTransfer.files[i].path);
-            window.console.log(e.dataTransfer.files[i].path);
-            ss.MusicManager.readTagsFromSong(song);
-            window.console.log(song);*/
-          }
-        };
+    properties: {
+      query: {
+        type: String,
+        notify: true
       },
+      djSearch: {
+        type: Boolean,
+        notify: true
+      }
+    },
 
-      toggleIsTall: function(e, detail, sender  ) {
-        this.isTall = !this.isTall;
-      },
+    isTall: false,
 
-      toggleSearchInfoDialog: function(e, detail, sender) {
-        this.$.searchInfoDialog.toggle();
-      },
+    musicDir: '',
 
-      clickSettingsAction: function(e, detail, sender) {
-        e.stopPropagation();
-        this.asyncFire('page-settings');
-      },
+    domReady: function() {
+      this.$.createSongButton.ondragover = function() {
+        this.icon = 'add-circle-outline';
+      };
+      this.$.createSongButton.ondragend = function() {
+        this.icon = 'add-circle';
+      };
+      this.$.createSongButton.ondrop = function(e) {
+        e.preventDefault();
+        for (var i = 0; i < e.dataTransfer.files.length; ++i) {
+          var song = new ss.Song();
+          window.console.log(song);
+          /*song.setFilepath(e.dataTransfer.files[i].path);
+          window.console.log(e.dataTransfer.files[i].path);
+          ss.MusicManager.readTagsFromSong(song);
+          window.console.log(song);*/
+        }
+      };
+    },
 
-      toggleCreateSongDialog: function(e, detail, sender) {
-        this.$.createSongDialog.toggle();
-      },
+    toggleIsTall: function(e, detail, sender  ) {
+      this.isTall = !this.isTall;
+    },
 
-      searchAction: function(e, detail, sender) {
-        this.asyncFire('core-signal', {name: 'search'});
-      },
+    toggleSearchInfoDialog: function(e, detail, sender) {
+      this.$.searchInfoDialog.toggle();
+    },
 
-      musicDirChanged: function(oldValue, newValue) {
-        if (this.global)
-          this.global.musicDir = newValue;
-      },
+    clickSettingsAction: function(e, detail, sender) {
+      e.stopPropagation();
+      this.asyncFire('page-settings');
+    },
 
-      globalChanged: function(oldValue, newValue) {
-        if (this.musicDir)
-          this.global.musicDir = this.musicDir;
-      },
+    toggleCreateSongDialog: function(e, detail, sender) {
+      this.$.createSongDialog.toggle();
+    },
 
-      analyzeBpms: function(e, detail, sender) {
-        ss.AudioAnalyzer.analyzeBpms();
-      },
-    });
+    searchAction: function(e, detail, sender) {
+      this.asyncFire('core-signal', {name: 'search'});
+    },
 
-  </script>
-</polymer-element>
+    musicDirChanged: function(oldValue, newValue) {
+      if (this.global)
+        this.global.musicDir = newValue;
+    },
+
+    globalChanged: function(oldValue, newValue) {
+      if (this.musicDir)
+        this.global.musicDir = this.musicDir;
+    },
+
+    analyzeBpms: function(e, detail, sender) {
+      ss.AudioAnalyzer.analyzeBpms();
+    },
+  });
+
+  computeIsTall(isTall) {
+    return isTall ? "medium-tall" : "";
+  }
+</script>

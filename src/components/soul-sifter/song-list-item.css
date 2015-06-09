@@ -12,6 +12,7 @@ ss-star-rating::shadow core-icon {
 
 
 .song-item {
+  @apply(--layout-horizontal --layout-center);
   height: 30px;
   padding: 0 8px;
   margin: 0 10px;
@@ -55,4 +56,8 @@ ss-star-rating::shadow core-icon {
 time {
   text-align: right;
   width: 64px;
+}
+
+.flex {
+  @apply(--layout-flex);
 }

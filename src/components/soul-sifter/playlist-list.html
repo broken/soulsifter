@@ -13,68 +13,68 @@
 <link href="themes.html" rel="import">
 
 
-<polymer-element name="playlist-list">
-
+<dom-module id="playlist-list">
+  <link href="playlist-list.css" rel="import" type="css">
   <template>
-    <link href="playlist-list.css" rel="stylesheet">
     <core-style ref="main"></core-style>
     
     <core-signals on-core-signal-playlists-changed="{{updatePlaylists}}"></core-signals>
 
     <div id="wrapper">
-      <template repeat="{{p in playlists}}" id="playlistTpl">
-        <playlist-list-item playlist="{{p}}" on-playlist-select="{{selectPlaylist}}"></playlist-list-item>
+      <template is="dom-repeat" items="{{playlists}}" id="playlistTpl">
+        <playlist-list-item playlist="{{item}}" on-playlist-select="{{selectPlaylist}}"></playlist-list-item>
       </template>
       <core-selection id="selection" on-core-select="{{selectAction}}"></core-selection>
     </div>
     <paper-fab mini icon="add" on-click="{{createPlaylist}}"></paper-fab>
   </template>
+</dom-module>
 
 <script>
-    Polymer('playlist-list', {
+  Polymer({
+    is: 'playlist-list',
 
-      domReady: function() {
-        this.updatePlaylists();
-      },
+    domReady: function() {
+      this.updatePlaylists();
+    },
 
-      togglePlaylistDialog: function(e, detail, sender) {
-        this.$.createPlaylistDialog.toggle();
-      },
+    togglePlaylistDialog: function(e, detail, sender) {
+      this.$.createPlaylistDialog.toggle();
+    },
 
-      createPlaylist: function(e, detail, sender) {
-        var playlist = new ss.Playlist();
-        this.asyncFire('page-playlist-edit', {playlist: playlist});
-      },
+    createPlaylist: function(e, detail, sender) {
+      var playlist = new ss.Playlist();
+      this.asyncFire('page-playlist-edit', {playlist: playlist});
+    },
 
-      selectPlaylist: function(e, detail, sender) {
-        this.$.selection.select(sender);
-      },
+    selectPlaylist: function(e, detail, sender) {
+      this.$.selection.select(sender);
+    },
 
-      selectAction: function(e, detail, sender) {
-        // unselect all
-        for (var i = 0, item = this.$.playlistTpl.nextElementSibling;
-            item && i < this.playlists.length;
-            item = item.nextElementSibling, ++i) {
-          item.select(false);
+    selectAction: function(e, detail, sender) {
+      // unselect all
+      for (var i = 0, item = this.$.playlistTpl.nextElementSibling;
+          item && i < this.playlists.length;
+          item = item.nextElementSibling, ++i) {
+        item.select(false);
+      }
+      // (de)select the selected
+      detail.item.select(detail.isSelected);
+      // update the query
+      var playlist = detail.item.playlist;
+      if (detail.isSelected) {
+        if (playlist.query) {
+          this.asyncFire('genre-change', playlist.styles);
+          this.asyncFire('query-change', playlist.query);
+        } else {
+          this.asyncFire('core-signal', {name: 'search', data: {playlist: playlist}});
         }
-        // (de)select the selected
-        detail.item.select(detail.isSelected);
-        // update the query
-        var playlist = detail.item.playlist;
-        if (detail.isSelected) {
-          if (playlist.query) {
-            this.asyncFire('genre-change', playlist.styles);
-            this.asyncFire('query-change', playlist.query);
-          } else {
-            this.asyncFire('core-signal', {name: 'search', data: {playlist: playlist}});
-          }
-        }
-      },
+      }
+    },
 
-      updatePlaylists: function(e, detail, sender) {
-        this.playlists = ss.Playlist.findAll();
-      },
-      
-    });
-  </script>
-</polymer-element>
+    updatePlaylists: function(e, detail, sender) {
+      this.playlists = ss.Playlist.findAll();
+    },
+    
+  });
+</script>

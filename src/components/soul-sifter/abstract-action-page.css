@@ -10,7 +10,11 @@
 
 #layout {
   height: 100%;
+  @apply(--layout-vertical --layout-center --layout-center-justified);
 }
 #actions {
   width: 100%;
+}
+#abstractActions {
+  @apply(--layout-horizontal --layout-end-justified);
 }

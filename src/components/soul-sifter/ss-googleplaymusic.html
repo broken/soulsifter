@@ -3,145 +3,150 @@
 <link href="global-state.html" rel="import">
 
 
-<polymer-element name="ss-googleplaymusic" attributes="values">
+<dom-module id="ss-googleplaymusic">
   <template>
     <global-state values="{{global}}"></global-state>
   </template>
-  <script>
-    Polymer('ss-googleplaymusic', {
+</dom-module>
 
-      attached: function() {
-        if (!this.global.pm) {
-          var PlayMusic = require('playmusic');
-          this.pm = new PlayMusic();
-          var settings = new ss.SoulSifterSettings();
-          var email = settings.getString('google.email');
-          var appKey = settings.getString('google.appKey');
-          this.pm.init({email: email, password: appKey},
-              function() {
-                console.log("Succesfully connected to Google Music.");
-              },
-              function(message, data, err, res) {
-                console.warn("Login to Google Music failed: " + message);
-                console.warn("Data: " + data);
-                console.warn("Err: " +  err);
-                console.warn("Response: " + res);
-              });
-          this.global.pm = this.pm;
-        }
-      },
+<script>
+  Polymer({
+    is: 'ss-googleplaymusic',
 
-      /**
-       * Success callback takes a song.
-       * Failure callback takes message, body, err, httpResonse
-       */
-      findSong: function(song, success, failure) {
-        var maxResults = 3;
-        this.pm.search(song.artist + ' ' + song.title, maxResults,
-            function(data) {
-              console.log(data);
-              if (!data.entries) {
-                failure('No results in Google Play Music for ' + song.artist + ' - ' + song.title, '', 1);
-                return;
-              }
-              // We first filter by type. Types are:
-              // 1 : track result
-              // 2 : artist result
-              // 3 : album result
-              // Then we take the result with the highest score.
-              var track = data.entries
-                  .filter(function(val) { return val.type == 1; })
-                  .sort(function(a, b) { return a.score < b.score; })
-                  .shift();
-              if (!track) {
-                failure('No track results in Google Play Music for ' + song.artist + ' - ' + song.title, '', 2);
-                return;
-              }
-              success(track);
+    attached: function() {
+      if (!this.global.pm) {
+        var PlayMusic = require('playmusic');
+        this.pm = new PlayMusic();
+        var settings = new ss.SoulSifterSettings();
+        var email = settings.getString('google.email');
+        var appKey = settings.getString('google.appKey');
+        this.pm.init({email: email, password: appKey},
+            function() {
+              console.log('Succesfully connected to Google Music.');
             },
-            function(message, body, err, httpResponse) {
-              console.warn('Error searching Google Play Music for ' + song.artist + ' - ' + song.title + '.  ' + message + '\n' + body + '\n' + err + '\n' + httpResponse);
-              failure(message, body, err, httpResonse);
-            }
-        );
-      },
+            function(message, data, err, res) {
+              console.warn('Login to Google Music failed: ' + message);
+              console.warn('Data: ' + data);
+              console.warn('Err: ' +  err);
+              console.warn('Response: ' + res);
+            });
+        this.global.pm = this.pm;
+      }
+    },
 
-      /**
-       * Success callback takes a stream url
-       * Failure callback takes message, body, err, httpResonse
-       */
-      findSongStreamUrl: function(song, success, failure) {
-        var pm = this.pm;
-        findSong(song, function(song) {
-          pm.getStreamUrl(song.track.nid, success);
-        },
-        failure);
-      },
-
-      /**
-       * Success callback takes a stream url
-       * Failure callback takes message, body, err, httpResonse
-       */
-      findStreamUrl: function(nid, success, failure) {
-        var pm = this.pm;
-        pm.getStreamUrl(nid, success, failure);
-      },
-
-      findPlaylist: function(name, success, failure) {
-        this.pm.getPlayLists(function(data) {
+    /**
+     * Success callback takes a song.
+     * Failure callback takes message, body, err, httpResonse
+     */
+    findSong: function(song, success, failure) {
+      var maxResults = 3;
+      this.pm.search(song.artist + ' ' + song.title, maxResults,
+          function(data) {
             console.log(data);
-            if (!data.data.items) {
-              failure('Unable to find any playlists.', '', 1);
+            if (!data.entries) {
+              failure('No results in Google Play Music for ' + song.artist + ' - ' + song.title, '', 1);
               return;
             }
-            var playlist = data.data.items
-                .filter(function(val) { return val.name == name;})
+            // We first filter by type. Types are:
+            // 1 : track result
+            // 2 : artist result
+            // 3 : album result
+            // Then we take the result with the highest score.
+            var track = data.entries
+                .filter(function(val) { return val.type == 1; })
+                .sort(function(a, b) { return a.score < b.score; })
                 .shift();
-            console.log(playlist);
-            if (!playlist) {
-              failure('No playlist with given name.', '', 2);
+            if (!track) {
+              failure('No track results in Google Play Music for ' + song.artist + ' - ' + song.title, '', 2);
               return;
             }
-            success(playlist);
+            success(track);
+          },
+          function(message, body, err, httpResponse) {
+            console.warn('Error searching Google Play Music for ' + song.artist + ' - ' + song.title + '.  ' + message + '\
+' + body + '\
+' + err + '\
+' + httpResponse);
+            failure(message, body, err, httpResonse);
+          }
+      );
+    },
+
+    /**
+     * Success callback takes a stream url
+     * Failure callback takes message, body, err, httpResonse
+     */
+    findSongStreamUrl: function(song, success, failure) {
+      var pm = this.pm;
+      findSong(song, function(song) {
+        pm.getStreamUrl(song.track.nid, success);
+      },
+      failure);
+    },
+
+    /**
+     * Success callback takes a stream url
+     * Failure callback takes message, body, err, httpResonse
+     */
+    findStreamUrl: function(nid, success, failure) {
+      var pm = this.pm;
+      pm.getStreamUrl(nid, success, failure);
+    },
+
+    findPlaylist: function(name, success, failure) {
+      this.pm.getPlayLists(function(data) {
+          console.log(data);
+          if (!data.data.items) {
+            failure('Unable to find any playlists.', '', 1);
+            return;
+          }
+          var playlist = data.data.items
+              .filter(function(val) { return val.name == name;})
+              .shift();
+          console.log(playlist);
+          if (!playlist) {
+            failure('No playlist with given name.', '', 2);
+            return;
+          }
+          success(playlist);
+        },
+        failure
+      );
+    },
+
+    savePlaylist: function(playlist, success, failure) {
+      var that = this;
+      this.pm.addPlayList(playlist.name,
+          function(data, response) {
+            console.log('Successfully added playlist ' + playlist.name);
+            var playlistId = data.mutate_response[0].id;
+            var async = require('async');
+            var songs = ss.SearchUtil.searchSongs(playlist.query, 0, 0, '', playlist.styles, 100);
+            async.eachLimit(songs,
+              1,  // add one at a time. be nice to Google
+              function(item, callback) {
+                that.findSong(item,
+                  function(song) {
+                    that.pm.addTrackToPlayList(song.track.nid, playlistId,
+                        function(data, res) { callback(); },
+                        function(data, err, res) { callback(); });
+                  },
+                  function() {
+                    callback();  // no errors for now
+                  }
+                );
+              },
+              function(err) {
+                if (err) {
+                  console.error('Unable to fill songs for playlist', err);
+                  return;
+                }
+                console.log('Finished creating playlist.');
+              }
+            );
           },
           failure
-        );
-      },
-
-      savePlaylist: function(playlist, success, failure) {
-        var that = this;
-        this.pm.addPlayList(playlist.name,
-            function(data, response) {
-              console.log('Successfully added playlist ' + playlist.name);
-              var playlistId = data.mutate_response[0].id;
-              var async = require('async');
-              var songs = ss.SearchUtil.searchSongs(playlist.query, 0, 0, '', playlist.styles, 100);
-              async.eachLimit(songs,
-                1,  // add one at a time. be nice to Google
-                function(item, callback) {
-                  that.findSong(item,
-                    function(song) {
-                      that.pm.addTrackToPlayList(song.track.nid, playlistId,
-                          function(data, res) { callback(); },
-                          function(data, err, res) { callback(); });
-                    },
-                    function() {
-                      callback();  // no errors for now
-                    }
-                  );
-                },
-                function(err) {
-                  if (err) {
-                    console.error('Unable to fill songs for playlist', err);
-                    return;
-                  }
-                  console.log('Finished creating playlist.');
-                }
-              );
-            },
-            failure
-        );
-      },
-    });
-  </script>
-</polymer-element>
+      );
+    },
+  });
+</script>

@@ -3,44 +3,60 @@
 <link href="../core-icon/core-icon.html" rel="import">
 <link href="../core-selector/core-selector.html" rel="import">
 
-<polymer-element name="ss-star-rating" attributes="count value readOnly">
 
+<dom-module id="ss-star-rating">
+  <link href="ss-star-rating.css" rel="import" type="css">
   <template>
-    <link href="ss-star-rating.css" rel="stylesheet">
     <core-style ref="main"></core-style>
 
     <core-selector selected="{{selectedStar}}" activateEvent="click" id="selector">
-      <template repeat="{{n in stars}}">
-        <core-icon icon="star-rate" class="{{ {selected: n < value} | tokenList }}"></core-icon>
+      <template is="dom-repeat" items="{{stars}}">
+        <core-icon icon="star-rate" class$="{{computeIsSelected(item, value)}}"></core-icon>
       </template>
     </core-selector>
   </template>
+</dom-module>
 
-  <script>
-    Polymer('ss-star-rating', {
+<script>
+  Polymer({
+    is: 'ss-star-rating',
 
-      count: 5,
-
-      value: 0,
-
-      readOnly: false,
-
-      ready: function() {
-        this.countChanged(0, this.count);
+    properties: {
+      count: {
+        type: Number,
+        value: 5,
+        observer: 'countChanged'
       },
-
-      countChanged: function(oldValue, newValue) {
-        this.stars = [];
-        for (var i = 0; i < this.count; ++i) {
-          this.stars.push(i);
-        }
+      value: {
+        type: Number,
+        value: 0,
+        notify: true
       },
+      readOnly: {
+        type: Boolean,
+        value: false
+      }
+    },
 
-      selectedStarChanged: function(e, detail, sender) {
-        if (!this.readOnly) {
-          this.value = detail + 1;
-        }
-      },
-    });
-  </script>
-</polymer-element>
+    ready: function() {
+      this.countChanged(0, this.count);
+    },
+
+    countChanged: function(newValue, oldValue) {
+      this.stars = [];
+      for (var i = 0; i < this.count; ++i) {
+        this.stars.push(i);
+      }
+    },
+
+    selectedStarChanged: function(e, detail, sender) {
+      if (!this.readOnly) {
+        this.value = detail + 1;
+      }
+    },
+  });
+
+  computeIsSelected(item, value) {
+    return item < value ? "selected" : "";
+  }
+</script>

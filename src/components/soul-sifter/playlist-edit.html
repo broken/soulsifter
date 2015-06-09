@@ -1,5 +1,6 @@
 <link href="../polymer/polymer.html" rel="import">
 
+<link href="../iron-flex-layout/iron-flex-layout.html" rel="import">
 <link href="../paper-checkbox/paper-checkbox.html" rel="import">
 <link href="../paper-input/paper-input.html" rel="import">
 
@@ -8,15 +9,14 @@
 <link href="themes.html" rel="import">
 
 
-<polymer-element name="playlist-edit" attributes="playlist">
-
+<dom-module id="playlist-edit">
+  <link href="playlist-edit.css" rel="import" type="css">
   <template>
-    <link href="playlist-edit.css" rel="stylesheet">
     <core-style ref="main"></core-style>
 
-    <abstract-action-page acceptAction="{{save}}">
-      <div horizontal layout around-justified id="pageContainer">
-        <div vertical layout>
+    <abstract-action-page id="abstractActionPage">
+      <div id="pageContainer">
+        <div class="vert">
           <paper-input floatingLabel label="Name" value="{{playlist.name}}"></paper-input>
           <paper-input floatingLabel label="Query" value="{{playlist.query}}"></paper-input>
           <paper-checkbox label="from Song Trail" checked="{{fromSongTrail}}"></paper-checkbox>
@@ -25,29 +25,41 @@
       </div>
     </abstract-action-page>
   </template>
+</dom-module>
 
-  <script>
-    Polymer('playlist-edit', {
+<script>
+  Polymer({
+    is: 'playlist-edit',
 
-      fromSongTrail: false,
+    properties: {
+      playlist: {
+        type: Object,
+        observer: 'playlistChanged'
+      }
+    },
 
-      playlistChanged: function(oldValue, newValue) {
-        this.$.genreList.setSelection(newValue.styles);
-      },
+    fromSongTrail: false,
 
-      save: function(e, detail, sender) {
-        if (this.genreSelection) this.playlist.styles = this.genreSelection;
-        if (this.playlist.id) {
-          this.playlist.update();
-        } else {
-          this.playlist.save();
-          if (this.fromSongTrail) {
-            this.asyncFire('core-signal', {name: 'save-song-trail', data: {playlist: this.playlist} });
-          }
+    domReady: function() {
+      this.$.abstractActionPage.setAcceptAction(this.save);
+    },
+
+    playlistChanged: function(newValue, oldValue) {
+      this.$.genreList.setSelection(newValue.styles);
+    },
+
+    save: function(e, detail, sender) {
+      if (this.genreSelection) this.playlist.styles = this.genreSelection;
+      if (this.playlist.id) {
+        this.playlist.update();
+      } else {
+        this.playlist.save();
+        if (this.fromSongTrail) {
+          this.asyncFire('core-signal', {name: 'save-song-trail', data: {playlist: this.playlist} });
         }
-        this.asyncFire('core-signal', {name: 'playlists-changed'});
-      },
+      }
+      this.asyncFire('core-signal', {name: 'playlists-changed'});
+    },
 
-    });
-  </script>
-</polymer-element>
+  });
+</script>

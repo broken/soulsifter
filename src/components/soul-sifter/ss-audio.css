@@ -23,3 +23,11 @@ paper-slider::shadow .bar-container #sliderBar{
 paper-slider::shadow #sliderKnob {
   display: none;
 }
+
+.horizontal {
+  @apply(--layout-horizontal);
+}
+
+.timebar {
+  @apply(--layout-vertical --layout-flex);
+}

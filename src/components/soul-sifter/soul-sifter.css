@@ -54,3 +54,11 @@ paper-toast {
   left: auto;
   right: 20px;
 }
+
+.vertical {
+  @apply(--layout-vertical);
+}
+
+.flex {
+  @apply(--layout-flex);
+}

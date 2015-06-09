@@ -1,5 +1,6 @@
 <link href="../polymer/polymer.html" rel="import">
 
+<link href="../iron-flex-layout/iron-flex-layout.html" rel="import">
 <link href="../core-icons/core-icons.html" rel="import">
 <link href="../core-menu/core-menu.html" rel="import">
 <link href="../core-style/core-style.html" rel="import">
@@ -13,17 +14,16 @@
 <link href="themes.html" rel="import">
 
 
-<polymer-element name="song-list-item" attributes="song">
-
+<dom-module id="song-list-item">
+  <link href="song-list-item.css" rel="import" type="css">
   <template>
-    <link href="song-list-item.css" rel="stylesheet">
     <core-style ref="main"></core-style>
 
     <global-state values="{{global}}"></global-state>
 
-    <div horizontal layout center class="song-item" draggable="true" on-dragstart="{{dragSong}}" id="draggableItem">
+    <div class="song-item" draggable="true" on-dragstart="{{dragSong}}" id="draggableItem">
       <div id="cover"></div>
-      <div flex class="key fade-out">
+      <div class="key fade-out flex">
         <span class="artist">{{song.artist}}</span>
         <span> - </span>
         <span class="title">{{song.title}}</span>
@@ -37,59 +37,57 @@
         </paper-dropdown>
       </paper-menu-button>
       <div class="bpmDiff">{{bpmDiff}}</div>
-      <ss-star-rating value="{{song.rating}}" readOnly></ss-star-rating>
+      <ss-star-rating value="{{song.rating}}" read-only></ss-star-rating>
       <time class="added">{{localeDate}}</time>
     </div>
   </template>
+</dom-module>
 
-  <script>
-    Polymer('song-list-item', {
+<script>
+  Polymer({
+    is: 'song-list-item',
 
-      /** @attribute song */
-      song: null,
+    properties: {
+      song: Object
+    },
 
-      bpmDiff: '',
+    observers: [
+      'globalBpmChanged(global.bpm)',
+      'globalMusicDirChanged(gobal.musicDir)'
+    ],
 
-      localeDate: '',
+    bpmDiff: '',
 
-      observe: {
-        'global.bpm': 'globalBpmChanged',
-        'gobal.musicDir': 'globalMusicDirChanged'
-      },
+    localeDate: '',
 
-      attached: function() {
-        this.localeDate = new Date(this.song.dateAdded).toLocaleDateString();
-        this.$.cover.style.backgroundImage = 'url("' + this.song.album.coverFilepath + '")';
-      },
+    attached: function() {
+      this.localeDate = new Date(this.song.dateAdded).toLocaleDateString();
+      this.$.cover.style.backgroundImage = 'url("' + this.song.album.coverFilepath + '")';
+    },
 
-      globalChanged: function(oldValue, newValue) {
-        this.globalMusicDirChanged('', this.global.musicDir);
-      },
+    globalMusicDirChanged: function(newValue) {
+      //var filename = this.song.filePath.substr(this.song.filePath.lastIndexOf('/') + 1);
+      //var fp = newValue + this.song.filePath.substr(this.song.filePath.search('mp3') + 3);
+      //this.filepath = 'application/octet-stream:' + filename + ':file://' + fp;
+    },
 
-      globalMusicDirChanged: function(oldValue, newValue) {
-        //var filename = this.song.filePath.substr(this.song.filePath.lastIndexOf('/') + 1);
-        //var fp = newValue + this.song.filePath.substr(this.song.filePath.search('mp3') + 3);
-        //this.filepath = 'application/octet-stream:' + filename + ':file://' + fp;
-      },
+    globalBpmChanged: function(newValue) {
+      if (this.global.bpm)
+        this.bpmDiff = ((this.global.bpm / this.song.bpm - 1) * 100).toFixed(2);
+    },
 
-      globalBpmChanged: function(oldValue, newValue) {
-        if (this.global.bpm)
-          this.bpmDiff = ((this.global.bpm / this.song.bpm - 1) * 100).toFixed(2);
-      },
+    dragSong: function(e) {
+      e.dataTransfer.effectAllowed = 'move';
+      e.dataTransfer.setData('text/plain', 'extensis-filenames-type:' + this.song.filepath);
+    },
 
-      dragSong: function(e) {
-        e.dataTransfer.effectAllowed = 'move';
-        e.dataTransfer.setData('text/plain', 'extensis-filenames-type:' + this.song.filepath);
-      },
+    clickEditAction: function(e, detail, sender) {
+      e.stopPropagation();
+      this.asyncFire('page-song-edit', {song: this.song});
+    },
 
-      clickEditAction: function(e, detail, sender) {
-        e.stopPropagation();
-        this.asyncFire('page-song-edit', {song: this.song});
-      },
-
-      stopPropagation: function(e, detail, sender) {
-        e.stopPropagation();
-      },
-    });
-  </script>
-</polymer-element>
+    stopPropagation: function(e, detail, sender) {
+      e.stopPropagation();
+    },
+  });
+</script>

@@ -1,5 +1,6 @@
 <link href="../polymer/polymer.html" rel="import">
 
+<link href="../iron-flex-layout/iron-flex-layout.html" rel="import">
 <link href="../core-animated-pages/core-animated-pages.html" rel="import">
 <link href="../core-drawer-panel/core-drawer-panel.html" rel="import">
 <link href="../core-header-panel/core-header-panel.html" rel="import">
@@ -20,33 +21,32 @@
 <link href="themes.html" rel="import">
 
 
-<polymer-element name="soul-sifter">
-
+<dom-module id="soul-sifter">
+  <link href="soul-sifter.css" rel="import" type="css">
   <template>
-    <link href="soul-sifter.css" rel="stylesheet">
     <core-style ref="main"></core-style>
 
     <div id="soulSifter">
       <core-animated-pages transitions="slide-from-right" selected="{{section}}" id="main">
         <section>
           <core-drawer-panel id="core_drawer_panel">
-            <section id="core_drawer_panel-drawer" drawer layout vertical>
-              <paper-tabs selected="1" id="paper_tabs">
+            <section id="core_drawer_panel-drawer" drawer class="vertical">
+              <paper-tabs selected="{{selectedTab}}" id="paper_tabs">
                 <paper-tab id="paper_tab-song">Song</paper-tab>
                 <paper-tab id="paper_tab-genres" active>Genres</paper-tab>
                 <paper-tab id="paper_tab-playlists">Playlists</paper-tab>
               </paper-tabs>
-              <core-animated-pages selected="{{ $.paper_tabs.selected }}" id="core_animated_pages" flex>
-                <song-section songTrail="{{songTrail}}"></song-section>
+              <core-animated-pages selected="{{selectedTab}}" id="core_animated_pages" class="flex">
+                <song-section song-trail="{{songTrail}}"></song-section>
                 <genre-list selection="{{genres}}"></genre-list>
                 <playlist-list on-query-change="{{changeQuery}}" on-genre-change="{{updateGenres}}"></playlist-list>
               </core-animated-pages>
             </section>
             <core-header-panel main>
-              <search-toolbar query="{{query}}" djSearch="{{djSearch}}" class="core-header">
+              <search-toolbar query="{{query}}" dj-search="{{djSearch}}" class="core-header">
                 <paper-icon-button icon="menu" onclick="document.querySelector('soul-sifter::shadow core-drawer-panel').togglePanel();"></paper-icon-button>
               </search-toolbar>
-              <song-list query="{{query}}" djSearch="{{djSearch}}" songTrail="{{songTrail}}" class="content"></song-list>
+              <song-list query="{{query}}" dj-search="{{djSearch}}" song-trail="{{songTrail}}" class="content"></song-list>
             </core-header-panel>
           </core-drawer-panel>
         </section>
@@ -63,51 +63,59 @@
       <paper-toast id="toast" text="{{errorText}}" duration="5000" autoCloseDisabled></paper-toast>
     </div>
   </template>
+</dom-module>
 
-  <script>
-    Polymer('soul-sifter', {
+<script>
+  Polymer({
+    is: 'soul-sifter',
 
-      djSearch: true,
+    properties: {
+      selectedTab: {
+        type: Number,
+        value: 1
+      }
+    },
 
-      domReady: function() {
-        /* theming */
-        CoreStyle.g.theme.init();
+    djSearch: true,
 
-        /* setup listeners */
-        var that = this;
-        this.addEventListener('page-main', function(e) {
-          that.section = 0;
-        });
-        this.addEventListener('page-playlist-edit', function(e) {
-          that.section = 1;
-          that.playlist = e.detail.playlist;
-        });
-        this.addEventListener('page-song-edit', function(e) {
-          that.section = 2;
-          that.song = e.detail.song;
-        });
-        this.addEventListener('page-settings', function(e) {
-          that.section = 3;
-        });
-        this.addEventListener('error-alert', function(e) {
-          console.log(e.detail.msg);
-          that.errorText = e.detail.msg;
-          that.$.toast.show();
-        });
-      },
+    domReady: function() {
+      /* theming */
+      CoreStyle.g.theme.init();
 
-      changeQuery: function(e, detail, sender) {
-        this.query = detail;
-      },
+      /* setup listeners */
+      var that = this;
+      this.addEventListener('page-main', function(e) {
+        that.section = 0;
+      });
+      this.addEventListener('page-playlist-edit', function(e) {
+        that.section = 1;
+        that.playlist = e.detail.playlist;
+      });
+      this.addEventListener('page-song-edit', function(e) {
+        that.section = 2;
+        that.song = e.detail.song;
+      });
+      this.addEventListener('page-settings', function(e) {
+        that.section = 3;
+      });
+      this.addEventListener('error-alert', function(e) {
+        console.log(e.detail.msg);
+        that.errorText = e.detail.msg;
+        that.$.toast.show();
+      });
+    },
 
-      updateGenres: function(e, detail, sender) {
-        this.genres = detail;
-      },
+    changeQuery: function(e, detail, sender) {
+      this.query = detail;
+    },
 
-      genresChanged: function(spliceOrOldValue, undefOrNewValue) {
-        // The first selection uses a property observer, while subsequent calls use an array observer and calls this method with splice changes rather than the old & new values
-        this.asyncFire('core-signal', {name: 'genres-changed', data: this.genres});
-      },
-    });
-  </script>
-</polymer-element>
+    updateGenres: function(e, detail, sender) {
+      this.genres = detail;
+    },
+
+    genresChanged: function(spliceOrOldValue, undefOrNewValue) {
+      // The first selection uses a property observer, while subsequent calls use an array observer and calls this method with splice changes rather than the old & new values
+      this.asyncFire('core-signal', {name: 'genres-changed', data: this.genres});
+    },
+  });
+</script>

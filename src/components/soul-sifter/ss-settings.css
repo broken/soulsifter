@@ -1,4 +1,5 @@
 #pageContainer {
+  @apply(--layout-horizontal --layout-around-justified);
   width: 100%;
 }
 
@@ -21,4 +22,8 @@ paper-checkbox {
 
 .label {
   font-size: 0.75em;
+}
+
+.vertical {
+  @apply(--layout-vertical);
 }

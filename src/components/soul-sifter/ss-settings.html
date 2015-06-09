@@ -1,5 +1,6 @@
 <link href="../polymer/polymer.html" rel="import">
 
+<link href="../iron-flex-layout/iron-flex-layout.html" rel="import">
 <link href="../core-style/core-style.html" rel="import">
 <link href="../paper-checkbox/paper-checkbox.html" rel="import">
 <link href="../paper-input/paper-input.html" rel="import">
@@ -7,21 +8,20 @@
 <link href="themes.html" rel="import">
 
 
-<polymer-element name="ss-settings">
-
+<dom-module id="ss-settings">
+  <link href="ss-settings.css" rel="import" type="css">
   <template>
-    <link href="ss-settings.css" rel="stylesheet">
     <core-style ref="main"></core-style>
 
-    <abstract-action-page acceptAction="{{save}}">
-      <div horizontal layout around-justified id="pageContainer">
-        <div vertical layout>
+    <abstract-action-page id="abstractActionPage">
+      <div id="pageContainer">
+        <div class="vertical">
           <paper-input floatingLabel label="Google Music Email" value="{{googleEmail}}"></paper-input>
           <paper-input floatingLabel label="Google Music App Key" value="{{googleAppKey}}"></paper-input>
           <br>
           <paper-input floatingLabel label="Default song list limit" value="{{songListLimit}}"></paper-input>
         </div>
-        <div vertical layout>
+        <div class="vertical">
           <paper-input floatingLabel label="Database Name" value="{{dbName}}"></paper-input>
           <paper-input floatingLabel label="Database User" value="{{dbUser}}"></paper-input>
           <paper-input floatingLabel label="Database Password" value="{{dbPassword}}"></paper-input>
@@ -30,32 +30,37 @@
       </div>
     </abstract-action-page>
   </template>
+</dom-module>
 
-  <script>
+<script>
 
-    Polymer('ss-settings', {
+  Polymer({
+    is: 'ss-settings',
 
-      created: function() {
-        this.settings = new ss.SoulSifterSettings();
-        this.googleAppKey = this.settings.getString('google.appKey');
-        this.googleEmail = this.settings.getString('google.email');
-        this.dbName = this.settings.getString('db.name');
-        this.dbUser = this.settings.getString('db.user');
-        this.dbPassword = this.settings.getString('db.password');
-        this.dbUrl = this.settings.getString('db.url');
-        this.songListLimit = this.settings.getInt("songList.limit");
-      },
+    created: function() {
+      this.settings = new ss.SoulSifterSettings();
+      this.googleAppKey = this.settings.getString('google.appKey');
+      this.googleEmail = this.settings.getString('google.email');
+      this.dbName = this.settings.getString('db.name');
+      this.dbUser = this.settings.getString('db.user');
+      this.dbPassword = this.settings.getString('db.password');
+      this.dbUrl = this.settings.getString('db.url');
+      this.songListLimit = this.settings.getInt("songList.limit");
+    },
 
-      save: function(e, detail, sender) {
-        this.settings.putString('google.appKey', this.googleAppKey);
-        this.settings.putString('google.email', this.googleEmail);
-        this.settings.putString('db.name', this.dbName);
-        this.settings.putString('db.user', this.dbUser);
-        this.settings.putString('db.password', this.dbPassword);
-        this.settings.putString('db.url', this.dbUrl);
-        this.settings.putInt("songList.limit", this.songListLimit);
-        this.settings.save();
-      },
-    });
-  </script>
-</polymer-element>
+    domReady: function() {
+      this.$.abstractActionPage.setAcceptAction(this.save);
+    },
+
+    save: function(e, detail, sender) {
+      this.settings.putString('google.appKey', this.googleAppKey);
+      this.settings.putString('google.email', this.googleEmail);
+      this.settings.putString('db.name', this.dbName);
+      this.settings.putString('db.user', this.dbUser);
+      this.settings.putString('db.password', this.dbPassword);
+      this.settings.putString('db.url', this.dbUrl);
+      this.settings.putInt("songList.limit", this.songListLimit);
+      this.settings.save();
+    },
+  });
+</script>

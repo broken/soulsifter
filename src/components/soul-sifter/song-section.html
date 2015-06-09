@@ -1,5 +1,6 @@
 <link href="../polymer/polymer.html" rel="import">
 
+<link href="../iron-flex-layout/iron-flex-layout.html" rel="import">
 <link href="../core-menu/core-menu.html" rel="import">
 <link href="../core-scroll-header-panel/core-scroll-header-panel.html" rel="import">
 <link href="../core-signals/core-signals.html" rel="import">
@@ -18,10 +19,9 @@
 <link href="themes.html" rel="import">
 
 
-<polymer-element name="song-section" attributes="songTrail">
-
+<dom-module id="song-section">
+  <link href="song-section.css" rel="import" type="css">
   <template>
-    <link href="song-section.css" rel="stylesheet">
     <core-style ref="main"></core-style>
 
     <global-state values="{{global}}"></global-state>
@@ -30,27 +30,27 @@
 
     <core-scroll-header-panel condenses keepCondensedHeader fit condensedHeaderHeight="40px" id="cshp">
       <core-toolbar id="header" draggable="true" on-dragstart="{{dragSong}}">
-        <div horizontal layout justified id="nav">
-          <paper-icon-button icon="arrow-back" on-click="{{backAction}}" disabled?="{{!songTrailIndex}}"></paper-icon-button>
-          <paper-icon-button icon="arrow-forward" on-click="{{forwardAction}}" disabled?="{{songTrailIndex == songTrail.length}}"></paper-icon-button>
+        <div id="nav">
+          <paper-icon-button icon="arrow-back" on-click="{{backAction}}" disabled$="{{!songTrailIndex}}"></paper-icon-button>
+          <paper-icon-button icon="arrow-forward" on-click="{{forwardAction}}" disabled$="{{isIndexAtEndOfSongTrail(songTrailIndex, songTrail)}}"></paper-icon-button>
         </div>
       </core-toolbar>
-      <section vertical layout class="content">
+      <section class="content vertical">
         <div class="title">{{song.title}}</div>
         <div class="artist">{{song.artist}}</div>
-        <ss-star-rating value="{{song.rating}}" readOnly></ss-star-rating>
+        <ss-star-rating value="{{song.rating}}" read-only></ss-star-rating>
         <div class="track" self-end>{{song.album.track}}</div>
         <div class="track" self-end>{{song.album.name}}</div>
-        <div class="released" self-end>{{song.album.releaseDateYear}}-{{song.album.releaseDateMonth}}-{{song.album.releaseDateDay}}</div>
-        <div class="comments" flex>{{song.comments}}</div>
+        <div class="released" self-end><span>{{song.album.releaseDateYear}}</span>-<span>{{song.album.releaseDateMonth}}</span>-<span>{{song.album.releaseDateDay}}</span></div>
+        <div class="comments flex">{{song.comments}}</div>
         <div class="bpm">{{song.bpm}} bpm</div>
         <time class="added">{{localeDateTime}}</time>
-        <div horizontal layout center>
+        <div class="slider">
           <div>pitch</div>
           <pitch-slider></pitch-slider>
         </div>
-        <div horizontal layout flex>
-          <ss-audio flex id="audio"></ss-audio>
+        <div class="btn">
+          <ss-audio class="flex" id="audio"></ss-audio>
           <paper-menu-button on-click="{{stopPropagation}}">
             <paper-icon-button icon="more-vert"></paper-icon-button>
             <paper-dropdown class="dropdown" transition="cascade" halign="right" valign="bottom">
@@ -63,110 +63,122 @@
       </section>
     </core-scroll-header-panel>
   </template>
+</dom-module>
 
-  <script>
+<script>
 
-    Polymer('song-section', {
+  Polymer({
+    is: 'song-section',
 
-      localeDateTime: '',
+    properties: {
+      songTrail: {
+        type: Array,
+        notify: true
+      }
+    },
 
-      songTrailIndex: 0,
+    observers: {
+      'globalSongChanged(global.song)'
+    },
 
-      observe: {
-        'global.song': 'globalSongChanged'
-      },
+    localeDateTime: '',
 
-      created: function() {
-        this.songTrail = [];
-      },
+    songTrailIndex: 0,
 
-      ready: function() {
-        this.fs = require('fs');
-      },
+    created: function() {
+      this.songTrail = [];
+    },
 
-      globalSongChanged: function(oldSong, song) {
-        this.song = song;
-        if (!song) {
-          this.setCoverImage();
-          return;
-        }
+    ready: function() {
+      this.fs = require('fs');
+    },
 
-        var entry = new ss.PlaylistEntry();
-        entry.song = song;
-        entry.position = this.songTrailIndex++;
-        this.songTrail[entry.position] = entry;
+    globalSongChanged: function(song) {
+      this.song = song;
+      if (!song) {
+        this.setCoverImage();
+        return;
+      }
 
-        this.localeDateTime = new Date(this.song.dateAdded).toLocaleString();
+      var entry = new ss.PlaylistEntry();
+      entry.song = song;
+      entry.position = this.songTrailIndex++;
+      this.songTrail[entry.position] = entry;
 
-        // audio source; use local, otherwise contact google api
-        var that = this;
-        this.fs.access(this.song.filepath, this.fs.F_OK | this.fs.R_OK, function(err) {
-            if (!err) {
-              that.$.audio.src = "file://" + that.song.filepath;
-              that.setCoverImage(that.song.album.coverFilepath);
-            } else {
-              that.$.gpm.findSong(that.song,
-                  function(s) {
-                    window.console.log(s);
-                    that.$.gpm.findStreamUrl(s.track.nid,
-                        function(url) {
-                          that.$.audio.src = url;
-                        },
-                        function(msg, body, err, resp) { console.warn(msg); that.$.audio.src = ''; });
-                    if (s.track.albumArtRef && s.track.albumArtRef.length) {
-                      that.setCoverImage(s.track.albumArtRef[0].url);
-                    } else {
-                      that.setCoverImage();
-                    }
-                  },
-                  function(msg, body, err, resp) {
-                    console.warn(msg);
-                    that.$.audio.src = '';
+      this.localeDateTime = new Date(this.song.dateAdded).toLocaleString();
+
+      // audio source; use local, otherwise contact google api
+      var that = this;
+      this.fs.access(this.song.filepath, this.fs.F_OK | this.fs.R_OK, function(err) {
+          if (!err) {
+            that.$.audio.src = "file://" + that.song.filepath;
+            that.setCoverImage(that.song.album.coverFilepath);
+          } else {
+            that.$.gpm.findSong(that.song,
+                function(s) {
+                  window.console.log(s);
+                  that.$.gpm.findStreamUrl(s.track.nid,
+                      function(url) {
+                        that.$.audio.src = url;
+                      },
+                      function(msg, body, err, resp) { console.warn(msg); that.$.audio.src = ''; });
+                  if (s.track.albumArtRef && s.track.albumArtRef.length) {
+                    that.setCoverImage(s.track.albumArtRef[0].url);
+                  } else {
                     that.setCoverImage();
                   }
-                );
-            }
-          });
-      },
+                },
+                function(msg, body, err, resp) {
+                  console.warn(msg);
+                  that.$.audio.src = '';
+                  that.setCoverImage();
+                }
+              );
+          }
+        });
+    },
 
-      dragSong: function(e) {
-        e.dataTransfer.effectAllowed = 'move';
-        e.dataTransfer.setData('text/plain', 'extensis-filenames-type:' + this.song.filepath);
-      },
+    dragSong: function(e) {
+      e.dataTransfer.effectAllowed = 'move';
+      e.dataTransfer.setData('text/plain', 'extensis-filenames-type:' + this.song.filepath);
+    },
 
-      backAction: function(e, detail, sender) {
-        this.global.song = --this.songTrailIndex ? this.songTrail[--this.songTrailIndex].song : undefined;
-      },
+    backAction: function(e, detail, sender) {
+      this.global.song = --this.songTrailIndex ? this.songTrail[--this.songTrailIndex].song : undefined;
+    },
 
-      forwardAction: function(e, detail, sender) {
-        this.global.song = this.songTrail[this.songTrailIndex].song;
-      },
+    forwardAction: function(e, detail, sender) {
+      this.global.song = this.songTrail[this.songTrailIndex].song;
+    },
 
-      saveSongTrail: function(e, detail, sender) {
-        var playlist = detail.playlist;
-        for (var i = 0; i < this.songTrailIndex; ++i) {
-          var entry = this.songTrail[i];
-          entry.playlist = playlist;
-          entry.save();
-        }
-      },
+    saveSongTrail: function(e, detail, sender) {
+      var playlist = detail.playlist;
+      for (var i = 0; i < this.songTrailIndex; ++i) {
+        var entry = this.songTrail[i];
+        entry.playlist = playlist;
+        entry.save();
+      }
+    },
 
-      setCoverImage: function(img) {
-        var url = '';
-        if (img) {
-          url = 'url("' + img + '")';
-        }
-        this.$.cshp.shadowRoot.getElementById('headerBg').style.backgroundImage = url;
-      },
+    setCoverImage: function(img) {
+      var url = '';
+      if (img) {
+        url = 'url("' + img + '")';
+      }
+      this.$.cshp.shadowRoot.getElementById('headerBg').style.backgroundImage = url;
+    },
 
-      editAction: function(e, detail, sender) {
-        e.stopPropagation();
-        this.asyncFire('page-song-edit', {song: this.song});
-      },
+    editAction: function(e, detail, sender) {
+      e.stopPropagation();
+      this.asyncFire('page-song-edit', {song: this.song});
+    },
 
-      stopPropagation: function(e, detail, sender) {
-        e.stopPropagation();
-      },
-    });
-  </script>
-</polymer-element>
+    stopPropagation: function(e, detail, sender) {
+      e.stopPropagation();
+    },
+  });
+
+  isIndexAtEndOfSongTrail(songTrailIndex, songTrail) {
+    return songTrailIndex == songTrail.index;
+  }
+</script>

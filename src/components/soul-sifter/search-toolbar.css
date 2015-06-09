@@ -21,3 +21,7 @@ core-toolbar::shadow .toolbar-tools {
 #bpm::shadow .mirror-text, #bpm::shadow .label {
   padding: 0;
 }
+
+.flex {
+  @apply(--layout-flex);
+}

@@ -16,6 +16,7 @@ paper-dropdown {
   height: 30px;
 }
 #item {
+  @apply(--layout-horizontal --layout-center);
   height: 30px;
   padding-left: 40px;
 }
@@ -38,4 +39,8 @@ paper-dropdown {
 #item paper-menu-button paper-icon-button {
   margin-top: 4px;
   padding: 0;
+}
+
+.flex {
+  @apply(--layout-flex);
 }

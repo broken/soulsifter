@@ -13,3 +13,15 @@ div.text {
 .heading {
   margin-top: 14px;
 }
+
+.vertical {
+  @apply(--layout-vertical);
+}
+
+.horizontal {
+  @apply(--layout-horizontal);
+}
+
+.flex {
+  @apply(--layout-flex);
+}

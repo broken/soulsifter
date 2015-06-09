@@ -16,6 +16,7 @@ core-scroll-header-panel {
 }
 
 #nav {
+  @apply(--layout-horizontal --layout-justified);
   position: absolute;
   top: 0;
   left: 0;
@@ -30,4 +31,20 @@ core-scroll-header-panel {
 audio {
   height: 30px;
   width: 100%;
+}
+
+.vertical {
+  @apply(--layout-vertical);
+}
+
+.slider {
+  @apply(--layout-horizontal --layout-center);
+}
+
+.btn {
+  @apply(--layout-horizontal --layout-flex);
+}
+
+.flex {
+  @apply(--layout-flex);
 }

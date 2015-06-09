@@ -17,4 +17,9 @@ core-collapse {
 }
 #item {
   height: 30px;
+  @apply(--layout-horizontal --layout-center);
+}
+
+.flex {
+  @apply(--layout-flex);
 }

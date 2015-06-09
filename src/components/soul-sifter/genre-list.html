@@ -1,5 +1,5 @@
-<link href="../polymer/polymer.html" rel="import">
-
+<link href="../polymer/polymer.html" rel="import">{
+}
 <link href="../core-ajax/core-ajax.html" rel="import">
 <link href="../core-collapse/core-collapse.html" rel="import">
 <link href="../core-selection/core-selection.html" rel="import">
@@ -10,38 +10,45 @@
 <link href="themes.html" rel="import">
 
 
-<polymer-element name="genre-list" attributes="selection">
-
+<dom-module id="genre-list">
+  <link href="genre-list.css" rel="import" type="css">
   <template>
-    <link href="genre-list.css" rel="stylesheet">
     <core-style ref="main"></core-style>
 
-    <template repeat="{{g in genres}}" id="genreTpl">
-      <genre-list-item genre="{{g}}" on-genre-select="{{selectAction}}"></genre-list-item>
+    <template is="dom-repeat" items="{{genres}}" id="genreTpl">
+      <genre-list-item genre="{{item}}" on-genre-select="{{selectAction}}"></genre-list-item>
     </template>
     <core-selection multi id="selection"></core-selection>
   </template>
+</dom-module>
 
 <script>
-    Polymer('genre-list', {
+  Polymer({
+    is: 'genre-list',
 
-      domReady: function() {
-        this.genres = ss.Style.findAllParents();
-      },
+    properties: {
+      selection: {
+        type: Array,
+        notify: true
+      }
+    },
 
-      setSelection: function(genres) {
-        for (var i = 0, item = this.$.genreTpl.nextElementSibling;
-            item && i < this.genres.length;
-            item = item.nextElementSibling, ++i) {
-          item.selectIfInArray(genres);
-        }
-      },
+    domReady: function() {
+      this.genres = ss.Style.findAllParents();
+    },
 
-      selectAction: function(e, detail, sender) {
-        this.$.selection.select(detail);
-        this.selection = this.$.selection.getSelection();
-      },
-      
-    });
-  </script>
-</polymer-element>
+    setSelection: function(genres) {
+      for (var i = 0, item = this.$.genreTpl.nextElementSibling;
+          item && i < this.genres.length;
+          item = item.nextElementSibling, ++i) {
+        item.selectIfInArray(genres);
+      }
+    },
+
+    selectAction: function(e, detail, sender) {
+      this.$.selection.select(detail);
+      this.selection = this.$.selection.getSelection();  // Bug? may return single item rather than array.
+    },
+    
+  });
+</script>

@@ -1,5 +1,6 @@
 <link href="../polymer/polymer.html" rel="import">
 
+<link href="../iron-flex-layout/iron-flex-layout.html" rel="import">
 <link href="../core-style/core-style.html" rel="import">
 <link href="../paper-checkbox/paper-checkbox.html" rel="import">
 <link href="../paper-input/paper-input.html" rel="import">
@@ -9,14 +10,15 @@
 <link href="ss-star-rating.html" rel="import">
 <link href="themes.html" rel="import">
 
-<polymer-element name="song-edit" attributes="song">
+
+<dom-module id="song-edit">
+  <link href="song-edit.css" rel="import" type="css">
   <template>
-    <link href="song-edit.css" rel="stylesheet">
     <core-style ref="main"></core-style>
 
-    <abstract-action-page acceptAction="{{save}}">
-      <div horizontal layout around-justified id="pageContainer">
-        <div vertical layout>
+    <abstract-action-page id="abstractActionPage">
+      <div id="pageContainer">
+        <div class="vertical">
           <paper-input label="Artist" value="{{song.artist}}" required="true" floatingLabel></paper-input>
           <paper-input label="Track Num" value="{{song.track}}" floatingLabel></paper-input>
           <paper-input label="Title" value="{{song.title}}" required="true" floatingLabel></paper-input>
@@ -31,7 +33,7 @@
           <paper-checkbox label="Low Quality" checked="{{song.lowQuality}}" floatingLabel></paper-checkbox>
           <paper-checkbox label="Mixed" checked="{{song.album.mixed}}" floatingLabel></paper-checkbox>
         </div>
-        <div vertical layout>
+        <div class="vertical">
           <paper-input label="Album Artist" value="{{song.album.artist}}" floatingLabel></paper-input>
           <paper-input label="Album Name" value="{{song.album.name}}" required="true" floatingLabel></paper-input>
           <paper-input label="POS" value="{{song.albumPart.pos}}" floatingLabel></paper-input>
@@ -47,21 +49,34 @@
       </div>
     </abstract-action-page>
   </template>
-  <script>
-    Polymer('song-edit', {
+</dom-module>
 
-      songChanged: function(oldValue, newValue) {
-        this.$.genreList.setSelection(newValue.styles);
-      },
+<script>
+  Polymer({
+    is: 'song-edit',
 
-      save: function(e, detail, sender) {
-        this.song.styles = this.genreSelection;
-        if (this.song.id) {
-          this.song.update();
-        } else {
-          this.song.save();
-        }
-      },
-    });
-  </script>
-</polymer-element>
+    properties: {
+      song: {
+        type: Object,
+        observer: 'songChanged'
+      }
+    },
+
+    domReady: function() {
+      this.$.abstractActionPage.setAcceptAction(this.save);
+    },
+
+    songChanged: function(newValue, oldValue) {
+      this.$.genreList.setSelection(newValue.styles);
+    },
+
+    save: function(e, detail, sender) {
+      this.song.styles = this.genreSelection;
+      if (this.song.id) {
+        this.song.update();
+      } else {
+        this.song.save();
+      }
+    },
+  });
+</script>

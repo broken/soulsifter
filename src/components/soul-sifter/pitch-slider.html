@@ -7,51 +7,63 @@
 <link href="themes.html" rel="import">
 
 
-<polymer-element name="pitch-slider" attributes="pitch pitchPctMax">
-
+<dom-module id="pitch-slider">
+  <link href="pitch-slider.css" rel="import" type="css">
   <template>
-    <link href="pitch-slider.css" rel="stylesheet">
     <core-style ref="main"></core-style>
 
     <global-state values="{{global}}"></global-state>
 
-    <paper-slider editable pin value="{{pitch}}" step="0.1" min="{{-pitchPctMax}}" max="{{pitchPctMax}}"></paper-slider>
+    <paper-slider editable pin value="{{pitch}}" step="0.1" min="{{pitchPctMin}}" max="{{pitchPctMax}}"></paper-slider>
   </template>
+</dom-module>
 
-  <script>
-    Polymer('pitch-slider', {
+<script>
+  Polymer({
+    is: 'pitch-slider',
 
-      // hints
-      pitch: 0,
-      pitchPctMax: 8,
-
-      observe: {
-        'global.bpm': 'globalBpmChanged',
-        'global.song': 'globalSongChanged'
+    properties: {
+      pitch: {
+        type: Number,
+        value: 0,
+        observer: 'pitchChanged'
       },
-
-      globalSongChanged: function(oldSong, song) {
-        if (!song || !song.bpm) return;
-        if (this.global.bpm == 0) {
-          this.global.bpm = parseFloat(song.bpm).toFixed(1);
-        } else {
-          var pitch = this.global.bpm / song.bpm;
-          pitch = (pitch - 1) * 100;
-          if (pitch > this.pitchPctMax) pitch = this.pitchPctMax;
-          if (pitch < -this.pitchPctMax) pitch = -this.pitchPctMax;
-          this.pitch = pitch;
-        }
+      pitchPctMax: {
+        type: Number,
+        value: 8
       },
+      pitchPctMin: {
+        type: Number,
+        value: -8
+      }
+    },
 
-      globalBpmChanged: function(oldBpm, bpm) {
-        if (this.global.song && this.global.song.bpm)
-          this.pitch = (this.global.bpm - this.global.song.bpm) / this.global.song.bpm * 100;
-      },
+    observers: [
+      'globalBpmChanged(global.bpm)',
+      'globalSongChanged(global.song)'
+    ],
 
-      pitchChanged: function(oldValue, newValue) {
-        if (this.global.song && this.global.song.bpm)
-          this.global.bpm = (this.global.song.bpm * (this.pitch/100) + this.global.song.bpm * 1).toFixed(1);
-      },
-    });
-  </script>
-</polymer-element>
+    globalSongChanged: function(song) {
+      if (!song || !song.bpm) return;
+      if (this.global.bpm == 0) {
+        this.global.bpm = parseFloat(song.bpm).toFixed(1);
+      } else {
+        var pitch = this.global.bpm / song.bpm;
+        pitch = (pitch - 1) * 100;
+        if (pitch > this.pitchPctMax) pitch = this.pitchPctMax;
+        if (pitch < this.pitchPctMin) pitch = this.pitchPctMin;
+        this.pitch = pitch;
+      }
+    },
+
+    globalBpmChanged: function(bpm) {
+      if (this.global.song && this.global.song.bpm)
+        this.pitch = (this.global.bpm - this.global.song.bpm) / this.global.song.bpm * 100;
+    },
+
+    pitchChanged: function(newValue, oldValue) {
+      if (this.global.song && this.global.song.bpm)
+        this.global.bpm = (this.global.song.bpm * (this.pitch/100) + this.global.song.bpm * 1).toFixed(1);
+    },
+  });
+</script>

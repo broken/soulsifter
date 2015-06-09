@@ -1,27 +1,37 @@
 <link href="../polymer/polymer.html" rel="import">
 
 
-<polymer-element name="global-state" attributes="values">
-  <script>
-    (function() {
-      /**
-       * bpm: active bpm
-       * song: current active song
-       * musicDir: main directory for music
-       * pm: play music instance
-       */
-      var values = {};
+<dom-module id="global-state">
+</dom-module>
 
-      Polymer('global-state', {
-        ready: function() {
-          this.values = values;
-          for (var i = 0; i < this.attributes.length; ++i) {
-            var attr = this.attributes[i];
-            if (attr.nodeName != 'values')
-              values[attr.nodeName] = attr.value;
-          }
+<script>
+  (function() {
+    /**
+     * bpm: active bpm
+     * song: current active song
+     * musicDir: main directory for music
+     * pm: play music instance
+     */
+    var values = {};
+
+    Polymer({
+      is: 'global-state',
+
+      properties: {
+        values: {
+          type: Object,
+          notify: true
         }
-      });
-    })();
-  </script>
-</polymer-element>
+      },
+      
+      ready: function() {
+        this.values = values;
+        for (var i = 0; i < this.attributes.length; ++i) {
+          var attr = this.attributes[i];
+          if (attr.nodeName != 'values')
+            values[attr.nodeName] = attr.value;
+        }
+      }
+    });
+  })();
+</script>

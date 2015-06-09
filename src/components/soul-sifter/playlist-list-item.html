@@ -1,5 +1,6 @@
 <link href="../polymer/polymer.html" rel="import">
 
+<link href="../iron-flex-layout/iron-flex-layout.html" rel="import">
 <link href="../core-icon/core-icon.html" rel="import">
 <link href="../core-menu/core-menu.html" rel="import">
 <link href="../core-style/core-style.html" rel="import">
@@ -14,21 +15,20 @@
 <link href="themes.html" rel="import">
 
 
-<polymer-element name="playlist-list-item" attributes="playlist">
-
+<dom-module id="playlist-list-item">
+  <link href="playlist-list-item.css" rel="import" type="css">
   <template>
-    <link href="playlist-list-item.css" rel="stylesheet">
     <core-style ref="main"></core-style>
 
     <ss-googleplaymusic id="gpm"></ss-googleplaymusic>
 
     <div id="itemContainer">
       <paper-shadow animated id="shadow" z="0">
-        <div horizontal layout center id="item" class="{{ {'selected': isSelected} | tokenList }}" on-click="{{clickAction}}">
+        <div id="item" class$="{{computeIsSelected(isSelected)}}" on-click="{{clickAction}}">
           <paper-ripple fit></paper-ripple>
-          <div flex>
-            {{playlist.name}}
-            <core-icon icon="find-replace" alt="smart playlist" class="{{ {'smart': playlist.query} | tokenList }}"></core-icon>
+          <div class="flex">
+            <span>{{playlist.name}}</span>
+            <core-icon icon="find-replace" alt="smart playlist" class$="{{computeIsSmart(playlist)}}"></core-icon>
           </div>
           <paper-menu-button on-click="{{stopPropagation}}">
             <paper-icon-button icon="more-vert"></paper-icon-button>
@@ -44,46 +44,60 @@
       </paper-shadow>
     </div>
   </template>
+</dom-module>
 
-  <script>
-    Polymer('playlist-list-item', {
-      /** @event playlist-select */
+<script>
+  Polymer({
+    is: 'playlist-list-item',
 
-      /** @attribute playlist */
+    properties: {
+      playlist: Object
+    },
+    
+    /** @event playlist-select */
 
-      /** @attribute selected */
-      isSelected: false,
+    /** @attribute playlist */
 
-      clickAction: function(e, detail, sender) {
-        this.asyncFire('playlist-select', this);
-      },
+    /** @attribute selected */
+    isSelected: false,
 
-      /** @method select */
-      select: function(isSelected) {
-        this.$.shadow.setZ(isSelected ? 1 : 0);
-        this.isSelected = isSelected;
-      },
+    clickAction: function(e, detail, sender) {
+      this.asyncFire('playlist-select', this);
+    },
 
-      editAction: function(e, detail, sender) {
-        e.stopPropagation();
-        this.asyncFire('page-playlist-edit', {playlist: this.playlist});
-      },
+    /** @method select */
+    select: function(isSelected) {
+      this.$.shadow.setZ(isSelected ? 1 : 0);
+      this.isSelected = isSelected;
+    },
 
-      deleteAction: function(e, detail, sender) {
-        e.stopPropagation();
-        this.playlist.erase();
-        this.asyncFire('core-signal', {name: 'playlists-changed'});
-      },
+    editAction: function(e, detail, sender) {
+      e.stopPropagation();
+      this.asyncFire('page-playlist-edit', {playlist: this.playlist});
+    },
 
-      exportAction: function(e, detail, sender) {
-        e.stopPropagation();
-        this.$.gpm.savePlaylist(this.playlist, function() {}, function() {});
-      },
+    deleteAction: function(e, detail, sender) {
+      e.stopPropagation();
+      this.playlist.erase();
+      this.asyncFire('core-signal', {name: 'playlists-changed'});
+    },
 
-      stopPropagation: function(e, detail, sender) {
-        e.stopPropagation();
-      },
+    exportAction: function(e, detail, sender) {
+      e.stopPropagation();
+      this.$.gpm.savePlaylist(this.playlist, function() {}, function() {});
+    },
 
-    });
-  </script>
-</polymer-element>
+    stopPropagation: function(e, detail, sender) {
+      e.stopPropagation();
+    },
+
+  });
+
+  computeIsSelected(isSelected) {
+    return isSelected ? "selected" : "";
+  }
+
+  computeIsSmart(playlist) {
+    return playlist.query ? "smart" : "";
+  }
+</script>
