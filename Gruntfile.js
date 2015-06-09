@@ -80,7 +80,7 @@ module.exports = function(grunt) {
     },
     bump: {
       options: {
-        files: ['src/package.json', 'bower.json'],
+        files: ['version.json'], // 'package.json', 'src/package.json', 'bower.json'
         updateConfigs: [],
         commit: false,
         commitMessage: 'Release v%VERSION%',
@@ -96,8 +96,12 @@ module.exports = function(grunt) {
         regExp: false
       }
     },
+    buildnumber: {
+      files: [ 'version.json' ]
+    },
   });
 
+  grunt.loadNpmTasks('grunt-build-number');
   grunt.loadNpmTasks('grunt-bump');
   grunt.loadNpmTasks('grunt-contrib-copy');
   grunt.loadNpmTasks('grunt-node-webkit-builder');
@@ -105,7 +109,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-spawn');
   grunt.loadNpmTasks('grunt-text-replace');
 
-  grunt.registerTask('default', ['nodewebkit', 'copy:ffmpegsumo', 'bump']);
+  grunt.registerTask('default', ['nodewebkit', 'copy:ffmpegsumo', 'buildnumber']);
   grunt.registerTask('nw-gyp', ['shell:nwgypclean', 'shell:nwgypconfigure', 'replace:rtti', 'shell:nwgypbuild']);
   grunt.registerTask('up', ['shell:updateviews', 'shell:updatecomponents']);
   grunt.registerTask('all', ['nw-gyp', 'default']);
