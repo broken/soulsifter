@@ -1,12 +1,11 @@
 <link href="../polymer/polymer.html" rel="import">
 
 <link href="../iron-flex-layout/iron-flex-layout.html" rel="import">
-<link href="../core-icon/core-icon.html" rel="import">
-<link href="../core-menu/core-menu.html" rel="import">
-<link href="../core-style/core-style.html" rel="import">
+<link href="../iron-icon/iron-icon.html" rel="import">
 <link href="../paper-dropdown/paper-dropdown.html" rel="import">
 <link href="../paper-icon-button/paper-icon-button.html" rel="import">
 <link href="../paper-item/paper-item.html" rel="import">
+<link href="../paper-menu/paper-menu.html" rel="import">
 <link href="../paper-menu-button/paper-menu-button.html" rel="import">
 <link href="../paper-ripple/paper-ripple.html" rel="import">
 <link href="../paper-shadow/paper-shadow.html" rel="import">
@@ -18,8 +17,6 @@
 <dom-module id="playlist-list-item">
   <link href="playlist-list-item.css" rel="import" type="css">
   <template>
-    <core-style ref="main"></core-style>
-
     <ss-googleplaymusic id="gpm"></ss-googleplaymusic>
 
     <div id="itemContainer">
@@ -28,16 +25,16 @@
           <paper-ripple fit></paper-ripple>
           <div class="flex">
             <span>{{playlist.name}}</span>
-            <core-icon icon="find-replace" alt="smart playlist" class$="{{computeIsSmart(playlist)}}"></core-icon>
+            <iron-icon icon="find-replace" alt="smart playlist" class$="{{computeIsSmart(playlist)}}"></iron-icon>
           </div>
           <paper-menu-button on-click="{{stopPropagation}}">
             <paper-icon-button icon="more-vert"></paper-icon-button>
             <paper-dropdown class="dropdown" transition="cascade" halign="right">
-              <core-menu>
+              <paper-menu>
                 <paper-item on-click="{{editAction}}">Edit playlist</paper-item>
                 <paper-item on-click="{{deleteAction}}">Delete playlist</paper-item>
                 <paper-item on-click="{{exportAction}}">Export to Google Play Music</paper-button>
-              </core-menu>
+              </paper-menu>
             </paper-dropdown>
           </paper-menu-button>
         </div>
@@ -79,7 +76,7 @@
     deleteAction: function(e, detail, sender) {
       e.stopPropagation();
       this.playlist.erase();
-      this.asyncFire('core-signal', {name: 'playlists-changed'});
+      this.asyncFire('iron-signal', {name: 'playlists-changed'});
     },
 
     exportAction: function(e, detail, sender) {

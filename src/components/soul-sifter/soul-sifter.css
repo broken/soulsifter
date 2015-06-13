@@ -24,7 +24,7 @@
 :host /deep/ core-field {
   color: inherit;
 }
-:host /deep/ core-toolbar {
+:host /deep/ paper-toolbar {
   background-color: inherit;
   font-size: 1em;
 }

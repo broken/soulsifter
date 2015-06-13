@@ -1,6 +1,7 @@
 <link href="../polymer/polymer.html" rel="import">
 
 <link href="../iron-flex-layout/iron-flex-layout.html" rel="import">
+<link href="../iron-signals/iron-signals.html" rel="import">
 <link href="../paper-checkbox/paper-checkbox.html" rel="import">
 <link href="../paper-input/paper-input.html" rel="import">
 
@@ -12,8 +13,6 @@
 <dom-module id="playlist-edit">
   <link href="playlist-edit.css" rel="import" type="css">
   <template>
-    <core-style ref="main"></core-style>
-
     <abstract-action-page id="abstractActionPage">
       <div id="pageContainer">
         <div class="vert">
@@ -55,10 +54,10 @@
       } else {
         this.playlist.save();
         if (this.fromSongTrail) {
-          this.asyncFire('core-signal', {name: 'save-song-trail', data: {playlist: this.playlist} });
+          this.asyncFire('iron-signal', {name: 'save-song-trail', data: {playlist: this.playlist} });
         }
       }
-      this.asyncFire('core-signal', {name: 'playlists-changed'});
+      this.asyncFire('iron-signal', {name: 'playlists-changed'});
     },
 
   });

@@ -1,12 +1,10 @@
 <link href="../polymer/polymer.html" rel="import">
 
 <link href="../iron-flex-layout/iron-flex-layout.html" rel="import">
-<link href="../core-icons/core-icons.html" rel="import">
-<link href="../core-menu/core-menu.html" rel="import">
-<link href="../core-style/core-style.html" rel="import">
 <link href="../paper-dropdown/paper-dropdown.html" rel="import">
 <link href="../paper-icon-button/paper-icon-button.html" rel="import">
 <link href="../paper-item/paper-item.html" rel="import">
+<link href="../paper-menu/paper-menu.html" rel="import">
 <link href="../paper-menu-button/paper-menu-button.html" rel="import">
 
 <link href="global-state.html" rel="import">
@@ -17,8 +15,6 @@
 <dom-module id="song-list-item">
   <link href="song-list-item.css" rel="import" type="css">
   <template>
-    <core-style ref="main"></core-style>
-
     <global-state values="{{global}}"></global-state>
 
     <div class="song-item" draggable="true" on-dragstart="{{dragSong}}" id="draggableItem">
@@ -31,9 +27,9 @@
       <paper-menu-button on-click="{{stopPropagation}}">
         <paper-icon-button icon="more-vert"></paper-icon-button>
         <paper-dropdown class="dropdown" transition="cascade">
-          <core-menu>
+          <paper-menu>
             <paper-item on-click="{{clickEditAction}}">Edit info</paper-item>
-          </core-menu>
+          </paper-menu>
         </paper-dropdown>
       </paper-menu-button>
       <div class="bpmDiff">{{bpmDiff}}</div>

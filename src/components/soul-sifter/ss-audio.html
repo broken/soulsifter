@@ -1,18 +1,16 @@
 <link href="../polymer/polymer.html" rel="import">
 
 <link href="../iron-flex-layout/iron-flex-layout.html" rel="import">
-<link href="../core-icon/core-icon.html" rel="import">
-<link href="../core-icons/av-icons.html" rel="import">
+<link href="../iron-icon/iron-icon.html" rel="import">
+<link href="../iron-icons/av-icons.html" rel="import">
 <link href="../paper-slider/paper-slider.html" rel="import">
 
 
 <dom-module id="ss-audio">
   <link href="ss-audio.css" rel="import" type="css">
   <template>
-    <core-style ref="main"></core-style>
-
     <div class$="{{computeIsDisabled(disabled)}}">
-      <core-icon id="playPause" icon="av:play-arrow" on-click="{{playAction}}"></core-icon>
+      <iron-icon id="playPause" icon="av:play-arrow" on-click="{{playAction}}"></iron-icon>
       <div class="timebar">
         <div id="time" self-end>{{currentTimeStr}}</div>
         <paper-slider id="slider" min="0" max="{{duration}}" value="{{currentTime}}" on-change="{{changeCurrentTime}}" disabled="{{disabled}}"></paper-slider>

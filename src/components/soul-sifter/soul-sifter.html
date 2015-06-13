@@ -2,9 +2,8 @@
 
 <link href="../iron-flex-layout/iron-flex-layout.html" rel="import">
 <link href="../core-animated-pages/core-animated-pages.html" rel="import">
-<link href="../core-drawer-panel/core-drawer-panel.html" rel="import">
-<link href="../core-header-panel/core-header-panel.html" rel="import">
-<link href="../core-style/core-style.html" rel="import">
+<link href="../paper-drawer-panel/paper-drawer-panel.html" rel="import">
+<link href="../paper-header-panel/paper-header-panel.html" rel="import">
 <link href="../paper-tabs/paper-tab.html" rel="import">
 <link href="../paper-tabs/paper-tabs.html" rel="import">
 <link href="../paper-toast/paper-toast.html" rel="import">
@@ -24,12 +23,10 @@
 <dom-module id="soul-sifter">
   <link href="soul-sifter.css" rel="import" type="css">
   <template>
-    <core-style ref="main"></core-style>
-
     <div id="soulSifter">
       <core-animated-pages transitions="slide-from-right" selected="{{section}}" id="main">
         <section>
-          <core-drawer-panel id="core_drawer_panel">
+          <paper-drawer-panel id="core_drawer_panel">
             <section id="core_drawer_panel-drawer" drawer class="vertical">
               <paper-tabs selected="{{selectedTab}}" id="paper_tabs">
                 <paper-tab id="paper_tab-song">Song</paper-tab>
@@ -42,13 +39,13 @@
                 <playlist-list on-query-change="{{changeQuery}}" on-genre-change="{{updateGenres}}"></playlist-list>
               </core-animated-pages>
             </section>
-            <core-header-panel main>
-              <search-toolbar query="{{query}}" dj-search="{{djSearch}}" class="core-header">
-                <paper-icon-button icon="menu" onclick="document.querySelector('soul-sifter::shadow core-drawer-panel').togglePanel();"></paper-icon-button>
+            <paper-header-panel main>
+              <search-toolbar query="{{query}}" dj-search="{{djSearch}}" class="paper-header">
+                <paper-icon-button icon="menu" onclick="document.querySelector('soul-sifter::shadow paper-drawer-panel').togglePanel();"></paper-icon-button>
               </search-toolbar>
               <song-list query="{{query}}" dj-search="{{djSearch}}" song-trail="{{songTrail}}" class="content"></song-list>
-            </core-header-panel>
-          </core-drawer-panel>
+            </paper-header-panel>
+          </paper-drawer-panel>
         </section>
         <section>
           <playlist-edit playlist="{{playlist}}"></playlist-edit>
@@ -115,7 +112,7 @@
 
     genresChanged: function(spliceOrOldValue, undefOrNewValue) {
       // The first selection uses a property observer, while subsequent calls use an array observer and calls this method with splice changes rather than the old & new values
-      this.asyncFire('core-signal', {name: 'genres-changed', data: this.genres});
+      this.asyncFire('iron-signal', {name: 'genres-changed', data: this.genres});
     },
   });
 </script>

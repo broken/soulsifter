@@ -1,19 +1,17 @@
 <link href="../polymer/polymer.html" rel="import">
 
-<link href="../core-icon/core-icon.html" rel="import">
-<link href="../core-selector/core-selector.html" rel="import">
+<link href="../iron-icon/iron-icon.html" rel="import">
+<link href="../iron-selector/iron-selector.html" rel="import">
 
 
 <dom-module id="ss-star-rating">
   <link href="ss-star-rating.css" rel="import" type="css">
   <template>
-    <core-style ref="main"></core-style>
-
-    <core-selector selected="{{selectedStar}}" activateEvent="click" id="selector">
+    <iron-selector selected="{{selectedStar}}" activateEvent="click" id="selector">
       <template is="dom-repeat" items="{{stars}}">
-        <core-icon icon="star-rate" class$="{{computeIsSelected(item, value)}}"></core-icon>
+        <iron-icon icon="star-rate" class$="{{computeIsSelected(item, value)}}"></iron-icon>
       </template>
-    </core-selector>
+    </iron-selector>
   </template>
 </dom-module>
 

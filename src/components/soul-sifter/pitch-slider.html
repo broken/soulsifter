@@ -1,6 +1,5 @@
 <link href="../polymer/polymer.html" rel="import">
 
-<link href="../core-style/core-style.html" rel="import">
 <link href="../paper-slider/paper-slider.html" rel="import">
 
 <link href="global-state.html" rel="import">
@@ -10,8 +9,6 @@
 <dom-module id="pitch-slider">
   <link href="pitch-slider.css" rel="import" type="css">
   <template>
-    <core-style ref="main"></core-style>
-
     <global-state values="{{global}}"></global-state>
 
     <paper-slider editable pin value="{{pitch}}" step="0.1" min="{{pitchPctMin}}" max="{{pitchPctMax}}"></paper-slider>

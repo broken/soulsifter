@@ -2,15 +2,13 @@
 
 <link href="../iron-flex-layout/iron-flex-layout.html" rel="import">
 <link href="../core-field/core-field.html" rel="import">
-<link href="../core-icon-button/core-icon-button.html" rel="import">
-<link href="../core-icons/core-icons.html" rel="import">
-<link href="../core-localstorage/core-localstorage.html" rel="import">
-<link href="../core-signals/core-signals.html" rel="import">
-<link href="../core-style/core-style.html" rel="import">
-<link href="../core-toolbar/core-toolbar.html" rel="import">
+<link href="../iron-localstorage/iron-localstorage.html" rel="import">
+<link href="../iron-signals/iron-signals.html" rel="import">
 <link href="../paper-dialog/paper-dialog.html" rel="import">
+<link href="../paper-icon-button/paper-icon-button.html" rel="import">
 <link href="../paper-input/paper-input.html" rel="import">
 <link href="../paper-toggle-button/paper-toggle-button.html" rel="import">
+<link href="../paper-toolbar/paper-toolbar.html" rel="import">
 
 <!-- <link href="create-song.html" rel="import"> -->
 <link href="global-state.html" rel="import">
@@ -21,22 +19,20 @@
 <dom-module id="search-toolbar">
   <link href="search-toolbar.css" rel="import" type="css">
   <template>
-    <core-style ref="main"></core-style>
-
     <global-state values="{{global}}"></global-state>
-    <core-localstorage name="soul-sifter-music-directory" value="{{musicDir}}"></core-localstorage>
+    <iron-localstorage name="soul-sifter-music-directory" value="{{musicDir}}"></iron-localstorage>
 
-    <core-toolbar class$="{{computeIsTall(isTall)}}">
+    <paper-toolbar class$="{{computeIsTall(isTall)}}">
       <content></content>
       <core-field class="indent flex">
-        <core-icon-button icon="search" on-click="{{searchAction}}"></core-icon-button>
+        <paper-icon-button icon="search" on-click="{{searchAction}}"></paper-icon-button>
         <paper-input id="searchInput" label="search" class="flex" value="{{query}}"></paper-input>
-        <core-icon-button icon="info-outline" on-click="{{toggleSearchInfoDialog}}"></core-icon-button>
+        <paper-icon-button icon="info-outline" on-click="{{toggleSearchInfoDialog}}"></paper-icon-button>
       </core-field>
       <paper-input label="bpm" floatingLabel value="{{global.bpm}}" id="bpm"></paper-input>
-      <core-icon-button icon="add-circle" on-click="{{toggleCreateSongDialog}}" id="createSongButton"></core-icon-button>
-      <core-icon-button icon="settings" on-click="{{clickSettingsAction}}"></core-icon-button>
-      <core-icon-button icon="unfold-more" on-click="{{toggleIsTall}}"></core-icon-button>
+      <paper-icon-button icon="add-circle" on-click="{{toggleCreateSongDialog}}" id="createSongButton"></paper-icon-button>
+      <paper-icon-button icon="settings" on-click="{{clickSettingsAction}}"></paper-icon-button>
+      <paper-icon-button icon="unfold-more" on-click="{{toggleIsTall}}"></paper-icon-button>
       <!-- middle row -->
       <!-- bottom row -->
       <div class="bottom {{ {hide: !isTall} | tokenList }}">
@@ -45,10 +41,10 @@
       </div>
       <div class="bottom flex {{ {hide: !isTall} | tokenList }}"></div>
       <div class="bottom {{ {hide: !isTall} | tokenList }}">
-        <core-icon-button icon="query-builder" on-click="{{analyzeBpms}}"></core-icon-button>
+        <paper-icon-button icon="query-builder" on-click="{{analyzeBpms}}"></paper-icon-button>
         Analyze BPMs
       </div>
-    </core-toolbar>
+    </paper-toolbar>
     <paper-dialog backdrop layered id="searchInfoDialog">
       <search-info></search-info>
     </paper-dialog>
@@ -115,7 +111,7 @@
     },
 
     searchAction: function(e, detail, sender) {
-      this.asyncFire('core-signal', {name: 'search'});
+      this.asyncFire('iron-signal', {name: 'search'});
     },
 
     musicDirChanged: function(oldValue, newValue) {

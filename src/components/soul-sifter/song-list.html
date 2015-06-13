@@ -1,9 +1,7 @@
 <link href="../polymer/polymer.html" rel="import">
 
-<link href="../core-ajax/core-ajax.html" rel="import">
-<link href="../core-selector/core-selector.html" rel="import">
-<link href="../core-signals/core-signals.html" rel="import">
-<link href="../core-style/core-style.html" rel="import">
+<link href="../iron-selector/iron-selector.html" rel="import">
+<link href="../iron-signals/iron-signals.html" rel="import">
 <link href="../core-tooltip/core-tooltip.html" rel="import">
 
 <link href="global-state.html" rel="import">
@@ -14,18 +12,16 @@
 <dom-module id="song-list">
   <link href="song-list.css" rel="import" type="css">
   <template>
-    <core-style ref="main"></core-style>
-
     <global-state values="{{global}}"></global-state>
-    <core-signals on-core-signal-genres-changed="{{genresChanged}}"
-                          on-core-signal-search="{{searchAction}}"></core-signals>
+    <iron-signals on-iron-signal-genres-changed="{{genresChanged}}"
+                          on-iron-signal-search="{{searchAction}}"></iron-signals>
 
     <core-tooltip id="tooltip" label="Searching..." noarrow position top></core-tooltip>
-    <core-selector selected="{{selectedRow}}" activateEvent="click" id="selector">
+    <iron-selector selected="{{selectedRow}}" activateEvent="click" id="selector">
       <template is="dom-repeat" items="{{songs}}">
         <song-list-item song="{{item}}"></song-list-item>
       </template>
-    </core-selector>
+    </iron-selector>
   </template>
 </dom-module>
 

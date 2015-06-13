@@ -1,9 +1,7 @@
 <link href="../polymer/polymer.html" rel="import">
 
+<link href="../iron-collapse/iron-collapse.html" rel="import">
 <link href="../iron-flex-layout/iron-flex-layout.html" rel="import">
-<link href="../core-collapse/core-collapse.html" rel="import">
-<link href="../core-selection/core-selection.html" rel="import">
-<link href="../core-style/core-style.html" rel="import">
 <link href="../paper-icon-button/paper-icon-button.html" rel="import">
 <link href="../paper-ripple/paper-ripple.html" rel="import">
 <link href="../paper-shadow/paper-shadow.html" rel="import">
@@ -14,8 +12,6 @@
 <dom-module id="genre-list-item">
   <link href="genre-list-item.css" rel="import" type="css">
   <template>
-    <core-style ref="main"></core-style>
-
     <div id="itemContainer">
       <paper-shadow animated id="shadow" z="0">
         <div class$="{{computeIsSelected(isSelected)}}" style$="{{computePaddingLeftStyle(indent)}}" on-tap="{{selectTapAction}}" id="item">
@@ -25,12 +21,12 @@
         </div>
       </paper-shadow>
     </div>
-    <core-collapse id="collapse">
+    <iron-collapse id="collapse">
       <template is="dom-repeat" items="{{genre.subGenre}}" id="subGenreTpl">
         <genre-list-item genre="{{item}}" indent="{{incIndent(indent)}}" on-expand-parents="{{expand}}"></genre-list-item>
       </template>
-      <core-selection multi on-core-select="{{selectGenreAction}}" id="selection"></core-selection>
-    </core-collapse>
+      <!-- <array-selector multi items="{{genre.subGenre}}" on-iron-select="{{selectGenreAction}}" id="selection"></array-selector> -->
+    </iron-collapse>
   </template>
 </dom-module>
 

@@ -1,9 +1,6 @@
 <link href="../polymer/polymer.html" rel="import">
 
-<link href="../core-icons/core-icons.html" rel="import">
-<link href="../core-selection/core-selection.html" rel="import">
-<link href="../core-signals/core-signals.html" rel="import">
-<link href="../core-style/core-style.html" rel="import">
+<link href="../iron-signals/iron-signals.html" rel="import">
 <link href="../paper-button/paper-button.html" rel="import">
 <link href="../paper-dialog/paper-dialog.html" rel="import">
 <link href="../paper-fab/paper-fab.html" rel="import">
@@ -16,15 +13,13 @@
 <dom-module id="playlist-list">
   <link href="playlist-list.css" rel="import" type="css">
   <template>
-    <core-style ref="main"></core-style>
-    
-    <core-signals on-core-signal-playlists-changed="{{updatePlaylists}}"></core-signals>
+    <iron-signals on-iron-signal-playlists-changed="{{updatePlaylists}}"></iron-signals>
 
     <div id="wrapper">
       <template is="dom-repeat" items="{{playlists}}" id="playlistTpl">
         <playlist-list-item playlist="{{item}}" on-playlist-select="{{selectPlaylist}}"></playlist-list-item>
       </template>
-      <core-selection id="selection" on-core-select="{{selectAction}}"></core-selection>
+      <array-selector id="selection" on-core-select="{{selectAction}}"></array-selector>
     </div>
     <paper-fab mini icon="add" on-click="{{createPlaylist}}"></paper-fab>
   </template>
@@ -67,7 +62,7 @@
           this.asyncFire('genre-change', playlist.styles);
           this.asyncFire('query-change', playlist.query);
         } else {
-          this.asyncFire('core-signal', {name: 'search', data: {playlist: playlist}});
+          this.asyncFire('iron-signal', {name: 'search', data: {playlist: playlist}});
         }
       }
     },

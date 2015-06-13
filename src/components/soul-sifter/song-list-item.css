@@ -6,7 +6,7 @@
 ss-star-rating {
   margin: 0 6px;
 }
-ss-star-rating::shadow core-icon {
+ss-star-rating::shadow iron-icon {
   margin: 0 -5px;
 }
 

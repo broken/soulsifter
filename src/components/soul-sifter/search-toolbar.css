@@ -1,9 +1,9 @@
-core-toolbar {
+paper-toolbar {
   box-shadow: rgba(0, 0, 0, 0.2) 0px 3px 2px;
   height: 45px;
 }
 
-core-toolbar::shadow .toolbar-tools {
+paper-toolbar::shadow .toolbar-tools {
   height: 45px;
 }
 

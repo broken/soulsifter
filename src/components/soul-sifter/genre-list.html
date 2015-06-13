@@ -1,9 +1,5 @@
-<link href="../polymer/polymer.html" rel="import">{
-}
-<link href="../core-ajax/core-ajax.html" rel="import">
-<link href="../core-collapse/core-collapse.html" rel="import">
-<link href="../core-selection/core-selection.html" rel="import">
-<link href="../core-style/core-style.html" rel="import">
+<link href="../polymer/polymer.html" rel="import">
+
 <link href="../paper-icon-button/paper-icon-button.html" rel="import">
 
 <link href="genre-list-item.html" rel="import">
@@ -13,12 +9,10 @@
 <dom-module id="genre-list">
   <link href="genre-list.css" rel="import" type="css">
   <template>
-    <core-style ref="main"></core-style>
-
     <template is="dom-repeat" items="{{genres}}" id="genreTpl">
       <genre-list-item genre="{{item}}" on-genre-select="{{selectAction}}"></genre-list-item>
     </template>
-    <core-selection multi id="selection"></core-selection>
+    <array-selector multi id="selection"></array-selector>
   </template>
 </dom-module>
 
