@@ -11,7 +11,19 @@
 
 
 <dom-module id="playlist-list">
-  <link href="playlist-list.css" rel="import" type="css">
+  <style is="custom-style">
+    #wrapper {
+      height: 100%;
+      overflow-y: scroll;
+    }
+
+
+    paper-fab {
+      bottom: 12px;
+      position: absolute;
+      right: 12px;
+    }
+  </style>
   <template>
     <iron-signals on-iron-signal-playlists-changed="{{updatePlaylists}}"></iron-signals>
 

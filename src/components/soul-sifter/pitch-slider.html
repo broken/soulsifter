@@ -7,7 +7,17 @@
 
 
 <dom-module id="pitch-slider">
-  <link href="pitch-slider.css" rel="import" type="css">
+  <style is="custom-style">
+    paper-slider::shadow paper-input::shadow paper-input-decorator {
+      padding: 0 0 2px 0;
+    }
+    paper-slider::shadow paper-input::shadow input[is="core-input"] {
+      margin: 0.25em 0;
+    }
+    paper-slider::shadow #sliderContainer {
+      margin: 0;
+    }
+  </style>
   <template>
     <global-state values="{{global}}"></global-state>
 

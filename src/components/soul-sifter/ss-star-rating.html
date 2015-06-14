@@ -5,7 +5,21 @@
 
 
 <dom-module id="ss-star-rating">
-  <link href="ss-star-rating.css" rel="import" type="css">
+  <style is="custom-style">
+    :host {
+      white-space: nowrap;
+    }
+
+    core-icon {
+      color: #222;
+      height: 26px;
+      width: 26px;
+    }
+
+    core-icon.selected {
+      color: #eee;
+    }
+  </style>
   <template>
     <iron-selector selected="{{selectedStar}}" activateEvent="click" id="selector">
       <template is="dom-repeat" items="{{stars}}">

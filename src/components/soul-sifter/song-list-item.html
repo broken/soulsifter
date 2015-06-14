@@ -13,7 +13,71 @@
 
 
 <dom-module id="song-list-item">
-  <link href="song-list-item.css" rel="import" type="css">
+  <style is="custom-style">
+    :host {
+      font-size: small;
+    }
+
+
+    ss-star-rating {
+      margin: 0 6px;
+    }
+    ss-star-rating::shadow iron-icon {
+      margin: 0 -5px;
+    }
+
+
+    .song-item {
+      @apply(--layout-horizontal --layout-center);
+      height: 30px;
+      padding: 0 8px;
+      margin: 0 10px;
+    }
+    .song-item div {
+      margin: 3px;
+    }
+    .song-item paper-menu-button {
+      display: none;
+    }
+    .song-item:hover paper-menu-button {
+      display: inline-block;
+    }
+    .song-item paper-menu-button paper-icon-button {
+      margin-top: 4px;
+      padding: 0;
+    }
+
+    #cover {
+      background-size: cover;
+      height: 30px;
+      width: 30px;
+    }
+
+    .key {
+      position: relative;
+      overflow: hidden;
+      white-space: nowrap;
+    }
+
+    .fade-out:after {
+      display: block;
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      right: 0;
+      width: 30px;
+      content: "";
+    }
+
+    time {
+      text-align: right;
+      width: 64px;
+    }
+
+    .flex {
+      @apply(--layout-flex);
+    }
+  </style>
   <template>
     <global-state values="{{global}}"></global-state>
 

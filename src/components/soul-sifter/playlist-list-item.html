@@ -15,7 +15,54 @@
 
 
 <dom-module id="playlist-list-item">
-  <link href="playlist-list-item.css" rel="import" type="css">
+  <style is="custom-style">
+    :host {
+      font-size: 13px;
+    }
+
+    paper-shadow {
+      height: 100%;
+      width: 100%;
+    }
+
+    paper-dropdown {
+      top: 18px;
+    }
+
+    #itemContainer {
+      margin: 7px 20px 7px 20px;
+      height: 30px;
+    }
+    #item {
+      @apply(--layout-horizontal --layout-center);
+      height: 30px;
+      padding-left: 40px;
+    }
+    #item iron-icon {
+      display: none;
+      height: 16px;
+      width: 16px;
+      vertical-align: top;
+    }
+    #item iron-icon.smart {
+      display: inline-block;
+    }
+
+    #item paper-menu-button {
+      display: none;
+    }
+    #item:hover paper-menu-button {
+      display: inline-block;
+    }
+    #item paper-menu-button paper-icon-button {
+      margin-top: 4px;
+      padding: 0;
+    }
+
+    .flex {
+      @apply(--layout-flex);
+    }
+  </style>
   <template>
     <ss-googleplaymusic id="gpm"></ss-googleplaymusic>
 

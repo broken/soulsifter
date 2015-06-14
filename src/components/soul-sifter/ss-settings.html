@@ -8,7 +8,37 @@
 
 
 <dom-module id="ss-settings">
-  <link href="ss-settings.css" rel="import" type="css">
+  <style is="custom-style">
+    #pageContainer {
+      @apply(--layout-horizontal --layout-around-justified);
+      width: 100%;
+    }
+
+    paper-input {
+      position: relative;
+      width: 240px;
+    }
+    paper-input::shadow paper-input-decorator {
+      padding: 3px 0;
+    }
+    paper-input::shadow paper-input-decorator::shadow .floated-label {
+      position: absolute;
+      right: 260px;
+      top: 14px;
+    }
+
+    paper-checkbox {
+      margin: 10px 0;
+    }
+
+    .label {
+      font-size: 0.75em;
+    }
+
+    .vertical {
+      @apply(--layout-vertical);
+    }
+  </style>
   <template>
     <abstract-action-page id="abstractActionPage">
       <div id="pageContainer">

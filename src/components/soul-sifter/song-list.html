@@ -10,7 +10,17 @@
 
 
 <dom-module id="song-list">
-  <link href="song-list.css" rel="import" type="css">
+  <style is="custom-style">
+    core-tooltip {
+      position: absolute;
+      left: 50%;
+    }
+
+    .song {
+      height: 20px;
+      padding-left: 5px;
+    }
+  </style>
   <template>
     <global-state values="{{global}}"></global-state>
     <iron-signals on-iron-signal-genres-changed="{{genresChanged}}"

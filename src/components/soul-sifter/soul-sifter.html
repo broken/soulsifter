@@ -21,7 +21,72 @@
 
 
 <dom-module id="soul-sifter">
-  <link href="soul-sifter.css" rel="import" type="css">
+  <style is="custom-style">
+    :host {
+      position: absolute;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 0;
+    }
+
+    #soulSifter {
+      margin: 0;
+      padding: 0;
+      position: absolute;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 0;
+    }
+
+
+    /* remove preset colors */
+    :host /deep/ input {
+      color: inherit;
+    }
+    :host /deep/ core-field {
+      color: inherit;
+    }
+    :host /deep/ paper-toolbar {
+      background-color: inherit;
+      font-size: 1em;
+    }
+    :host /deep/ paper-input {
+      color: inherit;
+    }
+
+    core-animated-pages#main {
+      overflow: hidden;
+      height: 100%;
+    }
+
+    paper-icon-button {
+      position: absolute;
+      display: none;
+      width: 24px;
+      height: 24px;
+      font-size: 16px;
+      margin: 8px;
+    }
+
+    core-drawer-panel[narrow] paper-icon-button {
+      display: inline-block
+    }
+
+    paper-toast {
+      left: auto;
+      right: 20px;
+    }
+
+    .vertical {
+      @apply(--layout-vertical);
+    }
+
+    .flex {
+      @apply(--layout-flex);
+    }
+  </style>
   <template>
     <div id="soulSifter">
       <core-animated-pages transitions="slide-from-right" selected="{{section}}" id="main">

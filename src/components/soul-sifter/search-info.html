@@ -6,7 +6,35 @@
 
 
 <dom-module id="search-info">
-  <link href="search-info.css" rel="import" type="css">
+  <style is="custom-style">
+    div {
+      white-space: nowrap;
+    }
+
+    div.text {
+      width: 575px;
+    }
+
+    .right {
+      text-align: right;
+    }
+
+    .heading {
+      margin-top: 14px;
+    }
+
+    .vertical {
+      @apply(--layout-vertical);
+    }
+
+    .horizontal {
+      @apply(--layout-horizontal);
+    }
+
+    .flex {
+      @apply(--layout-flex);
+    }
+  </style>
   <template>
     <div class="text vertical">
       <div class="heading">

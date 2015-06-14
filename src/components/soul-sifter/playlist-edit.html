@@ -11,7 +11,16 @@
 
 
 <dom-module id="playlist-edit">
-  <link href="playlist-edit.css" rel="import" type="css">
+  <style is="custom-style">
+    #pageContainer {
+      width: 100%;
+      @apply(--layout-horizontal --layout-around-justified);
+    }
+
+    .vert {
+      @apply(--layout-vertical);
+    }
+  </style>
   <template>
     <abstract-action-page id="abstractActionPage">
       <div id="pageContainer">

@@ -1,8 +1,0 @@
-#pageContainer {
-  width: 100%;
-  @apply(--layout-horizontal --layout-around-justified);
-}
-
-.vert {
-  @apply(--layout-vertical);
-}

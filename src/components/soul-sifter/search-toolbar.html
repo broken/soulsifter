@@ -17,7 +17,35 @@
 
 
 <dom-module id="search-toolbar">
-  <link href="search-toolbar.css" rel="import" type="css">
+  <style is="custom-style">
+    paper-toolbar {
+      box-shadow: rgba(0, 0, 0, 0.2) 0px 3px 2px;
+      height: 45px;
+    }
+
+    paper-toolbar::shadow .toolbar-tools {
+      height: 45px;
+    }
+
+    .hide {
+      display: none;
+    }
+
+    #bpm {
+      width: 64px;
+    }
+    #bpm::shadow .input-container {
+      bottom: 0;
+      top: 0;
+    }
+    #bpm::shadow .mirror-text, #bpm::shadow .label {
+      padding: 0;
+    }
+
+    .flex {
+      @apply(--layout-flex);
+    }
+  </style>
   <template>
     <global-state values="{{global}}"></global-state>
     <iron-localstorage name="soul-sifter-music-directory" value="{{musicDir}}"></iron-localstorage>

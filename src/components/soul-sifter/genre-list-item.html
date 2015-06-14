@@ -10,7 +10,33 @@
 
 
 <dom-module id="genre-list-item">
-  <link href="genre-list-item.css" rel="import" type="css">
+  <style is="custom-style">
+    :host {
+      font-size: 13px;
+    }
+
+    paper-icon-button {
+      transform: scale(.6);
+    }
+
+    iron-collapse {
+      margin-top: -7px;
+      margin-bottom: -7px;
+    }
+
+    #itemContainer {
+      margin: 7px 20px 7px 20px;
+      height: 30px;
+    }
+    #item {
+      height: 30px;
+      @apply(--layout-horizontal --layout-center);
+    }
+
+    .flex {
+      @apply(--layout-flex);
+    }
+  </style>
   <template>
     <div id="itemContainer">
       <paper-shadow animated id="shadow" z="0">
