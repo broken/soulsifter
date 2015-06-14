@@ -57,6 +57,18 @@ module.exports = function(grunt) {
           from: /\t*-fno-rtti \\\n/g,
           to: ''
         }]
+      },
+      less: {
+        src: 'build/soulsifter/osx64/soulsifter.app/Contents/Resources/app.nw/components/soul-sifter/theme-scratchlive.html',
+        overwrite: true,
+        replacements: [{
+          from: /\/\*/g,
+          to: '',
+        },
+        {
+          from: /\*\//g,
+          to: '',
+        }],
       }
     },
     copy: {
@@ -72,7 +84,7 @@ module.exports = function(grunt) {
     },
     spawn: {
       run: {
-        command: './build/soulsifter/osx/soulsifter.app/Contents/MacOS/node-webkit build/soulsifter/osx/soulsifter.app/Contents/Resources/app.nw',
+        command: './build/soulsifter/osx64/soulsifter.app/Contents/MacOS/nwjs build/soulsifter/osx64/soulsifter.app/Contents/Resources/app.nw',
       },
       ulimit: {
         command: 'ulimit -n 10240',
@@ -99,18 +111,30 @@ module.exports = function(grunt) {
     buildnumber: {
       files: [ 'version.json' ]
     },
+    less: {
+      development: {
+        options: {
+          ieCompat: false,
+        },
+        files: {
+          'build/soulsifter/osx64/soulsifter.app/Contents/Resources/app.nw/components/soul-sifter/theme-scratchlive.html': 'src/components/soul-sifter/theme-scratchlive.html',
+        },
+      },
+    },
   });
 
   grunt.loadNpmTasks('grunt-build-number');
   grunt.loadNpmTasks('grunt-bump');
   grunt.loadNpmTasks('grunt-contrib-copy');
+  grunt.loadNpmTasks('grunt-contrib-less');
   grunt.loadNpmTasks('grunt-node-webkit-builder');
   grunt.loadNpmTasks('grunt-shell');
   grunt.loadNpmTasks('grunt-spawn');
   grunt.loadNpmTasks('grunt-text-replace');
 
-  grunt.registerTask('default', ['nodewebkit', 'copy:ffmpegsumo', 'buildnumber']);
+  grunt.registerTask('css-hack', ['less:development', 'replace:less']);
+  grunt.registerTask('default', ['nodewebkit', 'css-hack', 'copy:ffmpegsumo', 'buildnumber']);
   grunt.registerTask('nw-gyp', ['shell:nwgypclean', 'shell:nwgypconfigure', 'replace:rtti', 'shell:nwgypbuild']);
-  grunt.registerTask('up', ['shell:updateviews', 'shell:updatecomponents']);
+  grunt.registerTask('up', ['shell:updateviews', 'shell:updatecomponents', 'css-hack', 'buildnumber']);
   grunt.registerTask('all', ['nw-gyp', 'default']);
 };

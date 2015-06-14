@@ -1,0 +1,238 @@
+@inherit: 'inherit';
+@black: 'black';
+@osx_grey: '#B1B1B1';
+
+@sl_blue: '#1EC8FA';
+@sl_brown: '#6E330A';
+@sl_green: '#39FF7E';
+@sl_grey: '#292929';
+@sl_orange: '#FDC443';
+@sl_purple: '#AC1AFA';
+
+// main
+@bg: @sl_grey;
+@clr: '#999999';
+@clr_bold: '#CCCCCC';
+// star rating
+@sr_clr: '#666';
+@sr_selected: '#EEE';
+// paper menu
+@pm_bg: '#111';
+@pm_bghover: @black;
+// paper input
+@pi_accent: @sl_blue;
+// paper toggle button
+@pb_clr: @sl_blue;
+// ppaert alert toast
+@pt_bg: @sl_orange;
+@pt_clr: @black;
+// abstract actions
+@aa_ok: @sl_orange;
+// drawer tabs
+@dt_bg: '#1F1F1F';
+@dt_clr: @inherit;
+@dt_bar: @sl_orange;
+@dt_ink: @sl_orange;
+// genre list
+@gl_ink: @sl_orange;
+@gl_select: @sl_brown;
+// playlist list
+@pl_fab: @sl_brown;
+// search toolbar
+@st_bg: @black;
+// pitch slider
+@ps_clr: @sl_blue;
+@ps_bg: '#999';
+// search info
+@si_heading: '#CCC';
+@si_emphasis: @sl_green;
+// song list
+@sl_border: '1px solid #2F2F2F';
+@sl_hover: 'rgb(20,20,20)';
+@sl_fadeout: 'linear-gradient(to right, rgba(41,41,41,0), rgba(41,41,41,1))';
+@sl_hoverfadeout: 'linear-gradient(to right, rgba(20,20,20,0), rgba(20,20,20,1))';
+@sl_btnborder: '1px solid rgb(20,20,20)';
+@sl_btnborderhover: '1px solid #999999';
+// audio
+@au_play: '#CCC';
+@au_disabled: '#999';
+
+// <script>
+//   CoreStyle.g.theme.init = function() {
+//     CoreStyle.g.paperInput.labelColor = CoreStyle.g.theme.clr;
+//     CoreStyle.g.paperInput.focusedColor = CoreStyle.g.theme.pi_accent;
+//   };
+// </script>
+
+/*<style is="custom-style">*/
+  /*<!-- main -->*/
+  #soulSifter {
+    color: @clr;
+    background-color: @bg;
+  }
+
+  /*<!-- star rating -->*/
+  ss-star-rating::shadow core-icon {
+    color: @sr_clr;
+  }
+  ss-star-rating::shadow core-icon.selected {
+    color: @sr_selected;
+  }
+
+  /*<!-- paper menus -->*/
+  paper-menu-button paper-dropdown::shadow #background {
+    background-color: @pm_bg;
+  }
+  paper-menu-button paper-dropdown core-menu {
+    margin: 0;
+  }
+  paper-menu-button paper-dropdown core-menu paper-item {
+    font-size: 1em;
+  }
+  paper-menu-button paper-dropdown core-menu paper-item:hover {
+    background-color: @pm_bghover;
+  }
+
+  /*<!-- paper input -->*/
+  section /deep/ paper-input::shadow .focused-underline {
+    background-color: @pi_accent;
+  }
+  section /deep/ paper-input[focused]::shadow .floated-label {
+    color: @pi_accent;
+  }
+
+  /*<!-- paper toggle button -->*/
+  paper-toggle-button::shadow [checked] .toggle-ink {
+    color: @pb_clr;
+  }
+  paper-toggle-button::shadow [checked] .toggle {
+    background-color: @pb_clr;
+  }
+
+  /*<!-- paper toast (alert) -->*/
+  paper-toast {
+    background-color: @pt_bg;
+    color: @pt_clr;
+  }
+
+  /*<!-- abstract actions -->*/
+  #abstractActions paper-button {
+    color: @clr;
+  }
+  #abstractActions paper-button[autofocus] {
+    color: @aa_ok;
+  }
+
+  /*<!-- drawer tabs -->*/
+  paper-tabs {
+    background-color: @dt_bg;
+    color: @dt_clr;
+  }
+  paper-tabs::shadow #selectionBar {
+    background-color: @dt_bar;
+  }
+  paper-tab::shadow #ink {
+    color: @dt_ink;
+  }
+
+  /*<!-- genre list -->*/
+  genre-list-item::shadow #item.selected {
+    background-color: @gl_select;
+  }
+  genre-list-item::shadow paper-ripple {
+    color: @gl_ink;
+  }
+
+  /*<!-- playlist list -->*/
+  paper-fab {
+    background-color: @pl_fab;
+    color: @clr_bold;
+  }
+  playlist-list-item::shadow #item.selected {
+    background-color: @gl_select;
+  }
+  playlist-list-item::shadow paper-ripple {
+    color: @gl_ink;
+  }
+
+  /*<!-- search toolbar -->*/
+  search-toolbar {
+    background-color: @st_bg;
+  }
+  #searchInput {
+    color: @clr_bold;
+  }
+  #searchInput::shadow input::-webkit-input-placeholder {
+    color: @clr;
+  }
+
+  /*<!-- pitch slider -->*/
+  paper-slider::shadow #sliderBar::shadow #activeProgress {
+    background-color: @ps_clr;
+  }
+  paper-slider::shadow #sliderKnobInner {
+    background-color: @ps_clr;
+  }
+  paper-slider::shadow #sliderKnobInner::before {
+    background-color: @ps_clr;
+  }
+  paper-slider::shadow #sliderBar::shadow #secondaryProgress {
+    background-color: @ps_bg;
+  }
+  paper-slider::shadow #sliderBar::shadow #progressContainer {
+    background-color: @ps_bg;
+  }
+
+  /*<!-- song list -->*/
+  .song-item {
+    border-bottom: @sl_border;
+  }
+  .song-item:hover {
+    background-color: @sl_hover;
+  }
+  .song-item .artist {
+    color: @clr;
+  }
+  .song-item .title {
+    color: @clr_bold;
+  }
+  .song-item .fade-out:after {
+    background: @sl_fadeout;
+  }
+  .song-item:hover .fade-out:after {
+    background: @sl_hoverfadeout;
+  }
+  .song-item paper-menu-button paper-icon-button {
+    border: @sl_btnborder;
+  }
+  .song-item paper-menu-button paper-icon-button:hover {
+    border: @sl_btnborderhover;
+  }
+
+  /*<!-- song section -->*/
+  .title {
+    color: @clr_bold;
+  }
+  core-scroll-header-panel::shadow #condensedHeaderBg {
+    background-color: @pm_bg;
+  }
+
+  /*<!-- search info -->*/
+  .heading {
+    color: @si_heading;
+  }
+  .emphasis {
+    color: @si_emphasis;
+  }
+  .text {
+    color: @clr;
+  }
+
+  /*<!-- audio -->*/
+  ss-audio::shadow core-icon {
+    color: @au_play;
+  }
+  ss-audio::shadow .disabled core-icon {
+    color: @au_disabled;
+  }
+/*</core-style>*/
