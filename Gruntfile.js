@@ -59,15 +59,15 @@ module.exports = function(grunt) {
         }]
       },
       less: {
-        src: 'build/soulsifter/osx64/soulsifter.app/Contents/Resources/app.nw/components/soul-sifter/theme-scratchlive.html',
+        src: 'build/soulsifter/osx64/soulsifter.app/Contents/Resources/app.nw/components/soul-sifter/theme.html',
         overwrite: true,
         replacements: [{
-          from: /\/\*/g,
-          to: '',
+          from: /\/\*</g,
+          to: '<',
         },
         {
-          from: /\*\//g,
-          to: '',
+          from: />\*\//g,
+          to: '>',
         }],
       }
     },
@@ -117,7 +117,7 @@ module.exports = function(grunt) {
           ieCompat: false,
         },
         files: {
-          'build/soulsifter/osx64/soulsifter.app/Contents/Resources/app.nw/components/soul-sifter/theme-scratchlive.html': 'src/components/soul-sifter/theme-scratchlive.html',
+          'build/soulsifter/osx64/soulsifter.app/Contents/Resources/app.nw/components/soul-sifter/theme.html': 'src/components/soul-sifter/theme-scratchlive.html',
         },
       },
     },

@@ -3,8 +3,6 @@
 <link href="../iron-flex-layout/iron-flex-layout.html" rel="import">
 <link href="../paper-button/paper-button.html" rel="import">
 
-<link href="themes.html" rel="import">
-
 
 <dom-module id="abstract-action-page">
   <style is="custom-style">
@@ -17,23 +15,31 @@
       left: 0;
     }
 
+    paper-button.accent {
+      color: var(--paper-button-accent);
+    }
+
     #layout {
       height: 100%;
-      @apply(--layout-vertical --layout-center --layout-center-justified);
+      @apply(--layout-vertical);
+      @apply(--layout-center);
+      @apply(--layout-center-justified);
     }
     #actions {
       width: 100%;
     }
     #abstractActions {
-      @apply(--layout-horizontal --layout-end-justified);
+      padding-top: 30px;
+      @apply(--layout-horizontal);
+      @apply(--layout-end-justified);
     }
   </style>
   <template>
     <div id="layout">
       <content></content>
       <div id="abstractActions">
-        <paper-button affirmative on-click="{{exit}}">Cancel</paper-button>
-        <paper-button affirmative autofocus on-click="{{accept}}">Accept</paper-button>
+        <paper-button on-click="{{exit}}">Cancel</paper-button>
+        <paper-button on-click="{{accept}}" class="accent">Accept</paper-button>
       </div>
     </div>
   </template>

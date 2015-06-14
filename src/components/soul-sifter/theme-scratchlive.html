@@ -1,23 +1,24 @@
-@inherit: 'inherit';
-@black: 'black';
-@osx_grey: '#B1B1B1';
+@inherit: inherit;
+@black: black;
+@osx_grey: #B1B1B1;
 
-@sl_blue: '#1EC8FA';
-@sl_brown: '#6E330A';
-@sl_green: '#39FF7E';
-@sl_grey: '#292929';
-@sl_orange: '#FDC443';
-@sl_purple: '#AC1AFA';
+@sl_blue: #1EC8FA;
+@sl_brown: #6E330A;
+@sl_green: #39FF7E;
+@sl_grey: #292929;
+@sl_orange: #FDC443;
+@sl_purple: #AC1AFA;
 
 // main
 @bg: @sl_grey;
-@clr: '#999999';
-@clr_bold: '#CCCCCC';
+@clr: #999999;
+@clr_bold: #CCCCCC;
+@err: #F92772;
 // star rating
-@sr_clr: '#666';
-@sr_selected: '#EEE';
+@sr_clr: #666;
+@sr_selected: #EEE;
 // paper menu
-@pm_bg: '#111';
+@pm_bg: #111;
 @pm_bghover: @black;
 // paper input
 @pi_accent: @sl_blue;
@@ -29,7 +30,7 @@
 // abstract actions
 @aa_ok: @sl_orange;
 // drawer tabs
-@dt_bg: '#1F1F1F';
+@dt_bg: #1F1F1F;
 @dt_clr: @inherit;
 @dt_bar: @sl_orange;
 @dt_ink: @sl_orange;
@@ -42,20 +43,20 @@
 @st_bg: @black;
 // pitch slider
 @ps_clr: @sl_blue;
-@ps_bg: '#999';
+@ps_bg: #999;
 // search info
-@si_heading: '#CCC';
+@si_heading: #CCC;
 @si_emphasis: @sl_green;
 // song list
-@sl_border: '1px solid #2F2F2F';
-@sl_hover: 'rgb(20,20,20)';
-@sl_fadeout: 'linear-gradient(to right, rgba(41,41,41,0), rgba(41,41,41,1))';
-@sl_hoverfadeout: 'linear-gradient(to right, rgba(20,20,20,0), rgba(20,20,20,1))';
-@sl_btnborder: '1px solid rgb(20,20,20)';
-@sl_btnborderhover: '1px solid #999999';
+@sl_border: 1px solid #2F2F2F;
+@sl_hover: rgb(20,20,20);
+@sl_fadeout: linear-gradient(to right, rgba(41,41,41,0), rgba(41,41,41,1));
+@sl_hoverfadeout: linear-gradient(to right, rgba(20,20,20,0), rgba(20,20,20,1));
+@sl_btnborder: 1px solid rgb(20,20,20);
+@sl_btnborderhover: 1px solid #999999;
 // audio
-@au_play: '#CCC';
-@au_disabled: '#999';
+@au_play: #CCC;
+@au_disabled: #999;
 
 // <script>
 //   CoreStyle.g.theme.init = function() {
@@ -65,13 +66,20 @@
 // </script>
 
 /*<style is="custom-style">*/
-  /*<!-- main -->*/
-  #soulSifter {
-    color: @clr;
-    background-color: @bg;
+  /** main **/
+  soul-sifter {
+    --ss-soulsifter-color: @clr;
+    --ss-soulsifter-bg: @bg;
+
+    /* paper elements */
+    --paper-button-accent: @aa_ok;
+    --paper-input-container-color: @clr;
+    --paper-input-container-focus-color: @pi_accent;
+    --paper-input-container-invalid-color: @err;
+    --paper-input-container-input-color: @clr;
   }
 
-  /*<!-- star rating -->*/
+  /** star rating **/
   ss-star-rating::shadow core-icon {
     color: @sr_clr;
   }
@@ -79,7 +87,7 @@
     color: @sr_selected;
   }
 
-  /*<!-- paper menus -->*/
+  /** paper menus **/
   paper-menu-button paper-dropdown::shadow #background {
     background-color: @pm_bg;
   }
@@ -93,15 +101,7 @@
     background-color: @pm_bghover;
   }
 
-  /*<!-- paper input -->*/
-  section /deep/ paper-input::shadow .focused-underline {
-    background-color: @pi_accent;
-  }
-  section /deep/ paper-input[focused]::shadow .floated-label {
-    color: @pi_accent;
-  }
-
-  /*<!-- paper toggle button -->*/
+  /** paper toggle button **/
   paper-toggle-button::shadow [checked] .toggle-ink {
     color: @pb_clr;
   }
@@ -109,21 +109,13 @@
     background-color: @pb_clr;
   }
 
-  /*<!-- paper toast (alert) -->*/
+  /** paper toast (alert) **/
   paper-toast {
     background-color: @pt_bg;
     color: @pt_clr;
   }
 
-  /*<!-- abstract actions -->*/
-  #abstractActions paper-button {
-    color: @clr;
-  }
-  #abstractActions paper-button[autofocus] {
-    color: @aa_ok;
-  }
-
-  /*<!-- drawer tabs -->*/
+  /** drawer tabs **/
   paper-tabs {
     background-color: @dt_bg;
     color: @dt_clr;
@@ -135,7 +127,7 @@
     color: @dt_ink;
   }
 
-  /*<!-- genre list -->*/
+  /** genre list **/
   genre-list-item::shadow #item.selected {
     background-color: @gl_select;
   }
@@ -143,7 +135,7 @@
     color: @gl_ink;
   }
 
-  /*<!-- playlist list -->*/
+  /** playlist list **/
   paper-fab {
     background-color: @pl_fab;
     color: @clr_bold;
@@ -155,7 +147,7 @@
     color: @gl_ink;
   }
 
-  /*<!-- search toolbar -->*/
+  /** search toolbar **/
   search-toolbar {
     background-color: @st_bg;
   }
@@ -166,7 +158,7 @@
     color: @clr;
   }
 
-  /*<!-- pitch slider -->*/
+  /** pitch slider **/
   paper-slider::shadow #sliderBar::shadow #activeProgress {
     background-color: @ps_clr;
   }
@@ -183,7 +175,7 @@
     background-color: @ps_bg;
   }
 
-  /*<!-- song list -->*/
+  /** song list **/
   .song-item {
     border-bottom: @sl_border;
   }
@@ -209,7 +201,7 @@
     border: @sl_btnborderhover;
   }
 
-  /*<!-- song section -->*/
+  /** song section **/
   .title {
     color: @clr_bold;
   }
@@ -217,7 +209,7 @@
     background-color: @pm_bg;
   }
 
-  /*<!-- search info -->*/
+  /** search info **/
   .heading {
     color: @si_heading;
   }
@@ -228,11 +220,11 @@
     color: @clr;
   }
 
-  /*<!-- audio -->*/
+  /** audio **/
   ss-audio::shadow core-icon {
     color: @au_play;
   }
   ss-audio::shadow .disabled core-icon {
     color: @au_disabled;
   }
-/*</core-style>*/
+/*</style>*/

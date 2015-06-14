@@ -1,16 +1,16 @@
 <link href="../polymer/polymer.html" rel="import">
 
 <link href="../iron-flex-layout/iron-flex-layout.html" rel="import">
-<link href="../paper-checkbox/paper-checkbox.html" rel="import">
 <link href="../paper-input/paper-input.html" rel="import">
 
-<link href="themes.html" rel="import">
+<link href="abstract-action-page.html" rel="import">
 
 
 <dom-module id="ss-settings">
   <style is="custom-style">
     #pageContainer {
-      @apply(--layout-horizontal --layout-around-justified);
+      @apply(--layout-horizontal);
+      @apply(--layout-around-justified);
       width: 100%;
     }
 
@@ -18,21 +18,16 @@
       position: relative;
       width: 240px;
     }
-    paper-input::shadow paper-input-decorator {
+    paper-input::shadow paper-input-container {
       padding: 3px 0;
     }
-    paper-input::shadow paper-input-decorator::shadow .floated-label {
+    paper-input /deep/ paper-input-container.paper-input div.label-is-floating label {
       position: absolute;
+      left: inherit;
       right: 260px;
-      top: 14px;
-    }
-
-    paper-checkbox {
-      margin: 10px 0;
-    }
-
-    .label {
-      font-size: 0.75em;
+      top: 23px;
+      white-space: nowrap;
+      transform-origin: right top;
     }
 
     .vertical {
@@ -64,7 +59,7 @@
   Polymer({
     is: 'ss-settings',
 
-    created: function() {
+    ready: function() {
       this.settings = new ss.SoulSifterSettings();
       this.googleAppKey = this.settings.getString('google.appKey');
       this.googleEmail = this.settings.getString('google.email');
@@ -75,8 +70,11 @@
       this.songListLimit = this.settings.getInt("songList.limit");
     },
 
-    domReady: function() {
-      this.$.abstractActionPage.setAcceptAction(this.save);
+    attached: function() {
+      // https://www.polymer-project.org/1.0/docs/migration.html#domready
+      this.async(function() {
+        this.$.abstractActionPage.setAcceptAction(this.save);
+      }.bind(this));
     },
 
     save: function(e, detail, sender) {
