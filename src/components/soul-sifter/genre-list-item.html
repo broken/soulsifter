@@ -4,17 +4,13 @@
 <link href="../iron-flex-layout/iron-flex-layout.html" rel="import">
 <link href="../paper-icon-button/paper-icon-button.html" rel="import">
 <link href="../paper-ripple/paper-ripple.html" rel="import">
-<link href="../paper-shadow/paper-shadow.html" rel="import">
-
-<link href="themes.html" rel="import">
 
 
 <dom-module id="genre-list-item">
   <style is="custom-style">
-    :host {
-      font-size: 13px;
+    paper-ripple {
+      color: var(--ss-genre-list-item-ripple-color);
     }
-
     paper-icon-button {
       transform: scale(.6);
     }
@@ -30,7 +26,8 @@
     }
     #item {
       height: 30px;
-      @apply(--layout-horizontal --layout-center);
+      @apply(--layout-horizontal);
+      @apply(--layout-center);
     }
 
     .flex {
@@ -39,19 +36,17 @@
   </style>
   <template>
     <div id="itemContainer">
-      <paper-shadow animated id="shadow" z="0">
-        <div class$="{{computeIsSelected(isSelected)}}" style$="{{computePaddingLeftStyle(indent)}}" on-tap="{{selectTapAction}}" id="item">
-          <paper-ripple fit></paper-ripple>
-          <paper-icon-button icon="{{icon}}" on-tap="{{expandTapAction}}"></paper-icon-button>
-          <div class="flex">{{genre.name}}</div>
-        </div>
-      </paper-shadow>
+      <div class$="{{computeIsSelected(isSelected)}}" style$="{{computePaddingLeftStyle(indent)}}" on-tap="selectTapAction" id="item">
+        <paper-ripple></paper-ripple>
+        <paper-icon-button icon="{{icon}}" on-tap="expandTapAction"></paper-icon-button>
+        <div class="flex">{{genre.name}}</div>
+      </div>
     </div>
     <iron-collapse id="collapse">
       <template is="dom-repeat" items="{{genre.subGenre}}" id="subGenreTpl">
-        <genre-list-item genre="{{item}}" indent="{{incIndent(indent)}}" on-expand-parents="{{expand}}"></genre-list-item>
+        <genre-list-item genre="{{item}}" indent="{{incIndent(indent)}}" on-expand-parents="expand"></genre-list-item>
       </template>
-      <!-- <array-selector multi items="{{genre.subGenre}}" on-iron-select="{{selectGenreAction}}" id="selection"></array-selector> -->
+      <!-- <array-selector multi items="{{genre.subGenre}}" on-iron-select="selectGenreAction" id="selection"></array-selector> -->
     </iron-collapse>
   </template>
 </dom-module>
@@ -99,7 +94,7 @@
       for (var i = 0; i < genres.length; ++i) {
         if (genres[i].id == this.genre.id) {
           this.$.selection.toggle(this);
-          this.asyncFire('expand-parents');
+          this.fire('expand-parents');
         }
       }
       // have all child elements check if they're in the array
@@ -140,21 +135,21 @@
     },
 
     selectGenreAction: function(e, detail, sender) {
-      this.$.shadow.setZ(detail.isSelected ? 1 : 0);
+      // this.$.shadow.setZ(detail.isSelected ? 1 : 0);
       this.isSelected = detail.isSelected;
-      this.asyncFire('genre-select', this.genre);
+      this.fire('genre-select', this.genre);
+    },
+
+    computePaddingLeftStyle: function(indent) {
+      return 'padding-left: ' + indent + 'px;';
+    },
+
+    incIndent: function(indent) {
+      return indent + 20;
+    },
+
+    computeIsSelected: function(isSelected) {
+      return isSelected ? "selected" : "";
     },
   });
-
-  computePaddingLeftStyle(indent) {
-    return 'padding-left: ' + indent + 'px;';
-  }
-
-  incIndent(indent) {
-    return indent + 20;
-  }
-
-  computeIsSelected(isSelected) {
-    return isSelected ? "selected" : "";
-  }
 </script>

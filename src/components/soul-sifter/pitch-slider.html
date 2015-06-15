@@ -3,7 +3,6 @@
 <link href="../paper-slider/paper-slider.html" rel="import">
 
 <link href="global-state.html" rel="import">
-<link href="themes.html" rel="import">
 
 
 <dom-module id="pitch-slider">
@@ -69,7 +68,7 @@
     },
 
     pitchChanged: function(newValue, oldValue) {
-      if (this.global.song && this.global.song.bpm)
+      if (this.global && this.global.song && this.global.song.bpm)
         this.global.bpm = (this.global.song.bpm * (this.pitch/100) + this.global.song.bpm * 1).toFixed(1);
     },
   });

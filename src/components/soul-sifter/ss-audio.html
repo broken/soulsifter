@@ -44,10 +44,10 @@
   </style>
   <template>
     <div class$="{{computeIsDisabled(disabled)}}">
-      <iron-icon id="playPause" icon="av:play-arrow" on-click="{{playAction}}"></iron-icon>
+      <iron-icon id="playPause" icon="av:play-arrow" on-click="playAction"></iron-icon>
       <div class="timebar">
         <div id="time" self-end>{{currentTimeStr}}</div>
-        <paper-slider id="slider" min="0" max="{{duration}}" value="{{currentTime}}" on-change="{{changeCurrentTime}}" disabled="{{disabled}}"></paper-slider>
+        <paper-slider id="slider" min="0" max="{{duration}}" value="{{currentTime}}" on-change="changeCurrentTime" disabled="{{disabled}}"></paper-slider>
       </div>
     </div>
   </template>
@@ -126,9 +126,9 @@
       this.audio.currentTime = this.$.slider.immediateValue;
     },
 
-  });
+    computeIsDisabled: function(isDisabled) {
+      return (isDisabled ? "disabled " : "") + "horizontal";
+    },
 
-  computeIsDisabled(isDisabled) {
-    return (isDisabled ? "disabled " : "") + "horizontal";
-  }
+  });
 </script>

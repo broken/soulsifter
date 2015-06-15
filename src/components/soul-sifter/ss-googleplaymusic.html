@@ -13,6 +13,13 @@
   Polymer({
     is: 'ss-googleplaymusic',
 
+    properties: {
+      connected: {
+        type: Boolean,
+        value: false
+      }
+    },
+
     attached: function() {
       if (!this.global.pm) {
         var PlayMusic = require('playmusic');
@@ -20,10 +27,14 @@
         var settings = new ss.SoulSifterSettings();
         var email = settings.getString('google.email');
         var appKey = settings.getString('google.appKey');
+        if (!email) {
+          return;
+        }
         this.pm.init({email: email, password: appKey},
             function() {
+              this.connected = true;
               console.log('Succesfully connected to Google Music.');
-            },
+            }.bind(this),
             function(message, data, err, res) {
               console.warn('Login to Google Music failed: ' + message);
               console.warn('Data: ' + data);
@@ -39,6 +50,9 @@
      * Failure callback takes message, body, err, httpResonse
      */
     findSong: function(song, success, failure) {
+      if (!this.connected) {
+        return;
+      }
       var maxResults = 3;
       this.pm.search(song.artist + ' ' + song.title, maxResults,
           function(data) {
@@ -77,6 +91,9 @@
      * Failure callback takes message, body, err, httpResonse
      */
     findSongStreamUrl: function(song, success, failure) {
+      if (!this.connected) {
+        return;
+      }
       var pm = this.pm;
       findSong(song, function(song) {
         pm.getStreamUrl(song.track.nid, success);
@@ -89,11 +106,17 @@
      * Failure callback takes message, body, err, httpResonse
      */
     findStreamUrl: function(nid, success, failure) {
+      if (!this.connected) {
+        return;
+      }
       var pm = this.pm;
       pm.getStreamUrl(nid, success, failure);
     },
 
     findPlaylist: function(name, success, failure) {
+      if (!this.connected) {
+        return;
+      }
       this.pm.getPlayLists(function(data) {
           console.log(data);
           if (!data.data.items) {
@@ -115,6 +138,9 @@
     },
 
     savePlaylist: function(playlist, success, failure) {
+      if (!this.connected) {
+        return;
+      }
       var that = this;
       this.pm.addPlayList(playlist.name,
           function(data, response) {

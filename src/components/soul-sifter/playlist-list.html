@@ -7,7 +7,6 @@
 <link href="../paper-input/paper-input.html" rel="import">
 
 <link href="playlist-list-item.html" rel="import">
-<link href="themes.html" rel="import">
 
 
 <dom-module id="playlist-list">
@@ -25,15 +24,15 @@
     }
   </style>
   <template>
-    <iron-signals on-iron-signal-playlists-changed="{{updatePlaylists}}"></iron-signals>
+    <iron-signals on-iron-signal-playlists-changed="updatePlaylists"></iron-signals>
 
     <div id="wrapper">
       <template is="dom-repeat" items="{{playlists}}" id="playlistTpl">
-        <playlist-list-item playlist="{{item}}" on-playlist-select="{{selectPlaylist}}"></playlist-list-item>
+        <playlist-list-item playlist="{{item}}" on-playlist-select="selectPlaylist"></playlist-list-item>
       </template>
-      <array-selector id="selection" on-core-select="{{selectAction}}"></array-selector>
+      <array-selector id="selection" on-core-select="selectAction"></array-selector>
     </div>
-    <paper-fab mini icon="add" on-click="{{createPlaylist}}"></paper-fab>
+    <paper-fab mini icon="add" on-click="createPlaylist"></paper-fab>
   </template>
 </dom-module>
 
@@ -41,8 +40,11 @@
   Polymer({
     is: 'playlist-list',
 
-    domReady: function() {
-      this.updatePlaylists();
+    attached: function() {
+      // https://www.polymer-project.org/1.0/docs/migration.html#domready
+      this.async(function() {
+        this.updatePlaylists();
+      }.bind(this));
     },
 
     togglePlaylistDialog: function(e, detail, sender) {
@@ -51,7 +53,7 @@
 
     createPlaylist: function(e, detail, sender) {
       var playlist = new ss.Playlist();
-      this.asyncFire('page-playlist-edit', {playlist: playlist});
+      this.fire('page-playlist-edit', {playlist: playlist});
     },
 
     selectPlaylist: function(e, detail, sender) {
@@ -71,10 +73,10 @@
       var playlist = detail.item.playlist;
       if (detail.isSelected) {
         if (playlist.query) {
-          this.asyncFire('genre-change', playlist.styles);
-          this.asyncFire('query-change', playlist.query);
+          this.fire('genre-change', playlist.styles);
+          this.fire('query-change', playlist.query);
         } else {
-          this.asyncFire('iron-signal', {name: 'search', data: {playlist: playlist}});
+          this.fire('iron-signal', {name: 'search', data: {playlist: playlist}});
         }
       }
     },

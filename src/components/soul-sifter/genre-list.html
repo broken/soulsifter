@@ -3,14 +3,10 @@
 <link href="../paper-icon-button/paper-icon-button.html" rel="import">
 
 <link href="genre-list-item.html" rel="import">
-<link href="themes.html" rel="import">
 
 
 <dom-module id="genre-list">
   <style is="custom-style">
-    :host {
-      font-size: 13px;
-    }
 
     paper-icon-button {
       transform: scale(.6);
@@ -36,7 +32,7 @@
   </style>
   <template>
     <template is="dom-repeat" items="{{genres}}" id="genreTpl">
-      <genre-list-item genre="{{item}}" on-genre-select="{{selectAction}}"></genre-list-item>
+      <genre-list-item genre="{{item}}" on-genre-select="selectAction"></genre-list-item>
     </template>
     <array-selector multi id="selection"></array-selector>
   </template>
@@ -53,8 +49,11 @@
       }
     },
 
-    domReady: function() {
-      this.genres = ss.Style.findAllParents();
+    attached: function() {
+      // https://www.polymer-project.org/1.0/docs/migration.html#domready
+      this.async(function() {
+        this.genres = ss.Style.findAllParents();
+      }.bind(this));
     },
 
     setSelection: function(genres) {

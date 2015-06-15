@@ -6,7 +6,6 @@
 
 <link href="global-state.html" rel="import">
 <link href="song-list-item.html" rel="import">
-<link href="themes.html" rel="import">
 
 
 <dom-module id="song-list">
@@ -23,8 +22,8 @@
   </style>
   <template>
     <global-state values="{{global}}"></global-state>
-    <iron-signals on-iron-signal-genres-changed="{{genresChanged}}"
-                          on-iron-signal-search="{{searchAction}}"></iron-signals>
+    <iron-signals on-iron-signal-genres-changed="genresChanged"
+                          on-iron-signal-search="searchAction"></iron-signals>
 
     <core-tooltip id="tooltip" label="Searching..." noarrow position top></core-tooltip>
     <iron-selector selected="{{selectedRow}}" activateEvent="click" id="selector">
@@ -52,7 +51,7 @@
       'globalBpmChanged(global.bpm)'
     ],
 
-    created: function() {
+    ready: function() {
       // init & hint lists & objects
       this.songs = [];
       this.genres = [];
@@ -60,8 +59,11 @@
       this.settings = new ss.SoulSifterSettings();
     },
 
-    domReady: function() {
-      this.searchAction();
+    attached: function() {
+      // https://www.polymer-project.org/1.0/docs/migration.html#domready
+      this.async(function() {
+        this.searchAction();
+      }.bind(this));
     },
 
     globalBpmChanged: function(newValue) {

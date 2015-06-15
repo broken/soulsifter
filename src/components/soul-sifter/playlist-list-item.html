@@ -11,7 +11,6 @@
 <link href="../paper-shadow/paper-shadow.html" rel="import">
 
 <link href="ss-googleplaymusic.html" rel="import">
-<link href="themes.html" rel="import">
 
 
 <dom-module id="playlist-list-item">
@@ -68,19 +67,19 @@
 
     <div id="itemContainer">
       <paper-shadow animated id="shadow" z="0">
-        <div id="item" class$="{{computeIsSelected(isSelected)}}" on-click="{{clickAction}}">
+        <div id="item" class$="{{computeIsSelected(isSelected)}}" on-click="clickAction">
           <paper-ripple fit></paper-ripple>
           <div class="flex">
             <span>{{playlist.name}}</span>
             <iron-icon icon="find-replace" alt="smart playlist" class$="{{computeIsSmart(playlist)}}"></iron-icon>
           </div>
-          <paper-menu-button on-click="{{stopPropagation}}">
+          <paper-menu-button on-click="stopPropagation">
             <paper-icon-button icon="more-vert"></paper-icon-button>
             <paper-dropdown class="dropdown" transition="cascade" halign="right">
               <paper-menu>
-                <paper-item on-click="{{editAction}}">Edit playlist</paper-item>
-                <paper-item on-click="{{deleteAction}}">Delete playlist</paper-item>
-                <paper-item on-click="{{exportAction}}">Export to Google Play Music</paper-button>
+                <paper-item on-click="editAction">Edit playlist</paper-item>
+                <paper-item on-click="deleteAction">Delete playlist</paper-item>
+                <paper-item on-click="exportAction">Export to Google Play Music</paper-button>
               </paper-menu>
             </paper-dropdown>
           </paper-menu-button>
@@ -106,7 +105,7 @@
     isSelected: false,
 
     clickAction: function(e, detail, sender) {
-      this.asyncFire('playlist-select', this);
+      this.fire('playlist-select', this);
     },
 
     /** @method select */
@@ -117,13 +116,13 @@
 
     editAction: function(e, detail, sender) {
       e.stopPropagation();
-      this.asyncFire('page-playlist-edit', {playlist: this.playlist});
+      this.fire('page-playlist-edit', {playlist: this.playlist});
     },
 
     deleteAction: function(e, detail, sender) {
       e.stopPropagation();
       this.playlist.erase();
-      this.asyncFire('iron-signal', {name: 'playlists-changed'});
+      this.fire('iron-signal', {name: 'playlists-changed'});
     },
 
     exportAction: function(e, detail, sender) {
@@ -135,13 +134,13 @@
       e.stopPropagation();
     },
 
+    computeIsSelected: function(isSelected) {
+      return isSelected ? "selected" : "";
+    },
+
+    computeIsSmart: function(playlist) {
+      return playlist.query ? "smart" : "";
+    },
+
   });
-
-  computeIsSelected(isSelected) {
-    return isSelected ? "selected" : "";
-  }
-
-  computeIsSmart(playlist) {
-    return playlist.query ? "smart" : "";
-  }
 </script>

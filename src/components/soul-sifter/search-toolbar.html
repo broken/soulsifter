@@ -1,7 +1,7 @@
 <link href="../polymer/polymer.html" rel="import">
 
 <link href="../iron-flex-layout/iron-flex-layout.html" rel="import">
-<link href="../core-field/core-field.html" rel="import">
+<link href="../iron-icons/iron-icons.html" rel="import">
 <link href="../iron-localstorage/iron-localstorage.html" rel="import">
 <link href="../iron-signals/iron-signals.html" rel="import">
 <link href="../paper-dialog/paper-dialog.html" rel="import">
@@ -13,23 +13,14 @@
 <!-- <link href="create-song.html" rel="import"> -->
 <link href="global-state.html" rel="import">
 <link href="search-info.html" rel="import">
-<link href="themes.html" rel="import">
 
 
 <dom-module id="search-toolbar">
   <style is="custom-style">
-    paper-toolbar {
-      box-shadow: rgba(0, 0, 0, 0.2) 0px 3px 2px;
-      height: 45px;
+    paper-icon-button {
+      color: var(--ss-soulsifter-color);
     }
 
-    paper-toolbar::shadow .toolbar-tools {
-      height: 45px;
-    }
-
-    .hide {
-      display: none;
-    }
 
     #bpm {
       width: 64px;
@@ -45,6 +36,15 @@
     .flex {
       @apply(--layout-flex);
     }
+    .hide {
+      display: none;
+    }
+    .horizontal {
+      @apply(--layout-horizontal);
+    }
+    .indent {
+      margin-left: 60px;
+    }
   </style>
   <template>
     <global-state values="{{global}}"></global-state>
@@ -52,26 +52,29 @@
 
     <paper-toolbar class$="{{computeIsTall(isTall)}}">
       <content></content>
-      <core-field class="indent flex">
-        <paper-icon-button icon="search" on-click="{{searchAction}}"></paper-icon-button>
-        <paper-input id="searchInput" label="search" class="flex" value="{{query}}"></paper-input>
-        <paper-icon-button icon="info-outline" on-click="{{toggleSearchInfoDialog}}"></paper-icon-button>
-      </core-field>
-      <paper-input label="bpm" floatingLabel value="{{global.bpm}}" id="bpm"></paper-input>
-      <paper-icon-button icon="add-circle" on-click="{{toggleCreateSongDialog}}" id="createSongButton"></paper-icon-button>
-      <paper-icon-button icon="settings" on-click="{{clickSettingsAction}}"></paper-icon-button>
-      <paper-icon-button icon="unfold-more" on-click="{{toggleIsTall}}"></paper-icon-button>
+      <!-- top row -->
+      <section class="indent horizontal">
+        <paper-icon-button icon="search" on-click="searchAction"></paper-icon-button>
+        <paper-input id="searchInput" label="search" class="flex" value="{{query}}" noLabelFloat></paper-input>
+        <paper-icon-button icon="info-outline" on-click="toggleSearchInfoDialog"></paper-icon-button>
+        <paper-input label="bpm" value="{{global.bpm}}" id="bpm"></paper-input>
+        <paper-icon-button icon="add-circle" on-click="toggleCreateSongDialog" id="createSongButton"></paper-icon-button>
+        <paper-icon-button icon="settings" on-click="clickSettingsAction"></paper-icon-button>
+        <paper-icon-button icon="unfold-more" on-click="toggleIsTall"></paper-icon-button>
+      </section>
       <!-- middle row -->
       <!-- bottom row -->
-      <div class="bottom {{ {hide: !isTall} | tokenList }}">
-        <paper-toggle-button checked="{{djSearch}}"></paper-toggle-button>
-        DJ Search Mode
-      </div>
-      <div class="bottom flex {{ {hide: !isTall} | tokenList }}"></div>
-      <div class="bottom {{ {hide: !isTall} | tokenList }}">
-        <paper-icon-button icon="query-builder" on-click="{{analyzeBpms}}"></paper-icon-button>
-        Analyze BPMs
-      </div>
+      <section class$="{{computeHideIfTall(isTall, 'bottom')}}">
+        <div>
+          <paper-toggle-button checked="{{djSearch}}"></paper-toggle-button>
+          DJ Search Mode
+        </div>
+        <div class="flex"></div>
+        <div>
+          <paper-icon-button icon="query-builder" on-click="analyzeBpms"></paper-icon-button>
+          Analyze BPMs
+        </div>
+      </section>
     </paper-toolbar>
     <paper-dialog backdrop layered id="searchInfoDialog">
       <search-info></search-info>
@@ -94,31 +97,36 @@
       djSearch: {
         type: Boolean,
         notify: true
+      },
+      isTall: {
+        type: Boolean,
+        value: false
       }
     },
 
-    isTall: false,
-
     musicDir: '',
 
-    domReady: function() {
-      this.$.createSongButton.ondragover = function() {
-        this.icon = 'add-circle-outline';
-      };
-      this.$.createSongButton.ondragend = function() {
-        this.icon = 'add-circle';
-      };
-      this.$.createSongButton.ondrop = function(e) {
-        e.preventDefault();
-        for (var i = 0; i < e.dataTransfer.files.length; ++i) {
-          var song = new ss.Song();
-          window.console.log(song);
-          /*song.setFilepath(e.dataTransfer.files[i].path);
-          window.console.log(e.dataTransfer.files[i].path);
-          ss.MusicManager.readTagsFromSong(song);
-          window.console.log(song);*/
-        }
-      };
+    attached: function() {
+      // https://www.polymer-project.org/1.0/docs/migration.html#domready
+      this.async(function() {
+        this.$.createSongButton.ondragover = function() {
+          this.icon = 'add-circle-outline';
+        };
+        this.$.createSongButton.ondragend = function() {
+          this.icon = 'add-circle';
+        };
+        this.$.createSongButton.ondrop = function(e) {
+          e.preventDefault();
+          for (var i = 0; i < e.dataTransfer.files.length; ++i) {
+            var song = new ss.Song();
+            window.console.log(song);
+            /*song.setFilepath(e.dataTransfer.files[i].path);
+            window.console.log(e.dataTransfer.files[i].path);
+            ss.MusicManager.readTagsFromSong(song);
+            window.console.log(song);*/
+          }
+        };
+      }.bind(this));
     },
 
     toggleIsTall: function(e, detail, sender  ) {
@@ -131,7 +139,7 @@
 
     clickSettingsAction: function(e, detail, sender) {
       e.stopPropagation();
-      this.asyncFire('page-settings');
+      this.fire('page-settings');
     },
 
     toggleCreateSongDialog: function(e, detail, sender) {
@@ -139,7 +147,7 @@
     },
 
     searchAction: function(e, detail, sender) {
-      this.asyncFire('iron-signal', {name: 'search'});
+      this.fire('iron-signal', {name: 'search'});
     },
 
     musicDirChanged: function(oldValue, newValue) {
@@ -155,9 +163,14 @@
     analyzeBpms: function(e, detail, sender) {
       ss.AudioAnalyzer.analyzeBpms();
     },
-  });
 
-  computeIsTall(isTall) {
-    return isTall ? "medium-tall" : "";
-  }
+    computeIsTall: function(isTall) {
+      return isTall ? 'medium-tall' : '';
+    },
+
+    computeHideIfTall: function(isTall, classes) {
+      classes = classes || '';
+      return classes + (isTall ? '' : ' hide');
+    },
+  });
 </script>

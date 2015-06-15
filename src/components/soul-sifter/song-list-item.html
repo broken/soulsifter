@@ -9,7 +9,6 @@
 
 <link href="global-state.html" rel="import">
 <link href="ss-star-rating.html" rel="import">
-<link href="themes.html" rel="import">
 
 
 <dom-module id="song-list-item">
@@ -81,18 +80,18 @@
   <template>
     <global-state values="{{global}}"></global-state>
 
-    <div class="song-item" draggable="true" on-dragstart="{{dragSong}}" id="draggableItem">
+    <div class="song-item" draggable="true" on-dragstart="dragSong" id="draggableItem">
       <div id="cover"></div>
       <div class="key fade-out flex">
         <span class="artist">{{song.artist}}</span>
         <span> - </span>
         <span class="title">{{song.title}}</span>
       </div>
-      <paper-menu-button on-click="{{stopPropagation}}">
+      <paper-menu-button on-click="stopPropagation">
         <paper-icon-button icon="more-vert"></paper-icon-button>
         <paper-dropdown class="dropdown" transition="cascade">
           <paper-menu>
-            <paper-item on-click="{{clickEditAction}}">Edit info</paper-item>
+            <paper-item on-click="clickEditAction">Edit info</paper-item>
           </paper-menu>
         </paper-dropdown>
       </paper-menu-button>
@@ -143,7 +142,7 @@
 
     clickEditAction: function(e, detail, sender) {
       e.stopPropagation();
-      this.asyncFire('page-song-edit', {song: this.song});
+      this.fire('page-song-edit', {song: this.song});
     },
 
     stopPropagation: function(e, detail, sender) {

@@ -1,7 +1,9 @@
 <link href="../polymer/polymer.html" rel="import">
 
 <link href="../iron-flex-layout/iron-flex-layout.html" rel="import">
-<link href="../core-animated-pages/core-animated-pages.html" rel="import">
+<link href="../neon-animation/neon-animatable.html" rel="import">
+<link href="../neon-animation/neon-animated-pages.html" rel="import">
+<link href="../neon-animation/neon-animations.html" rel="import">
 <link href="../paper-drawer-panel/paper-drawer-panel.html" rel="import">
 <link href="../paper-header-panel/paper-header-panel.html" rel="import">
 <link href="../paper-tabs/paper-tab.html" rel="import">
@@ -29,16 +31,21 @@
       left: 0;
       color: var(--ss-soulsifter-color);
       background-color: var(--ss-soulsifter-bg);
+      font-size: 13px;
+    }
+    /* placed here since less preprocessor fails mixins. */
+    paper-tab {
+      --paper-tab: {
+        background-color: var(--paper-tab-bg);
+      };
+      --paper-tab-content: {
+        color: var(--paper-tab-selection-color);
+      };
     }
 
-    #soulSifter {
-      margin: 0;
-      padding: 0;
-      position: absolute;
-      top: 0;
-      right: 0;
-      bottom: 0;
-      left: 0;
+    #drawer {
+      background-color: var(--ss-soulsifter-bg);
+      overflow: hidden;
     }
 
 
@@ -57,7 +64,7 @@
       color: inherit;
     }
 
-    core-animated-pages#main {
+    neon-animated-pages#main {
       overflow: hidden;
       height: 100%;
     }
@@ -83,48 +90,47 @@
     .vertical {
       @apply(--layout-vertical);
     }
-
     .flex {
       @apply(--layout-flex);
     }
   </style>
   <template>
-    <div id="soulSifter">
-      <core-animated-pages transitions="slide-from-right" selected="{{section}}" id="main">
-        <section>
-          <paper-drawer-panel id="core_drawer_panel">
-            <section id="core_drawer_panel-drawer" drawer class="vertical">
-              <paper-tabs selected="{{selectedTab}}" id="paper_tabs">
-                <paper-tab id="paper_tab-song">Song</paper-tab>
-                <paper-tab id="paper_tab-genres" active>Genres</paper-tab>
-                <paper-tab id="paper_tab-playlists">Playlists</paper-tab>
-              </paper-tabs>
-              <core-animated-pages selected="{{selectedTab}}" id="core_animated_pages" class="flex">
-                <song-section song-trail="{{songTrail}}"></song-section>
-                <genre-list selection="{{genres}}"></genre-list>
-                <playlist-list on-query-change="{{changeQuery}}" on-genre-change="{{updateGenres}}"></playlist-list>
-              </core-animated-pages>
-            </section>
-            <paper-header-panel main>
-              <search-toolbar query="{{query}}" dj-search="{{djSearch}}" class="paper-header">
-                <paper-icon-button icon="menu" onclick="document.querySelector('soul-sifter::shadow paper-drawer-panel').togglePanel();"></paper-icon-button>
-              </search-toolbar>
-              <song-list query="{{query}}" dj-search="{{djSearch}}" song-trail="{{songTrail}}" class="content"></song-list>
-            </paper-header-panel>
-          </paper-drawer-panel>
-        </section>
-        <section>
-          <playlist-edit playlist="{{playlist}}"></playlist-edit>
-        </section>
-        <section>
-          <song-edit song="{{song}}"></song-edit>
-        </section>
-        <section>
-          <ss-settings></ss-settings>
-        </section>
-      </core-animated-pages>
-      <paper-toast id="toast" text="{{errorText}}" duration="5000" autoCloseDisabled></paper-toast>
-    </div>
+    <neon-animated-pages id="main" selected="{{section}}" entry-animation="slide-from-right-animation" exit-animation="slide-left-animation">
+      <neon-animatable>
+        <paper-drawer-panel>
+          <section drawer id="drawer">
+            <paper-tabs selected="{{selectedTab}}">
+              <paper-tab id="paper_tab-song">Song</paper-tab>
+              <paper-tab id="paper_tab-genres" active>Genres</paper-tab>
+              <paper-tab id="paper_tab-playlists">Playlists</paper-tab>
+            </paper-tabs>
+            <neon-animated-pages selected="{{selectedTab}}" class="flex" entry-animation="slide-from-right-animation" exit-animation="slide-left-animation">
+              <neon-animatable><song-section song-trail="{{songTrail}}"></song-section></neon-animatable>
+              <neon-animatable>
+              <genre-list selection="{{genres}}"></genre-list>
+              </neon-animatable>
+              <neon-animatable><playlist-list on-query-change="changeQuery" on-genre-change="updateGenres"></playlist-list></neon-animatable>
+            </neon-animated-pages>
+          </section>
+          <paper-header-panel main>
+            <search-toolbar query="{{query}}" dj-search="{{djSearch}}" class="paper-header">
+              <paper-icon-button paper-drawer-toggle icon="menu"></paper-icon-button>
+            </search-toolbar>
+            <song-list query="{{query}}" dj-search="{{djSearch}}" song-trail="{{songTrail}}" class="fit"></song-list>
+          </paper-header-panel>
+        </paper-drawer-panel>
+      </neon-animatable>
+      <neon-animatable>
+        <playlist-edit playlist="{{playlist}}"></playlist-edit>
+      </neon-animatable>
+      <neon-animatable>
+        <song-edit song="{{song}}"></song-edit>
+      </neon-animatable>
+      <neon-animatable>
+        <ss-settings></ss-settings>
+      </neon-animatable>
+    </neon-animated-pages>
+    <paper-toast id="toast" text="{{errorText}}" duration="5000" autoCloseDisabled></paper-toast> 
   </template>
 </dom-module>
 
@@ -136,36 +142,43 @@
       selectedTab: {
         type: Number,
         value: 1
+      },
+      section: {
+        type: Number,
+        value: 0
       }
     },
 
     djSearch: true,
 
-    domReady: function() {
-      /* theming */
-      CoreStyle.g.theme.init();
+    attached: function() {
+      // https://www.polymer-project.org/1.0/docs/migration.html#domready
+      this.async(function() {
+        /* theming */
+        // CoreStyle.g.theme.init();
 
-      /* setup listeners */
-      var that = this;
-      this.addEventListener('page-main', function(e) {
-        that.section = 0;
-      });
-      this.addEventListener('page-playlist-edit', function(e) {
-        that.section = 1;
-        that.playlist = e.detail.playlist;
-      });
-      this.addEventListener('page-song-edit', function(e) {
-        that.section = 2;
-        that.song = e.detail.song;
-      });
-      this.addEventListener('page-settings', function(e) {
-        that.section = 3;
-      });
-      this.addEventListener('error-alert', function(e) {
-        console.log(e.detail.msg);
-        that.errorText = e.detail.msg;
-        that.$.toast.show();
-      });
+        /* setup listeners */
+        var that = this;
+        this.addEventListener('page-main', function(e) {
+          that.section = 0;
+        });
+        this.addEventListener('page-playlist-edit', function(e) {
+          that.section = 1;
+          that.playlist = e.detail.playlist;
+        });
+        this.addEventListener('page-song-edit', function(e) {
+          that.section = 2;
+          that.song = e.detail.song;
+        });
+        this.addEventListener('page-settings', function(e) {
+          that.section = 3;
+        });
+        this.addEventListener('error-alert', function(e) {
+          console.log(e.detail.msg);
+          that.errorText = e.detail.msg;
+          that.$.toast.show();
+        });
+      }.bind(this));
     },
 
     changeQuery: function(e, detail, sender) {
@@ -178,7 +191,7 @@
 
     genresChanged: function(spliceOrOldValue, undefOrNewValue) {
       // The first selection uses a property observer, while subsequent calls use an array observer and calls this method with splice changes rather than the old & new values
-      this.asyncFire('iron-signal', {name: 'genres-changed', data: this.genres});
+      this.fire('iron-signal', {name: 'genres-changed', data: this.genres});
     },
   });
 </script>

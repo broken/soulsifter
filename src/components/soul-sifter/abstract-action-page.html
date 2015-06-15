@@ -38,8 +38,8 @@
     <div id="layout">
       <content></content>
       <div id="abstractActions">
-        <paper-button on-click="{{exit}}">Cancel</paper-button>
-        <paper-button on-click="{{accept}}" class="accent">Accept</paper-button>
+        <paper-button on-click="exit">Cancel</paper-button>
+        <paper-button on-click="accept" class="accent">Accept</paper-button>
       </div>
     </div>
   </template>
@@ -54,12 +54,12 @@
     },
 
     accept: function(e, detail, sender) {
-      this.acceptAction.call(this.parentNode.host);
+      this.acceptAction.call(this.parentNode);
       this.exit();
     },
 
     exit: function(e, detail, sender) {
-      this.asyncFire('page-main');
+      this.fire('page-main');
     },
     
   });

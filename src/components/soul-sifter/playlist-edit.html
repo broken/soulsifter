@@ -7,7 +7,6 @@
 
 <link href="abstract-action-page.html" rel="import">
 <link href="genre-list.html" rel="import">
-<link href="themes.html" rel="import">
 
 
 <dom-module id="playlist-edit">
@@ -48,8 +47,11 @@
 
     fromSongTrail: false,
 
-    domReady: function() {
-      this.$.abstractActionPage.setAcceptAction(this.save);
+    attached: function() {
+      // https://www.polymer-project.org/1.0/docs/migration.html#domready
+      this.async(function() {
+        this.$.abstractActionPage.setAcceptAction(this.save);
+      }.bind(this));
     },
 
     playlistChanged: function(newValue, oldValue) {
@@ -63,10 +65,10 @@
       } else {
         this.playlist.save();
         if (this.fromSongTrail) {
-          this.asyncFire('iron-signal', {name: 'save-song-trail', data: {playlist: this.playlist} });
+          this.fire('iron-signal', {name: 'save-song-trail', data: {playlist: this.playlist} });
         }
       }
-      this.asyncFire('iron-signal', {name: 'playlists-changed'});
+      this.fire('iron-signal', {name: 'playlists-changed'});
     },
 
   });

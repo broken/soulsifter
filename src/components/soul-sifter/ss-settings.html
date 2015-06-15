@@ -38,16 +38,16 @@
     <abstract-action-page id="abstractActionPage">
       <div id="pageContainer">
         <div class="vertical">
-          <paper-input floatingLabel label="Google Music Email" value="{{googleEmail}}"></paper-input>
-          <paper-input floatingLabel label="Google Music App Key" value="{{googleAppKey}}"></paper-input>
+          <paper-input label="Google Music Email" value="{{googleEmail}}"></paper-input>
+          <paper-input label="Google Music App Key" value="{{googleAppKey}}"></paper-input>
           <br>
-          <paper-input floatingLabel label="Default song list limit" value="{{songListLimit}}"></paper-input>
+          <paper-input label="Default song list limit" value="{{songListLimit}}" allowedPattern="[0-9]*" preventInvalidInput></paper-input>
         </div>
         <div class="vertical">
-          <paper-input floatingLabel label="Database Name" value="{{dbName}}"></paper-input>
-          <paper-input floatingLabel label="Database User" value="{{dbUser}}"></paper-input>
-          <paper-input floatingLabel label="Database Password" value="{{dbPassword}}"></paper-input>
-          <paper-input floatingLabel label="Database URL" value="{{dbUrl}}"></paper-input>
+          <paper-input label="Database Name" value="{{dbName}}"></paper-input>
+          <paper-input label="Database User" value="{{dbUser}}"></paper-input>
+          <paper-input label="Database Password" value="{{dbPassword}}"></paper-input>
+          <paper-input label="Database URL" value="{{dbUrl}}"></paper-input>
         </div>
       </div>
     </abstract-action-page>
@@ -67,7 +67,7 @@
       this.dbUser = this.settings.getString('db.user');
       this.dbPassword = this.settings.getString('db.password');
       this.dbUrl = this.settings.getString('db.url');
-      this.songListLimit = this.settings.getInt("songList.limit");
+      this.songListLimit = this.settings.getInt('songList.limit');
     },
 
     attached: function() {
@@ -78,14 +78,26 @@
     },
 
     save: function(e, detail, sender) {
-      this.settings.putString('google.appKey', this.googleAppKey);
-      this.settings.putString('google.email', this.googleEmail);
-      this.settings.putString('db.name', this.dbName);
-      this.settings.putString('db.user', this.dbUser);
-      this.settings.putString('db.password', this.dbPassword);
-      this.settings.putString('db.url', this.dbUrl);
-      this.settings.putInt("songList.limit", this.songListLimit);
+      this.puts('google.appKey', this.googleAppKey);
+      this.puts('google.email', this.googleEmail);
+      this.puts('db.name', this.dbName);
+      this.puts('db.user', this.dbUser);
+      this.puts('db.password', this.dbPassword);
+      this.puts('db.url', this.dbUrl);
+      this.puti('songList.limit', this.songListLimit);
       this.settings.save();
+    },
+
+    puts: function(key, value) {
+      if (!!key && !!value) {
+        this.settings.putString(key, value);
+      }
+    },
+
+    puti: function(key, value) {
+      if (!!key && (!!value || value === 0)) {
+        this.settings.putInt(key, value);
+      }
     },
   });
 </script>
