@@ -13,9 +13,9 @@ OSX Build Instructions
 ======================
 Presteps:
 * create mysql db
-* install npm modules
+* install npm modules (nw-gyp, grunt plugins)
 * custom build of nwjs (for drag & drop & mp3 play support)
-* copy ffmpegsumo.so from Chrom into libraries/ directory (for mp3 play support)
+* copy ffmpegsumo.so from Chrome into libraries/ directory (for mp3 play support)
 * required libs: mysql-connector-c++, libtag, mad, boost
 
 ```
