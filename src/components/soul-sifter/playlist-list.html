@@ -16,9 +16,8 @@
       overflow-y: scroll;
     }
 
-
     paper-fab {
-      bottom: 12px;
+      bottom: 60px;
       position: absolute;
       right: 12px;
     }
@@ -27,12 +26,11 @@
     <iron-signals on-iron-signal-playlists-changed="updatePlaylists"></iron-signals>
 
     <div id="wrapper">
-      <template is="dom-repeat" items="{{playlists}}" id="playlistTpl">
-        <playlist-list-item playlist="{{item}}" on-playlist-select="selectPlaylist"></playlist-list-item>
+      <template is="dom-repeat" items="[[playlists]]" id="playlistTpl">
+        <playlist-list-item playlist="[[item]]" on-playlist-select="_selectPlaylist" selected$="[[_isSelected(item, selected)]]"></playlist-list-item>
       </template>
-      <array-selector id="selection" on-core-select="selectAction"></array-selector>
     </div>
-    <paper-fab mini icon="add" on-click="createPlaylist"></paper-fab>
+    <paper-fab mini icon="add" on-click="_createPlaylist"></paper-fab>
   </template>
 </dom-module>
 
@@ -40,50 +38,44 @@
   Polymer({
     is: 'playlist-list',
 
+    properties: {
+      selected: Object
+    },
+
     attached: function() {
       // https://www.polymer-project.org/1.0/docs/migration.html#domready
       this.async(function() {
-        this.updatePlaylists();
+        this._updatePlaylists();
       }.bind(this));
     },
 
-    togglePlaylistDialog: function(e, detail, sender) {
-      this.$.createPlaylistDialog.toggle();
+    _updatePlaylists: function(e, detail, sender) {
+      this.playlists = ss.Playlist.findAll();
     },
 
-    createPlaylist: function(e, detail, sender) {
+    _createPlaylist: function(e, detail, sender) {
       var playlist = new ss.Playlist();
       this.fire('page-playlist-edit', {playlist: playlist});
     },
 
-    selectPlaylist: function(e, detail, sender) {
-      this.$.selection.select(sender);
-    },
+    _selectPlaylist: function(e, detail, sender) {
+      this.selected = (this.selected === e.model.item) ? null : e.model.item;
 
-    selectAction: function(e, detail, sender) {
-      // unselect all
-      for (var i = 0, item = this.$.playlistTpl.nextElementSibling;
-          item && i < this.playlists.length;
-          item = item.nextElementSibling, ++i) {
-        item.select(false);
-      }
-      // (de)select the selected
-      detail.item.select(detail.isSelected);
       // update the query
-      var playlist = detail.item.playlist;
-      if (detail.isSelected) {
-        if (playlist.query) {
-          this.fire('genre-change', playlist.styles);
-          this.fire('query-change', playlist.query);
-        } else {
-          this.fire('iron-signal', {name: 'search', data: {playlist: playlist}});
-        }
-      }
+      // var playlist = detail.item.playlist;
+      // if (detail.isSelected) {
+      //   if (playlist.query) {
+      //     this.fire('genre-change', playlist.styles);
+      //     this.fire('query-change', playlist.query);
+      //   } else {
+      //     this.fire('iron-signal', {name: 'search', data: {playlist: playlist}});
+      //   }
+      // }
     },
 
-    updatePlaylists: function(e, detail, sender) {
-      this.playlists = ss.Playlist.findAll();
-    },
+    _isSelected: function(item, selected) {
+      return item === selected;
+    }
     
   });
 </script>

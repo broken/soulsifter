@@ -2,145 +2,178 @@
 
 <link href="../iron-flex-layout/iron-flex-layout.html" rel="import">
 <link href="../iron-icon/iron-icon.html" rel="import">
-<link href="../paper-dropdown/paper-dropdown.html" rel="import">
 <link href="../paper-icon-button/paper-icon-button.html" rel="import">
-<link href="../paper-item/paper-item.html" rel="import">
 <link href="../paper-menu/paper-menu.html" rel="import">
-<link href="../paper-menu-button/paper-menu-button.html" rel="import">
 <link href="../paper-ripple/paper-ripple.html" rel="import">
-<link href="../paper-shadow/paper-shadow.html" rel="import">
+<link href="../paper-material/paper-material.html" rel="import">
 
 <link href="ss-googleplaymusic.html" rel="import">
 
 
 <dom-module id="playlist-list-item">
   <style is="custom-style">
-    :host {
-      font-size: 13px;
-    }
-
-    paper-shadow {
-      height: 100%;
-      width: 100%;
-    }
-
-    paper-dropdown {
-      top: 18px;
+    :host[selected] #itemContainer {
+      background-color: var(--ss-playlist-list-item-selected-background-color);
     }
 
     #itemContainer {
-      margin: 7px 20px 7px 20px;
+      border-radius: 2px;
+      margin: 7px 20px;
       height: 30px;
     }
     #item {
-      @apply(--layout-horizontal --layout-center);
       height: 30px;
       padding-left: 40px;
+      @apply(--layout-horizontal);
+      @apply(--layout-center);
     }
     #item iron-icon {
       display: none;
-      height: 16px;
-      width: 16px;
       vertical-align: top;
+      --iron-icon-height: 16px;
+      --iron-icon-width: 16px;
     }
     #item iron-icon.smart {
-      display: inline-block;
+      display: block;
     }
 
-    #item paper-menu-button {
-      display: none;
-    }
-    #item:hover paper-menu-button {
-      display: inline-block;
-    }
-    #item paper-menu-button paper-icon-button {
+    #item paper-icon-button paper-icon-button {
       margin-top: 4px;
       padding: 0;
     }
 
-    .flex {
+    .content {
       @apply(--layout-flex);
+      @apply(--layout-horizontal);
+    }
+
+    /* menu */
+    #btn {
+      display: none;
+      vertical-align: top;
+      --iron-icon-height: 16px;
+      --iron-icon-width: 16px;
+    }
+    #menu {
+      padding: 15px;
+      position: absolute;
+      top: 0;
+      left: 31px;
+      border-radius: 2px;
+      display: block;
+      opacity: 1;
+      transition: opacity 1s;
+    }
+    #menu.hide {
+      display: none;
+      opacity: 0;
+    }
+    #item #btn {
+      display: none;
+    }
+    #item:hover #btn {
+      display: block;
+    }
+    .menuItem {
+      margin: 2px;
+    }
+    div.menuItem:hover {
+      background-color: var(--ss-options-button-menu-item-hover-color);
     }
   </style>
   <template>
     <ss-googleplaymusic id="gpm"></ss-googleplaymusic>
 
     <div id="itemContainer">
-      <paper-shadow animated id="shadow" z="0">
-        <div id="item" class$="{{computeIsSelected(isSelected)}}" on-click="clickAction">
+      <paper-material animated id="material" elevation="[[_computeElevation(selected)]]">
+        <div id="item" on-click="_onClick">
           <paper-ripple fit></paper-ripple>
-          <div class="flex">
+          <div class="content">
             <span>{{playlist.name}}</span>
-            <iron-icon icon="find-replace" alt="smart playlist" class$="{{computeIsSmart(playlist)}}"></iron-icon>
+            <iron-icon icon="find-replace" alt="smart playlist" class$="[[_isSmart(playlist)]]"></iron-icon>
           </div>
-          <paper-menu-button on-click="stopPropagation">
-            <paper-icon-button icon="more-vert"></paper-icon-button>
-            <paper-dropdown class="dropdown" transition="cascade" halign="right">
-              <paper-menu>
-                <paper-item on-click="editAction">Edit playlist</paper-item>
-                <paper-item on-click="deleteAction">Delete playlist</paper-item>
-                <paper-item on-click="exportAction">Export to Google Play Music</paper-button>
-              </paper-menu>
-            </paper-dropdown>
-          </paper-menu-button>
+          <paper-icon-button id="btn" icon="more-vert" on-click="_preventDefault"></paper-icon-button>
         </div>
-      </paper-shadow>
+      </paper-material>
+      <paper-material id="menu" class="hide" elevation="3">
+        <div on-click="_editAction" class="menuItem">
+          <div>Edit playlist</div>
+          <paper-ripple></paper-ripple>
+        </div>
+        <div on-click="_deleteAction" class="menuItem">
+          <div>Delete playlist</div>
+          <paper-ripple></paper-ripple>
+        </div>
+        <div on-click="_exportAction" class="menuItem">
+          <div>Export to Google Play Music</div>
+          <paper-ripple></paper-ripple>
+        </div>
+      </paper-material>
     </div>
   </template>
 </dom-module>
 
 <script>
+  /** Fires events:
+   *      playlist-select
+   *      page-playlist-edit
+   *      playlists-changed?
+   */
   Polymer({
     is: 'playlist-list-item',
 
     properties: {
-      playlist: Object
-    },
-    
-    /** @event playlist-select */
-
-    /** @attribute playlist */
-
-    /** @attribute selected */
-    isSelected: false,
-
-    clickAction: function(e, detail, sender) {
-      this.fire('playlist-select', this);
+      playlist: Object,
+      selected: {
+        type: Boolean,
+        value: false
+      }
     },
 
-    /** @method select */
-    select: function(isSelected) {
-      this.$.shadow.setZ(isSelected ? 1 : 0);
-      this.isSelected = isSelected;
+    attached: function() {
+      // open & close menu
+      var menu = this.$.menu;
+      var btn = this.$.btn;
+      document.addEventListener('click', function(event) {
+          if (!menu.classList.contains('hide') || btn.contains(event.target)) {
+            menu.classList.toggle('hide');
+          }
+        });
     },
 
-    editAction: function(e, detail, sender) {
-      e.stopPropagation();
+    _onClick: function(e, detail, sender) {
+      if (!event.defaultPrevented) {
+        this.fire('playlist-select', this);
+      }
+    },
+
+    _editAction: function(e, detail, sender) {
+      e.preventDefault();
       this.fire('page-playlist-edit', {playlist: this.playlist});
     },
 
-    deleteAction: function(e, detail, sender) {
-      e.stopPropagation();
-      this.playlist.erase();
-      this.fire('iron-signal', {name: 'playlists-changed'});
+    _deleteAction: function(e, detail, sender) {
+      e.preventDefault();
+      // this.playlist.erase();
+      // this.fire('iron-signal', {name: 'playlists-changed'});
     },
 
-    exportAction: function(e, detail, sender) {
-      e.stopPropagation();
-      this.$.gpm.savePlaylist(this.playlist, function() {}, function() {});
+    _exportAction: function(e, detail, sender) {
+      e.preventDefault();
+      // this.$.gpm.savePlaylist(this.playlist, function() {}, function() {});
     },
 
-    stopPropagation: function(e, detail, sender) {
-      e.stopPropagation();
-    },
-
-    computeIsSelected: function(isSelected) {
-      return isSelected ? "selected" : "";
-    },
-
-    computeIsSmart: function(playlist) {
+    _isSmart: function(playlist) {
       return playlist.query ? "smart" : "";
     },
+
+    _preventDefault: function(event) {
+      event.preventDefault();
+    },
+
+    _computeElevation: function(selected) {
+      return selected ? "3" : "0";
+    }
 
   });
 </script>

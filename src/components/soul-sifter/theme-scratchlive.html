@@ -18,7 +18,7 @@
 @sr_clr: #666;
 @sr_selected: #EEE;
 // paper menu
-@pm_bg: #111;
+@pm_bg: #161616;
 @pm_bghover: @black;
 // paper input
 @pi_accent: @sl_blue;
@@ -85,6 +85,7 @@
     --paper-input-container-focus-color: @pi_accent;
     --paper-input-container-invalid-color: @err;
     --paper-input-container-input-color: @clr;
+    --paper-item-min-height: 13px;
     --paper-tab-ink: @dt_ink;
     --paper-tabs-selection-bar-color: @dt_bar;
     --paper-toolbar-background: @st_bg;
@@ -95,6 +96,9 @@
     /* soulsifter elements */
     --ss-genre-list-item-ripple-color: @gl_ink;
     --ss-genre-list-item-select-color: @gl_select;
+    --ss-options-button-menu-background-color: @pm_bg;
+    --ss-options-button-menu-item-hover-color: @pm_bghover;
+    --ss-playlist-list-item-selected-background-color: @gl_select;
   }
 
   /** star rating **/
@@ -103,20 +107,6 @@
   }
   ss-star-rating::shadow core-icon.selected {
     color: @sr_selected;
-  }
-
-  /** paper menus **/
-  paper-menu-button paper-dropdown::shadow #background {
-    background-color: @pm_bg;
-  }
-  paper-menu-button paper-dropdown core-menu {
-    margin: 0;
-  }
-  paper-menu-button paper-dropdown core-menu paper-item {
-    font-size: 1em;
-  }
-  paper-menu-button paper-dropdown core-menu paper-item:hover {
-    background-color: @pm_bghover;
   }
 
   /** paper toggle button **/
@@ -137,9 +127,6 @@
   paper-fab {
     background-color: @pl_fab;
     color: @clr_bold;
-  }
-  playlist-list-item::shadow #item.selected {
-    background-color: @gl_select;
   }
   playlist-list-item::shadow paper-ripple {
     color: @gl_ink;
