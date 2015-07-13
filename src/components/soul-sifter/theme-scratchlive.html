@@ -99,14 +99,16 @@
     --ss-options-button-menu-background-color: @pm_bg;
     --ss-options-button-menu-item-hover-color: @pm_bghover;
     --ss-playlist-list-item-selected-background-color: @gl_select;
-  }
-
-  /** star rating **/
-  ss-star-rating::shadow core-icon {
-    color: @sr_clr;
-  }
-  ss-star-rating::shadow core-icon.selected {
-    color: @sr_selected;
+    --ss-song-list-item-border-bottom: @sl_border;
+    --ss-song-list-item-hover-background-color: @sl_hover;
+    --ss-song-list-item-artist-color: @clr;
+    --ss-song-list-item-title-color: @clr_bold;
+    --ss-song-list-item-fade-out: @sl_fadeout;
+    --ss-song-list-item-hover-fade-out: @sl_hoverfadeout;
+    --ss-song-list-item-button-border: @sl_btnborder;
+    --ss-song-list-item-button-hover-border: @sl_btnborderhover;
+    --ss-star-rating-color: @sr_clr;
+    --ss-star-rating-selected-color: @sr_selected;
   }
 
   /** paper toggle button **/
@@ -147,32 +149,6 @@
   }
   paper-slider::shadow #sliderBar::shadow #progressContainer {
     background-color: @ps_bg;
-  }
-
-  /** song list **/
-  .song-item {
-    border-bottom: @sl_border;
-  }
-  .song-item:hover {
-    background-color: @sl_hover;
-  }
-  .song-item .artist {
-    color: @clr;
-  }
-  .song-item .title {
-    color: @clr_bold;
-  }
-  .song-item .fade-out:after {
-    background: @sl_fadeout;
-  }
-  .song-item:hover .fade-out:after {
-    background: @sl_hoverfadeout;
-  }
-  .song-item paper-menu-button paper-icon-button {
-    border: @sl_btnborder;
-  }
-  .song-item paper-menu-button paper-icon-button:hover {
-    border: @sl_btnborderhover;
   }
 
   /** song section **/

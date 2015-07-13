@@ -13,24 +13,20 @@
 
 <dom-module id="song-list-item">
   <style is="custom-style">
-    :host {
-      font-size: small;
-    }
 
 
     ss-star-rating {
       margin: 0 6px;
     }
-    ss-star-rating::shadow iron-icon {
-      margin: 0 -5px;
-    }
 
 
     .song-item {
-      @apply(--layout-horizontal --layout-center);
+      @apply(--layout-horizontal);
+      @apply(--layout-center);
       height: 30px;
       padding: 0 8px;
       margin: 0 10px;
+      border-bottom: var(--ss-song-list-item-border-bottom);
     }
     .song-item div {
       margin: 3px;
@@ -38,12 +34,33 @@
     .song-item paper-menu-button {
       display: none;
     }
+    .song-item:hover {
+      background-color: var(--ss-song-list-item-hover-background-color);
+    }
     .song-item:hover paper-menu-button {
       display: inline-block;
     }
     .song-item paper-menu-button paper-icon-button {
       margin-top: 4px;
       padding: 0;
+    }
+    .song-item .artist {
+      color: var(--ss-song-list-item-artist-color);
+    }
+    .song-item .title {
+      color: var(--ss-song-list-item-title-color);
+    }
+    .song-item .fade-out:after {
+      background: var(--ss-song-list-item-fade-out);
+    }
+    .song-item:hover .fade-out:after {
+      background: var(--ss-song-list-item-hover-fade-out);
+    }
+    .song-item paper-menu-button paper-icon-button {
+      border: var(--ss-song-list-item-button-border);
+    }
+    .song-item paper-menu-button paper-icon-button:hover {
+      border: var(--ss-song-list-item-button-hover-border);
     }
 
     #cover {
@@ -76,6 +93,10 @@
     .flex {
       @apply(--layout-flex);
     }
+
+    paper-dropdown {
+      display: none;
+    }
   </style>
   <template>
     <global-state values="{{global}}"></global-state>
@@ -83,9 +104,9 @@
     <div class="song-item" draggable="true" on-dragstart="dragSong" id="draggableItem">
       <div id="cover"></div>
       <div class="key fade-out flex">
-        <span class="artist">{{song.artist}}</span>
+        <span class="artist">[[song.artist]]</span>
         <span> - </span>
-        <span class="title">{{song.title}}</span>
+        <span class="title">[[song.title]]</span>
       </div>
       <paper-menu-button on-click="stopPropagation">
         <paper-icon-button icon="more-vert"></paper-icon-button>

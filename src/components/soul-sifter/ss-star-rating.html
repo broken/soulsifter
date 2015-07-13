@@ -9,21 +9,19 @@
     :host {
       white-space: nowrap;
     }
-
-    core-icon {
-      color: #222;
-      height: 26px;
-      width: 26px;
+    iron-icon {
+      height: 13px;
+      width: 13px;
+      color: var(--ss-star-rating-color);
     }
-
-    core-icon.selected {
-      color: #eee;
+    iron-icon[selected] {
+      color: var(--ss-star-rating-selected-color);
     }
   </style>
   <template>
-    <iron-selector selected="{{selectedStar}}" activateEvent="click" id="selector">
-      <template is="dom-repeat" items="{{stars}}">
-        <iron-icon icon="star-rate" class$="{{computeIsSelected(item, value)}}"></iron-icon>
+    <iron-selector selected="{{selectedStar}}" activateEvent="[[_activateEvent(readOnly)]]" id="selector">
+      <template is="dom-repeat" items="[[stars]]">
+        <iron-icon icon="star" selected$="[[_isSelected(item, value)]]"></iron-icon>
       </template>
     </iron-selector>
   </template>
@@ -36,8 +34,7 @@
     properties: {
       count: {
         type: Number,
-        value: 5,
-        observer: 'countChanged'
+        value: 5
       },
       value: {
         type: Number,
@@ -47,28 +44,28 @@
       readOnly: {
         type: Boolean,
         value: false
+      },
+      stars: {
+        type: Array,
+        computed: '_computeStars(count)',
+        readOnly: true
       }
     },
 
-    ready: function() {
-      this.countChanged(0, this.count);
-    },
-
-    countChanged: function(newValue, oldValue) {
-      this.stars = [];
-      for (var i = 0; i < this.count; ++i) {
-        this.stars.push(i);
+    _computeStars: function(count) {
+      var stars = [];
+      for (var i = 0; i < count; ++i) {
+        stars.push(i);
       }
+      return stars;
     },
 
-    selectedStarChanged: function(e, detail, sender) {
-      if (!this.readOnly) {
-        this.value = detail + 1;
-      }
+    _activateEvent: function(readOnly) {
+      return readOnly ? "" : "click";
     },
 
-    computeIsSelected: function(item, value) {
-      return item < value ? "selected" : "";
-    },
+    _isSelected: function(item, value) {
+      return item < value;
+    }
   });
 </script>
