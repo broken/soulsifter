@@ -3,6 +3,7 @@
 <link href="../iron-collapse/iron-collapse.html" rel="import">
 <link href="../iron-flex-layout/iron-flex-layout.html" rel="import">
 <link href="../paper-icon-button/paper-icon-button.html" rel="import">
+<link href="../paper-material/paper-material.html" rel="import">
 <link href="../paper-ripple/paper-ripple.html" rel="import">
 
 
@@ -21,7 +22,7 @@
     }
 
     #itemContainer {
-      margin: 7px 20px 7px 20px;
+      margin: 7px 20px 0 20px;
       height: 30px;
     }
     #item {
@@ -33,20 +34,23 @@
     .flex {
       @apply(--layout-flex);
     }
+
+    .selected {
+      background-color: var(--ss-genre-list-item-select-color);
+    }
   </style>
   <template>
     <div id="itemContainer">
-      <div class$="{{computeIsSelected(isSelected)}}" style$="{{computePaddingLeftStyle(indent)}}" on-tap="selectTapAction" id="item">
+      <paper-material class$="{{computeIsSelected(isSelected)}}" style$="{{computePaddingLeftStyle(indent)}}" on-tap="selectTapAction" id="item" elevation="0">
         <paper-ripple></paper-ripple>
         <paper-icon-button icon="{{icon}}" on-tap="expandTapAction"></paper-icon-button>
         <div class="flex">{{genre.name}}</div>
-      </div>
+      </paper-material>
     </div>
     <iron-collapse id="collapse">
-      <template is="dom-repeat" items="{{genre.subGenre}}" id="subGenreTpl">
+      <template is="dom-repeat" items="[[_getSubGenres(genre)]]" id="subGenreTpl">
         <genre-list-item genre="{{item}}" indent="{{incIndent(indent)}}" on-expand-parents="expand"></genre-list-item>
       </template>
-      <!-- <array-selector multi items="{{genre.subGenre}}" on-iron-select="selectGenreAction" id="selection"></array-selector> -->
     </iron-collapse>
   </template>
 </dom-module>
@@ -60,25 +64,32 @@
       indent: {
         type: Number,
         value: 0
+      },
+      isSelected: {
+        type: Boolean,
+        value: false
       }
+    },
+
+    _getSubGenres: function(genre) {
+      return genre.children;
     },
 
     /** @event genre-select */
 
-    /** @attribute selected */
-    isSelected: false,
-
     /** @method select */
     select: function(isSelected) {
-      if ((isSelected && !this.$.selection.isSelected(this)) ||
-          (!isSelected && this.$.selection.isSelected(this))) {
-        this.$.selection.toggle(this);
+      if ((isSelected && !this.isSelected) ||
+          (!isSelected && this.isSelected)) {
+        this.isSelected = !this.isSelected;
+        this.selectGenreAction();
       }
       if (this.genre.subGenre && this.genre.subGenre.length > 0) {
-        for (var i = 0, item = this.$.subGenreTpl.nextElementSibling;
-            item && i < this.genre.subGenre.length;
-            item = item.nextElementSibling, ++i) {
-          item.select(isSelected);
+        for (var i = 0, childNodes = Polymer.dom(this.$.collapse).childNodes;
+             i < childNodes.length; ++i) {
+          if (childNodes[i].nodeName === 'GENRE-LIST-ITEM') {
+            childNodes[i].select(isSelected);
+          }
         }
       }
     },
@@ -87,22 +98,25 @@
     selectIfInArray: function(genres) {
       // deselect to set clean slate
       this.$.collapse.opened = false;
-      if (this.$.selection.isSelected(this)) {
-        this.$.selection.toggle(this);
+      if (this.isSelected) {
+        this.isSelected = !this.isSelected;
+        this.selectGenreAction();
       }
       // select this and request parents to expand if found in array
       for (var i = 0; i < genres.length; ++i) {
         if (genres[i].id == this.genre.id) {
-          this.$.selection.toggle(this);
+          this.isSelected = !this.isSelected;
+          this.selectGenreAction();
           this.fire('expand-parents');
         }
       }
       // have all child elements check if they're in the array
       if (this.genre.subGenre && this.genre.subGenre.length > 0) {
-        for (var i = 0, item = this.$.subGenreTpl.nextElementSibling;
-            item && i < this.genre.subGenre.length;
-            item = item.nextElementSibling, ++i) {
-          item.selectIfInArray(genres);
+        for (var i = 0, childNodes = Polymer.dom(this.$.collapse).childNodes;
+             i < childNodes.length; ++i) {
+          if (childNodes[i].nodeName === 'GENRE-LIST-ITEM') {
+            childNodes[i].selectIfInArray(genres);
+          }
         }
       }
     },
@@ -124,7 +138,7 @@
     },
 
     selectTapAction: function(e, detail, sender) {
-      this.select(!this.$.selection.isSelected(this));
+      this.select(!this.isSelected);
     },
 
     expandTapAction: function(e, detail, sender) {
@@ -134,9 +148,8 @@
       e.stopPropagation();
     },
 
-    selectGenreAction: function(e, detail, sender) {
+    selectGenreAction: function() {
       // this.$.shadow.setZ(detail.isSelected ? 1 : 0);
-      this.isSelected = detail.isSelected;
       this.fire('genre-select', this.genre);
     },
 
