@@ -4,8 +4,8 @@
 <link href="../iron-signals/iron-signals.html" rel="import">
 <link href="../core-tooltip/core-tooltip.html" rel="import">
 
-<link href="global-state.html" rel="import">
 <link href="song-list-item.html" rel="import">
+<link href="ss-global-behavior.html" rel="import">
 
 
 <dom-module id="song-list">
@@ -21,12 +21,12 @@
     }
   </style>
   <template>
-    <global-state values="{{global}}"></global-state>
-    <iron-signals on-iron-signal-genres-changed="genresChanged"
+    <iron-signals on-iron-signal-genres-changed="_genresChanged"
                           on-iron-signal-search="searchAction"></iron-signals>
 
     <core-tooltip id="tooltip" label="Searching..." noarrow position top></core-tooltip>
-    <iron-selector selected="{{selectedRow}}" activateEvent="click" id="selector">
+    <!-- due to multiple bugs in iron-selector, we listen for the iron-activate event -->
+    <iron-selector on-iron-activate="_selectedSongChanged">
       <template is="dom-repeat" items="{{songs}}">
         <song-list-item song="{{item}}"></song-list-item>
       </template>
@@ -38,26 +38,41 @@
   Polymer({
     is: 'song-list',
 
+    behaviors: [
+      GlobalBehavior
+    ],
+
     properties: {
       query: {
         type: String,
-        observer: 'queryChanged'
+        observer: '_queryChanged'
       },
-      djSearch: Boolean,
-      songTrail: Array
+      djSearch: {
+        type: Boolean,
+        value: true
+      },
+      songTrail: {
+        type: Array,
+        value: function() { return []; }
+      },
+      songs: {
+        type: Array,
+        value: function() { return []; }
+      },
+      genres: {
+        type: Array,
+        value: function() { return []; }
+      },
+      settings: {
+        type: Object,
+        value: function() { return new ss.SoulSifterSettings(); },
+        readOnly: true
+      },
     },
 
     observers: [
-      'globalBpmChanged(global.bpm)'
+      '_globalBpmChanged(global.bpm)'
     ],
-
-    ready: function() {
-      // init & hint lists & objects
-      this.songs = [];
-      this.genres = [];
-      this.songTrail = [];
-      this.settings = new ss.SoulSifterSettings();
-    },
 
     attached: function() {
       // https://www.polymer-project.org/1.0/docs/migration.html#domready
@@ -66,23 +81,19 @@
       }.bind(this));
     },
 
-    globalBpmChanged: function(newValue) {
+    _globalBpmChanged: function(bpm) {
       if (this.djSearch) this.searchAction();
     },
 
-    genresChanged: function(e, detail, sender) {
+    _genresChanged: function(e, detail, sender) {
       this.genres = detail;
     },
 
-    selectedRowChanged: function(e, detail, sender) {
-      var selectedRowIndex = detail;
-      if (selectedRowIndex != -1) {
-        var s = this.songs[selectedRowIndex];
-        this.global.song = s;
-      }
+    _selectedSongChanged: function(e) {
+      this.set('global.song', e.detail.item.song);
     },
 
-    queryChanged: function(newValue, oldValue) {
+    _queryChanged: function(newValue, oldValue) {
       // only search if it's not actively being changed
       setTimeout(function(self, query) {
         return function() {
@@ -117,8 +128,6 @@
           }
           that.songs = ss.SearchUtil.searchSongs(p.q, p.min, p.max, p.key, that.genres, omitSongs, that.settings.getInt('songList.limit'));
         }
-        // clear the row selection
-        that.$.selector.selected = -1;
         // A couple things to note here. First, this timeout will activate when the template repeat has finished loading, which is 99% of the wait time here. Next, I would love to use paper-toast, but it appears that loading the template repeat consumes all the resources that would allow it to animate in. I could set a timeout for the toast animation, but what a waste.
         setTimeout(function() {
           that.$.tooltip.show = false;

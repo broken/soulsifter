@@ -1,0 +1,60 @@
+<script>
+
+var instances = [];
+var data = {};
+
+/**
+ * bpm: current active bpm
+ * song: current active song
+ * musicDir: main directory for music -- deprecated: move to settings
+ * playmusic: play music instance
+ */
+var GlobalBehavior = {
+  
+  properties: {
+    global: {
+      type: Object,
+      notify: true,
+      value: data
+    }
+  },
+  
+  ready: function() {
+    var _setOrig = this.set;
+    var _notifyPathOrig = this.notifyPath;
+    this.set = function() {
+      _setOrig.apply(this, arguments);
+      if (arguments[0].split(".")[0] === "global") {
+        this.invokeInstances(_notifyPathOrig, arguments);
+      }
+    };
+    this.notifyPath = function() {
+      _notifyPathOrig.apply(this, arguments);
+      if (arguments[0].split(".")[0] === "global") {
+        this.invokeInstances(_notifyPathOrig, arguments);
+      }
+    };
+  },
+  
+  invokeInstances: function(fn, args) {
+    var instance;
+    for (instance of instances) {
+      if (instance !== this) {
+        fn.apply(instance, args);
+      }
+    }
+  },
+  
+  attached: function() {
+    instances.push(this);
+  },
+  
+  detached: function() {
+    var i = instances.indexOf(this);
+    if (i >= 0) {
+      instances.splice(i, 1);
+    }
+  }
+};
+
+</script>
