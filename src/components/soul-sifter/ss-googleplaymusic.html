@@ -1,17 +1,15 @@
 <link href="../polymer/polymer.html" rel="import">
 
-<link href="global-state.html" rel="import">
+<link href="ss-global-behavior.html" rel="import">
 
-
-<dom-module id="ss-googleplaymusic">
-  <template>
-    <global-state values="{{global}}"></global-state>
-  </template>
-</dom-module>
 
 <script>
   Polymer({
     is: 'ss-googleplaymusic',
+
+    behaviors: [
+      GlobalBehavior
+    ],
 
     properties: {
       connected: {
@@ -21,16 +19,16 @@
     },
 
     attached: function() {
-      if (!this.global.pm) {
+      if (!this.global.playmusic) {
         var PlayMusic = require('playmusic');
-        this.pm = new PlayMusic();
+        this.playmusic = new PlayMusic();
         var settings = new ss.SoulSifterSettings();
         var email = settings.getString('google.email');
         var appKey = settings.getString('google.appKey');
         if (!email) {
           return;
         }
-        this.pm.init({email: email, password: appKey},
+        this.playmusic.init({email: email, password: appKey},
             function() {
               this.connected = true;
               console.log('Succesfully connected to Google Music.');
@@ -41,7 +39,7 @@
               console.warn('Err: ' +  err);
               console.warn('Response: ' + res);
             });
-        this.global.pm = this.pm;
+        this.global.playmusic = this.playmusic;
       }
     },
 
@@ -54,7 +52,7 @@
         return;
       }
       var maxResults = 3;
-      this.pm.search(song.artist + ' ' + song.title, maxResults,
+      this.playmusic.search(song.artist + ' ' + song.title, maxResults,
           function(data) {
             console.log(data);
             if (!data.entries) {
@@ -94,9 +92,9 @@
       if (!this.connected) {
         return;
       }
-      var pm = this.pm;
+      var playmusic = this.playmusic;
       findSong(song, function(song) {
-        pm.getStreamUrl(song.track.nid, success);
+        playmusic.getStreamUrl(song.track.nid, success);
       },
       failure);
     },
@@ -109,15 +107,15 @@
       if (!this.connected) {
         return;
       }
-      var pm = this.pm;
-      pm.getStreamUrl(nid, success, failure);
+      var playmusic = this.playmusic;
+      playmusic.getStreamUrl(nid, success, failure);
     },
 
     findPlaylist: function(name, success, failure) {
       if (!this.connected) {
         return;
       }
-      this.pm.getPlayLists(function(data) {
+      this.playmusic.getPlayLists(function(data) {
           console.log(data);
           if (!data.data.items) {
             failure('Unable to find any playlists.', '', 1);
@@ -142,7 +140,7 @@
         return;
       }
       var that = this;
-      this.pm.addPlayList(playlist.name,
+      this.playmusic.addPlayList(playlist.name,
           function(data, response) {
             console.log('Successfully added playlist ' + playlist.name);
             var playlistId = data.mutate_response[0].id;
@@ -153,7 +151,7 @@
               function(item, callback) {
                 that.findSong(item,
                   function(song) {
-                    that.pm.addTrackToPlayList(song.track.nid, playlistId,
+                    that.playmusic.addTrackToPlayList(song.track.nid, playlistId,
                         function(data, res) { callback(); },
                         function(data, err, res) { callback(); });
                   },
