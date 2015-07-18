@@ -75,7 +75,7 @@
     --accent-color: #ff4081;
     --primary-background-color: @bg;
     --primary-text-color: @clr;
-    --secondary-text-color: #757575;
+    --secondary-text-color: @clr_bold;
     --disabled-text-color: #bdbdbd;
     --divider-color: #e0e0e0;
 
@@ -149,14 +149,6 @@
   }
   paper-slider::shadow #sliderBar::shadow #progressContainer {
     background-color: @ps_bg;
-  }
-
-  /** song section **/
-  .title {
-    color: @clr_bold;
-  }
-  core-scroll-header-panel::shadow #condensedHeaderBg {
-    background-color: @pm_bg;
   }
 
   /** search info **/

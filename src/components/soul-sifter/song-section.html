@@ -10,34 +10,50 @@
 <link href="../paper-menu-button/paper-menu-button.html" rel="import">
 <link href="../paper-toolbar/paper-toolbar.html" rel="import">
 
-<link href="global-state.html" rel="import">
 <link href="pitch-slider.html" rel="import">
 <link href="ss-audio.html" rel="import">
+<link href="ss-global-behavior.html" rel="import">
 <link href="ss-googleplaymusic.html" rel="import">
 <link href="ss-star-rating.html" rel="import">
 
 
 <dom-module id="song-section">
   <style is="custom-style">
-    :host {
-      overflow: hidden;
-    }
-
     paper-scroll-header-panel {
-      position: static;
+      /*position: static;*/
+      height: 100%;
     }
-
     #header {
       background-size: cover;
       height: 256px;
     }
-
     .content {
       margin: 10px 15px;
     }
-
+    .title {
+      color: var(--secondary-text-color);
+    }
+    .slider {
+      @apply(--layout-horizontal);
+      @apply(--layout-center);
+    }
+    .audio {
+      @apply(--layout-horizontal);
+      @apply(--layout-flex);
+    }
+    .flex {
+      @apply(--layout-flex);
+    }
+    .self-end {
+      @apply(--layout-self-end);
+    }
+    .vertical {
+      @apply(--layout-vertical);
+    }
+/*
     #nav {
-      @apply(--layout-horizontal --layout-justified);
+      @apply(--layout-horizontal);
+      @apply(--layout-justified);
       position: absolute;
       top: 0;
       left: 0;
@@ -52,42 +68,25 @@
     audio {
       height: 30px;
       width: 100%;
-    }
-
-    .vertical {
-      @apply(--layout-vertical);
-    }
-
-    .slider {
-      @apply(--layout-horizontal --layout-center);
-    }
-
-    .btn {
-      @apply(--layout-horizontal --layout-flex);
-    }
-
-    .flex {
-      @apply(--layout-flex);
-    }
+    }*/
   </style>
   <template>
-    <global-state values="{{global}}"></global-state>
     <ss-googleplaymusic id="gpm"></ss-googleplaymusic>
     <iron-signals on-iron-signal-save-song-trail="saveSongTrail"></iron-signals>
 
-    <paper-scroll-header-panel condenses keepCondensedHeader fit condensedHeaderHeight="40px" id="cshp">
+    <paper-scroll-header-panel id="shp" condenses keepCondensedHeader condensedHeaderHeight="40" headerHeight="256">
       <paper-toolbar id="header" draggable="true" on-dragstart="dragSong">
         <div id="nav">
           <paper-icon-button icon="arrow-back" on-click="backAction" disabled$="{{!songTrailIndex}}"></paper-icon-button>
           <paper-icon-button icon="arrow-forward" on-click="forwardAction" disabled$="{{isIndexAtEndOfSongTrail(songTrailIndex, songTrail)}}"></paper-icon-button>
         </div>
       </paper-toolbar>
-      <section class="content vertical">
+      <div class="content vertical">
         <div class="title">{{song.title}}</div>
         <div class="artist">{{song.artist}}</div>
         <ss-star-rating value="{{song.rating}}" read-only></ss-star-rating>
-        <div class="track" self-end>{{song.album.track}}</div>
-        <div class="track" self-end>{{song.album.name}}</div>
+        <div class="track self-end">{{song.album.track}}</div>
+        <div class="track self-end">{{song.album.name}}</div>
         <div class="released" self-end><span>{{song.album.releaseDateYear}}</span>-<span>{{song.album.releaseDateMonth}}</span>-<span>{{song.album.releaseDateDay}}</span></div>
         <div class="comments flex">{{song.comments}}</div>
         <div class="bpm">{{song.bpm}} bpm</div>
@@ -96,7 +95,7 @@
           <div>pitch</div>
           <pitch-slider></pitch-slider>
         </div>
-        <div class="btn">
+        <div class="audio">
           <ss-audio class="flex" id="audio"></ss-audio>
           <paper-menu-button on-click="stopPropagation">
             <paper-icon-button icon="more-vert"></paper-icon-button>
@@ -107,7 +106,7 @@
             </paper-dropdown>
           </paper-menu-button>
         </div>
-      </section>
+      </div>
     </paper-scroll-header-panel>
   </template>
 </dom-module>
@@ -116,6 +115,10 @@
 
   Polymer({
     is: 'song-section',
+
+    behaviors: [
+      GlobalBehavior
+    ],
 
     properties: {
       songTrail: {
@@ -135,6 +138,11 @@
     ready: function() {
       this.songTrail = [];
       this.fs = require('fs');
+    },
+
+    // https://github.com/PolymerElements/paper-scroll-header-panel/issues/33
+    setupHeaderSize: function() {
+      this.$.shp.measureHeaderHeight();
     },
 
     globalSongChanged: function(song) {
@@ -188,11 +196,11 @@
     },
 
     backAction: function(e, detail, sender) {
-      this.global.song = --this.songTrailIndex ? this.songTrail[--this.songTrailIndex].song : undefined;
+      this.set('global.song', --this.songTrailIndex ? this.songTrail[--this.songTrailIndex].song : undefined);
     },
 
     forwardAction: function(e, detail, sender) {
-      this.global.song = this.songTrail[this.songTrailIndex].song;
+      this.set('global.song', this.songTrail[this.songTrailIndex].song);
     },
 
     saveSongTrail: function(e, detail, sender) {
@@ -209,7 +217,7 @@
       if (img) {
         url = 'url("' + img + '")';
       }
-      // this.$.cshp.shadowRoot.getElementById('headerBg').style.backgroundImage = url;
+      // this.$.paperheaderpanel.shadowRoot.getElementById('headerBg').style.backgroundImage = url;
     },
 
     editAction: function(e, detail, sender) {

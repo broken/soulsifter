@@ -104,10 +104,8 @@
               <paper-tab id="paper_tab-playlists">Playlists</paper-tab>
             </paper-tabs>
             <neon-animated-pages selected="{{selectedTab}}" class="flex" entry-animation="slide-from-right-animation" exit-animation="slide-left-animation">
-              <neon-animatable><song-section song-trail="{{songTrail}}"></song-section></neon-animatable>
-              <neon-animatable>
-              <genre-list selection="{{genres}}"></genre-list>
-              </neon-animatable>
+              <neon-animatable><song-section id="songSection" song-trail="{{songTrail}}"></song-section></neon-animatable>
+              <neon-animatable><genre-list selection="{{genres}}"></genre-list></neon-animatable>
               <neon-animatable><playlist-list on-query-change="changeQuery" on-genre-change="updateGenres"></playlist-list></neon-animatable>
             </neon-animated-pages>
           </section>
@@ -140,11 +138,24 @@
     properties: {
       selectedTab: {
         type: Number,
-        value: 1
+        value: 1,
+        observer: '_selectedTabChanged'
       },
       section: {
         type: Number,
         value: 0
+      },
+      notifiedSongSection: {
+        type: Boolean,
+        value: false
+      }
+    },
+
+    // https://github.com/PolymerElements/paper-scroll-header-panel/issues/33
+    _selectedTabChanged: function(val, notified) {
+      if (!this.notifiedSongSection && val === 0) {
+        this.$.songSection.setupHeaderSize();
+        this.notifiedSongSection = true;
       }
     },
 
