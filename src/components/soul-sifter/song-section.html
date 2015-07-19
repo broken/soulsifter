@@ -84,8 +84,8 @@
         <ss-star-rating value="{{song.rating}}" read-only></ss-star-rating>
         <div class="track self-end">{{song.album.track}}</div>
         <div class="track self-end">{{song.album.name}}</div>
-        <div class="released" self-end><span>{{song.album.releaseDateYear}}</span>-<span>{{song.album.releaseDateMonth}}</span>-<span>{{song.album.releaseDateDay}}</span></div>
-        <div class="comments flex">{{song.comments}}</div>
+        <div class="released self-end"><span>{{song.album.releaseDateYear}}</span>-<span>{{song.album.releaseDateMonth}}</span>-<span>{{song.album.releaseDateDay}}</span></div>
+        <div class="comments">{{song.comments}}</div>
         <div class="bpm">{{song.bpm}} bpm</div>
         <time class="added">{{localeDateTime}}</time>
         <div class="slider">
