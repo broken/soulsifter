@@ -24,13 +24,21 @@ var GlobalBehavior = {
     var _notifyPathOrig = this.notifyPath;
     this.set = function() {
       _setOrig.apply(this, arguments);
-      if (arguments[0].split(".")[0] === "global") {
+      var path = arguments[0];
+      if (typeof path === 'string') {
+        path = path.split('.');
+      }
+      if (path[0] === 'global') {
         this.invokeInstances(_notifyPathOrig, arguments);
       }
     };
     this.notifyPath = function() {
       _notifyPathOrig.apply(this, arguments);
-      if (arguments[0].split(".")[0] === "global") {
+      var path = arguments[0];
+      if (typeof path === 'string') {
+        path = path.split('.');
+      }
+      if (path[0] === 'global') {
         this.invokeInstances(_notifyPathOrig, arguments);
       }
     };
