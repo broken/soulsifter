@@ -128,12 +128,15 @@
     is: 'song-list-item',
 
     properties: {
-      song: Object
+      song: Object,
+      musicDir: {
+        type: String,
+        value: function() { return (new ss.SoulSifterSettings()).getString('music.dir'); }
+      }
     },
 
     observers: [
-      'globalBpmChanged(global.bpm)',
-      'globalMusicDirChanged(gobal.musicDir)'
+      'globalBpmChanged(global.bpm)'
     ],
 
     bpmDiff: '',

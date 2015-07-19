@@ -2,7 +2,6 @@
 
 <link href="../iron-flex-layout/iron-flex-layout.html" rel="import">
 <link href="../iron-icons/iron-icons.html" rel="import">
-<link href="../iron-localstorage/iron-localstorage.html" rel="import">
 <link href="../iron-signals/iron-signals.html" rel="import">
 <link href="../paper-dialog/paper-dialog.html" rel="import">
 <link href="../paper-icon-button/paper-icon-button.html" rel="import">
@@ -58,7 +57,6 @@
   </style>
   <template>
     <global-state values="{{global}}"></global-state>
-    <iron-localstorage name="soul-sifter-music-directory" value="{{musicDir}}"></iron-localstorage>
 
     <paper-toolbar class$="{{computeIsTall(isTall)}}">
       <content></content>
@@ -114,8 +112,6 @@
       }
     },
 
-    musicDir: '',
-
     attached: function() {
       // https://www.polymer-project.org/1.0/docs/migration.html#domready
       this.async(function() {
@@ -158,16 +154,6 @@
 
     searchAction: function(e, detail, sender) {
       this.fire('iron-signal', {name: 'search'});
-    },
-
-    musicDirChanged: function(oldValue, newValue) {
-      if (this.global)
-        this.global.musicDir = newValue;
-    },
-
-    globalChanged: function(oldValue, newValue) {
-      if (this.musicDir)
-        this.global.musicDir = this.musicDir;
     },
 
     analyzeBpms: function(e, detail, sender) {
