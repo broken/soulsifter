@@ -50,7 +50,6 @@
     .vertical {
       @apply(--layout-vertical);
     }
-/*
     #nav {
       @apply(--layout-horizontal);
       @apply(--layout-justified);
@@ -60,15 +59,13 @@
       right: 0;
       margin: 0;
     }
-
     #nav paper-icon-button[disabled] {
       visibility: hidden;
     }
-
     audio {
       height: 30px;
       width: 100%;
-    }*/
+    }
   </style>
   <template>
     <ss-googleplaymusic id="gpm"></ss-googleplaymusic>
@@ -77,8 +74,8 @@
     <paper-scroll-header-panel id="shp" condenses keepCondensedHeader condensedHeaderHeight="40" headerHeight="256">
       <paper-toolbar id="header" draggable="true" on-dragstart="dragSong">
         <div id="nav">
-          <paper-icon-button icon="arrow-back" on-click="backAction" disabled$="{{!songTrailIndex}}"></paper-icon-button>
-          <paper-icon-button icon="arrow-forward" on-click="forwardAction" disabled$="{{isIndexAtEndOfSongTrail(songTrailIndex, songTrail)}}"></paper-icon-button>
+          <paper-icon-button icon="arrow-back" on-click="backAction" disabled$="[[_isIndexAtStartOfSongTrail(songTrailIndex, songTrail)]]"></paper-icon-button>
+          <paper-icon-button icon="arrow-forward" on-click="forwardAction" disabled$="[[_isIndexAtEndOfSongTrail(songTrailIndex, songTrail)]]"></paper-icon-button>
         </div>
       </paper-toolbar>
       <div class="content vertical">
@@ -123,7 +120,16 @@
     properties: {
       songTrail: {
         type: Array,
-        notify: true
+        notify: true,
+        value: function() { return []; }
+      },
+      songTrailIndex: {
+        type: Number,
+        value: -1
+      },
+      localeDateTime: {
+        type: String,
+        value: ''
       }
     },
 
@@ -131,12 +137,7 @@
       'globalSongChanged(global.song)'
     ],
 
-    localeDateTime: '',
-
-    songTrailIndex: 0,
-
     ready: function() {
-      this.songTrail = [];
       this.fs = require('fs');
     },
 
@@ -152,10 +153,11 @@
         return;
       }
 
+      this.set('songTrailIndex', this.songTrailIndex+1);
       var entry = new ss.PlaylistEntry();
       entry.song = song;
-      entry.position = this.songTrailIndex++;
-      this.songTrail[entry.position] = entry;
+      entry.position = this.songTrailIndex;
+      this.set(['songTrail', entry.position], entry);
 
       this.localeDateTime = new Date(this.song.dateAdded).toLocaleString();
 
@@ -196,16 +198,25 @@
     },
 
     backAction: function(e, detail, sender) {
-      this.set('global.song', --this.songTrailIndex ? this.songTrail[--this.songTrailIndex].song : undefined);
+      if (this.songTrailIndex) {
+        // we push the index back two since changing the song will cause it to increment one again.
+        this.set('songTrailIndex', this.songTrailIndex - 2);
+        this.set('global.song', this.songTrail[this.songTrailIndex+1].song);
+      } else {
+        // already at last song
+        this.set('songTrailIndex', this.songTrailIndex - 1);
+        this.set('global.song', undefined);
+      }
     },
 
     forwardAction: function(e, detail, sender) {
-      this.set('global.song', this.songTrail[this.songTrailIndex].song);
+      // we do not increment the songTrailIndex here, since setting the global song will cause it to increment.
+      this.set('global.song', this.songTrail[this.songTrailIndex+1].song);
     },
 
     saveSongTrail: function(e, detail, sender) {
       var playlist = detail.playlist;
-      for (var i = 0; i < this.songTrailIndex; ++i) {
+      for (var i = 0; i <= this.songTrailIndex; ++i) {
         var entry = this.songTrail[i];
         entry.playlist = playlist;
         entry.save();
@@ -229,8 +240,12 @@
       e.stopPropagation();
     },
 
-    isIndexAtEndOfSongTrail: function(songTrailIndex, songTrail) {
-      return songTrailIndex == songTrail.index;
+    _isIndexAtStartOfSongTrail: function(songTrailIndex, songTrail) {
+      return songTrailIndex < 0;
+    },
+
+    _isIndexAtEndOfSongTrail: function(songTrailIndex, songTrail) {
+      return songTrailIndex + 1 >= songTrail.length;
     },
   });
 </script>
