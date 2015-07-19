@@ -17,10 +17,16 @@
 
 <dom-module id="search-toolbar">
   <style is="custom-style">
+    :host {
+      height: 39px;
+    }
     paper-icon-button {
       color: var(--primary-text-color);
     }
-
+    .top {
+      flex: 1;
+      align-items: flex-end;
+    }
 
     #bpm {
       width: 64px;
@@ -43,7 +49,11 @@
       @apply(--layout-horizontal);
     }
     .indent {
-      margin-left: 60px;
+      margin-left: 31px;
+    }
+
+    paper-toolbar {
+      transform: translateY(-25px);
     }
   </style>
   <template>
@@ -53,7 +63,7 @@
     <paper-toolbar class$="{{computeIsTall(isTall)}}">
       <content></content>
       <!-- top row -->
-      <section class="indent horizontal">
+      <section class="indent horizontal top">
         <paper-icon-button icon="search" on-click="searchAction"></paper-icon-button>
         <paper-input id="searchInput" label="search" class="flex" value="{{query}}" noLabelFloat></paper-input>
         <paper-icon-button icon="info-outline" on-click="toggleSearchInfoDialog"></paper-icon-button>
