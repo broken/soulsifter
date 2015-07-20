@@ -33,6 +33,9 @@
       background-color: var(--primary-background-color);
       font-size: 13px;
     }
+    #pageAnimatedPages {
+      height: 100%;
+    }
     /* placed here since less preprocessor fails mixins. */
     paper-tab {
       --paper-tab: {
@@ -94,7 +97,7 @@
     }
   </style>
   <template>
-    <neon-animated-pages id="main" selected="{{section}}" entry-animation="slide-from-right-animation" exit-animation="slide-left-animation">
+    <neon-animated-pages selected="{{selectedPage}}" entry-animation="[[pageEntryAnimation]]" exit-animation="[[pageExitAnimation]]" id="pageAnimatedPages">
       <neon-animatable>
         <paper-drawer-panel>
           <section drawer id="drawer">
@@ -136,14 +139,16 @@
     is: 'soul-sifter',
 
     properties: {
+      selectedPage: {
+        type: Number,
+        value: 0
+      },
+      pageEntryAnimation: String,
+      pageExitAnimation: String,
       selectedTab: {
         type: Number,
         value: 1,
         observer: '_selectedTabChanged'
-      },
-      section: {
-        type: Number,
-        value: 0
       },
       notifiedSongSection: {
         type: Boolean,
@@ -162,33 +167,37 @@
     djSearch: true,
 
     attached: function() {
-      // https://www.polymer-project.org/1.0/docs/migration.html#domready
-      this.async(function() {
-        /* theming */
-        // CoreStyle.g.theme.init();
-
-        /* setup listeners */
-        var that = this;
-        this.addEventListener('page-main', function(e) {
-          that.section = 0;
-        });
-        this.addEventListener('page-playlist-edit', function(e) {
-          that.section = 1;
-          that.playlist = e.detail.playlist;
-        });
-        this.addEventListener('page-song-edit', function(e) {
-          that.section = 2;
-          that.song = e.detail.song;
-        });
-        this.addEventListener('page-settings', function(e) {
-          that.section = 3;
-        });
-        this.addEventListener('error-alert', function(e) {
-          console.log(e.detail.msg);
-          that.errorText = e.detail.msg;
-          that.$.toast.show();
-        });
-      }.bind(this));
+      // setup page listeners
+      var that = this;
+      var mainEntry = 'slide-from-left-animation', mainExit = 'slide-left-animation';
+      var subEntry = 'slide-from-right-animation', subExit = 'slide-right-animation';
+      this.addEventListener('page-main', function(e) {
+        that.pageEntryAnimation = mainEntry;
+        that.pageExitAnimation = subExit;
+        that.selectedPage = 0;
+      });
+      this.addEventListener('page-playlist-edit', function(e) {
+        that.pageEntryAnimation = subEntry;
+        that.pageExitAnimation = mainExit;
+        that.selectedPage = 1;
+        that.playlist = e.detail.playlist;
+      });
+      this.addEventListener('page-song-edit', function(e) {
+        that.pageEntryAnimation = subEntry;
+        that.pageExitAnimation = mainExit;
+        that.selectedPage = 2;
+        that.song = e.detail.song;
+      });
+      this.addEventListener('page-settings', function(e) {
+        that.pageEntryAnimation = subEntry;
+        that.pageExitAnimation = mainExit;
+        that.selectedPage = 3;
+      });
+      this.addEventListener('error-alert', function(e) {
+        console.log(e.detail.msg);
+        that.errorText = e.detail.msg;
+        that.$.toast.show();
+      });
     },
 
     changeQuery: function(e, detail, sender) {
