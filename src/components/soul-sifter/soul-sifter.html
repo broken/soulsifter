@@ -36,6 +36,14 @@
     #pageAnimatedPages {
       height: 100%;
     }
+    #drawer {
+      display: flex;
+      flex-direction: column;
+      background-color: var(--primary-background-color);
+    }
+    #drawer neon-animated-pages {
+      overflow-y: scroll;
+    }
     /* placed here since less preprocessor fails mixins. */
     paper-tab {
       --paper-tab: {
@@ -44,14 +52,6 @@
       --paper-tab-content: {
         font-weight: 500 !important;
       };
-    }
-
-    #drawer {
-      background-color: var(--primary-background-color);
-      overflow: hidden;
-    }
-    neon-animated-pages {
-      height: 100%;
     }
 
 
@@ -80,17 +80,14 @@
       margin: 8px;
     }
 
-    core-drawer-panel[narrow] paper-icon-button {
-      display: inline-block
-    }
-
     paper-toast {
       left: auto;
       right: 20px;
     }
 
     .vertical {
-      @apply(--layout-vertical);
+      display: flex;
+      flex-direction: column;
     }
     .flex {
       @apply(--layout-flex);
@@ -106,7 +103,7 @@
               <paper-tab id="paper_tab-genres" active>Genres</paper-tab>
               <paper-tab id="paper_tab-playlists">Playlists</paper-tab>
             </paper-tabs>
-            <neon-animated-pages selected="{{selectedTab}}" class="flex" entry-animation="slide-from-right-animation" exit-animation="slide-left-animation">
+            <neon-animated-pages selected="{{selectedTab}}" entry-animation="slide-from-right-animation" exit-animation="slide-left-animation">
               <neon-animatable><song-section id="songSection" song-trail="{{songTrail}}"></song-section></neon-animatable>
               <neon-animatable><genre-list selection="{{genres}}"></genre-list></neon-animatable>
               <neon-animatable><playlist-list on-query-change="changeQuery" on-genre-change="updateGenres"></playlist-list></neon-animatable>
