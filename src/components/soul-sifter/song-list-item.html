@@ -5,7 +5,7 @@
 <link href="../mat-menu-button/mat-menu-button.html" rel="import">
 <link href="../mat-option/mat-option.html" rel="import">
 
-<link href="global-state.html" rel="import">
+<link href="ss-global-behavior.html" rel="import">
 <link href="ss-star-rating.html" rel="import">
 
 
@@ -103,8 +103,6 @@
     }
   </style>
   <template>
-    <global-state values="{{global}}"></global-state>
-
     <div class="song-item" draggable="true" on-dragstart="dragSong" id="draggableItem">
       <div id="cover"></div>
       <div class="key fade-out flex">
@@ -127,6 +125,10 @@
   Polymer({
     is: 'song-list-item',
 
+    behaviors: [
+      GlobalBehavior
+    ],
+
     properties: {
       song: Object,
       musicDir: {
@@ -136,7 +138,7 @@
     },
 
     observers: [
-      'globalBpmChanged(global.bpm)'
+      '_globalBpmChanged(global.bpm)'
     ],
 
     bpmDiff: '',
@@ -154,7 +156,7 @@
       //this.filepath = 'application/octet-stream:' + filename + ':file://' + fp;
     },
 
-    globalBpmChanged: function(newValue) {
+    _globalBpmChanged: function(newValue) {
       if (this.global.bpm)
         this.bpmDiff = ((this.global.bpm / this.song.bpm - 1) * 100).toFixed(2);
     },

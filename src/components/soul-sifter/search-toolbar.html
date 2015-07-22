@@ -10,8 +10,8 @@
 <link href="../paper-toolbar/paper-toolbar.html" rel="import">
 
 <!-- <link href="create-song.html" rel="import"> -->
-<link href="global-state.html" rel="import">
 <link href="search-info.html" rel="import">
+<link href="ss-global-behavior.html" rel="import">
 
 
 <dom-module id="search-toolbar">
@@ -56,8 +56,6 @@
     }
   </style>
   <template>
-    <global-state values="{{global}}"></global-state>
-
     <paper-toolbar class$="{{computeIsTall(isTall)}}">
       <content></content>
       <!-- top row -->
@@ -96,6 +94,10 @@
 <script>
   Polymer({
     is: 'search-toolbar',
+
+    behaviors: [
+      GlobalBehavior
+    ],
 
     properties: {
       query: {

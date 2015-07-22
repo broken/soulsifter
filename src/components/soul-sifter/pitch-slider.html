@@ -2,7 +2,7 @@
 
 <link href="../paper-slider/paper-slider.html" rel="import">
 
-<link href="global-state.html" rel="import">
+<link href="ss-global-behavior.html" rel="import">
 
 
 <dom-module id="pitch-slider">
@@ -18,8 +18,6 @@
     }
   </style>
   <template>
-    <global-state values="{{global}}"></global-state>
-
     <paper-slider editable pin value="{{pitch}}" step="0.1" min="{{pitchPctMin}}" max="{{pitchPctMax}}"></paper-slider>
   </template>
 </dom-module>
@@ -28,11 +26,15 @@
   Polymer({
     is: 'pitch-slider',
 
+    behaviors: [
+      GlobalBehavior
+    ],
+
     properties: {
       pitch: {
         type: Number,
         value: 0,
-        observer: 'pitchChanged'
+        observer: '_pitchChanged'
       },
       pitchPctMax: {
         type: Number,
@@ -45,14 +47,14 @@
     },
 
     observers: [
-      'globalBpmChanged(global.bpm)',
-      'globalSongChanged(global.song)'
+      '_globalBpmChanged(global.bpm)',
+      '_globalSongChanged(global.song)'
     ],
 
-    globalSongChanged: function(song) {
+    _globalSongChanged: function(song) {
       if (!song || !song.bpm) return;
       if (this.global.bpm == 0) {
-        this.global.bpm = parseFloat(song.bpm).toFixed(1);
+        this.set('global.bpm', parseFloat(song.bpm).toFixed(1));
       } else {
         var pitch = this.global.bpm / song.bpm;
         pitch = (pitch - 1) * 100;
@@ -62,14 +64,14 @@
       }
     },
 
-    globalBpmChanged: function(bpm) {
+    _globalBpmChanged: function(bpm) {
       if (this.global.song && this.global.song.bpm)
         this.pitch = (this.global.bpm - this.global.song.bpm) / this.global.song.bpm * 100;
     },
 
-    pitchChanged: function(newValue, oldValue) {
+    _pitchChanged: function(newValue, oldValue) {
       if (this.global && this.global.song && this.global.song.bpm)
-        this.global.bpm = (this.global.song.bpm * (this.pitch/100) + this.global.song.bpm * 1).toFixed(1);
+        this.set('global.bpm', (this.global.song.bpm * (this.pitch/100) + this.global.song.bpm * 1).toFixed(1));
     },
   });
 </script>
