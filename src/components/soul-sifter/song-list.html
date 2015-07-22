@@ -22,7 +22,7 @@
   </style>
   <template>
     <iron-signals on-iron-signal-genres-changed="_genresChanged"
-                          on-iron-signal-search="searchAction"></iron-signals>
+                          on-iron-signal-search="search"></iron-signals>
 
     <core-tooltip id="tooltip" label="Searching..." noarrow position top></core-tooltip>
     <!-- due to multiple bugs in iron-selector, we listen for the iron-activate event -->
@@ -77,12 +77,12 @@
     attached: function() {
       // https://www.polymer-project.org/1.0/docs/migration.html#domready
       this.async(function() {
-        this.searchAction();
+        this.search();
       }.bind(this));
     },
 
     _globalBpmChanged: function(bpm) {
-      if (this.djSearch) this.searchAction();
+      if (this.djSearch) this.search();
     },
 
     _genresChanged: function(e, detail, sender) {
@@ -98,13 +98,13 @@
       setTimeout(function(self, query) {
         return function() {
           if (self.query == query) {
-            self.searchAction();
+            self.search();
           }
         };
       }(this, this.query), 750);
     },
 
-    searchAction: function(e, detail, sender) {
+    search: function(e, detail, sender) {
       this.$.tooltip.show = true;
       var that = this;
       // give the tooltip a chance to show

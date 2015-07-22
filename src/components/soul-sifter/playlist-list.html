@@ -45,11 +45,11 @@
     attached: function() {
       // https://www.polymer-project.org/1.0/docs/migration.html#domready
       this.async(function() {
-        this._updatePlaylists();
+        this.updatePlaylists();
       }.bind(this));
     },
 
-    _updatePlaylists: function(e, detail, sender) {
+    updatePlaylists: function(e, detail, sender) {
       this.playlists = ss.Playlist.findAll();
     },
 
