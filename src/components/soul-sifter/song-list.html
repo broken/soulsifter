@@ -21,8 +21,7 @@
     }
   </style>
   <template>
-    <iron-signals on-iron-signal-genres-changed="_genresChanged"
-                          on-iron-signal-search="search"></iron-signals>
+    <iron-signals on-iron-signal-search="search"></iron-signals>
 
     <core-tooltip id="tooltip" label="Searching..." noarrow position top></core-tooltip>
     <!-- due to multiple bugs in iron-selector, we listen for the iron-activate event -->
@@ -83,10 +82,6 @@
 
     _globalBpmChanged: function(bpm) {
       if (this.djSearch) this.search();
-    },
-
-    _genresChanged: function(e, detail, sender) {
-      this.genres = detail;
     },
 
     _selectedSongChanged: function(e) {

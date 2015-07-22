@@ -113,7 +113,7 @@
             <search-toolbar query="{{query}}" dj-search="{{djSearch}}" class="paper-header">
               <paper-icon-button paper-drawer-toggle icon="menu"></paper-icon-button>
             </search-toolbar>
-            <song-list query="{{query}}" dj-search="{{djSearch}}" song-trail="{{songTrail}}" class="fit"></song-list>
+            <song-list query="{{query}}" dj-search="{{djSearch}}" song-trail="{{songTrail}}" genres="[[genres]]" class="fit"></song-list>
           </paper-header-panel>
         </paper-drawer-panel>
       </neon-animatable>
@@ -150,7 +150,8 @@
       notifiedSongSection: {
         type: Boolean,
         value: false
-      }
+      },
+      genres: Array
     },
 
     // https://github.com/PolymerElements/paper-scroll-header-panel/issues/33
@@ -203,11 +204,6 @@
 
     updateGenres: function(e, detail, sender) {
       this.genres = detail;
-    },
-
-    genresChanged: function(spliceOrOldValue, undefOrNewValue) {
-      // The first selection uses a property observer, while subsequent calls use an array observer and calls this method with splice changes rather than the old & new values
-      this.fire('iron-signal', {name: 'genres-changed', data: this.genres});
     },
   });
 </script>
