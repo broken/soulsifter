@@ -55,9 +55,10 @@
       --iron-icon-width: 16px;
     }
     #menu {
+      background-color: var(--ss-options-button-menu-background-color);
       padding: 15px;
       position: absolute;
-      top: 0;
+      top: 7px;
       left: 31px;
       border-radius: 2px;
       display: block;
@@ -76,8 +77,10 @@
     }
     .menuItem {
       margin: 2px;
+      position: relative;
     }
-    div.menuItem:hover {
+    .menuItem:hover {
+      color: var(--secondary-text-color);
       background-color: var(--ss-options-button-menu-item-hover-color);
     }
   </style>
