@@ -1,0 +1,60 @@
+<link href="../polymer/polymer.html" rel="import">
+
+<link href="../paper-icon-button/paper-icon-button.html" rel="import">
+<link href="../paper-material/paper-material.html" rel="import">
+
+
+<dom-module id="ss-options-menu">
+  <style is="custom-style">
+    #btn {
+      line-height: inherit;
+      vertical-align: top;
+      --iron-icon-height: 16px;
+      --iron-icon-width: 16px;
+    }
+    #menu {
+      background-color: var(--ss-options-button-menu-background-color);
+      padding: 15px;
+      position: absolute;
+      top: 7px;
+      left: 16px;
+      border-radius: 2px;
+      display: block;
+      opacity: 1;
+      transition: opacity 1s;
+    }
+    #menu.hide {
+      display: none;
+      opacity: 0;
+    }
+  </style>
+  <template>
+    <paper-icon-button id="btn" icon="more-vert"></paper-icon-button>
+    <paper-material id="menu" class="hide" elevation="3">
+      <content></content>
+    </paper-material>
+    </div>
+  </template>
+</dom-module>
+
+<script>
+  Polymer({
+    is: 'ss-options-menu',
+
+    attached: function() {
+      // prevent ripples further down the chain
+      this.addEventListener('down', function(e) { e.preventDefault(); });
+      // prevent selection further down the chain
+      this.addEventListener('click', function(e) { e.preventDefault(); });
+
+      // open & close menu
+      var menu = this.$.menu;
+      var btn = this.$.btn;
+      document.addEventListener('click', function(event) {
+          if (!menu.classList.contains('hide') || btn.contains(event.target)) {
+            menu.classList.toggle('hide');
+          }
+        });
+    },
+  });
+</script>

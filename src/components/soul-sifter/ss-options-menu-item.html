@@ -1,0 +1,31 @@
+<link href="../polymer/polymer.html" rel="import">
+
+<link href="../paper-ripple/paper-ripple.html" rel="import">
+
+
+<dom-module id="ss-options-menu-item">
+  <style is="custom-style">
+    :host {
+      line-height: 22px;
+      margin: 2px;
+      position: relative;
+      display: block;
+    }
+    :host:hover {
+      color: var(--secondary-text-color);
+      background-color: var(--ss-options-button-menu-item-hover-color);
+    }
+  </style>
+  <template>
+    <div>
+      <content></content>
+    </div>
+    <paper-ripple></paper-ripple>
+  </template>
+</dom-module>
+
+<script>
+  Polymer({
+    is: 'ss-options-menu-item'
+  });
+</script>

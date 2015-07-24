@@ -8,6 +8,8 @@
 <link href="../paper-material/paper-material.html" rel="import">
 
 <link href="ss-googleplaymusic.html" rel="import">
+<link href="ss-options-menu.html" rel="import">
+<link href="ss-options-menu-item.html" rel="import">
 
 
 <dom-module id="playlist-list-item">
@@ -46,42 +48,11 @@
       @apply(--layout-flex);
       @apply(--layout-horizontal);
     }
-
-    /* menu */
-    #btn {
+    #item ss-options-menu::shadow #btn {
       display: none;
-      vertical-align: top;
-      --iron-icon-height: 16px;
-      --iron-icon-width: 16px;
     }
-    #menu {
-      background-color: var(--ss-options-button-menu-background-color);
-      padding: 15px;
-      position: absolute;
-      top: 7px;
-      left: 31px;
-      border-radius: 2px;
+    #item:hover ss-options-menu::shadow #btn {
       display: block;
-      opacity: 1;
-      transition: opacity 1s;
-    }
-    #menu.hide {
-      display: none;
-      opacity: 0;
-    }
-    #item #btn {
-      display: none;
-    }
-    #item:hover #btn {
-      display: block;
-    }
-    .menuItem {
-      margin: 2px;
-      position: relative;
-    }
-    .menuItem:hover {
-      color: var(--secondary-text-color);
-      background-color: var(--ss-options-button-menu-item-hover-color);
     }
   </style>
   <template>
@@ -92,24 +63,14 @@
         <div id="item" on-click="_onClick">
           <paper-ripple fit></paper-ripple>
           <div class="content">
-            <span>{{playlist.name}}</span>
+            <span>[[playlist.name]]</span>
             <iron-icon icon="find-replace" alt="smart playlist" class$="[[_isSmart(playlist)]]"></iron-icon>
           </div>
-          <paper-icon-button id="btn" icon="more-vert" on-click="_preventDefault"></paper-icon-button>
-        </div>
-      </paper-material>
-      <paper-material id="menu" class="hide" elevation="3">
-        <div on-click="_editAction" class="menuItem">
-          <div>Edit playlist</div>
-          <paper-ripple></paper-ripple>
-        </div>
-        <div on-click="_deleteAction" class="menuItem">
-          <div>Delete playlist</div>
-          <paper-ripple></paper-ripple>
-        </div>
-        <div on-click="_exportAction" class="menuItem">
-          <div>Export to Google Play Music</div>
-          <paper-ripple></paper-ripple>
+          <ss-options-menu>
+            <ss-options-menu-item on-click="_editAction">Edit playlist</ss-options-menu-item>
+            <ss-options-menu-item on-click="_deleteAction">Delete playlist</ss-options-menu-item>
+            <ss-options-menu-item on-click="_exportAction">Export to Google Play Music</ss-options-menu-item>
+          </ss-options-menu>
         </div>
       </paper-material>
     </div>
@@ -130,17 +91,6 @@
         type: Boolean,
         value: false
       }
-    },
-
-    attached: function() {
-      // open & close menu
-      var menu = this.$.menu;
-      var btn = this.$.btn;
-      document.addEventListener('click', function(event) {
-          if (!menu.classList.contains('hide') || btn.contains(event.target)) {
-            menu.classList.toggle('hide');
-          }
-        });
     },
 
     _onClick: function(e, detail, sender) {
@@ -167,10 +117,6 @@
 
     _isSmart: function(playlist) {
       return playlist.query ? "smart" : "";
-    },
-
-    _preventDefault: function(event) {
-      event.preventDefault();
     },
 
     _computeElevation: function(selected) {
