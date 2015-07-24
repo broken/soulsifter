@@ -1,11 +1,10 @@
 <link href="../polymer/polymer.html" rel="import">
 
 <link href="../iron-flex-layout/iron-flex-layout.html" rel="import">
-<link href="../mat-menu/mat-menu.html" rel="import">
-<link href="../mat-menu-button/mat-menu-button.html" rel="import">
-<link href="../mat-option/mat-option.html" rel="import">
 
 <link href="ss-global-behavior.html" rel="import">
+<link href="ss-options-menu.html" rel="import">
+<link href="ss-options-menu-item.html" rel="import">
 <link href="ss-star-rating.html" rel="import">
 
 
@@ -15,12 +14,6 @@
 
     ss-star-rating {
       margin: 0 6px;
-    }
-    #menuButton {
-      color: white;
-    }
-    #menuButton::shadow mat-icon-button {
-      color: red;
     }
 
 
@@ -35,13 +28,13 @@
     .song-item div {
       margin: 3px;
     }
-    .song-item #menuButton {
-      display: none;
-    }
     .song-item:hover {
       background-color: var(--ss-song-list-item-hover-background-color);
     }
-    .song-item:hover #menuButton {
+    .song-item ss-options-menu::shadow #btn {
+      display: none;
+    }
+    .song-item:hover ss-options-menu::shadow #btn {
       display: block;
     }
     /*.song-item #menuButton {
@@ -97,10 +90,6 @@
     .flex {
       @apply(--layout-flex);
     }
-
-    mat-menu-button /deep/ xp-icon {
-      color: var(--primary-text-color);
-    }
   </style>
   <template>
     <div class="song-item" draggable="true" on-dragstart="dragSong" id="draggableItem">
@@ -110,14 +99,13 @@
         <span> - </span>
         <span class="title">[[song.title]]</span>
       </div>
-      <mat-menu-button target="menu" id="menuButton"></mat-menu-button>
+      <ss-options-menu>
+        <ss-options-menu-item on-click="clickEditAction">Edit song</ss-options-menu-item>
+      </ss-options-menu>
       <div class="bpmDiff">{{bpmDiff}}</div>
       <ss-star-rating value="{{song.rating}}" read-only></ss-star-rating>
       <time class="added">{{localeDate}}</time>
     </div>
-    <mat-menu id="menu">
-      <mat-option label="Edit info" on-click="clickEditAction"></mat-option>
-    </mat-menu>
   </template>
 </dom-module>
 

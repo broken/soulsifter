@@ -6,6 +6,10 @@
 
 <dom-module id="ss-options-menu">
   <style is="custom-style">
+    :host {
+      position: relative;
+      height: 33px;
+    }
     #btn {
       line-height: inherit;
       vertical-align: top;
@@ -16,12 +20,13 @@
       background-color: var(--ss-options-button-menu-background-color);
       padding: 15px;
       position: absolute;
-      top: 7px;
-      left: 16px;
+      top: 6px;
+      right: 8px;
       border-radius: 2px;
       display: block;
       opacity: 1;
       transition: opacity 1s;
+      z-index: 1;
     }
     #menu.hide {
       display: none;

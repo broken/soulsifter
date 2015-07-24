@@ -11,11 +11,6 @@
 
 <dom-module id="playlist-list">
   <style is="custom-style">
-    #wrapper {
-      height: 100%;
-      overflow-y: scroll;
-    }
-
     paper-fab {
       bottom: 60px;
       position: absolute;
@@ -25,11 +20,9 @@
   <template>
     <iron-signals on-iron-signal-playlists-changed="updatePlaylists"></iron-signals>
 
-    <div id="wrapper">
-      <template is="dom-repeat" items="[[playlists]]" id="playlistTpl">
-        <playlist-list-item playlist="[[item]]" on-playlist-select="_selectPlaylist" selected$="[[_isSelected(item, selected)]]"></playlist-list-item>
-      </template>
-    </div>
+    <template is="dom-repeat" items="[[playlists]]" id="playlistTpl">
+      <playlist-list-item playlist="[[item]]" on-playlist-select="_selectPlaylist" selected$="[[_isSelected(item, selected)]]"></playlist-list-item>
+    </template>
     <paper-fab mini icon="add" on-click="_createPlaylist"></paper-fab>
   </template>
 </dom-module>
