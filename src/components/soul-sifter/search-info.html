@@ -1,118 +1,100 @@
 <link href="../polymer/polymer.html" rel="import">
 
-<link href="../iron-flex-layout/iron-flex-layout.html" rel="import">
-
 
 <dom-module id="search-info">
   <style is="custom-style">
-    div {
+    :host {
+      display: flex;
+      flex-direction: column;
+      width: 575px;
       white-space: nowrap;
     }
-
-    div.text {
-      width: 575px;
-    }
-
-    .right {
-      text-align: right;
-    }
-
-    .heading {
+    header {
+      color: var(--ss-search-info-heading-color);
       margin-top: 14px;
     }
-
-    .vertical {
-      @apply(--layout-vertical);
-    }
-
-    .horizontal {
-      @apply(--layout-horizontal);
-    }
-
-    .flex {
-      @apply(--layout-flex);
-    }
-
-    /** search info **/
-    .heading {
-      color: var(--ss-search-info-heading-color);
+    section {
+      display: flex;
+      flex-direction: row;
     }
     .emphasis {
       color: var(--ss-search-info-emphasis-color);
     }
-    .text {
-      color: var(--primary-text-color);
+    .right {
+      text-align: right;
+    }
+    .flex {
+      flex: 1;
+      flex-basis: 0.000000001px;
     }
   </style>
   <template>
-    <div class="text vertical">
-      <div class="heading">
-        <span>Search atoms</span>
-        <hr>
+    <header>
+      <span>Search atoms</span>
+      <hr>
+    </header>
+    <section>
+      <div class="right flex">
+        <span class="emphasis">id</span> : <br>
+        <span class="emphasis">a</span> or <span class="emphasis">artist</span> : <br>
+        <span class="emphasis">t</span> or <span class="emphasis">title</span> : <br>
+        <span class="emphasis">r</span> or <span class="emphasis">remixer</span> : <br>
+        <span class="emphasis">rating</span> : <br>
+        <span class="emphasis">comment</span> : <br>
+        <span class="emphasis">q</span> or <span class="emphasis">query</span> : <br>
       </div>
-      <div class="horizontal">
-        <div class="right flex">
-          <span class="emphasis">id</span> : <br>
-          <span class="emphasis">a</span> or <span class="emphasis">artist</span> : <br>
-          <span class="emphasis">t</span> or <span class="emphasis">title</span> : <br>
-          <span class="emphasis">r</span> or <span class="emphasis">remixer</span> : <br>
-          <span class="emphasis">rating</span> : <br>
-          <span class="emphasis">comment</span> : <br>
-          <span class="emphasis">q</span> or <span class="emphasis">query</span> : <br>
-        </div>
-        <div class="flex">
-          Internal song ID<br>
-          Song artist<br>
-          Song title<br>
-          Song remixer<br>
-          Minimum song rating<br>
-          Song comment<br>
-          Custom query predicate<br>
-        </div>
-        <div class="right flex">
-          <span class="emphasis">aid</span> : <br>
-          <span class="emphasis">n</span> or <span class="emphasis">album</span> : <br>
-          <span class="emphasis">m</span> or <span class="emphasis">mixed</span> : <br>
-          <span class="emphasis">l</span> or <span class="emphasis">label</span> : <br>
-          <span class="emphasis">y</span> or <span class="emphasis">year</span> : <br>
-          <span class="emphasis">trashed</span> : <br>
-          <span class="emphasis">lowq</span> : <br>
-          <span class="emphasis">limit</span> : <br>
-        </div>
-        <div class="flex">
-          Internal album ID<br>
-          Album name<br>
-          Is album mixed<br>
-          Label released on<br>
-          Year released<br>
-          Has song been deleted<br>
-          Is song low quality<br>
-          Result count limit<br>
-        </div>
+      <div class="flex">
+        Internal song ID<br>
+        Song artist<br>
+        Song title<br>
+        Song remixer<br>
+        Minimum song rating<br>
+        Song comment<br>
+        Custom query predicate<br>
       </div>
-      <div class="heading">
-        <span>Special characters</span>
-        <hr>
+      <div class="right flex">
+        <span class="emphasis">aid</span> : <br>
+        <span class="emphasis">n</span> or <span class="emphasis">album</span> : <br>
+        <span class="emphasis">m</span> or <span class="emphasis">mixed</span> : <br>
+        <span class="emphasis">l</span> or <span class="emphasis">label</span> : <br>
+        <span class="emphasis">y</span> or <span class="emphasis">year</span> : <br>
+        <span class="emphasis">trashed</span> : <br>
+        <span class="emphasis">lowq</span> : <br>
+        <span class="emphasis">limit</span> : <br>
       </div>
-      <div class="horizontal">
-        <div class="right flex">
-          <span class="emphasis">-</span> : <br>
-          <span class="emphasis">"</span> : <br>
-        </div>
-        <div class="flex">
-          Negates a query atom<br>
-          Used to group terms<br>
-        </div>
-        <div class="right flex">
-          <span class="emphasis">0</span> or <span class="emphasis">1</span> : <br>
-          <span class="emphasis">\\</span> : <br>
-        </div>
-        <div class="flex">
-          Boolean values<br>
-          Escape character<br>
-        </div>
+      <div class="flex">
+        Internal album ID<br>
+        Album name<br>
+        Is album mixed<br>
+        Label released on<br>
+        Year released<br>
+        Has song been deleted<br>
+        Is song low quality<br>
+        Result count limit<br>
       </div>
-    </div>
+    </section>
+    <header>
+      <span>Special characters</span>
+      <hr>
+    </header>
+    <section>
+      <div class="right flex">
+        <span class="emphasis">-</span> : <br>
+        <span class="emphasis">"</span> : <br>
+      </div>
+      <div class="flex">
+        Negates a query atom<br>
+        Used to group terms<br>
+      </div>
+      <div class="right flex">
+        <span class="emphasis">0</span> or <span class="emphasis">1</span> : <br>
+        <span class="emphasis">\\</span> : <br>
+      </div>
+      <div class="flex">
+        Boolean values<br>
+        Escape character<br>
+      </div>
+    </section>
   </template>
 </dom-module>
 
