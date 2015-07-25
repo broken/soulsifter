@@ -41,15 +41,15 @@
   </style>
   <template>
     <div id="itemContainer">
-      <paper-material class$="{{computeIsSelected(isSelected)}}" style$="{{computePaddingLeftStyle(indent)}}" on-tap="selectTapAction" id="item" elevation="0">
+      <paper-material class$="[[_computeSelectedClass(isSelected)]]" style$="[[_computePaddingLeftStyle(indent)]]" on-tap="_toggleSelect" id="item" elevation="0">
         <paper-ripple></paper-ripple>
-        <paper-icon-button icon="{{icon}}" on-tap="expandTapAction"></paper-icon-button>
-        <div class="flex">{{genre.name}}</div>
+        <paper-icon-button icon="[[icon]]" on-tap="_toggleExpansion"></paper-icon-button>
+        <div class="flex">[[genre.name]]</div>
       </paper-material>
     </div>
     <iron-collapse id="collapse">
       <template is="dom-repeat" items="[[_getSubGenres(genre)]]" id="subGenreTpl">
-        <genre-list-item genre="{{item}}" indent="{{incIndent(indent)}}" on-expand-parents="expand"></genre-list-item>
+        <genre-list-item genre="[[item]]" indent="[[_incIndent(indent)]]" on-expand-parents="expand"></genre-list-item>
       </template>
     </iron-collapse>
   </template>
@@ -77,12 +77,11 @@
 
     /** @event genre-select */
 
-    /** @method select */
     select: function(isSelected) {
       if ((isSelected && !this.isSelected) ||
           (!isSelected && this.isSelected)) {
         this.isSelected = !this.isSelected;
-        this.selectGenreAction();
+        this._signalGenreToggle();
       }
       if (this.genre.subGenre && this.genre.subGenre.length > 0) {
         for (var i = 0, childNodes = Polymer.dom(this.$.collapse).childNodes;
@@ -100,13 +99,13 @@
       this.$.collapse.opened = false;
       if (this.isSelected) {
         this.isSelected = !this.isSelected;
-        this.selectGenreAction();
+        this._signalGenreToggle();
       }
       // select this and request parents to expand if found in array
       for (var i = 0; i < genres.length; ++i) {
         if (genres[i].id == this.genre.id) {
           this.isSelected = !this.isSelected;
-          this.selectGenreAction();
+          this._signalGenreToggle();
           this.fire('expand-parents');
         }
       }
@@ -137,32 +136,31 @@
       }
     },
 
-    selectTapAction: function(e, detail, sender) {
+    _toggleSelect: function(e, detail, sender) {
       this.select(!this.isSelected);
     },
 
-    expandTapAction: function(e, detail, sender) {
+    _toggleExpansion: function(e, detail, sender) {
       if (!this.genre.subGenre || this.genre.subGenre.length <= 0) return;
       this.$.collapse.toggle();
       this.icon = this.$.collapse.opened ? 'expand-less' : 'expand-more';
       e.stopPropagation();
     },
 
-    selectGenreAction: function() {
-      // this.$.shadow.setZ(detail.isSelected ? 1 : 0);
-      this.fire('genre-select', this.genre);
+    _signalGenreToggle: function() {
+      this.fire('genre-select', {genre: this.genre});
     },
 
-    computePaddingLeftStyle: function(indent) {
-      return 'padding-left: ' + indent + 'px;';
-    },
-
-    incIndent: function(indent) {
+    _incIndent: function(indent) {
       return indent + 20;
     },
 
-    computeIsSelected: function(isSelected) {
+    _computeSelectedClass: function(isSelected) {
       return isSelected ? "selected" : "";
+    },
+
+    _computePaddingLeftStyle: function(indent) {
+      return 'padding-left: ' + indent + 'px;';
     },
   });
 </script>

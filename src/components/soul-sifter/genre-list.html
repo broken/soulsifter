@@ -1,41 +1,16 @@
 <link href="../polymer/polymer.html" rel="import">
 
-<link href="../paper-icon-button/paper-icon-button.html" rel="import">
-
 <link href="genre-list-item.html" rel="import">
 
 
 <dom-module id="genre-list">
   <style is="custom-style">
-
-    paper-icon-button {
-      transform: scale(.6);
-    }
-
-    iron-collapse {
-      margin-top: -7px;
-      margin-bottom: -7px;
-    }
-
-    #itemContainer {
-      margin: 7px 20px 7px 20px;
-      height: 30px;
-    }
-    #item {
-      height: 30px;
-      @apply(--layout-horizontal);
-      @apply(--layout-center);
-    }
-
-    .flex {
-      @apply(--layout-flex);
-    }
   </style>
   <template>
-    <template is="dom-repeat" items="{{genres}}" id="genreTpl">
-      <genre-list-item genre="{{item}}" on-genre-select="selectAction"></genre-list-item>
+    <template is="dom-repeat" items="[[genreParents]]" id="genreTpl">
+      <genre-list-item genre="[[item]]" on-genre-select="_selectGenre"></genre-list-item>
     </template>
-    <array-selector multi id="selection"></array-selector>
+    <array-selector id="selector" items="[[allGenres]]" selected="{{selection}}" multi toggle></array-selector>
   </template>
 </dom-module>
 
@@ -44,30 +19,32 @@
     is: 'genre-list',
 
     properties: {
+      genreParents: {
+        type: Array,
+        value: function() { return ss.Style.findAllParents(); }
+      },
+      allGenres: {
+        type: Array,
+        value: function() { return ss.Style.findAll(); },
+        readOnly: true
+      },
       selection: {
         type: Array,
         notify: true
       }
     },
 
-    attached: function() {
-      // https://www.polymer-project.org/1.0/docs/migration.html#domready
-      this.async(function() {
-        this.genres = ss.Style.findAllParents();
-      }.bind(this));
-    },
-
+    // Does this even work? Seems like it only sets parents...
     setSelection: function(genres) {
       for (var i = 0, item = this.$.genreTpl.nextElementSibling;
-          item && i < this.genres.length;
+          item && i < this.genreParents.length;
           item = item.nextElementSibling, ++i) {
         item.selectIfInArray(genres);
       }
     },
 
-    selectAction: function(e, detail, sender) {
-      this.$.selection.select(detail);
-      this.selection = this.$.selection.getSelection();  // Bug? may return single item rather than array.
+    _selectGenre: function(e, detail) {
+      this.$.selector.select(detail.genre);
     },
     
   });

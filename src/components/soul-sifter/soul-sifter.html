@@ -114,7 +114,7 @@
             <search-toolbar query="{{query}}" dj-search="{{djSearch}}" class="paper-header">
               <paper-icon-button paper-drawer-toggle icon="menu"></paper-icon-button>
             </search-toolbar>
-            <song-list query="{{query}}" dj-search="{{djSearch}}" song-trail="{{songTrail}}" genres="[[genres]]" class="fit"></song-list>
+            <song-list query="{{query}}" dj-search="{{djSearch}}" song-trail="[[songTrail]]" genres="[[genres]]" class="fit"></song-list>
           </paper-header-panel>
         </paper-drawer-panel>
       </neon-animatable>
@@ -152,7 +152,8 @@
         type: Boolean,
         value: false
       },
-      genres: Array
+      genres: Array,
+      songTrail: Array
     },
 
     // https://github.com/PolymerElements/paper-scroll-header-panel/issues/33

@@ -149,7 +149,7 @@
     },
 
     _globalBpmChanged: function(newValue) {
-      if (this.global.bpm)
+      if (this.song && this.global.bpm)
         this.bpmDiff = ((this.global.bpm / this.song.bpm - 1) * 100).toFixed(2);
     },
 
