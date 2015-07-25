@@ -1,91 +1,61 @@
 <link href="../polymer/polymer.html" rel="import">
 
-<link href="../iron-flex-layout/iron-flex-layout.html" rel="import">
 <link href="../iron-icons/iron-icons.html" rel="import">
 <link href="../paper-dialog/paper-dialog.html" rel="import">
 <link href="../paper-icon-button/paper-icon-button.html" rel="import">
 <link href="../paper-input/paper-input.html" rel="import">
 <link href="../paper-toggle-button/paper-toggle-button.html" rel="import">
-<link href="../paper-toolbar/paper-toolbar.html" rel="import">
 
-<!-- <link href="create-song.html" rel="import"> -->
 <link href="search-info.html" rel="import">
 <link href="ss-global-behavior.html" rel="import">
+<link href="ss-options-menu.html" rel="import">
+<link href="ss-options-menu-item.html" rel="import">
 
 
 <dom-module id="search-toolbar">
   <style is="custom-style">
     :host {
-      height: 39px;
+      background-color: var(--search-toolbar-background);
+      display: flex;
+      flex-direction: row;
+      height: 42px;
+      padding-top: 5px;
+      padding-left: 17px;
     }
     paper-icon-button {
       color: var(--primary-text-color);
     }
-    .top {
-      flex: 1;
-      align-items: flex-end;
+    #searchInfoDialog {
+      max-width: none !important;
     }
-
     #bpm {
       width: 64px;
     }
-    #bpm::shadow .input-container {
-      bottom: 0;
-      top: 0;
-    }
-    #bpm::shadow .mirror-text, #bpm::shadow .label {
-      padding: 0;
-    }
-
     .flex {
-      @apply(--layout-flex);
+      flex: 1;
+      flex-basis: auto;
     }
-    .hide {
-      display: none;
-    }
-    .horizontal {
-      @apply(--layout-horizontal);
-    }
-    .indent {
-      margin-left: 31px;
-    }
-
-    paper-toolbar {
-      transform: translateY(-25px);
+    .menuItem {
+      white-space: nowrap;
     }
   </style>
   <template>
-    <paper-toolbar class$="{{computeIsTall(isTall)}}">
-      <content></content>
-      <!-- top row -->
-      <section class="indent horizontal top">
-        <paper-icon-button icon="search" on-click="searchAction"></paper-icon-button>
-        <paper-input id="searchInput" label="search" class="flex" value="{{query}}" noLabelFloat></paper-input>
-        <paper-icon-button icon="info-outline" on-click="toggleSearchInfoDialog"></paper-icon-button>
-        <paper-input label="bpm" value="{{global.bpm}}" id="bpm"></paper-input>
-        <paper-icon-button icon="add-circle" on-click="toggleCreateSongDialog" id="createSongButton"></paper-icon-button>
-        <paper-icon-button icon="settings" on-click="clickSettingsAction"></paper-icon-button>
-        <paper-icon-button icon="unfold-more" on-click="toggleIsTall"></paper-icon-button>
-      </section>
-      <!-- middle row -->
-      <!-- bottom row -->
-      <section class$="{{computeHideIfTall(isTall, 'bottom')}}">
-        <div>
-          <paper-toggle-button checked="{{djSearch}}"></paper-toggle-button>
-          DJ Search Mode
-        </div>
-        <div class="flex"></div>
-        <div>
-          <paper-icon-button icon="query-builder" on-click="analyzeBpms"></paper-icon-button>
-          Analyze BPMs
-        </div>
-      </section>
-    </paper-toolbar>
+    <content></content>  <!-- for drawer icon. needed? -->
+    <paper-icon-button icon="search" on-click="search"></paper-icon-button>
+    <paper-input label="search" value="{{query}}" class="flex" no-label-float></paper-input>
+    <paper-icon-button icon="info-outline" on-click="_toggleSearchInfoDialog"></paper-icon-button>
+    <paper-input label="bpm" value="{{global.bpm}}" id="bpm" no-label-float></paper-input>
+    <paper-icon-button icon="add-circle" on-click="_openCreateSongPage" id="createSongButton"></paper-icon-button>
+    <paper-icon-button icon="settings" on-click="_openSettingsPage"></paper-icon-button>
+    <ss-options-menu>
+      <ss-options-menu-item on-click="analyzeBpms">Analyze BPMs</ss-options-menu-item>
+      <div class="menuItem"> <!-- cannot use ss-options-menu-item here since the ripple will prevent click on btn -->
+        <paper-toggle-button checked="{{djSearch}}"></paper-toggle-button>
+        <span>DJ Search Mode</span>
+      </div>
+    </ss-options-menu>
     <paper-dialog id="searchInfoDialog" entry-animation="fade-in-animation" exit-animation="fade-out-animation">
       <search-info></search-info>
-    </paper-dialog>
-    <paper-dialog backdrop layered heading="Create Song" id="createSongDialog">
-      <!-- <create-song></create-song> -->
     </paper-dialog>
   </template>
 </dom-module>
@@ -107,10 +77,6 @@
         type: Boolean,
         notify: true
       },
-      isTall: {
-        type: Boolean,
-        value: false
-      }
     },
 
     attached: function() {
@@ -136,24 +102,7 @@
       }.bind(this));
     },
 
-    toggleIsTall: function(e, detail, sender  ) {
-      this.isTall = !this.isTall;
-    },
-
-    toggleSearchInfoDialog: function(e, detail, sender) {
-      this.$.searchInfoDialog.toggle();
-    },
-
-    clickSettingsAction: function(e, detail, sender) {
-      e.stopPropagation();
-      this.fire('page-settings');
-    },
-
-    toggleCreateSongDialog: function(e, detail, sender) {
-      this.$.createSongDialog.toggle();
-    },
-
-    searchAction: function(e, detail, sender) {
+    search: function(e, detail, sender) {
       this.fire('iron-signal', {name: 'search'});
     },
 
@@ -161,13 +110,16 @@
       ss.AudioAnalyzer.analyzeBpms();
     },
 
-    computeIsTall: function(isTall) {
-      return isTall ? 'medium-tall' : '';
+    _toggleSearchInfoDialog: function(e, detail, sender) {
+      this.$.searchInfoDialog.toggle();
     },
 
-    computeHideIfTall: function(isTall, classes) {
-      classes = classes || '';
-      return classes + (isTall ? '' : ' hide');
+    _openSettingsPage: function(e, detail, sender) {
+      this.fire('page-settings');
+    },
+
+    _openCreateSongPage: function(e, detail, sender) {
+      // this.fire('create-song');
     },
   });
 </script>
