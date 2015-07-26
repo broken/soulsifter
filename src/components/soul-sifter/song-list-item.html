@@ -106,7 +106,7 @@
       <ss-options-menu>
         <ss-options-menu-item on-click="clickEditAction">Edit song</ss-options-menu-item>
       </ss-options-menu>
-      <div class="bpmDiff">{{bpmDiff}}</div>
+      <div>[[_computeBpmShift(global.bpm)]]</div>
       <ss-star-rating value="{{song.rating}}" read-only></ss-star-rating>
       <time class="added">{{localeDate}}</time>
     </div>
@@ -129,12 +129,6 @@
       }
     },
 
-    observers: [
-      '_globalBpmChanged(global.bpm)'
-    ],
-
-    bpmDiff: '',
-
     localeDate: '',
 
     attached: function() {
@@ -148,9 +142,13 @@
       //this.filepath = 'application/octet-stream:' + filename + ':file://' + fp;
     },
 
-    _globalBpmChanged: function(newValue) {
-      if (this.song && this.global.bpm)
-        this.bpmDiff = ((this.global.bpm / this.song.bpm - 1) * 100).toFixed(2);
+    _computeBpmShift: function(bpm) {
+      if (!bpm) return '0.00';
+      var songBpm = this.song ? this.song.bpm : undefined;
+      if (!songBpm) return 'n/a';
+      if (Math.abs(songBpm - bpm) > Math.abs(songBpm/2 - bpm)) songBpm = songBpm / 2;
+      else if (Math.abs(songBpm - bpm) > Math.abs(songBpm * 2 - bpm)) songBpm = songBpm * 2;
+      return ((bpm / songBpm - 1) * 100).toFixed(2);
     },
 
     dragSong: function(e) {
