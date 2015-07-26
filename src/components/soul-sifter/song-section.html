@@ -24,6 +24,8 @@
       height: 100%;
     }
     #header {
+      color: inherit;
+      background-color: transparent;
       background-size: cover;
       height: 256px;
     }
@@ -149,7 +151,7 @@
     globalSongChanged: function(song) {
       this.song = song;
       if (!song) {
-        this.setCoverImage();
+        this._setCoverImage();
         return;
       }
 
@@ -166,7 +168,7 @@
       this.fs.access(this.song.filepath, this.fs.F_OK | this.fs.R_OK, function(err) {
           if (!err) {
             that.$.audio.src = "file://" + that.song.filepath;
-            that.setCoverImage(that.song.album.coverFilepath);
+            that._setCoverImage(that.song.album.coverFilepath);
           } else {
             that.$.gpm.findSong(that.song,
                 function(s) {
@@ -177,15 +179,15 @@
                       },
                       function(msg, body, err, resp) { console.warn(msg); that.$.audio.src = ''; });
                   if (s.track.albumArtRef && s.track.albumArtRef.length) {
-                    that.setCoverImage(s.track.albumArtRef[0].url);
+                    that._setCoverImage(s.track.albumArtRef[0].url);
                   } else {
-                    that.setCoverImage();
+                    that._setCoverImage();
                   }
                 },
                 function(msg, body, err, resp) {
                   console.warn(msg);
                   that.$.audio.src = '';
-                  that.setCoverImage();
+                  that._setCoverImage();
                 }
               );
           }
@@ -223,12 +225,13 @@
       }
     },
 
-    setCoverImage: function(img) {
+    _setCoverImage: function(img) {
       var url = '';
       if (img) {
         url = 'url("' + img + '")';
       }
-      // this.$.paperheaderpanel.shadowRoot.getElementById('headerBg').style.backgroundImage = url;
+      var root = this.$.shp.shadowRoot || this.$.shp;
+      root.querySelector('#headerBg').style.backgroundImage = url;
     },
 
     editAction: function(e, detail, sender) {
