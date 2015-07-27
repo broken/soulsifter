@@ -47,7 +47,7 @@
         <div class="flex">[[genre.name]]</div>
       </paper-material>
     </div>
-    <iron-collapse id="collapse">
+    <iron-collapse id="collapse" opened="{{opened}}">
       <template is="dom-repeat" items="[[_getSubGenres(genre)]]" id="subGenreTpl">
         <genre-list-item genre="[[item]]" indent="[[_incIndent(indent)]]" on-expand-parents="expand"></genre-list-item>
       </template>
@@ -66,6 +66,10 @@
         value: 0
       },
       isSelected: {
+        type: Boolean,
+        value: false
+      },
+      opened: {
         type: Boolean,
         value: false
       }
@@ -93,35 +97,27 @@
       }
     },
 
-    /** @method selectIfInArray */
-    selectIfInArray: function(genres) {
-      // deselect to set clean slate
-      this.$.collapse.opened = false;
-      if (this.isSelected) {
-        this.isSelected = !this.isSelected;
-        this._signalGenreToggle();
-      }
+    selectIffInArray: function(genres) {
       // select this and request parents to expand if found in array
+      var selected = false;
       for (var i = 0; i < genres.length; ++i) {
-        if (genres[i].id == this.genre.id) {
-          this.isSelected = !this.isSelected;
-          this._signalGenreToggle();
+        if (genres[i].id === this.genre.id) {
+          selected = true;
           this.fire('expand-parents');
         }
       }
+      this.opened = false;
+      this.isSelected = selected;
       // have all child elements check if they're in the array
-      if (this.genre.subGenre && this.genre.subGenre.length > 0) {
-        for (var i = 0, childNodes = Polymer.dom(this.$.collapse).childNodes;
-             i < childNodes.length; ++i) {
-          if (childNodes[i].nodeName === 'GENRE-LIST-ITEM') {
-            childNodes[i].selectIfInArray(genres);
-          }
-        }
+      for (var i = 0, childNodes = Polymer.dom(this.$.collapse).querySelectorAll('genre-list-item');
+           i < childNodes.length; ++i) {
+        childNodes[i].selectIffInArray(genres);
       }
     },
 
     expand: function() {
-      this.$.collapse.opened = true;
+      this.opened = true;
+      this.fire('expand-parents');
     },
 
     ready: function() {
@@ -143,8 +139,8 @@
     _toggleExpansion: function(e, detail, sender) {
       if (!this.genre.subGenre || this.genre.subGenre.length <= 0) return;
       this.$.collapse.toggle();
-      this.icon = this.$.collapse.opened ? 'expand-less' : 'expand-more';
-      e.stopPropagation();
+      this.icon = this.opened ? 'expand-less' : 'expand-more';
+      e.stopPropagation();  // TODO remove
     },
 
     _signalGenreToggle: function() {
