@@ -10,24 +10,17 @@
 
 <dom-module id="playlist-edit">
   <style is="custom-style">
-    #pageContainer {
-      width: 100%;
-      @apply(--layout-horizontal --layout-around-justified);
-    }
-
-    .vert {
-      @apply(--layout-vertical);
-    }
   </style>
   <template>
     <abstract-action-page id="abstractActionPage">
-      <div id="pageContainer">
-        <div class="vert">
-          <paper-input floatingLabel label="Name" value="{{playlist.name}}"></paper-input>
-          <paper-input floatingLabel label="Query" value="{{playlist.query}}"></paper-input>
-          <paper-checkbox label="from Song Trail" checked="{{fromSongTrail}}"></paper-checkbox>
-        </div>
-        <genre-list id="genreList" selection="{{genreSelection}}"></genre-list>
+      <div class="fields">
+        <paper-input floatingLabel label="Name" value="{{playlist.name}}"></paper-input>
+        <paper-input floatingLabel label="Query" value="{{playlist.query}}"></paper-input>
+        <br>
+        <paper-checkbox checked="{{fromSongTrail}}">from Song Trail</paper-checkbox>
+      </div>
+      <div class="genres">
+        <genre-list id="genreList" selection="{{playlist.styles}}"></genre-list>
       </div>
     </abstract-action-page>
   </template>
@@ -38,13 +31,12 @@
     is: 'playlist-edit',
 
     properties: {
-      playlist: {
-        type: Object,
-        observer: 'playlistChanged'
-      }
+      playlist: Object,
+      fromSongTrail: {
+        type: Boolean,
+        value: false
+      },
     },
-
-    fromSongTrail: false,
 
     attached: function() {
       // https://www.polymer-project.org/1.0/docs/migration.html#domready
@@ -53,12 +45,7 @@
       }.bind(this));
     },
 
-    playlistChanged: function(newValue, oldValue) {
-      this.$.genreList.setSelection(newValue.styles);
-    },
-
     save: function(e, detail, sender) {
-      if (this.genreSelection) this.playlist.styles = this.genreSelection;
       if (this.playlist.id) {
         this.playlist.update();
       } else {

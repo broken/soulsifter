@@ -45,11 +45,6 @@
     .label {
       font-size: 0.75em;
     }
-
-    .genres {
-      padding-right: 60px;
-      overflow-y: scroll;
-    }
   </style>
   <template>
     <abstract-action-page id="abstractActionPage">
@@ -81,7 +76,7 @@
         <paper-input label="Release Day" value="{{song.album.releaseDateDay}}" type="number" min="1" max="31" floatingLabel></paper-input>
       </div>
       <div class="genres">
-        <genre-list id="genreList" selection="{{selectedGenres}}"></genre-list>
+        <genre-list id="genreList" selection="{{song.styles}}"></genre-list>
       </div>
     </abstract-action-page>
   </template>
@@ -92,11 +87,7 @@
     is: 'song-edit',
 
     properties: {
-      song: {
-        type: Object,
-        observer: 'songChanged'
-      },
-      selectedGenres: Array,
+      song: Object,
     },
 
     attached: function() {
@@ -106,12 +97,7 @@
       }.bind(this));
     },
 
-    songChanged: function() {
-      this.selectedGenres = this.song.styles;
-    },
-
     save: function(e, detail, sender) {
-      this.song.styles = this.selectedGenres;
       if (this.song.id) {
         this.song.update();
       } else {

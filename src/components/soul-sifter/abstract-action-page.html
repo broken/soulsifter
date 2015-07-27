@@ -48,7 +48,13 @@
     /* mark the vertical blocks with class fields */
     :host::shadow .fields {
       @apply(--layout-vertical);
+      justify-content: center;
       margin-left: 200px;
+    }
+    :host::shadow .genres {
+      padding-left: 30px;
+      padding-right: 60px;
+      overflow-y: scroll;
     }
   </style>
   <template>
