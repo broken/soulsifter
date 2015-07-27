@@ -118,7 +118,7 @@
               p.min  = that.global.bpm * (100 - pitchPctMax) / 100;
               p.max = that.global.bpm * (100 + pitchPctMax) / 100;
             }
-            if (that.global.song) p.key = that.global.song.tonicKey;  // todo
+            //if (that.global.song) p.key = that.global.song.tonicKey;  // todo
             omitSongs = that.songTrail.map(function(e) { return e.song; });
           }
           that.songs = ss.SearchUtil.searchSongs(p.q, p.min, p.max, p.key, that.genres, omitSongs, that.settings.getInt('songList.limit'));
