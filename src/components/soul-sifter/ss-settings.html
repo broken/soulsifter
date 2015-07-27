@@ -8,49 +8,22 @@
 
 <dom-module id="ss-settings">
   <style is="custom-style">
-    #pageContainer {
-      @apply(--layout-horizontal);
-      @apply(--layout-around-justified);
-      width: 100%;
-    }
-
-    paper-input {
-      position: relative;
-      width: 240px;
-    }
-    paper-input::shadow paper-input-container {
-      padding: 3px 0;
-    }
-    paper-input /deep/ paper-input-container.paper-input div.label-is-floating label {
-      position: absolute;
-      left: inherit;
-      right: 260px;
-      top: 23px;
-      white-space: nowrap;
-      transform-origin: right top;
-    }
-
-    .vertical {
-      @apply(--layout-vertical);
-    }
   </style>
   <template>
     <abstract-action-page id="abstractActionPage">
-      <div id="pageContainer">
-        <div class="vertical">
-          <paper-input label="Music Directory" value="{{musicDir}}"></paper-input>
-          <br>
-          <paper-input label="Google Music Email" value="{{googleEmail}}"></paper-input>
-          <paper-input label="Google Music App Key" value="{{googleAppKey}}"></paper-input>
-          <br>
-          <paper-input label="Default song list limit" value="{{songListLimit}}" allowedPattern="[0-9]*" preventInvalidInput></paper-input>
-        </div>
-        <div class="vertical">
-          <paper-input label="Database Name" value="{{dbName}}"></paper-input>
-          <paper-input label="Database User" value="{{dbUser}}"></paper-input>
-          <paper-input label="Database Password" value="{{dbPassword}}"></paper-input>
-          <paper-input label="Database URL" value="{{dbUrl}}"></paper-input>
-        </div>
+      <div class="fields">
+        <paper-input label="Music Directory" value="{{musicDir}}"></paper-input>
+        <br>
+        <paper-input label="Google Music Email" value="{{googleEmail}}"></paper-input>
+        <paper-input label="Google Music App Key" value="{{googleAppKey}}"></paper-input>
+        <br>
+        <paper-input label="Default song list limit" value="{{songListLimit}}" allowedPattern="[0-9]*" preventInvalidInput></paper-input>
+      </div>
+      <div class="fields">
+        <paper-input label="Database Name" value="{{dbName}}"></paper-input>
+        <paper-input label="Database User" value="{{dbUser}}"></paper-input>
+        <paper-input label="Database Password" value="{{dbPassword}}"></paper-input>
+        <paper-input label="Database URL" value="{{dbUrl}}"></paper-input>
       </div>
     </abstract-action-page>
   </template>

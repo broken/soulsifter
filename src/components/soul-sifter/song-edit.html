@@ -11,9 +11,8 @@
 
 <dom-module id="song-edit">
   <style is="custom-style">
-    #pageContainer {
-      @apply(--layout-horizontal --layout-around-justified);
-      width: 100%;
+    :host {
+      font-size: 16px;
     }
 
     paper-input {
@@ -47,41 +46,42 @@
       font-size: 0.75em;
     }
 
-    .vertical {
-      @apply(--layout-vertical);
+    .genres {
+      padding-right: 60px;
+      overflow-y: scroll;
     }
   </style>
   <template>
     <abstract-action-page id="abstractActionPage">
-      <div id="pageContainer">
-        <div class="vertical">
-          <paper-input label="Artist" value="{{song.artist}}" required="true" floatingLabel></paper-input>
-          <paper-input label="Track Num" value="{{song.track}}" floatingLabel></paper-input>
-          <paper-input label="Title" value="{{song.title}}" required="true" floatingLabel></paper-input>
-          <paper-input label="Remixer" value="{{song.remixer}}" floatingLabel></paper-input>
-          <paper-input label="Comments" value="{{song.comments}}" floatingLabel></paper-input>
-          <div id="ratingContainer">
-            <div class="label">rating</div>
-            <ss-star-rating value="{{song.rating}}"></ss-star-rating>
-          </div>
-          <paper-input label="BPM" value="{{song.bpm}}" floatingLabel></paper-input>
-          <paper-input label="Key" value="{{song.tonicKey}}" floatingLabel></paper-input>
-          <paper-checkbox label="Low Quality" checked="{{song.lowQuality}}" floatingLabel></paper-checkbox>
-          <paper-checkbox label="Mixed" checked="{{song.album.mixed}}" floatingLabel></paper-checkbox>
+      <div class="fields">
+        <paper-input label="Artist" value="{{song.artist}}" required="true" floatingLabel></paper-input>
+        <paper-input label="Track Num" value="{{song.track}}" floatingLabel></paper-input>
+        <paper-input label="Title" value="{{song.title}}" required="true" floatingLabel></paper-input>
+        <paper-input label="Remixer" value="{{song.remixer}}" floatingLabel></paper-input>
+        <paper-input label="Comments" value="{{song.comments}}" floatingLabel></paper-input>
+        <div id="ratingContainer">
+          <div class="label">Rating</div>
+          <ss-star-rating value="{{song.rating}}"></ss-star-rating>
         </div>
-        <div class="vertical">
-          <paper-input label="Album Artist" value="{{song.album.artist}}" floatingLabel></paper-input>
-          <paper-input label="Album Name" value="{{song.album.name}}" required="true" floatingLabel></paper-input>
-          <paper-input label="POS" value="{{song.albumPart.pos}}" floatingLabel></paper-input>
-          <paper-input label="Subtitle" value="{{song.albumPart.name}}" floatingLabel></paper-input>
-          <paper-input label="Label" value="{{song.album.label}}" floatingLabel></paper-input>
-          <paper-input label="Catalog ID" value="{{song.album.catalogId}}" floatingLabel></paper-input>
-          <paper-input label="Genre" required="true" floatingLabel></paper-input>
-          <paper-input label="Release Year" value="{{song.album.releaseDateYear}}" required="true" type="number" min="1600" max="2099" floatingLabel></paper-input>
-          <paper-input label="Release Month" value="{{song.album.releaseDateMonth}}" type="number" min="1" max="12" floatingLabel></paper-input>
-          <paper-input label="Release Day" value="{{song.album.releaseDateDay}}" type="number" min="1" max="31" floatingLabel></paper-input>
-        </div>
-        <genre-list id="genreList" selection="{{genreSelection}}"></genre-list>
+        <paper-input label="BPM" value="{{song.bpm}}" floatingLabel></paper-input>
+        <paper-input label="Key" value="{{song.tonicKey}}" floatingLabel></paper-input>
+        <paper-checkbox checked="{{song.lowQuality}}">Low Quality</paper-checkbox>
+        <paper-checkbox checked="{{song.album.mixed}}">Mixed</paper-checkbox>
+      </div>
+      <div class="fields">
+        <paper-input label="Album Artist" value="{{song.album.artist}}" floatingLabel></paper-input>
+        <paper-input label="Album Name" value="{{song.album.name}}" required="true" floatingLabel></paper-input>
+        <paper-input label="POS" value="{{song.albumPart.pos}}" floatingLabel></paper-input>
+        <paper-input label="Subtitle" value="{{song.albumPart.name}}" floatingLabel></paper-input>
+        <paper-input label="Label" value="{{song.album.label}}" floatingLabel></paper-input>
+        <paper-input label="Catalog ID" value="{{song.album.catalogId}}" floatingLabel></paper-input>
+        <paper-input label="Genre" required="true" floatingLabel></paper-input>
+        <paper-input label="Release Year" value="{{song.album.releaseDateYear}}" required="true" type="number" min="1600" max="2099" floatingLabel></paper-input>
+        <paper-input label="Release Month" value="{{song.album.releaseDateMonth}}" type="number" min="1" max="12" floatingLabel></paper-input>
+        <paper-input label="Release Day" value="{{song.album.releaseDateDay}}" type="number" min="1" max="31" floatingLabel></paper-input>
+      </div>
+      <div class="genres">
+        <genre-list id="genreList" selection="{{selectedGenres}}"></genre-list>
       </div>
     </abstract-action-page>
   </template>
@@ -95,7 +95,8 @@
       song: {
         type: Object,
         observer: 'songChanged'
-      }
+      },
+      selectedGenres: Array,
     },
 
     attached: function() {
@@ -105,12 +106,12 @@
       }.bind(this));
     },
 
-    songChanged: function(newValue, oldValue) {
-      this.$.genreList.setSelection(newValue.styles);
+    songChanged: function() {
+      this.selectedGenres = this.song.styles;
     },
 
     save: function(e, detail, sender) {
-      this.song.styles = this.genreSelection;
+      this.song.styles = this.selectedGenres;
       if (this.song.id) {
         this.song.update();
       } else {
