@@ -49,6 +49,8 @@
       this.addEventListener('down', function(e) { e.preventDefault(); });
       // prevent selection further down the chain
       this.addEventListener('click', function(e) { e.preventDefault(); });
+      // prevent selection further down the chain
+      this.addEventListener('tap', function(e) { e.preventDefault(); });
 
       // open & close menu
       var menu = this.$.menu;

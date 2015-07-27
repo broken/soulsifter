@@ -96,7 +96,7 @@
     }
   </style>
   <template>
-    <div class="song-item" draggable="true" on-dragstart="dragSong" id="draggableItem">
+    <div class="song-item" draggable="true" on-dragstart="_dragSong" id="draggableItem">
       <div id="cover"></div>
       <div class="key fade-out flex">
         <span class="artist">[[song.artist]]</span>
@@ -104,11 +104,11 @@
         <span class="title">[[song.title]]</span>
       </div>
       <ss-options-menu>
-        <ss-options-menu-item on-click="clickEditAction">Edit song</ss-options-menu-item>
+        <ss-options-menu-item on-click="_openEditSongPage">Edit song</ss-options-menu-item>
       </ss-options-menu>
-      <div>[[_computeBpmShift(global.bpm)]]</div>
-      <ss-star-rating value="{{song.rating}}" read-only></ss-star-rating>
-      <time class="added">{{localeDate}}</time>
+      <div>[[_computeBpmShift(song, global.bpm)]]</div>
+      <ss-star-rating value="[[song.rating]]" read-only></ss-star-rating>
+      <time class="added">[[_computeLocaleDateString(song)]]</time>
     </div>
   </template>
 </dom-module>
@@ -122,47 +122,37 @@
     ],
 
     properties: {
-      song: Object,
-      musicDir: {
-        type: String,
-        value: function() { return (new ss.SoulSifterSettings()).getString('music.dir'); }
+      song: {
+        type: Object,
+        observer: '_songChanged'
       }
     },
 
-    localeDate: '',
-
-    attached: function() {
-      this.localeDate = new Date(this.song.dateAdded).toLocaleDateString();
+    _songChanged: function() {
       this.$.cover.style.backgroundImage = 'url("' + this.song.album.coverFilepath + '")';
     },
 
-    globalMusicDirChanged: function(newValue) {
-      //var filename = this.song.filePath.substr(this.song.filePath.lastIndexOf('/') + 1);
-      //var fp = newValue + this.song.filePath.substr(this.song.filePath.search('mp3') + 3);
-      //this.filepath = 'application/octet-stream:' + filename + ':file://' + fp;
+    _computeLocaleDateString: function(song) {
+      return new Date(this.song.dateAdded).toLocaleDateString();
     },
 
-    _computeBpmShift: function(bpm) {
+    _computeBpmShift: function(song, bpm) {
       if (!bpm) return '0.00';
-      var songBpm = this.song ? this.song.bpm : undefined;
+      var songBpm = song ? song.bpm : undefined;
       if (!songBpm) return 'n/a';
       if (Math.abs(songBpm - bpm) > Math.abs(songBpm/2 - bpm)) songBpm = songBpm / 2;
       else if (Math.abs(songBpm - bpm) > Math.abs(songBpm * 2 - bpm)) songBpm = songBpm * 2;
       return ((bpm / songBpm - 1) * 100).toFixed(2);
     },
 
-    dragSong: function(e) {
+    _dragSong: function(e) {
       e.dataTransfer.effectAllowed = 'move';
       e.dataTransfer.setData('text/plain', 'extensis-filenames-type:' + this.song.filepath);
     },
 
-    clickEditAction: function(e, detail, sender) {
-      e.stopPropagation();
+    _openEditSongPage: function(e, detail, sender) {
+      e.preventDefautl();
       this.fire('page-song-edit', {song: this.song});
-    },
-
-    stopPropagation: function(e, detail, sender) {
-      e.stopPropagation();
     },
   });
 </script>
