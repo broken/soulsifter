@@ -92,7 +92,7 @@ module.exports = function(grunt) {
     },
     bump: {
       options: {
-        files: ['version.json'], // 'package.json', 'src/package.json', 'bower.json'
+        files: ['version.json'], // 'package.json', 'src/package.json', 'bower.json'],
         updateConfigs: [],
         commit: false,
         commitMessage: 'Release v%VERSION%',
