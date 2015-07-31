@@ -84,20 +84,19 @@
       this.async(function() {
         this.$.createSongButton.ondragover = function() {
           this.icon = 'add-circle-outline';
+          return false;
         };
-        this.$.createSongButton.ondragend = function() {
+        this.$.createSongButton.ondragleave = function() {
           this.icon = 'add-circle';
+          return false;
         };
         this.$.createSongButton.ondrop = function(e) {
           e.preventDefault();
+          this.icon = 'add-circle';
           for (var i = 0; i < e.dataTransfer.files.length; ++i) {
-            var song = new ss.Song();
-            window.console.log(song);
-            /*song.setFilepath(e.dataTransfer.files[i].path);
             window.console.log(e.dataTransfer.files[i].path);
-            ss.MusicManager.readTagsFromSong(song);
-            window.console.log(song);*/
           }
+          return false;
         };
       }.bind(this));
     },
@@ -119,7 +118,8 @@
     },
 
     _openCreateSongPage: function(e, detail, sender) {
-      // this.fire('create-song');
+      // var song = new ss.Song();
+      // this.fire('page-song-edit', {song: song});
     },
   });
 </script>

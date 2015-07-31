@@ -23,6 +23,10 @@
 <script>
   var gui = require('nw.gui');
 
+  // prevent default behavior from changing page on dropped file
+  window.ondragover = function(e) { e.preventDefault(); return false };
+  window.ondrop = function(e) { e.preventDefault(); return false };
+
   // create osx menu bar defaults
   var mb = new gui.Menu({type:"menubar"});
   mb.createMacBuiltin("Soul Sifter");
