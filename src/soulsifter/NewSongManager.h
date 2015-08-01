@@ -6,6 +6,8 @@
 
 #include <boost/filesystem.hpp>
 
+using namespace std;
+
 namespace dogatech {
 namespace soulsifter {
 
@@ -20,7 +22,7 @@ public:
    * When wanting to add files, the first step will be to import a list
    * of file paths. You should only import one album at a time.
    */
-  void import(const std::vector<std::string>& filepaths);
+  void import(const vector<string>& filepaths);
 
   /**
    * After importing the file paths, you can pull off songs to import. The
@@ -33,7 +35,7 @@ public:
   /**
    * This will return the cover image file path associated with the album.
    */
-  std::string coverImagePath();
+  string coverImagePath();
 
   /**
    * Use this to save a song after editing. It allows for future imports to
@@ -49,7 +51,7 @@ public:
 private:
   bool hasMovedFile;
   FilesToAdd* filesToAdd;
-  std::vector<std::string> filesToTrash;
+  vector<string> filesToTrash;
 
   void preprocessAllFiles(const vector<boost::filesystem::path>& filepaths);
 

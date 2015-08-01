@@ -20,9 +20,9 @@ class NewSongManager : public node::ObjectWrap {
 
   static NAN_METHOD(New);
 
-  // Unable to process import
+  static NAN_METHOD(import);
   static NAN_METHOD(nextSong);
-  // Unable to process coverImagePath
+  static NAN_METHOD(coverImagePath);
   static NAN_METHOD(processSong);
   static NAN_METHOD(trashMusicFile);
 
