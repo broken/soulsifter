@@ -26,6 +26,7 @@ class Style : public node::ObjectWrap {
   static NAN_METHOD(findAll);
   static NAN_METHOD(update);
   static NAN_METHOD(save);
+  static NAN_METHOD(sync);
   static NAN_METHOD(findAllParents);
   // Unable to process findAllSortedByName
   // Unable to process findAllSortedByREId

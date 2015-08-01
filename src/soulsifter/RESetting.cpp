@@ -126,6 +126,7 @@ namespace soulsifter {
 
     int RESetting::update() {
         try {
+
             sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("update RESettings set name=?, value=? where id=?");
             ps->setString(1, name);
             ps->setString(2, value);
@@ -144,6 +145,7 @@ namespace soulsifter {
 
     int RESetting::save() {
         try {
+
             sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("insert into RESettings (name, value) values (?, ?)");
             ps->setString(1, name);
             ps->setString(2, value);
@@ -167,6 +169,45 @@ namespace soulsifter {
             cerr << ", SQLState: " << e.getSQLState() << ")" << endl;
             exit(1);
         }
+    }
+
+    bool RESetting::sync() {
+        RESetting* reSetting = findById(id);
+        if (!reSetting) reSetting = findByName(name);
+        if (!reSetting) {
+            return true;
+        }
+
+        // check fields
+        bool needsUpdate = false;
+        boost::regex decimal("(-?\\d+)\\.?\\d*");
+        boost::smatch match1;
+        boost::smatch match2;
+        if (id != reSetting->getId()) {
+            if (id) {
+                cout << "updating reSetting " << id << " id from " << reSetting->getId() << " to " << id << endl;
+                needsUpdate = true;
+            } else {
+                id = reSetting->getId();
+            }
+        }
+        if (name.compare(reSetting->getName())  && (!boost::regex_match(name, match1, decimal) || !boost::regex_match(reSetting->getName(), match2, decimal) || match1[1].str().compare(match2[1].str()))) {
+            if (!name.empty()) {
+                cout << "updating reSetting " << id << " name from " << reSetting->getName() << " to " << name << endl;
+                needsUpdate = true;
+            } else {
+                name = reSetting->getName();
+            }
+        }
+        if (value.compare(reSetting->getValue())  && (!boost::regex_match(value, match1, decimal) || !boost::regex_match(reSetting->getValue(), match2, decimal) || match1[1].str().compare(match2[1].str()))) {
+            if (!value.empty()) {
+                cout << "updating reSetting " << id << " value from " << reSetting->getValue() << " to " << value << endl;
+                needsUpdate = true;
+            } else {
+                value = reSetting->getValue();
+            }
+        }
+        return needsUpdate;
     }
 
 

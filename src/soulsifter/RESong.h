@@ -38,6 +38,8 @@ namespace soulsifter {
 
         int update();
         int save();
+        // sync with db & return true if object needs saving or updating
+        bool sync();
 
         friend class RapidEvolutionDatabaseSongsSongHandler;
 

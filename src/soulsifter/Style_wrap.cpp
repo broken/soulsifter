@@ -49,6 +49,7 @@ void Style::Init(v8::Handle<v8::Object> exports) {
   NanSetTemplate(tpl, "findAll", NanNew<v8::FunctionTemplate>(findAll)->GetFunction());
   NanSetPrototypeTemplate(tpl, "update", NanNew<v8::FunctionTemplate>(update)->GetFunction());
   NanSetPrototypeTemplate(tpl, "save", NanNew<v8::FunctionTemplate>(save)->GetFunction());
+  NanSetPrototypeTemplate(tpl, "sync", NanNew<v8::FunctionTemplate>(sync)->GetFunction());
   NanSetTemplate(tpl, "findAllParents", NanNew<v8::FunctionTemplate>(findAllParents)->GetFunction());
   // Unable to process findAllSortedByName
   // Unable to process findAllSortedByREId
@@ -139,6 +140,15 @@ NAN_METHOD(Style::save) {
   int result =  obj->style->save();
 
   NanReturnValue(NanNew<v8::Number>(result));
+}
+
+NAN_METHOD(Style::sync) {
+  NanScope();
+
+  Style* obj = ObjectWrap::Unwrap<Style>(args.This());
+  bool result =  obj->style->sync();
+
+  NanReturnValue(NanNew<v8::Boolean>(result));
 }
 
 NAN_METHOD(Style::findAllParents) {

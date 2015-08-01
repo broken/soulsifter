@@ -167,6 +167,7 @@ namespace soulsifter {
 
     int Playlist::update() {
         try {
+
             sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("update Playlists set name=?, query=?, gmusicId=? where id=?");
             ps->setString(1, name);
             ps->setString(2, query);
@@ -242,6 +243,7 @@ namespace soulsifter {
 
     int Playlist::save() {
         try {
+
             sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("insert into Playlists (name, query, gmusicId) values (?, ?, ?)");
             ps->setString(1, name);
             ps->setString(2, query);
@@ -294,6 +296,66 @@ namespace soulsifter {
             cerr << ", SQLState: " << e.getSQLState() << ")" << endl;
             exit(1);
         }
+    }
+
+    bool Playlist::sync() {
+        Playlist* playlist = findById(id);
+        if (!playlist) {
+            return true;
+        }
+
+        // check fields
+        bool needsUpdate = false;
+        boost::regex decimal("(-?\\d+)\\.?\\d*");
+        boost::smatch match1;
+        boost::smatch match2;
+        if (id != playlist->getId()) {
+            if (id) {
+                cout << "updating playlist " << id << " id from " << playlist->getId() << " to " << id << endl;
+                needsUpdate = true;
+            } else {
+                id = playlist->getId();
+            }
+        }
+        if (name.compare(playlist->getName())  && (!boost::regex_match(name, match1, decimal) || !boost::regex_match(playlist->getName(), match2, decimal) || match1[1].str().compare(match2[1].str()))) {
+            if (!name.empty()) {
+                cout << "updating playlist " << id << " name from " << playlist->getName() << " to " << name << endl;
+                needsUpdate = true;
+            } else {
+                name = playlist->getName();
+            }
+        }
+        if (query.compare(playlist->getQuery())  && (!boost::regex_match(query, match1, decimal) || !boost::regex_match(playlist->getQuery(), match2, decimal) || match1[1].str().compare(match2[1].str()))) {
+            if (!query.empty()) {
+                cout << "updating playlist " << id << " query from " << playlist->getQuery() << " to " << query << endl;
+                needsUpdate = true;
+            } else {
+                query = playlist->getQuery();
+            }
+        }
+        if (gmusicId.compare(playlist->getGmusicId())  && (!boost::regex_match(gmusicId, match1, decimal) || !boost::regex_match(playlist->getGmusicId(), match2, decimal) || match1[1].str().compare(match2[1].str()))) {
+            if (!gmusicId.empty()) {
+                cout << "updating playlist " << id << " gmusicId from " << playlist->getGmusicId() << " to " << gmusicId << endl;
+                needsUpdate = true;
+            } else {
+                gmusicId = playlist->getGmusicId();
+            }
+        }
+        if (!equivalentVectors<int>(playlistEntryIds, playlist->getPlaylistEntryIds())) {
+            if (!containsVector<int>(playlistEntryIds, playlist->getPlaylistEntryIds())) {
+                cout << "updating playlist " << id << " playlistEntryIds" << endl;
+                needsUpdate = true;
+            }
+            appendUniqueVector<int>(playlist->getPlaylistEntryIds(), &playlistEntryIds);
+        }
+        if (!equivalentVectors<int>(styleIds, playlist->getStyleIds())) {
+            if (!containsVector<int>(styleIds, playlist->getStyleIds())) {
+                cout << "updating playlist " << id << " styleIds" << endl;
+                needsUpdate = true;
+            }
+            appendUniqueVector<int>(playlist->getStyleIds(), &styleIds);
+        }
+        return needsUpdate;
     }
 
     int Playlist::erase() {

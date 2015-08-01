@@ -49,6 +49,7 @@ void BasicGenre::Init(v8::Handle<v8::Object> exports) {
   NanSetTemplate(tpl, "findAll", NanNew<v8::FunctionTemplate>(findAll)->GetFunction());
   NanSetPrototypeTemplate(tpl, "update", NanNew<v8::FunctionTemplate>(update)->GetFunction());
   NanSetPrototypeTemplate(tpl, "save", NanNew<v8::FunctionTemplate>(save)->GetFunction());
+  NanSetPrototypeTemplate(tpl, "sync", NanNew<v8::FunctionTemplate>(sync)->GetFunction());
   NanSetTemplate(tpl, "findByFilepath", NanNew<v8::FunctionTemplate>(findByFilepath)->GetFunction());
   tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("id"), getId, setId);
   tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("name"), getName, setName);
@@ -131,6 +132,15 @@ NAN_METHOD(BasicGenre::save) {
   int result =  obj->basicgenre->save();
 
   NanReturnValue(NanNew<v8::Number>(result));
+}
+
+NAN_METHOD(BasicGenre::sync) {
+  NanScope();
+
+  BasicGenre* obj = ObjectWrap::Unwrap<BasicGenre>(args.This());
+  bool result =  obj->basicgenre->sync();
+
+  NanReturnValue(NanNew<v8::Boolean>(result));
 }
 
 NAN_METHOD(BasicGenre::findByFilepath) {

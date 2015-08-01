@@ -56,6 +56,7 @@ void Song::Init(v8::Handle<v8::Object> exports) {
   NanSetTemplate(tpl, "findAll", NanNew<v8::FunctionTemplate>(findAll)->GetFunction());
   NanSetPrototypeTemplate(tpl, "update", NanNew<v8::FunctionTemplate>(update)->GetFunction());
   NanSetPrototypeTemplate(tpl, "save", NanNew<v8::FunctionTemplate>(save)->GetFunction());
+  NanSetPrototypeTemplate(tpl, "sync", NanNew<v8::FunctionTemplate>(sync)->GetFunction());
   // Unable to process createRESongFromSong
   NanSetPrototypeTemplate(tpl, "reAlbum", NanNew<v8::FunctionTemplate>(reAlbum)->GetFunction());
   tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("dateAddedString"), getDateAddedString);
@@ -181,6 +182,15 @@ NAN_METHOD(Song::save) {
   int result =  obj->song->save();
 
   NanReturnValue(NanNew<v8::Number>(result));
+}
+
+NAN_METHOD(Song::sync) {
+  NanScope();
+
+  Song* obj = ObjectWrap::Unwrap<Song>(args.This());
+  bool result =  obj->song->sync();
+
+  NanReturnValue(NanNew<v8::Boolean>(result));
 }
 
 NAN_METHOD(Song::reAlbum) {

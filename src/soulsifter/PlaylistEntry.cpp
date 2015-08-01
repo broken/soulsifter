@@ -155,6 +155,27 @@ namespace soulsifter {
 
     int PlaylistEntry::update() {
         try {
+            if (playlist && playlist->sync()) {
+                if (playlist->getId()) {
+                    playlist->update();
+                } else {
+                    playlist->save();
+                }
+                playlistId = playlist->getId();
+            } else if (!playlistId && playlist) {
+                playlistId = playlist->getId();
+            }
+            if (song && song->sync()) {
+                if (song->getId()) {
+                    song->update();
+                } else {
+                    song->save();
+                }
+                songId = song->getId();
+            } else if (!songId && song) {
+                songId = song->getId();
+            }
+
             sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("update PlaylistEntries set playlistId=?, songId=?, position=?, time=? where id=?");
             ps->setInt(1, playlistId);
             ps->setInt(2, songId);
@@ -175,30 +196,27 @@ namespace soulsifter {
 
     int PlaylistEntry::save() {
         try {
-            if (playlist && (!playlist->getId() || !Playlist::findById(playlist->getId()))) {
-                if (playlist->save()) {
-                    if (playlist->getId()) {
-                        playlistId = playlist->getId();
-                    } else {
-                        playlistId = MysqlAccess::getInstance().getLastInsertId();
-                        playlist->setId(playlistId);
-                    }
+            if (playlist && playlist->sync()) {
+                if (playlist->getId()) {
+                    playlist->update();
                 } else {
-                    cerr << "Unable to save playlist" << endl;
+                    playlist->save();
                 }
+                playlistId = playlist->getId();
+            } else if (!playlistId && playlist) {
+                playlistId = playlist->getId();
             }
-            if (song && (!song->getId() || !Song::findById(song->getId()))) {
-                if (song->save()) {
-                    if (song->getId()) {
-                        songId = song->getId();
-                    } else {
-                        songId = MysqlAccess::getInstance().getLastInsertId();
-                        song->setId(songId);
-                    }
+            if (song && song->sync()) {
+                if (song->getId()) {
+                    song->update();
                 } else {
-                    cerr << "Unable to save song" << endl;
+                    song->save();
                 }
+                songId = song->getId();
+            } else if (!songId && song) {
+                songId = song->getId();
             }
+
             sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("insert into PlaylistEntries (playlistId, songId, position, time) values (?, ?, ?, ?)");
             ps->setInt(1, playlistId);
             ps->setInt(2, songId);
@@ -224,6 +242,71 @@ namespace soulsifter {
             cerr << ", SQLState: " << e.getSQLState() << ")" << endl;
             exit(1);
         }
+    }
+
+    bool PlaylistEntry::sync() {
+        PlaylistEntry* playlistEntry = findById(id);
+        if (!playlistEntry) playlistEntry = findByPlaylistIdAndSongId(playlistId, songId);
+        if (!playlistEntry) {
+            if (!playlistId && playlist) {
+                playlist->sync();
+                playlistId = playlist->getId();
+            }
+            if (!songId && song) {
+                song->sync();
+                songId = song->getId();
+            }
+            return true;
+        }
+
+        // check fields
+        bool needsUpdate = false;
+        boost::regex decimal("(-?\\d+)\\.?\\d*");
+        boost::smatch match1;
+        boost::smatch match2;
+        if (id != playlistEntry->getId()) {
+            if (id) {
+                cout << "updating playlistEntry " << id << " id from " << playlistEntry->getId() << " to " << id << endl;
+                needsUpdate = true;
+            } else {
+                id = playlistEntry->getId();
+            }
+        }
+        if (playlistId != playlistEntry->getPlaylistId()) {
+            if (playlistId) {
+                cout << "updating playlistEntry " << id << " playlistId from " << playlistEntry->getPlaylistId() << " to " << playlistId << endl;
+                needsUpdate = true;
+            } else {
+                playlistId = playlistEntry->getPlaylistId();
+            }
+        }
+        if (playlist) needsUpdate |= playlist->sync();
+        if (songId != playlistEntry->getSongId()) {
+            if (songId) {
+                cout << "updating playlistEntry " << id << " songId from " << playlistEntry->getSongId() << " to " << songId << endl;
+                needsUpdate = true;
+            } else {
+                songId = playlistEntry->getSongId();
+            }
+        }
+        if (song) needsUpdate |= song->sync();
+        if (position != playlistEntry->getPosition()) {
+            if (position) {
+                cout << "updating playlistEntry " << id << " position from " << playlistEntry->getPosition() << " to " << position << endl;
+                needsUpdate = true;
+            } else {
+                position = playlistEntry->getPosition();
+            }
+        }
+        if (time.compare(playlistEntry->getTime())  && (!boost::regex_match(time, match1, decimal) || !boost::regex_match(playlistEntry->getTime(), match2, decimal) || match1[1].str().compare(match2[1].str()))) {
+            if (!time.empty()) {
+                cout << "updating playlistEntry " << id << " time from " << playlistEntry->getTime() << " to " << time << endl;
+                needsUpdate = true;
+            } else {
+                time = playlistEntry->getTime();
+            }
+        }
+        return needsUpdate;
     }
 
     int PlaylistEntry::erase() {

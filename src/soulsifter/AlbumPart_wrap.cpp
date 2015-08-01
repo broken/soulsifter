@@ -51,6 +51,7 @@ void AlbumPart::Init(v8::Handle<v8::Object> exports) {
   NanSetTemplate(tpl, "findAll", NanNew<v8::FunctionTemplate>(findAll)->GetFunction());
   NanSetPrototypeTemplate(tpl, "update", NanNew<v8::FunctionTemplate>(update)->GetFunction());
   NanSetPrototypeTemplate(tpl, "save", NanNew<v8::FunctionTemplate>(save)->GetFunction());
+  NanSetPrototypeTemplate(tpl, "sync", NanNew<v8::FunctionTemplate>(sync)->GetFunction());
   tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("id"), getId, setId);
   tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("pos"), getPos, setPos);
   tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("name"), getName, setName);
@@ -136,6 +137,15 @@ NAN_METHOD(AlbumPart::save) {
   int result =  obj->albumpart->save();
 
   NanReturnValue(NanNew<v8::Number>(result));
+}
+
+NAN_METHOD(AlbumPart::sync) {
+  NanScope();
+
+  AlbumPart* obj = ObjectWrap::Unwrap<AlbumPart>(args.This());
+  bool result =  obj->albumpart->sync();
+
+  NanReturnValue(NanNew<v8::Boolean>(result));
 }
 
 NAN_GETTER(AlbumPart::getId) {

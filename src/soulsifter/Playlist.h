@@ -40,6 +40,8 @@ namespace soulsifter {
 
         int update();
         int save();
+        // sync with db & return true if object needs saving or updating
+        bool sync();
         int erase();
 
         const int getId() const;

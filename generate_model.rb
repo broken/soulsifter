@@ -129,6 +129,10 @@ def sqlCatchBlock()
   return "        } catch (sql::SQLException &e) {\n            cerr << \"ERROR: SQLException in \" << __FILE__;\n            cerr << \" (\" << __func__<< \") on line \" << __LINE__ << endl;\n            cerr << \"ERROR: \" << e.what();\n            cerr << \" (MySQL error code: \" << e.getErrorCode();\n            cerr << \", SQLState: \" << e.getSQLState() << \")\" << endl;\n            exit(1);\n        }\n"
 end
 
+def syncChildBlock(f)
+  return "            if (#{f[$name]} && #{f[$name]}->sync()) {\n                if (#{f[$name]}->getId()) {\n                    #{f[$name]}->update();\n                } else {\n                    #{f[$name]}->save();\n                }\n                #{f[$name]}Id = #{f[$name]}->getId();\n            } else if (!#{f[$name]}Id && #{f[$name]}) {\n                #{f[$name]}Id = #{f[$name]}->getId();\n            }\n"
+end
+
 def hFieldDeclaration(f)
   str = "        #{f[$type]}#{'*' if (f[$attrib] & Attrib::PTR > 0)} #{f[$name]};"
   str << "  // transient" if (f[$attrib] & Attrib::TRANSIENT > 0)
@@ -332,7 +336,7 @@ def cFindAllFunction(name, fields)
 end
 
 def hSyncFunction()
-  return "        bool sync();\n"
+  return "        // sync with db & return true if object needs saving or updating\n        bool sync();\n"
 end
 
 def cSyncFunction(name, fields, secondaryKeys)
@@ -354,7 +358,11 @@ def cSyncFunction(name, fields, secondaryKeys)
     end
     str << ");\n"
   end
-  str << "        if (!#{name}) {\n            return true;\n        }\n\n"
+  str << "        if (!#{name}) {\n"
+  fields.select{|f| f[$attrib] & Attrib::PTR > 0}.each do |f|
+    str << "            if (!#{f[$name]}Id && #{f[$name]}) {\n                #{f[$name]}->sync();\n                #{f[$name]}Id = #{f[$name]}->getId();\n            }\n"
+  end
+  str << "            return true;\n        }\n\n"
   str << "        // check fields\n        bool needsUpdate = false;\n"
   str << "        boost::regex decimal(\"(-?\\\\d+)\\\\.?\\\\d*\");\n        boost::smatch match1;\n        boost::smatch match2;\n"
   fields.each do |f|
@@ -396,6 +404,10 @@ end
 
 def cUpdateFunction(name, fields)
   str = "    int #{cap(name)}::update() {\n        try {\n"
+  fields.select{|f| f[$attrib] & Attrib::PTR > 0}.each do |f|
+    str << syncChildBlock(f)
+  end
+  str << "\n"
   str << "            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement(\"update #{cap(plural(name))} set "
   fields.each do |f|
     next if (f[$name] == "id" || f[$attrib] & Attrib::PTR > 0 || isVector(f[$type]) || f[$attrib] & Attrib::TRANSIENT > 0)
@@ -441,20 +453,13 @@ end
 
 def cSaveFunction(name, fields, attribs)
   str = "    int #{cap(name)}::save() {\n        try {\n"
+  fields.select{|f| f[$attrib] & Attrib::PTR > 0}.each do |f|
+    str << syncChildBlock(f)
+  end
   if (attribs & Attrib::SAVEID > 0)
     str << "            if (id == 0) {\n                sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement(\"select max(id) from #{cap(plural(name))}\");\n                sql::ResultSet *rs = ps->executeQuery();\n                rs->next();\n                id = rs->getInt(1) + 1;\n                rs->close();\n                delete rs;\n            }\n"
   end
-  fields.each do |f|
-    next unless (f[$attrib] & Attrib::PTR > 0)
-    str << "            if (#{f[$name]} && (!#{f[$name]}->getId() || !#{cap(f[$type])}::findById(#{f[$name]}->getId()))) {\n"
-    str << "                if (#{f[$name]}->save()) {\n"
-    str << "                    if (#{f[$name]}->getId()) {\n"
-    str << "                        #{f[$name]}Id = #{f[1]}->getId();\n"
-    str << "                    } else {\n"
-    str << "                        #{f[$name]}Id = MysqlAccess::getInstance().getLastInsertId();\n                        #{f[$name]}->setId(#{f[1]}Id);\n                    }\n"
-    str << "                } else {\n"
-    str << "                    cerr << \"Unable to save #{f[$name]}\" << endl;\n                }\n            }\n"
-  end
+  str << "\n"
   str << "            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement(\"insert into #{cap(plural(name))} ("
   i = 0
   fields.each do |f|
@@ -658,6 +663,7 @@ def writeHeader (name, fields, attribs, customMethods, customHeaders)
   str << "\n"
   str << hUpdateFunction()
   str << hSaveFunction()
+  str << hSyncFunction()
   if (attribs & Attrib::DELETABLE > 0)
     str << hEraseFunction()
   end
@@ -716,6 +722,7 @@ def writeCode (name, fields, attribs)
   str << "\n# pragma mark persistence\n\n"
   str << cUpdateFunction(name, fields)
   str << cSaveFunction(name, fields, attribs)
+  str << cSyncFunction(name, fields, secondaryKeys)
   if (attribs & Attrib::DELETABLE > 0)
     str << cEraseFunction(name, fields)
   end

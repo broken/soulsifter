@@ -164,6 +164,27 @@ namespace soulsifter {
 
     int Mix::update() {
         try {
+            if (outSong && outSong->sync()) {
+                if (outSong->getId()) {
+                    outSong->update();
+                } else {
+                    outSong->save();
+                }
+                outSongId = outSong->getId();
+            } else if (!outSongId && outSong) {
+                outSongId = outSong->getId();
+            }
+            if (inSong && inSong->sync()) {
+                if (inSong->getId()) {
+                    inSong->update();
+                } else {
+                    inSong->save();
+                }
+                inSongId = inSong->getId();
+            } else if (!inSongId && inSong) {
+                inSongId = inSong->getId();
+            }
+
             sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("update Mixes set outSongId=?, inSongId=?, bpmDiff=?, rank=?, comments=?, addon=? where id=?");
             ps->setInt(1, outSongId);
             ps->setInt(2, inSongId);
@@ -186,30 +207,27 @@ namespace soulsifter {
 
     int Mix::save() {
         try {
-            if (outSong && (!outSong->getId() || !Song::findById(outSong->getId()))) {
-                if (outSong->save()) {
-                    if (outSong->getId()) {
-                        outSongId = outSong->getId();
-                    } else {
-                        outSongId = MysqlAccess::getInstance().getLastInsertId();
-                        outSong->setId(outSongId);
-                    }
+            if (outSong && outSong->sync()) {
+                if (outSong->getId()) {
+                    outSong->update();
                 } else {
-                    cerr << "Unable to save outSong" << endl;
+                    outSong->save();
                 }
+                outSongId = outSong->getId();
+            } else if (!outSongId && outSong) {
+                outSongId = outSong->getId();
             }
-            if (inSong && (!inSong->getId() || !Song::findById(inSong->getId()))) {
-                if (inSong->save()) {
-                    if (inSong->getId()) {
-                        inSongId = inSong->getId();
-                    } else {
-                        inSongId = MysqlAccess::getInstance().getLastInsertId();
-                        inSong->setId(inSongId);
-                    }
+            if (inSong && inSong->sync()) {
+                if (inSong->getId()) {
+                    inSong->update();
                 } else {
-                    cerr << "Unable to save inSong" << endl;
+                    inSong->save();
                 }
+                inSongId = inSong->getId();
+            } else if (!inSongId && inSong) {
+                inSongId = inSong->getId();
             }
+
             sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("insert into Mixes (outSongId, inSongId, bpmDiff, rank, comments, addon) values (?, ?, ?, ?, ?, ?)");
             ps->setInt(1, outSongId);
             ps->setInt(2, inSongId);
@@ -237,6 +255,87 @@ namespace soulsifter {
             cerr << ", SQLState: " << e.getSQLState() << ")" << endl;
             exit(1);
         }
+    }
+
+    bool Mix::sync() {
+        Mix* mix = findById(id);
+        if (!mix) mix = findByOutSongIdAndInSongId(outSongId, inSongId);
+        if (!mix) {
+            if (!outSongId && outSong) {
+                outSong->sync();
+                outSongId = outSong->getId();
+            }
+            if (!inSongId && inSong) {
+                inSong->sync();
+                inSongId = inSong->getId();
+            }
+            return true;
+        }
+
+        // check fields
+        bool needsUpdate = false;
+        boost::regex decimal("(-?\\d+)\\.?\\d*");
+        boost::smatch match1;
+        boost::smatch match2;
+        if (id != mix->getId()) {
+            if (id) {
+                cout << "updating mix " << id << " id from " << mix->getId() << " to " << id << endl;
+                needsUpdate = true;
+            } else {
+                id = mix->getId();
+            }
+        }
+        if (outSongId != mix->getOutSongId()) {
+            if (outSongId) {
+                cout << "updating mix " << id << " outSongId from " << mix->getOutSongId() << " to " << outSongId << endl;
+                needsUpdate = true;
+            } else {
+                outSongId = mix->getOutSongId();
+            }
+        }
+        if (outSong) needsUpdate |= outSong->sync();
+        if (inSongId != mix->getInSongId()) {
+            if (inSongId) {
+                cout << "updating mix " << id << " inSongId from " << mix->getInSongId() << " to " << inSongId << endl;
+                needsUpdate = true;
+            } else {
+                inSongId = mix->getInSongId();
+            }
+        }
+        if (inSong) needsUpdate |= inSong->sync();
+        if (bpmDiff.compare(mix->getBpmDiff())  && (!boost::regex_match(bpmDiff, match1, decimal) || !boost::regex_match(mix->getBpmDiff(), match2, decimal) || match1[1].str().compare(match2[1].str()))) {
+            if (!bpmDiff.empty()) {
+                cout << "updating mix " << id << " bpmDiff from " << mix->getBpmDiff() << " to " << bpmDiff << endl;
+                needsUpdate = true;
+            } else {
+                bpmDiff = mix->getBpmDiff();
+            }
+        }
+        if (rank != mix->getRank()) {
+            if (rank) {
+                cout << "updating mix " << id << " rank from " << mix->getRank() << " to " << rank << endl;
+                needsUpdate = true;
+            } else {
+                rank = mix->getRank();
+            }
+        }
+        if (comments.compare(mix->getComments())  && (!boost::regex_match(comments, match1, decimal) || !boost::regex_match(mix->getComments(), match2, decimal) || match1[1].str().compare(match2[1].str()))) {
+            if (!comments.empty()) {
+                cout << "updating mix " << id << " comments from " << mix->getComments() << " to " << comments << endl;
+                needsUpdate = true;
+            } else {
+                comments = mix->getComments();
+            }
+        }
+        if (addon != mix->getAddon()) {
+            if (addon) {
+                cout << "updating mix " << id << " addon from " << mix->getAddon() << " to " << addon << endl;
+                needsUpdate = true;
+            } else {
+                addon = mix->getAddon();
+            }
+        }
+        return needsUpdate;
     }
 
 

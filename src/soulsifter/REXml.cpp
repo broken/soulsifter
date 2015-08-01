@@ -126,6 +126,7 @@ namespace soulsifter {
 
     int REXml::update() {
         try {
+
             sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("update REXml set name=?, xml=? where id=?");
             ps->setString(1, name);
             ps->setString(2, xml);
@@ -144,6 +145,7 @@ namespace soulsifter {
 
     int REXml::save() {
         try {
+
             sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("insert into REXml (name, xml) values (?, ?)");
             ps->setString(1, name);
             ps->setString(2, xml);
@@ -167,6 +169,45 @@ namespace soulsifter {
             cerr << ", SQLState: " << e.getSQLState() << ")" << endl;
             exit(1);
         }
+    }
+
+    bool REXml::sync() {
+        REXml* reXml = findById(id);
+        if (!reXml) reXml = findByName(name);
+        if (!reXml) {
+            return true;
+        }
+
+        // check fields
+        bool needsUpdate = false;
+        boost::regex decimal("(-?\\d+)\\.?\\d*");
+        boost::smatch match1;
+        boost::smatch match2;
+        if (id != reXml->getId()) {
+            if (id) {
+                cout << "updating reXml " << id << " id from " << reXml->getId() << " to " << id << endl;
+                needsUpdate = true;
+            } else {
+                id = reXml->getId();
+            }
+        }
+        if (name.compare(reXml->getName())  && (!boost::regex_match(name, match1, decimal) || !boost::regex_match(reXml->getName(), match2, decimal) || match1[1].str().compare(match2[1].str()))) {
+            if (!name.empty()) {
+                cout << "updating reXml " << id << " name from " << reXml->getName() << " to " << name << endl;
+                needsUpdate = true;
+            } else {
+                name = reXml->getName();
+            }
+        }
+        if (xml.compare(reXml->getXml())  && (!boost::regex_match(xml, match1, decimal) || !boost::regex_match(reXml->getXml(), match2, decimal) || match1[1].str().compare(match2[1].str()))) {
+            if (!xml.empty()) {
+                cout << "updating reXml " << id << " xml from " << reXml->getXml() << " to " << xml << endl;
+                needsUpdate = true;
+            } else {
+                xml = reXml->getXml();
+            }
+        }
+        return needsUpdate;
     }
 
 

@@ -274,6 +274,37 @@ namespace soulsifter {
 
     int Song::update() {
         try {
+            if (reSong && reSong->sync()) {
+                if (reSong->getId()) {
+                    reSong->update();
+                } else {
+                    reSong->save();
+                }
+                reSongId = reSong->getId();
+            } else if (!reSongId && reSong) {
+                reSongId = reSong->getId();
+            }
+            if (album && album->sync()) {
+                if (album->getId()) {
+                    album->update();
+                } else {
+                    album->save();
+                }
+                albumId = album->getId();
+            } else if (!albumId && album) {
+                albumId = album->getId();
+            }
+            if (albumPart && albumPart->sync()) {
+                if (albumPart->getId()) {
+                    albumPart->update();
+                } else {
+                    albumPart->save();
+                }
+                albumPartId = albumPart->getId();
+            } else if (!albumPartId && albumPart) {
+                albumPartId = albumPart->getId();
+            }
+
             sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("update Songs set artist=?, track=?, title=?, remixer=?, featuring=?, filepath=?, rating=?, dateAdded=?, bpm=?, tonicKeys=?, tonicKey=?, comments=?, trashed=?, lowQuality=?, reSongId=?, albumId=?, albumPartId=? where id=?");
             ps->setString(1, artist);
             ps->setString(2, track);
@@ -336,42 +367,37 @@ namespace soulsifter {
 
     int Song::save() {
         try {
-            if (reSong && (!reSong->getId() || !RESong::findById(reSong->getId()))) {
-                if (reSong->save()) {
-                    if (reSong->getId()) {
-                        reSongId = reSong->getId();
-                    } else {
-                        reSongId = MysqlAccess::getInstance().getLastInsertId();
-                        reSong->setId(reSongId);
-                    }
+            if (reSong && reSong->sync()) {
+                if (reSong->getId()) {
+                    reSong->update();
                 } else {
-                    cerr << "Unable to save reSong" << endl;
+                    reSong->save();
                 }
+                reSongId = reSong->getId();
+            } else if (!reSongId && reSong) {
+                reSongId = reSong->getId();
             }
-            if (album && (!album->getId() || !Album::findById(album->getId()))) {
-                if (album->save()) {
-                    if (album->getId()) {
-                        albumId = album->getId();
-                    } else {
-                        albumId = MysqlAccess::getInstance().getLastInsertId();
-                        album->setId(albumId);
-                    }
+            if (album && album->sync()) {
+                if (album->getId()) {
+                    album->update();
                 } else {
-                    cerr << "Unable to save album" << endl;
+                    album->save();
                 }
+                albumId = album->getId();
+            } else if (!albumId && album) {
+                albumId = album->getId();
             }
-            if (albumPart && (!albumPart->getId() || !AlbumPart::findById(albumPart->getId()))) {
-                if (albumPart->save()) {
-                    if (albumPart->getId()) {
-                        albumPartId = albumPart->getId();
-                    } else {
-                        albumPartId = MysqlAccess::getInstance().getLastInsertId();
-                        albumPart->setId(albumPartId);
-                    }
+            if (albumPart && albumPart->sync()) {
+                if (albumPart->getId()) {
+                    albumPart->update();
                 } else {
-                    cerr << "Unable to save albumPart" << endl;
+                    albumPart->save();
                 }
+                albumPartId = albumPart->getId();
+            } else if (!albumPartId && albumPart) {
+                albumPartId = albumPart->getId();
             }
+
             sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("insert into Songs (artist, track, title, remixer, featuring, filepath, rating, dateAdded, bpm, tonicKeys, tonicKey, comments, trashed, lowQuality, reSongId, albumId, albumPartId) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
             ps->setString(1, artist);
             ps->setString(2, track);
@@ -425,6 +451,186 @@ namespace soulsifter {
             cerr << ", SQLState: " << e.getSQLState() << ")" << endl;
             exit(1);
         }
+    }
+
+    bool Song::sync() {
+        Song* song = findById(id);
+        if (!song) song = findByRESongId(reSongId);
+        if (!song) {
+            if (!reSongId && reSong) {
+                reSong->sync();
+                reSongId = reSong->getId();
+            }
+            if (!albumId && album) {
+                album->sync();
+                albumId = album->getId();
+            }
+            if (!albumPartId && albumPart) {
+                albumPart->sync();
+                albumPartId = albumPart->getId();
+            }
+            return true;
+        }
+
+        // check fields
+        bool needsUpdate = false;
+        boost::regex decimal("(-?\\d+)\\.?\\d*");
+        boost::smatch match1;
+        boost::smatch match2;
+        if (id != song->getId()) {
+            if (id) {
+                cout << "updating song " << id << " id from " << song->getId() << " to " << id << endl;
+                needsUpdate = true;
+            } else {
+                id = song->getId();
+            }
+        }
+        if (artist.compare(song->getArtist())  && (!boost::regex_match(artist, match1, decimal) || !boost::regex_match(song->getArtist(), match2, decimal) || match1[1].str().compare(match2[1].str()))) {
+            if (!artist.empty()) {
+                cout << "updating song " << id << " artist from " << song->getArtist() << " to " << artist << endl;
+                needsUpdate = true;
+            } else {
+                artist = song->getArtist();
+            }
+        }
+        if (track.compare(song->getTrack())  && (!boost::regex_match(track, match1, decimal) || !boost::regex_match(song->getTrack(), match2, decimal) || match1[1].str().compare(match2[1].str()))) {
+            if (!track.empty()) {
+                cout << "updating song " << id << " track from " << song->getTrack() << " to " << track << endl;
+                needsUpdate = true;
+            } else {
+                track = song->getTrack();
+            }
+        }
+        if (title.compare(song->getTitle())  && (!boost::regex_match(title, match1, decimal) || !boost::regex_match(song->getTitle(), match2, decimal) || match1[1].str().compare(match2[1].str()))) {
+            if (!title.empty()) {
+                cout << "updating song " << id << " title from " << song->getTitle() << " to " << title << endl;
+                needsUpdate = true;
+            } else {
+                title = song->getTitle();
+            }
+        }
+        if (remixer.compare(song->getRemixer())  && (!boost::regex_match(remixer, match1, decimal) || !boost::regex_match(song->getRemixer(), match2, decimal) || match1[1].str().compare(match2[1].str()))) {
+            if (!remixer.empty()) {
+                cout << "updating song " << id << " remixer from " << song->getRemixer() << " to " << remixer << endl;
+                needsUpdate = true;
+            } else {
+                remixer = song->getRemixer();
+            }
+        }
+        if (featuring.compare(song->getFeaturing())  && (!boost::regex_match(featuring, match1, decimal) || !boost::regex_match(song->getFeaturing(), match2, decimal) || match1[1].str().compare(match2[1].str()))) {
+            if (!featuring.empty()) {
+                cout << "updating song " << id << " featuring from " << song->getFeaturing() << " to " << featuring << endl;
+                needsUpdate = true;
+            } else {
+                featuring = song->getFeaturing();
+            }
+        }
+        if (filepath.compare(song->getFilepath())  && (!boost::regex_match(filepath, match1, decimal) || !boost::regex_match(song->getFilepath(), match2, decimal) || match1[1].str().compare(match2[1].str()))) {
+            if (!filepath.empty()) {
+                cout << "updating song " << id << " filepath from " << song->getFilepath() << " to " << filepath << endl;
+                needsUpdate = true;
+            } else {
+                filepath = song->getFilepath();
+            }
+        }
+        if (rating != song->getRating()) {
+            if (rating) {
+                cout << "updating song " << id << " rating from " << song->getRating() << " to " << rating << endl;
+                needsUpdate = true;
+            } else {
+                rating = song->getRating();
+            }
+        }
+        if (dateAdded != song->getDateAdded()) {
+            if (!song->getDateAdded()) {
+                cout << "updating song " << id << " dateAdded from " << song->getDateAdded() << " to " << dateAdded << endl;
+                needsUpdate = true;
+            } else {
+                dateAdded = song->getDateAdded();
+            }
+        }
+        if (bpm.compare(song->getBpm())  && (!boost::regex_match(bpm, match1, decimal) || !boost::regex_match(song->getBpm(), match2, decimal) || match1[1].str().compare(match2[1].str()))) {
+            if (!bpm.empty()) {
+                cout << "updating song " << id << " bpm from " << song->getBpm() << " to " << bpm << endl;
+                needsUpdate = true;
+            } else {
+                bpm = song->getBpm();
+            }
+        }
+        if (!equivalentSets<string>(tonicKeys, song->tonicKeys)) {
+            if (!containsSet<string>(tonicKeys, song->tonicKeys)) {
+                cout << "updating song " << id << " tonicKeys" << endl;
+                needsUpdate = true;
+            }
+            tonicKeys.insert(song->tonicKeys.begin(), song->tonicKeys.end());
+        }
+        if (tonicKey.compare(song->getTonicKey())  && (!boost::regex_match(tonicKey, match1, decimal) || !boost::regex_match(song->getTonicKey(), match2, decimal) || match1[1].str().compare(match2[1].str()))) {
+            if (!tonicKey.empty()) {
+                cout << "updating song " << id << " tonicKey from " << song->getTonicKey() << " to " << tonicKey << endl;
+                needsUpdate = true;
+            } else {
+                tonicKey = song->getTonicKey();
+            }
+        }
+        if (comments.compare(song->getComments())  && (!boost::regex_match(comments, match1, decimal) || !boost::regex_match(song->getComments(), match2, decimal) || match1[1].str().compare(match2[1].str()))) {
+            if (!comments.empty()) {
+                cout << "updating song " << id << " comments from " << song->getComments() << " to " << comments << endl;
+                needsUpdate = true;
+            } else {
+                comments = song->getComments();
+            }
+        }
+        if (trashed != song->getTrashed()) {
+            if (trashed) {
+                cout << "updating song " << id << " trashed from " << song->getTrashed() << " to " << trashed << endl;
+                needsUpdate = true;
+            } else {
+                trashed = song->getTrashed();
+            }
+        }
+        if (lowQuality != song->getLowQuality()) {
+            if (lowQuality) {
+                cout << "updating song " << id << " lowQuality from " << song->getLowQuality() << " to " << lowQuality << endl;
+                needsUpdate = true;
+            } else {
+                lowQuality = song->getLowQuality();
+            }
+        }
+        if (reSongId != song->getRESongId()) {
+            if (reSongId) {
+                cout << "updating song " << id << " reSongId from " << song->getRESongId() << " to " << reSongId << endl;
+                needsUpdate = true;
+            } else {
+                reSongId = song->getRESongId();
+            }
+        }
+        if (reSong) needsUpdate |= reSong->sync();
+        if (albumId != song->getAlbumId()) {
+            if (albumId) {
+                cout << "updating song " << id << " albumId from " << song->getAlbumId() << " to " << albumId << endl;
+                needsUpdate = true;
+            } else {
+                albumId = song->getAlbumId();
+            }
+        }
+        if (album) needsUpdate |= album->sync();
+        if (albumPartId != song->getAlbumPartId()) {
+            if (albumPartId) {
+                cout << "updating song " << id << " albumPartId from " << song->getAlbumPartId() << " to " << albumPartId << endl;
+                needsUpdate = true;
+            } else {
+                albumPartId = song->getAlbumPartId();
+            }
+        }
+        if (albumPart) needsUpdate |= albumPart->sync();
+        if (!equivalentVectors<int>(styleIds, song->getStyleIds())) {
+            if (!containsVector<int>(styleIds, song->getStyleIds())) {
+                cout << "updating song " << id << " styleIds" << endl;
+                needsUpdate = true;
+            }
+            appendUniqueVector<int>(song->getStyleIds(), &styleIds);
+        }
+        return needsUpdate;
     }
 
 

@@ -141,6 +141,17 @@ namespace soulsifter {
 
     int AlbumPart::update() {
         try {
+            if (album && album->sync()) {
+                if (album->getId()) {
+                    album->update();
+                } else {
+                    album->save();
+                }
+                albumId = album->getId();
+            } else if (!albumId && album) {
+                albumId = album->getId();
+            }
+
             sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("update AlbumParts set pos=?, name=?, albumId=? where id=?");
             ps->setString(1, pos);
             ps->setString(2, name);
@@ -160,18 +171,17 @@ namespace soulsifter {
 
     int AlbumPart::save() {
         try {
-            if (album && (!album->getId() || !Album::findById(album->getId()))) {
-                if (album->save()) {
-                    if (album->getId()) {
-                        albumId = album->getId();
-                    } else {
-                        albumId = MysqlAccess::getInstance().getLastInsertId();
-                        album->setId(albumId);
-                    }
+            if (album && album->sync()) {
+                if (album->getId()) {
+                    album->update();
                 } else {
-                    cerr << "Unable to save album" << endl;
+                    album->save();
                 }
+                albumId = album->getId();
+            } else if (!albumId && album) {
+                albumId = album->getId();
             }
+
             sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("insert into AlbumParts (pos, name, albumId) values (?, ?, ?)");
             ps->setString(1, pos);
             ps->setString(2, name);
@@ -196,6 +206,58 @@ namespace soulsifter {
             cerr << ", SQLState: " << e.getSQLState() << ")" << endl;
             exit(1);
         }
+    }
+
+    bool AlbumPart::sync() {
+        AlbumPart* albumPart = findById(id);
+        if (!albumPart) albumPart = findByPosAndAlbumId(pos, albumId);
+        if (!albumPart) {
+            if (!albumId && album) {
+                album->sync();
+                albumId = album->getId();
+            }
+            return true;
+        }
+
+        // check fields
+        bool needsUpdate = false;
+        boost::regex decimal("(-?\\d+)\\.?\\d*");
+        boost::smatch match1;
+        boost::smatch match2;
+        if (id != albumPart->getId()) {
+            if (id) {
+                cout << "updating albumPart " << id << " id from " << albumPart->getId() << " to " << id << endl;
+                needsUpdate = true;
+            } else {
+                id = albumPart->getId();
+            }
+        }
+        if (pos.compare(albumPart->getPos())  && (!boost::regex_match(pos, match1, decimal) || !boost::regex_match(albumPart->getPos(), match2, decimal) || match1[1].str().compare(match2[1].str()))) {
+            if (!pos.empty()) {
+                cout << "updating albumPart " << id << " pos from " << albumPart->getPos() << " to " << pos << endl;
+                needsUpdate = true;
+            } else {
+                pos = albumPart->getPos();
+            }
+        }
+        if (name.compare(albumPart->getName())  && (!boost::regex_match(name, match1, decimal) || !boost::regex_match(albumPart->getName(), match2, decimal) || match1[1].str().compare(match2[1].str()))) {
+            if (!name.empty()) {
+                cout << "updating albumPart " << id << " name from " << albumPart->getName() << " to " << name << endl;
+                needsUpdate = true;
+            } else {
+                name = albumPart->getName();
+            }
+        }
+        if (albumId != albumPart->getAlbumId()) {
+            if (albumId) {
+                cout << "updating albumPart " << id << " albumId from " << albumPart->getAlbumId() << " to " << albumId << endl;
+                needsUpdate = true;
+            } else {
+                albumId = albumPart->getAlbumId();
+            }
+        }
+        if (album) needsUpdate |= album->sync();
+        return needsUpdate;
     }
 
 

@@ -126,6 +126,7 @@ namespace soulsifter {
 
     int REAlbumCover::update() {
         try {
+
             sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("update REAlbumCovers set reId=?, thumbnail=? where id=?");
             ps->setString(1, reId);
             ps->setString(2, thumbnail);
@@ -144,6 +145,7 @@ namespace soulsifter {
 
     int REAlbumCover::save() {
         try {
+
             sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("insert into REAlbumCovers (reId, thumbnail) values (?, ?)");
             ps->setString(1, reId);
             ps->setString(2, thumbnail);
@@ -167,6 +169,45 @@ namespace soulsifter {
             cerr << ", SQLState: " << e.getSQLState() << ")" << endl;
             exit(1);
         }
+    }
+
+    bool REAlbumCover::sync() {
+        REAlbumCover* reAlbumCover = findById(id);
+        if (!reAlbumCover) reAlbumCover = findByREId(reId);
+        if (!reAlbumCover) {
+            return true;
+        }
+
+        // check fields
+        bool needsUpdate = false;
+        boost::regex decimal("(-?\\d+)\\.?\\d*");
+        boost::smatch match1;
+        boost::smatch match2;
+        if (id != reAlbumCover->getId()) {
+            if (id) {
+                cout << "updating reAlbumCover " << id << " id from " << reAlbumCover->getId() << " to " << id << endl;
+                needsUpdate = true;
+            } else {
+                id = reAlbumCover->getId();
+            }
+        }
+        if (reId.compare(reAlbumCover->getREId())  && (!boost::regex_match(reId, match1, decimal) || !boost::regex_match(reAlbumCover->getREId(), match2, decimal) || match1[1].str().compare(match2[1].str()))) {
+            if (!reId.empty()) {
+                cout << "updating reAlbumCover " << id << " reId from " << reAlbumCover->getREId() << " to " << reId << endl;
+                needsUpdate = true;
+            } else {
+                reId = reAlbumCover->getREId();
+            }
+        }
+        if (thumbnail.compare(reAlbumCover->getThumbnail())  && (!boost::regex_match(thumbnail, match1, decimal) || !boost::regex_match(reAlbumCover->getThumbnail(), match2, decimal) || match1[1].str().compare(match2[1].str()))) {
+            if (!thumbnail.empty()) {
+                cout << "updating reAlbumCover " << id << " thumbnail from " << reAlbumCover->getThumbnail() << " to " << thumbnail << endl;
+                needsUpdate = true;
+            } else {
+                thumbnail = reAlbumCover->getThumbnail();
+            }
+        }
+        return needsUpdate;
     }
 
 

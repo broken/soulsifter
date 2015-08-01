@@ -121,6 +121,7 @@ namespace soulsifter {
 
     int BasicGenre::update() {
         try {
+
             sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("update BasicGenres set name=? where id=?");
             ps->setString(1, name);
             ps->setInt(2, id);
@@ -138,6 +139,7 @@ namespace soulsifter {
 
     int BasicGenre::save() {
         try {
+
             sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("insert into BasicGenres (name) values (?)");
             ps->setString(1, name);
             int saved = ps->executeUpdate();
@@ -160,6 +162,37 @@ namespace soulsifter {
             cerr << ", SQLState: " << e.getSQLState() << ")" << endl;
             exit(1);
         }
+    }
+
+    bool BasicGenre::sync() {
+        BasicGenre* basicGenre = findById(id);
+        if (!basicGenre) basicGenre = findByName(name);
+        if (!basicGenre) {
+            return true;
+        }
+
+        // check fields
+        bool needsUpdate = false;
+        boost::regex decimal("(-?\\d+)\\.?\\d*");
+        boost::smatch match1;
+        boost::smatch match2;
+        if (id != basicGenre->getId()) {
+            if (id) {
+                cout << "updating basicGenre " << id << " id from " << basicGenre->getId() << " to " << id << endl;
+                needsUpdate = true;
+            } else {
+                id = basicGenre->getId();
+            }
+        }
+        if (name.compare(basicGenre->getName())  && (!boost::regex_match(name, match1, decimal) || !boost::regex_match(basicGenre->getName(), match2, decimal) || match1[1].str().compare(match2[1].str()))) {
+            if (!name.empty()) {
+                cout << "updating basicGenre " << id << " name from " << basicGenre->getName() << " to " << name << endl;
+                needsUpdate = true;
+            } else {
+                name = basicGenre->getName();
+            }
+        }
+        return needsUpdate;
     }
 
 

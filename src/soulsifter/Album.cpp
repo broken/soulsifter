@@ -200,6 +200,17 @@ namespace soulsifter {
 
     int Album::update() {
         try {
+            if (basicGenre && basicGenre->sync()) {
+                if (basicGenre->getId()) {
+                    basicGenre->update();
+                } else {
+                    basicGenre->save();
+                }
+                basicGenreId = basicGenre->getId();
+            } else if (!basicGenreId && basicGenre) {
+                basicGenreId = basicGenre->getId();
+            }
+
             sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("update Albums set name=?, artist=?, coverFilepath=?, mixed=?, label=?, catalogId=?, releaseDateYear=?, releaseDateMonth=?, releaseDateDay=?, basicGenreId=? where id=?");
             ps->setString(1, name);
             ps->setString(2, artist);
@@ -226,18 +237,17 @@ namespace soulsifter {
 
     int Album::save() {
         try {
-            if (basicGenre && (!basicGenre->getId() || !BasicGenre::findById(basicGenre->getId()))) {
-                if (basicGenre->save()) {
-                    if (basicGenre->getId()) {
-                        basicGenreId = basicGenre->getId();
-                    } else {
-                        basicGenreId = MysqlAccess::getInstance().getLastInsertId();
-                        basicGenre->setId(basicGenreId);
-                    }
+            if (basicGenre && basicGenre->sync()) {
+                if (basicGenre->getId()) {
+                    basicGenre->update();
                 } else {
-                    cerr << "Unable to save basicGenre" << endl;
+                    basicGenre->save();
                 }
+                basicGenreId = basicGenre->getId();
+            } else if (!basicGenreId && basicGenre) {
+                basicGenreId = basicGenre->getId();
             }
+
             sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("insert into Albums (name, artist, coverFilepath, mixed, label, catalogId, releaseDateYear, releaseDateMonth, releaseDateDay, basicGenreId) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
             ps->setString(1, name);
             ps->setString(2, artist);
@@ -269,6 +279,114 @@ namespace soulsifter {
             cerr << ", SQLState: " << e.getSQLState() << ")" << endl;
             exit(1);
         }
+    }
+
+    bool Album::sync() {
+        Album* album = findById(id);
+        if (!album) album = findByNameAndArtist(name, artist);
+        if (!album) {
+            if (!basicGenreId && basicGenre) {
+                basicGenre->sync();
+                basicGenreId = basicGenre->getId();
+            }
+            return true;
+        }
+
+        // check fields
+        bool needsUpdate = false;
+        boost::regex decimal("(-?\\d+)\\.?\\d*");
+        boost::smatch match1;
+        boost::smatch match2;
+        if (id != album->getId()) {
+            if (id) {
+                cout << "updating album " << id << " id from " << album->getId() << " to " << id << endl;
+                needsUpdate = true;
+            } else {
+                id = album->getId();
+            }
+        }
+        if (name.compare(album->getName())  && (!boost::regex_match(name, match1, decimal) || !boost::regex_match(album->getName(), match2, decimal) || match1[1].str().compare(match2[1].str()))) {
+            if (!name.empty()) {
+                cout << "updating album " << id << " name from " << album->getName() << " to " << name << endl;
+                needsUpdate = true;
+            } else {
+                name = album->getName();
+            }
+        }
+        if (artist.compare(album->getArtist())  && (!boost::regex_match(artist, match1, decimal) || !boost::regex_match(album->getArtist(), match2, decimal) || match1[1].str().compare(match2[1].str()))) {
+            if (!artist.empty()) {
+                cout << "updating album " << id << " artist from " << album->getArtist() << " to " << artist << endl;
+                needsUpdate = true;
+            } else {
+                artist = album->getArtist();
+            }
+        }
+        if (coverFilepath.compare(album->getCoverFilepath())  && (!boost::regex_match(coverFilepath, match1, decimal) || !boost::regex_match(album->getCoverFilepath(), match2, decimal) || match1[1].str().compare(match2[1].str()))) {
+            if (!coverFilepath.empty()) {
+                cout << "updating album " << id << " coverFilepath from " << album->getCoverFilepath() << " to " << coverFilepath << endl;
+                needsUpdate = true;
+            } else {
+                coverFilepath = album->getCoverFilepath();
+            }
+        }
+        if (mixed != album->getMixed()) {
+            if (mixed) {
+                cout << "updating album " << id << " mixed from " << album->getMixed() << " to " << mixed << endl;
+                needsUpdate = true;
+            } else {
+                mixed = album->getMixed();
+            }
+        }
+        if (label.compare(album->getLabel())  && (!boost::regex_match(label, match1, decimal) || !boost::regex_match(album->getLabel(), match2, decimal) || match1[1].str().compare(match2[1].str()))) {
+            if (!label.empty()) {
+                cout << "updating album " << id << " label from " << album->getLabel() << " to " << label << endl;
+                needsUpdate = true;
+            } else {
+                label = album->getLabel();
+            }
+        }
+        if (catalogId.compare(album->getCatalogId())  && (!boost::regex_match(catalogId, match1, decimal) || !boost::regex_match(album->getCatalogId(), match2, decimal) || match1[1].str().compare(match2[1].str()))) {
+            if (!catalogId.empty()) {
+                cout << "updating album " << id << " catalogId from " << album->getCatalogId() << " to " << catalogId << endl;
+                needsUpdate = true;
+            } else {
+                catalogId = album->getCatalogId();
+            }
+        }
+        if (releaseDateYear != album->getReleaseDateYear()) {
+            if (releaseDateYear) {
+                cout << "updating album " << id << " releaseDateYear from " << album->getReleaseDateYear() << " to " << releaseDateYear << endl;
+                needsUpdate = true;
+            } else {
+                releaseDateYear = album->getReleaseDateYear();
+            }
+        }
+        if (releaseDateMonth != album->getReleaseDateMonth()) {
+            if (releaseDateMonth) {
+                cout << "updating album " << id << " releaseDateMonth from " << album->getReleaseDateMonth() << " to " << releaseDateMonth << endl;
+                needsUpdate = true;
+            } else {
+                releaseDateMonth = album->getReleaseDateMonth();
+            }
+        }
+        if (releaseDateDay != album->getReleaseDateDay()) {
+            if (releaseDateDay) {
+                cout << "updating album " << id << " releaseDateDay from " << album->getReleaseDateDay() << " to " << releaseDateDay << endl;
+                needsUpdate = true;
+            } else {
+                releaseDateDay = album->getReleaseDateDay();
+            }
+        }
+        if (basicGenreId != album->getBasicGenreId()) {
+            if (basicGenreId) {
+                cout << "updating album " << id << " basicGenreId from " << album->getBasicGenreId() << " to " << basicGenreId << endl;
+                needsUpdate = true;
+            } else {
+                basicGenreId = album->getBasicGenreId();
+            }
+        }
+        if (basicGenre) needsUpdate |= basicGenre->sync();
+        return needsUpdate;
     }
 
 

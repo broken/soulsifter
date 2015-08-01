@@ -26,6 +26,7 @@ class BasicGenre : public node::ObjectWrap {
   static NAN_METHOD(findAll);
   static NAN_METHOD(update);
   static NAN_METHOD(save);
+  static NAN_METHOD(sync);
   static NAN_METHOD(findByFilepath);
   static NAN_GETTER(getId);
   static NAN_SETTER(setId);

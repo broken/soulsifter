@@ -51,6 +51,7 @@ void Mix::Init(v8::Handle<v8::Object> exports) {
   NanSetTemplate(tpl, "findAll", NanNew<v8::FunctionTemplate>(findAll)->GetFunction());
   NanSetPrototypeTemplate(tpl, "update", NanNew<v8::FunctionTemplate>(update)->GetFunction());
   NanSetPrototypeTemplate(tpl, "save", NanNew<v8::FunctionTemplate>(save)->GetFunction());
+  NanSetPrototypeTemplate(tpl, "sync", NanNew<v8::FunctionTemplate>(sync)->GetFunction());
   NanSetTemplate(tpl, "mixoutCountForRESongId", NanNew<v8::FunctionTemplate>(mixoutCountForRESongId)->GetFunction());
   tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("id"), getId, setId);
   tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("outSongId"), getOutSongId, setOutSongId);
@@ -141,6 +142,15 @@ NAN_METHOD(Mix::save) {
   int result =  obj->mix->save();
 
   NanReturnValue(NanNew<v8::Number>(result));
+}
+
+NAN_METHOD(Mix::sync) {
+  NanScope();
+
+  Mix* obj = ObjectWrap::Unwrap<Mix>(args.This());
+  bool result =  obj->mix->sync();
+
+  NanReturnValue(NanNew<v8::Boolean>(result));
 }
 
 NAN_METHOD(Mix::mixoutCountForRESongId) {
