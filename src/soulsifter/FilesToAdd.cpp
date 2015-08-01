@@ -12,9 +12,11 @@
 
 #include <boost/algorithm/string/predicate.hpp>
 
-#include "MusicManager.h"
+#include "Album.h"
 #include "DTQueueUtil.h"
 #include "DTVectorUtil.h"
+#include "MusicManager.h"
+#include "Song.h"
 
 namespace dogatech {
   namespace soulsifter {
