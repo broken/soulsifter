@@ -62,7 +62,7 @@
       <content></content>
     </div>
     <div id="abstractActions">
-      <paper-button on-click="exit">Cancel</paper-button>
+      <paper-button on-click="cancel">Cancel</paper-button>
       <paper-button on-click="accept" class="accent">Accept</paper-button>
     </div>
   </template>
@@ -76,12 +76,21 @@
       this.acceptAction = a;
     },
 
-    accept: function(e, detail, sender) {
-      this.acceptAction.call(this.parentNode);
+    setCancelAction: function(a) {
+      this.cancelAction = a;
+    },
+
+    accept: function() {
+      if (this.acceptAction) this.acceptAction.call(this.parentNode);
       this.exit();
     },
 
-    exit: function(e, detail, sender) {
+    cancel: function() {
+      if (this.cancelAction) this.cancelAction.call(this.parentNode);
+      this.exit();
+    },
+
+    exit: function() {
       this.fire('page-main');
     },
     

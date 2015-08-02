@@ -88,21 +88,42 @@
 
     properties: {
       song: Object,
+      _newSongManager: {
+        type: Object,
+        value: function() { return new ss.NewSongManager(); }
+      },
+      _taggedSong: Object,
+      filepaths: {
+        type: Array,
+        observer: '_filepathsChanged'
+      }
     },
 
     attached: function() {
       // https://www.polymer-project.org/1.0/docs/migration.html#domready
       this.async(function() {
         this.$.abstractActionPage.setAcceptAction(this.save);
+        this.$.abstractActionPage.setCancelAction(this.skip);
       }.bind(this));
     },
 
-    save: function(e, detail, sender) {
-      if (this.song.id) {
-        this.song.update();
-      } else {
-        this.song.save();
+    save: function() {
+      this._newSongManager.processSong(this.song);
+      if (this._newSongManager.nextSong(this.song, this._taggedSong)) {
+        this.fire('page-song-edit');
       }
+    },
+
+    skip: function() {
+      this.song.sync();
+      if (this._newSongManager.nextSong(this.song, this._taggedSong)) {
+        this.fire('page-song-edit');
+      }
+    },
+
+    _filepathsChanged: function() {
+      this._newSongManager.import(this.filepaths);
+      this._newSongManager.nextSong(this.song, this._taggedSong);
     },
   });
 </script>

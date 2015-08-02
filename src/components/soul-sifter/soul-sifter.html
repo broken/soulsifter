@@ -122,7 +122,7 @@
         <playlist-edit playlist="{{playlist}}"></playlist-edit>
       </neon-animatable>
       <neon-animatable>
-        <song-edit song="{{song}}"></song-edit>
+        <song-edit song="{{song}}" filepaths="{{newSongFilepaths}}"></song-edit>
       </neon-animatable>
       <neon-animatable>
         <ss-settings></ss-settings>
@@ -186,7 +186,8 @@
         that.pageEntryAnimation = subEntry;
         that.pageExitAnimation = mainExit;
         that.selectedPage = 2;
-        that.song = e.detail.song;
+        if (e.detail.song) that.song = e.detail.song;
+        if (e.detail.filepaths) that.newSongFilepaths = e.detail.filepaths;
       });
       this.addEventListener('page-settings', function(e) {
         that.pageEntryAnimation = subEntry;

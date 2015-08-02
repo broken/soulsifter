@@ -93,9 +93,12 @@
         this.$.createSongButton.ondrop = function(e) {
           e.preventDefault();
           this.icon = 'add-circle';
-          for (var i = 0; i < e.dataTransfer.files.length; ++i) {
-            window.console.log(e.dataTransfer.files[i].path);
+          var files = e.dataTransfer.files;
+          var filepaths = new Array();
+          for (var i = 0; i < files.length; ++i) {
+            filepaths.push(files[i].path);
           }
+          this.fire('page-song-edit', {filepaths: filepaths});
           return false;
         };
       }.bind(this));
