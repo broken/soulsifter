@@ -38,8 +38,11 @@
           "madlld.cpp",
           "MiniBpm.cpp",
           # organization
+          "FilesToAdd.cpp",
           "MusicManager.cpp",
           #"MusicManager_wrap.cpp",
+          "NewSongManager.cpp",
+          "NewSongManager_wrap.cpp",
           "SearchUtil.cpp",
           "SearchUtil_wrap.cpp",
           "SoulSifterSettings.cpp",
@@ -51,6 +54,7 @@
           "ResultSetIterator.h",
           # util
           "DTVectorUtil.h",
+          "DTQueueUtil.h",
       ],
       'cflags!': [
           '-fno-exceptions',

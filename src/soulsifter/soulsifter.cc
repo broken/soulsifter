@@ -5,6 +5,7 @@
 #include "AudioAnalyzer_wrap.h"
 #include "BasicGenre_wrap.h"
 #include "Mix_wrap.h"
+#include "NewSongManager_wrap.h"
 #include "Playlist_wrap.h"
 #include "PlaylistEntry_wrap.h"
 #include "SearchUtil_wrap.h"
@@ -13,6 +14,7 @@
 #include "Style_wrap.h"
 
 void InitAll(v8::Handle<v8::Object> exports) {
+  // model
   Album::Init(exports);
   AlbumPart::Init(exports);
   BasicGenre::Init(exports);
@@ -22,8 +24,9 @@ void InitAll(v8::Handle<v8::Object> exports) {
   Song::Init(exports);
   Style::Init(exports);
 
-  // statics
+  // services
   AudioAnalyzer::Init(exports);
+  NewSongManager::Init(exports);
   SearchUtil::Init(exports);
 
   // not auto-generated
