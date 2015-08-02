@@ -35,7 +35,7 @@ public:
   /**
    * This will return the cover image file path associated with the album.
    */
-  string coverImagePath();
+  string coverImagePath() const;
 
   /**
    * Use this to save a song after editing. It allows for future imports to
@@ -51,7 +51,7 @@ public:
 private:
   bool hasMovedFile;
   FilesToAdd* filesToAdd;
-  vector<string> filesToTrash;
+  vector<const boost::filesystem::path> filesToTrash;
 
   void preprocessAllFiles(const vector<boost::filesystem::path>& filepaths);
 

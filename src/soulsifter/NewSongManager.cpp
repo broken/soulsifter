@@ -50,7 +50,7 @@ void NewSongManager::preprocessAllFiles(const vector<filesystem::path>& filepath
     if (filesystem::is_directory(filepath)) {
       vector<filesystem::path> dirContents;
       copy(filesystem::directory_iterator(filepath), filesystem::directory_iterator(), back_inserter(dirContents));
-      filesToTrash.push(filepath);
+      filesToTrash.push_back(filepath);
       preprocessAllFiles(dirContents);
       continue;
     }
@@ -185,6 +185,10 @@ void NewSongManager::trashMusicFile(Song* song) {
   // }
   
   // [self loadNextSong];
+}
+
+string NewSongManager::coverImagePath() const {
+  return *filesToAdd->coverPath();
 }
 
 }  // namespace soulsifter
