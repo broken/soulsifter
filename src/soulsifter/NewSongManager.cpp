@@ -19,6 +19,15 @@ using namespace std;
 namespace dogatech {
 namespace soulsifter {
 
+NewSongManager::NewSongManager()
+    : hasMovedFile(false),
+      filesToAdd(NULL) {
+}
+
+NewSongManager::~NewSongManager() {
+  delete filesToAdd;
+}
+
 void NewSongManager::import(const vector<string>& filepaths) {
   delete filesToAdd;
   filesToAdd = new FilesToAdd();
