@@ -29,6 +29,7 @@ namespace soulsifter {
     public:
         REXml();
         explicit REXml(const REXml& reXml);
+        void operator=(const REXml& reXml);
         ~REXml();
         void clear();
 
@@ -58,8 +59,6 @@ namespace soulsifter {
         string xml;
 
         static void populateFields(const sql::ResultSet* rs, REXml* reXml);
-
-        void operator=(const REXml& reXml);
     };
 
 }

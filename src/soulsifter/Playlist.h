@@ -31,6 +31,7 @@ namespace soulsifter {
     public:
         Playlist();
         explicit Playlist(const Playlist& playlist);
+        void operator=(const Playlist& playlist);
         ~Playlist();
         void clear();
 
@@ -74,8 +75,6 @@ namespace soulsifter {
         vector<Style*> styles;
 
         static void populateFields(const sql::ResultSet* rs, Playlist* playlist);
-
-        void operator=(const Playlist& playlist);
     };
 
 }

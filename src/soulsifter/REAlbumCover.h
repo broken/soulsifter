@@ -29,6 +29,7 @@ namespace soulsifter {
     public:
         REAlbumCover();
         explicit REAlbumCover(const REAlbumCover& reAlbumCover);
+        void operator=(const REAlbumCover& reAlbumCover);
         ~REAlbumCover();
         void clear();
 
@@ -56,8 +57,6 @@ namespace soulsifter {
         string thumbnail;
 
         static void populateFields(const sql::ResultSet* rs, REAlbumCover* reAlbumCover);
-
-        void operator=(const REAlbumCover& reAlbumCover);
     };
 
 }

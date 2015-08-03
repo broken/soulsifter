@@ -30,6 +30,7 @@ namespace soulsifter {
     public:
         Style();
         explicit Style(const Style& style);
+        void operator=(const Style& style);
         ~Style();
         void clear();
 
@@ -79,8 +80,6 @@ namespace soulsifter {
         vector<Style*> parents;
 
         static void populateFields(const sql::ResultSet* rs, Style* style);
-
-        void operator=(const Style& style);
     };
 
 }

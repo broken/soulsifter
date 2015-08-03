@@ -33,6 +33,7 @@ namespace soulsifter {
     public:
         Song();
         explicit Song(const Song& song);
+        void operator=(const Song& song);
         ~Song();
         void clear();
 
@@ -134,8 +135,6 @@ namespace soulsifter {
         vector<Style*> styles;
 
         static void populateFields(const sql::ResultSet* rs, Song* song);
-
-        void operator=(const Song& song);
     };
 
 }

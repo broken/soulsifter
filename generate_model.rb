@@ -650,6 +650,7 @@ def writeHeader (name, fields, attribs, customMethods, customHeaders)
   str << "\n    class #{capName} {\n    public:\n"
   str << hConstructor(name)
   str << hCopyConstructor(name)
+  str << hAssignmentConstructor(name)
   str << hDestructor(name)
   str << hClearFunction()
   str << "\n"
@@ -679,8 +680,6 @@ def writeHeader (name, fields, attribs, customMethods, customHeaders)
   end
   str << "\n"
   str << hPopulateFieldFunctions(name, fields)
-  str << "\n"
-  str << hAssignmentConstructor(name)
   str << "    };\n\n}\n}\n\n#endif /* defined(__soul_sifter__#{capName}__) */\n"
   return str
 end

@@ -31,6 +31,7 @@ namespace soulsifter {
     public:
         PlaylistEntry();
         explicit PlaylistEntry(const PlaylistEntry& playlistEntry);
+        void operator=(const PlaylistEntry& playlistEntry);
         ~PlaylistEntry();
         void clear();
 
@@ -73,8 +74,6 @@ namespace soulsifter {
         string time;
 
         static void populateFields(const sql::ResultSet* rs, PlaylistEntry* playlistEntry);
-
-        void operator=(const PlaylistEntry& playlistEntry);
     };
 
 }

@@ -29,6 +29,7 @@ namespace soulsifter {
     public:
         BasicGenre();
         explicit BasicGenre(const BasicGenre& basicGenre);
+        void operator=(const BasicGenre& basicGenre);
         ~BasicGenre();
         void clear();
 
@@ -56,8 +57,6 @@ namespace soulsifter {
         string name;
 
         static void populateFields(const sql::ResultSet* rs, BasicGenre* basicGenre);
-
-        void operator=(const BasicGenre& basicGenre);
     };
 
 }

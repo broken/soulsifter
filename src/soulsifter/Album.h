@@ -30,6 +30,7 @@ namespace soulsifter {
     public:
         Album();
         explicit Album(const Album& album);
+        void operator=(const Album& album);
         ~Album();
         void clear();
 
@@ -88,8 +89,6 @@ namespace soulsifter {
         BasicGenre* basicGenre;
 
         static void populateFields(const sql::ResultSet* rs, Album* album);
-
-        void operator=(const Album& album);
     };
 
 }

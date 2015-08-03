@@ -29,6 +29,7 @@ namespace soulsifter {
     public:
         RESetting();
         explicit RESetting(const RESetting& reSetting);
+        void operator=(const RESetting& reSetting);
         ~RESetting();
         void clear();
 
@@ -60,8 +61,6 @@ namespace soulsifter {
         string value;
 
         static void populateFields(const sql::ResultSet* rs, RESetting* reSetting);
-
-        void operator=(const RESetting& reSetting);
     };
 
 }
