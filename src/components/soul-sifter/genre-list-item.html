@@ -98,6 +98,7 @@
     },
 
     selectIffInArray: function(genres) {
+      if (!genres) return;
       // select this and request parents to expand if found in array
       var selected = false;
       for (var i = 0; i < genres.length; ++i) {

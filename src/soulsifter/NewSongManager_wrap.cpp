@@ -74,7 +74,7 @@ NAN_METHOD(NewSongManager::nextSong) {
   NewSongManager* obj = ObjectWrap::Unwrap<NewSongManager>(args.This());
   dogatech::soulsifter::Song* a0(node::ObjectWrap::Unwrap<Song>(args[0]->ToObject())->getNwcpValue());
   dogatech::soulsifter::Song* a1(node::ObjectWrap::Unwrap<Song>(args[1]->ToObject())->getNwcpValue());
-  bool result =  obj->newsongmanager->nextSong(&a0, &a1);
+  bool result =  obj->newsongmanager->nextSong(a0, a1);
 
   NanReturnValue(NanNew<v8::Boolean>(result));
 }

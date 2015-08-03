@@ -325,8 +325,8 @@ void MusicManager::writeTagsToSong(Song* song) {
     
 # pragma mark monitor changes
   
-  Song* MusicManager::updateSongWithChanges(const Song& song) {
-    Song *updatedSong = new Song(song);
+  void MusicManager::updateSongWithChanges(const Song& song, Song* updatedSong) {
+    *updatedSong = song;
     
     // compare with last
     if (lastParsedSong && lastSongFixed) {
@@ -412,7 +412,6 @@ void MusicManager::writeTagsToSong(Song* song) {
     
     delete lastParsedSong;
     lastParsedSong = new Song(song);
-    return updatedSong;
   }
     
     void MusicManager::setNewSongChanges(const Song& song) {

@@ -90,7 +90,8 @@
       song: Object,
       _newSongManager: {
         type: Object,
-        value: function() { return new ss.NewSongManager(); }
+        value: function() { return new ss.NewSongManager(); },
+        readOnly: true
       },
       _taggedSong: Object,
       filepaths: {
@@ -123,7 +124,29 @@
 
     _filepathsChanged: function() {
       this._newSongManager.import(this.filepaths);
-      this._newSongManager.nextSong(this.song, this._taggedSong);
+      // There is an issue to update the data bindings of the songs updated
+      // from the nextSong call on NewSongManager. Because of the dirty
+      // checking in notifyPath, and the internals of the object are updated
+      // via a 3rd-party library, we cannot update the bindings.
+      // There are two options:
+      // 1. Create temporary song objects to get updated, then set the bound
+      // objects to these values.
+      // 2. Call _pathEffector which is the "private" method in polymer which
+      // does the update calls of notifyPath without the dirty checking.
+      // Going with option 1 for now. Even though it is creating extra objects,
+      // it's relatively small, and we could make them private members ourself
+      // if we care about memory that much. It should be better than being
+      // bitten by using a method that is considered private and updated from
+      // underneath us.
+      var tmpSong = new ss.Song();
+      var tmpTaggedSong = new ss.Song();
+      if (this._newSongManager.nextSong(tmpSong, tmpTaggedSong)) {
+        this.song = tmpSong;
+        this._taggedSong = tmpTaggedSong;
+      } else {
+        // for some reason there is no song after importing filepaths, so just exit.
+        this.fire('page-main');
+      }
     },
   });
 </script>

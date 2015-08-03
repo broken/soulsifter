@@ -51,7 +51,7 @@ void NewSongManager::preprocessAllFiles(const vector<filesystem::path>& filepath
 
     // skip files starting with period
     if (filepath.filename().string().at(0) == '.') {
-      cout << "skipping " << filepath;
+      cout << "skipping " << filepath << endl;
       continue;
     }
     
@@ -86,9 +86,12 @@ void NewSongManager::preprocessAllFiles(const vector<filesystem::path>& filepath
   }
 }
 
-bool NewSongManager::nextSong(Song** updatedSong, Song** originalSong) {
-  if (filesToAdd->pullSong(originalSong)) {
-    *updatedSong = MusicManager::getInstance().updateSongWithChanges(**originalSong);
+bool NewSongManager::nextSong(Song* updatedSong, Song* originalSong) {
+  Song* songToAdd = NULL;
+  if (filesToAdd->pullSong(&songToAdd)) {
+    *originalSong = *songToAdd;
+    delete songToAdd;
+    MusicManager::getInstance().updateSongWithChanges(*originalSong, updatedSong);
 
     // TODO do this in a different thread and have it update the UI when finished
     // TODO this goes in caller

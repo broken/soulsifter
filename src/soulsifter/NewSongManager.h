@@ -29,8 +29,10 @@ public:
    * first song will be "optimized" for creation by using previous song
    * creations, while the second will be the original mp3 tagged song. This
    * method returns false when there are no more songs to process.
+   * I'd prefer these params to be ptr to ptr to song, but it doesn't appear to
+   * play well with nwjs.
    */
-  bool nextSong(Song** updatedSong, Song** originalSong);
+  bool nextSong(Song* updatedSong, Song* originalSong);
 
   /**
    * This will return the cover image file path associated with the album.
