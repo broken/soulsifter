@@ -70,7 +70,7 @@
         <paper-input label="Subtitle" value="{{song.albumPart.name}}" floatingLabel></paper-input>
         <paper-input label="Label" value="{{song.album.label}}" floatingLabel></paper-input>
         <paper-input label="Catalog ID" value="{{song.album.catalogId}}" floatingLabel></paper-input>
-        <paper-input label="Genre" required="true" floatingLabel></paper-input>
+        <paper-input label="Genre" value="{{basicgenre}}" required="true" floatingLabel></paper-input>
         <paper-input label="Release Year" value="{{song.album.releaseDateYear}}" required="true" type="number" min="1600" max="2099" floatingLabel></paper-input>
         <paper-input label="Release Month" value="{{song.album.releaseDateMonth}}" type="number" min="1" max="12" floatingLabel></paper-input>
         <paper-input label="Release Day" value="{{song.album.releaseDateDay}}" type="number" min="1" max="31" floatingLabel></paper-input>
@@ -109,6 +109,15 @@
     },
 
     save: function() {
+      // If there is no album part, we should clear this object out so it is
+      // not saved. Setting the ID deletes the object, and having an ID of 0
+      // indicates a NULL value upon save.
+      if (!this.song.albumPart.pos && !this.song.albumPart.name) {
+        this.song.albumPartId = 0;
+      }
+      // TODO this should be replaced with a drop-down containing these genres
+      this.song.album.basicGenre = ss.BasicGenre.findByName(this.basicgenre);
+
       this._newSongManager.processSong(this.song);
       if (this._newSongManager.nextSong(this.song, this._taggedSong)) {
         this.fire('page-song-edit');
@@ -141,8 +150,16 @@
       var tmpSong = new ss.Song();
       var tmpTaggedSong = new ss.Song();
       if (this._newSongManager.nextSong(tmpSong, tmpTaggedSong)) {
-        this.song = tmpSong;
         this._taggedSong = tmpTaggedSong;
+        this.song = tmpSong;
+        // Create album & album part for the song we are editing if there
+        // currently does not exist one. It is not needed for the tagged song
+        // since its purpose is only output.
+        if (!this.song.albumId) this.song.album = new ss.Album();
+        if (!this.song.albumPartId) {
+          this.song.albumPart = new ss.AlbumPart();
+          this.song.albumPart.album = this.song.album;
+        }
       } else {
         // for some reason there is no song after importing filepaths, so just exit.
         this.fire('page-main');
