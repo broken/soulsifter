@@ -153,9 +153,12 @@ namespace soulsifter {
             }
 
             sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("update AlbumParts set pos=?, name=?, albumId=? where id=?");
-            ps->setString(1, pos);
-            ps->setString(2, name);
-            ps->setInt(3, albumId);
+            if (!pos.empty()) ps->setString(1, pos);
+            else ps->setNull(1, sql::DataType::VARCHAR);
+            if (!name.empty()) ps->setString(2, name);
+            else ps->setNull(2, sql::DataType::VARCHAR);
+            if (albumId > 0) ps->setInt(3, albumId);
+            else ps->setNull(3, sql::DataType::INTEGER);
             ps->setInt(4, id);
             int result = ps->executeUpdate();
             return result;
@@ -183,9 +186,12 @@ namespace soulsifter {
             }
 
             sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("insert into AlbumParts (pos, name, albumId) values (?, ?, ?)");
-            ps->setString(1, pos);
-            ps->setString(2, name);
-            ps->setInt(3, albumId);
+            if (!pos.empty()) ps->setString(1, pos);
+            else ps->setNull(1, sql::DataType::VARCHAR);
+            if (!name.empty()) ps->setString(2, name);
+            else ps->setNull(2, sql::DataType::VARCHAR);
+            if (albumId > 0) ps->setInt(3, albumId);
+            else ps->setNull(3, sql::DataType::INTEGER);
             int saved = ps->executeUpdate();
             if (!saved) {
                 cerr << "Not able to save albumPart" << endl;

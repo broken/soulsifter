@@ -169,9 +169,12 @@ namespace soulsifter {
         try {
 
             sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("update Playlists set name=?, query=?, gmusicId=? where id=?");
-            ps->setString(1, name);
-            ps->setString(2, query);
-            ps->setString(3, gmusicId);
+            if (!name.empty()) ps->setString(1, name);
+            else ps->setNull(1, sql::DataType::VARCHAR);
+            if (!query.empty()) ps->setString(2, query);
+            else ps->setNull(2, sql::DataType::VARCHAR);
+            if (!gmusicId.empty()) ps->setString(3, gmusicId);
+            else ps->setNull(3, sql::DataType::VARCHAR);
             ps->setInt(4, id);
             int result = ps->executeUpdate();
             if (!playlistEntryIds.empty()) {
@@ -245,9 +248,12 @@ namespace soulsifter {
         try {
 
             sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("insert into Playlists (name, query, gmusicId) values (?, ?, ?)");
-            ps->setString(1, name);
-            ps->setString(2, query);
-            ps->setString(3, gmusicId);
+            if (!name.empty()) ps->setString(1, name);
+            else ps->setNull(1, sql::DataType::VARCHAR);
+            if (!query.empty()) ps->setString(2, query);
+            else ps->setNull(2, sql::DataType::VARCHAR);
+            if (!gmusicId.empty()) ps->setString(3, gmusicId);
+            else ps->setNull(3, sql::DataType::VARCHAR);
             int saved = ps->executeUpdate();
             if (!saved) {
                 cerr << "Not able to save playlist" << endl;

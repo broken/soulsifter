@@ -168,9 +168,12 @@ namespace soulsifter {
         try {
 
             sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("update Styles set name=?, reId=?, reLabel=? where id=?");
-            ps->setString(1, name);
-            ps->setInt(2, reId);
-            ps->setString(3, reLabel);
+            if (!name.empty()) ps->setString(1, name);
+            else ps->setNull(1, sql::DataType::VARCHAR);
+            if (reId > 0) ps->setInt(2, reId);
+            else ps->setNull(2, sql::DataType::INTEGER);
+            if (!reLabel.empty()) ps->setString(3, reLabel);
+            else ps->setNull(3, sql::DataType::VARCHAR);
             ps->setInt(4, id);
             int result = ps->executeUpdate();
             if (!childIds.empty()) {
@@ -244,9 +247,12 @@ namespace soulsifter {
         try {
 
             sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("insert into Styles (name, reId, reLabel) values (?, ?, ?)");
-            ps->setString(1, name);
-            ps->setInt(2, reId);
-            ps->setString(3, reLabel);
+            if (!name.empty()) ps->setString(1, name);
+            else ps->setNull(1, sql::DataType::VARCHAR);
+            if (reId > 0) ps->setInt(2, reId);
+            else ps->setNull(2, sql::DataType::INTEGER);
+            if (!reLabel.empty()) ps->setString(3, reLabel);
+            else ps->setNull(3, sql::DataType::VARCHAR);
             int saved = ps->executeUpdate();
             if (!saved) {
                 cerr << "Not able to save style" << endl;

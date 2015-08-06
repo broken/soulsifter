@@ -177,10 +177,14 @@ namespace soulsifter {
             }
 
             sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("update PlaylistEntries set playlistId=?, songId=?, position=?, time=? where id=?");
-            ps->setInt(1, playlistId);
-            ps->setInt(2, songId);
-            ps->setInt(3, position);
-            ps->setString(4, time);
+            if (playlistId > 0) ps->setInt(1, playlistId);
+            else ps->setNull(1, sql::DataType::INTEGER);
+            if (songId > 0) ps->setInt(2, songId);
+            else ps->setNull(2, sql::DataType::INTEGER);
+            if (position > 0) ps->setInt(3, position);
+            else ps->setNull(3, sql::DataType::INTEGER);
+            if (!time.empty()) ps->setString(4, time);
+            else ps->setNull(4, sql::DataType::VARCHAR);
             ps->setInt(5, id);
             int result = ps->executeUpdate();
             return result;
@@ -218,10 +222,14 @@ namespace soulsifter {
             }
 
             sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("insert into PlaylistEntries (playlistId, songId, position, time) values (?, ?, ?, ?)");
-            ps->setInt(1, playlistId);
-            ps->setInt(2, songId);
-            ps->setInt(3, position);
-            ps->setString(4, time);
+            if (playlistId > 0) ps->setInt(1, playlistId);
+            else ps->setNull(1, sql::DataType::INTEGER);
+            if (songId > 0) ps->setInt(2, songId);
+            else ps->setNull(2, sql::DataType::INTEGER);
+            if (position > 0) ps->setInt(3, position);
+            else ps->setNull(3, sql::DataType::INTEGER);
+            if (!time.empty()) ps->setString(4, time);
+            else ps->setNull(4, sql::DataType::VARCHAR);
             int saved = ps->executeUpdate();
             if (!saved) {
                 cerr << "Not able to save playlistEntry" << endl;

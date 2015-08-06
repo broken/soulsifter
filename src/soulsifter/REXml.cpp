@@ -128,8 +128,10 @@ namespace soulsifter {
         try {
 
             sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("update REXml set name=?, xml=? where id=?");
-            ps->setString(1, name);
-            ps->setString(2, xml);
+            if (!name.empty()) ps->setString(1, name);
+            else ps->setNull(1, sql::DataType::VARCHAR);
+            if (!xml.empty()) ps->setString(2, xml);
+            else ps->setNull(2, sql::DataType::VARCHAR);
             ps->setInt(3, id);
             int result = ps->executeUpdate();
             return result;
@@ -147,8 +149,10 @@ namespace soulsifter {
         try {
 
             sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("insert into REXml (name, xml) values (?, ?)");
-            ps->setString(1, name);
-            ps->setString(2, xml);
+            if (!name.empty()) ps->setString(1, name);
+            else ps->setNull(1, sql::DataType::VARCHAR);
+            if (!xml.empty()) ps->setString(2, xml);
+            else ps->setNull(2, sql::DataType::VARCHAR);
             int saved = ps->executeUpdate();
             if (!saved) {
                 cerr << "Not able to save reXml" << endl;

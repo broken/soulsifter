@@ -123,7 +123,8 @@ namespace soulsifter {
         try {
 
             sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("update BasicGenres set name=? where id=?");
-            ps->setString(1, name);
+            if (!name.empty()) ps->setString(1, name);
+            else ps->setNull(1, sql::DataType::VARCHAR);
             ps->setInt(2, id);
             int result = ps->executeUpdate();
             return result;
@@ -141,7 +142,8 @@ namespace soulsifter {
         try {
 
             sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("insert into BasicGenres (name) values (?)");
-            ps->setString(1, name);
+            if (!name.empty()) ps->setString(1, name);
+            else ps->setNull(1, sql::DataType::VARCHAR);
             int saved = ps->executeUpdate();
             if (!saved) {
                 cerr << "Not able to save basicGenre" << endl;

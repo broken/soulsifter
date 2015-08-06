@@ -7,7 +7,7 @@ module Attrib
   SAVEID = 2**3  # class: saving the object must explicitly set id
   TRANSIENT = 2**4  # field: not persistent
   KEY2 = 2**5  # field: secondary key, can be multiple fields which make it up
-  NULLABLE = 2**6 # field: if this field is nullable
+  NULLABLE = 2**6 # field: if this field is nullable (deprecated / unused)
   JOINTABLE = 2**7 # field: if this field is to a many-to-many join table versus though one
   DELETABLE = 2**8 # class: create delete method
 end
@@ -423,13 +423,14 @@ def cUpdateFunction(name, fields)
       str << "            ps->setBoolean(#{i}, #{f[$name]});\n"
     elsif (f[$type] == :time_t)
       str << "            ps->setString(#{i}, stringFromTime(#{f[$name]}));\n"
-    elsif (f[$attrib] & Attrib::NULLABLE > 0)
-      str << "            if (#{f[$name]} > 0) ps->set#{cap(f[$type].to_s)}(#{i}, #{f[$name]});\n"
-      str << "            else ps->setNull(#{i}, sql::DataType::INTEGER);\n"
     elsif (isSet(f[$type]))
       str << "            ps->set#{cap(getSetGeneric(f[$type]))}(#{i}, setToCsv(#{f[$name]}));\n"
+    elsif (f[$type] == :int)
+      str << "            if (#{f[$name]} > 0) ps->set#{cap(f[$type].to_s)}(#{i}, #{f[$name]});\n"
+      str << "            else ps->setNull(#{i}, sql::DataType::INTEGER);\n"
     else
-      str << "            ps->set#{cap(f[$type].to_s)}(#{i}, #{f[$name]});\n"
+      str << "            if (!#{f[$name]}.empty()) ps->set#{cap(f[$type].to_s)}(#{i}, #{f[$name]});\n"
+      str << "            else ps->setNull(#{i}, sql::DataType::VARCHAR);\n"
     end
   end
   str << "            ps->setInt(#{i + 1}, id);\n            int result = ps->executeUpdate();\n"
@@ -481,13 +482,14 @@ def cSaveFunction(name, fields, attribs)
       str << "            ps->set#{cap(f[$type].to_s)}ean(#{i}, #{f[$name]});\n"
     elsif (f[$type] == :time_t)
       str << "            ps->setString(#{i}, stringFromTime(#{f[$name]}));\n"
-    elsif (f[$attrib] & Attrib::NULLABLE > 0)
-      str << "            if (#{f[$name]} > 0) ps->set#{cap(f[$type].to_s)}(#{i}, #{f[$name]});\n"
-      str << "            else ps->setNull(#{i}, sql::DataType::INTEGER);\n"
     elsif (isSet(f[$type]))
       str << "            ps->set#{cap(getSetGeneric(f[$type]))}(#{i}, setToCsv(#{f[$name]}));\n"
+    elsif (f[$type] == :int)
+      str << "            if (#{f[$name]} > 0) ps->set#{cap(f[$type].to_s)}(#{i}, #{f[$name]});\n"
+      str << "            else ps->setNull(#{i}, sql::DataType::INTEGER);\n"
     else
-      str << "            ps->set#{cap(f[$type].to_s)}(#{i}, #{f[$name]});\n"
+      str << "            if (!#{f[$name]}.empty()) ps->set#{cap(f[$type].to_s)}(#{i}, #{f[$name]});\n"
+      str << "            else ps->setNull(#{i}, sql::DataType::VARCHAR);\n"
     end
   end
   str << "            int saved = ps->executeUpdate();\n            if (!saved) {\n"
@@ -543,9 +545,6 @@ def cPopulateFieldFunctions(name, fields)
       str << "        #{name}->set#{cap(f[$name])}(rs->getBoolean(\"#{f[$name]}\"));\n"
     elsif (f[$type] == :time_t)
       str << "        #{name}->set#{cap(f[$name])}(timeFromString(rs->getString(\"#{f[$name]}\")));\n"
-    elsif (f[$attrib] & Attrib::NULLABLE > 0)
-      str << "        if (rs->isNull(\"#{f[$name]}\")) #{name}->set#{cap(f[$name])}(0);\n"
-      str << "        else #{name}->set#{cap(f[$name])}(rs->get#{cap(f[$type].to_s)}(\"#{f[$name]}\"));\n"
     else
       str << "        #{name}->set#{cap(f[$name])}(rs->get#{cap(f[$type].to_s)}(\"#{f[$name]}\"));\n"
     end

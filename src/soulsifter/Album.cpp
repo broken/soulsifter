@@ -212,16 +212,25 @@ namespace soulsifter {
             }
 
             sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("update Albums set name=?, artist=?, coverFilepath=?, mixed=?, label=?, catalogId=?, releaseDateYear=?, releaseDateMonth=?, releaseDateDay=?, basicGenreId=? where id=?");
-            ps->setString(1, name);
-            ps->setString(2, artist);
-            ps->setString(3, coverFilepath);
+            if (!name.empty()) ps->setString(1, name);
+            else ps->setNull(1, sql::DataType::VARCHAR);
+            if (!artist.empty()) ps->setString(2, artist);
+            else ps->setNull(2, sql::DataType::VARCHAR);
+            if (!coverFilepath.empty()) ps->setString(3, coverFilepath);
+            else ps->setNull(3, sql::DataType::VARCHAR);
             ps->setBoolean(4, mixed);
-            ps->setString(5, label);
-            ps->setString(6, catalogId);
-            ps->setInt(7, releaseDateYear);
-            ps->setInt(8, releaseDateMonth);
-            ps->setInt(9, releaseDateDay);
-            ps->setInt(10, basicGenreId);
+            if (!label.empty()) ps->setString(5, label);
+            else ps->setNull(5, sql::DataType::VARCHAR);
+            if (!catalogId.empty()) ps->setString(6, catalogId);
+            else ps->setNull(6, sql::DataType::VARCHAR);
+            if (releaseDateYear > 0) ps->setInt(7, releaseDateYear);
+            else ps->setNull(7, sql::DataType::INTEGER);
+            if (releaseDateMonth > 0) ps->setInt(8, releaseDateMonth);
+            else ps->setNull(8, sql::DataType::INTEGER);
+            if (releaseDateDay > 0) ps->setInt(9, releaseDateDay);
+            else ps->setNull(9, sql::DataType::INTEGER);
+            if (basicGenreId > 0) ps->setInt(10, basicGenreId);
+            else ps->setNull(10, sql::DataType::INTEGER);
             ps->setInt(11, id);
             int result = ps->executeUpdate();
             return result;
@@ -249,16 +258,25 @@ namespace soulsifter {
             }
 
             sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("insert into Albums (name, artist, coverFilepath, mixed, label, catalogId, releaseDateYear, releaseDateMonth, releaseDateDay, basicGenreId) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-            ps->setString(1, name);
-            ps->setString(2, artist);
-            ps->setString(3, coverFilepath);
+            if (!name.empty()) ps->setString(1, name);
+            else ps->setNull(1, sql::DataType::VARCHAR);
+            if (!artist.empty()) ps->setString(2, artist);
+            else ps->setNull(2, sql::DataType::VARCHAR);
+            if (!coverFilepath.empty()) ps->setString(3, coverFilepath);
+            else ps->setNull(3, sql::DataType::VARCHAR);
             ps->setBoolean(4, mixed);
-            ps->setString(5, label);
-            ps->setString(6, catalogId);
-            ps->setInt(7, releaseDateYear);
-            ps->setInt(8, releaseDateMonth);
-            ps->setInt(9, releaseDateDay);
-            ps->setInt(10, basicGenreId);
+            if (!label.empty()) ps->setString(5, label);
+            else ps->setNull(5, sql::DataType::VARCHAR);
+            if (!catalogId.empty()) ps->setString(6, catalogId);
+            else ps->setNull(6, sql::DataType::VARCHAR);
+            if (releaseDateYear > 0) ps->setInt(7, releaseDateYear);
+            else ps->setNull(7, sql::DataType::INTEGER);
+            if (releaseDateMonth > 0) ps->setInt(8, releaseDateMonth);
+            else ps->setNull(8, sql::DataType::INTEGER);
+            if (releaseDateDay > 0) ps->setInt(9, releaseDateDay);
+            else ps->setNull(9, sql::DataType::INTEGER);
+            if (basicGenreId > 0) ps->setInt(10, basicGenreId);
+            else ps->setNull(10, sql::DataType::INTEGER);
             int saved = ps->executeUpdate();
             if (!saved) {
                 cerr << "Not able to save album" << endl;

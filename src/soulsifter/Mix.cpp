@@ -186,11 +186,16 @@ namespace soulsifter {
             }
 
             sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("update Mixes set outSongId=?, inSongId=?, bpmDiff=?, rank=?, comments=?, addon=? where id=?");
-            ps->setInt(1, outSongId);
-            ps->setInt(2, inSongId);
-            ps->setString(3, bpmDiff);
-            ps->setInt(4, rank);
-            ps->setString(5, comments);
+            if (outSongId > 0) ps->setInt(1, outSongId);
+            else ps->setNull(1, sql::DataType::INTEGER);
+            if (inSongId > 0) ps->setInt(2, inSongId);
+            else ps->setNull(2, sql::DataType::INTEGER);
+            if (!bpmDiff.empty()) ps->setString(3, bpmDiff);
+            else ps->setNull(3, sql::DataType::VARCHAR);
+            if (rank > 0) ps->setInt(4, rank);
+            else ps->setNull(4, sql::DataType::INTEGER);
+            if (!comments.empty()) ps->setString(5, comments);
+            else ps->setNull(5, sql::DataType::VARCHAR);
             ps->setBoolean(6, addon);
             ps->setInt(7, id);
             int result = ps->executeUpdate();
@@ -229,11 +234,16 @@ namespace soulsifter {
             }
 
             sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("insert into Mixes (outSongId, inSongId, bpmDiff, rank, comments, addon) values (?, ?, ?, ?, ?, ?)");
-            ps->setInt(1, outSongId);
-            ps->setInt(2, inSongId);
-            ps->setString(3, bpmDiff);
-            ps->setInt(4, rank);
-            ps->setString(5, comments);
+            if (outSongId > 0) ps->setInt(1, outSongId);
+            else ps->setNull(1, sql::DataType::INTEGER);
+            if (inSongId > 0) ps->setInt(2, inSongId);
+            else ps->setNull(2, sql::DataType::INTEGER);
+            if (!bpmDiff.empty()) ps->setString(3, bpmDiff);
+            else ps->setNull(3, sql::DataType::VARCHAR);
+            if (rank > 0) ps->setInt(4, rank);
+            else ps->setNull(4, sql::DataType::INTEGER);
+            if (!comments.empty()) ps->setString(5, comments);
+            else ps->setNull(5, sql::DataType::VARCHAR);
             ps->setBoolean(6, addon);
             int saved = ps->executeUpdate();
             if (!saved) {
