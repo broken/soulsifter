@@ -70,13 +70,13 @@
         <paper-input label="Subtitle" value="{{song.albumPart.name}}" floatingLabel></paper-input>
         <paper-input label="Label" value="{{song.album.label}}" floatingLabel></paper-input>
         <paper-input label="Catalog ID" value="{{song.album.catalogId}}" floatingLabel></paper-input>
-        <paper-input label="Genre" value="{{basicgenre}}" required="true" floatingLabel></paper-input>
+        <paper-input label="Genre" value="{{basicgenreName}}" required="true" floatingLabel></paper-input>
         <paper-input label="Release Year" value="{{song.album.releaseDateYear}}" required="true" type="number" min="1600" max="2099" floatingLabel></paper-input>
         <paper-input label="Release Month" value="{{song.album.releaseDateMonth}}" type="number" min="1" max="12" floatingLabel></paper-input>
         <paper-input label="Release Day" value="{{song.album.releaseDateDay}}" type="number" min="1" max="31" floatingLabel></paper-input>
       </div>
       <div class="genres">
-        <genre-list id="genreList" selection="{{song.styles}}"></genre-list>
+        <genre-list id="genreList" selection="{{_styles}}"></genre-list>
       </div>
     </abstract-action-page>
   </template>
@@ -87,17 +87,24 @@
     is: 'song-edit',
 
     properties: {
-      song: Object,
+      song: {
+        type: Object,
+        observer: '_songChanged'
+      },
       _newSongManager: {
         type: Object,
         value: function() { return new ss.NewSongManager(); },
         readOnly: true
       },
-      _taggedSong: Object,
+      _taggedSong: {
+        type: Object,
+        value: function() { return new ss.Song(); }
+      },
       filepaths: {
         type: Array,
         observer: '_filepathsChanged'
-      }
+      },
+      _styles: Array
     },
 
     attached: function() {
@@ -109,6 +116,9 @@
     },
 
     save: function() {
+      // perhaps allow genre list to select a set of IDs in the future?
+      var styleIds = this._styles.map(function(g) { return g.id; });
+      this.song.styleIds = styleIds;
       // If there is no album part, we should clear this object out so it is
       // not saved. Setting the ID deletes the object, and having an ID of 0
       // indicates a NULL value upon save.
@@ -116,17 +126,22 @@
         this.song.albumPartId = 0;
       }
       // TODO this should be replaced with a drop-down containing these genres
-      this.song.album.basicGenre = ss.BasicGenre.findByName(this.basicgenre);
+      this.song.album.basicGenre = ss.BasicGenre.findByName(this.basicgenreName);
 
-      this._newSongManager.processSong(this.song);
-      if (this._newSongManager.nextSong(this.song, this._taggedSong)) {
-        this.fire('page-song-edit');
+      if (this.song.id) {
+        this.song.update();
+      } else {
+        this._newSongManager.processSong(this.song);
+        if (this._newSongManager.nextSong(this.song, this._taggedSong)) {
+          this.fire('page-song-edit');
+        }
       }
     },
 
     skip: function() {
-      this.song.sync();
-      if (this._newSongManager.nextSong(this.song, this._taggedSong)) {
+      if (this.song.id) {
+        this.song.sync();
+      } else if (this._newSongManager.nextSong(this.song, this._taggedSong)) {
         this.fire('page-song-edit');
       }
     },
@@ -152,18 +167,26 @@
       if (this._newSongManager.nextSong(tmpSong, tmpTaggedSong)) {
         this._taggedSong = tmpTaggedSong;
         this.song = tmpSong;
-        // Create album & album part for the song we are editing if there
-        // currently does not exist one. It is not needed for the tagged song
-        // since its purpose is only output.
-        if (!this.song.albumId) this.song.album = new ss.Album();
-        if (!this.song.albumPartId) {
-          this.song.albumPart = new ss.AlbumPart();
-          this.song.albumPart.album = this.song.album;
-        }
       } else {
         // for some reason there is no song after importing filepaths, so just exit.
         this.fire('page-main');
       }
+    },
+
+    _songChanged: function() {
+      if (!this.song) return;
+      // Create album & album part for the song we are editing if there
+      // currently does not exist one. It is not needed for the tagged song
+      // since its purpose is only output.
+      if (!this.song.albumId) this.song.album = new ss.Album();
+      if (!this.song.albumPartId) {
+        this.song.albumPart = new ss.AlbumPart();
+        this.song.albumPart.album = this.song.album;
+      }
+      // TODO remove
+      if (this.song.album.basicGenre) this.basicgenreName = this.song.album.basicGenre.name;
+      // this does not seem to play well when working straight on the array object
+      this._styles = this.song.styles;
     },
   });
 </script>
