@@ -34,6 +34,7 @@ namespace soulsifter {
       ptree.put("db.name", "music");
       ptree.put("songList.limit", 128);
     }
+    stagingPath = "/Users/dogatech/Music/mp3";
   }
   
   void SoulSifterSettings::save() {
