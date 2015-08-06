@@ -184,7 +184,7 @@
         this.song.albumPart.album = this.song.album;
       }
       // TODO remove
-      if (this.song.album.basicGenre) this.basicgenreName = this.song.album.basicGenre.name;
+      if (!!this.song.album.basicGenre) this.basicgenreName = this.song.album.basicGenre.name;
       // this does not seem to play well when working straight on the array object
       this._styles = this.song.styles;
     },

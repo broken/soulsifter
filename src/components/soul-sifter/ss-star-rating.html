@@ -1,7 +1,6 @@
 <link href="../polymer/polymer.html" rel="import">
 
 <link href="../iron-icon/iron-icon.html" rel="import">
-<link href="../iron-selector/iron-selector.html" rel="import">
 
 
 <dom-module id="ss-star-rating">
@@ -19,11 +18,9 @@
     }
   </style>
   <template>
-    <iron-selector selected="{{selectedStar}}" activateEvent="[[_activateEvent(readOnly)]]" id="selector">
-      <template is="dom-repeat" items="[[stars]]">
-        <iron-icon icon="star" selected$="[[_isSelected(item, value)]]"></iron-icon>
-      </template>
-    </iron-selector>
+    <template is="dom-repeat" items="[[stars]]">
+      <iron-icon icon="star" selected$="[[_isSelected(item, value)]]" on-click="_select"></iron-icon>
+    </template>
   </template>
 </dom-module>
 
@@ -60,12 +57,13 @@
       return stars;
     },
 
-    _activateEvent: function(readOnly) {
-      return readOnly ? "" : "click";
-    },
-
     _isSelected: function(item, value) {
       return item < value;
-    }
+    },
+
+    _select: function(e) {
+      if (!this.readOnly)
+        this.value = e.model.item + 1;
+    },
   });
 </script>
