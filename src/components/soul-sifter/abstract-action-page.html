@@ -72,6 +72,13 @@
   Polymer({
     is: 'abstract-action-page',
 
+    properties: {
+      doNotCallExit: {
+        type: Boolean,
+        value: false
+      }
+    },
+
     setAcceptAction: function(a) {
       this.acceptAction = a;
     },
@@ -82,12 +89,12 @@
 
     accept: function() {
       if (this.acceptAction) this.acceptAction.call(this.parentNode);
-      this.exit();
+      if (!this.doNotCallExit) this.exit();
     },
 
     cancel: function() {
       if (this.cancelAction) this.cancelAction.call(this.parentNode);
-      this.exit();
+      if (!this.doNotCallExit) this.exit();
     },
 
     exit: function() {
