@@ -47,7 +47,7 @@
     }
   </style>
   <template>
-    <abstract-action-page id="abstractActionPage">
+    <abstract-action-page id="abstractActionPage" do-not-call-exit>
       <div class="fields">
         <paper-input label="Artist" value="{{song.artist}}" required="true" floatingLabel></paper-input>
         <paper-input label="Track Num" value="{{song.track}}" floatingLabel></paper-input>
@@ -132,22 +132,48 @@
         this.song.update();
       } else {
         this._newSongManager.processSong(this.song);
-        if (this._newSongManager.nextSong(this.song, this._taggedSong)) {
-          this.fire('page-song-edit');
+        if (this._hasMoreSongs()) {
+          return;  // stay on this page
         }
       }
+
+      this.$.abstractActionPage.exit();
     },
 
     skip: function() {
       if (this.song.id) {
         this.song.sync();
-      } else if (this._newSongManager.nextSong(this.song, this._taggedSong)) {
-        this.fire('page-song-edit');
+      } else if (this._hasMoreSongs()) {
+        return;  // stay on this page
       }
+      this.$.abstractActionPage.exit();
     },
 
     _filepathsChanged: function() {
       this._newSongManager.import(this.filepaths);
+      if (!this._hasMoreSongs()) {
+        // for some reason there is no song after importing filepaths, so just exit.
+        this.$.abstractActionPage.exit();
+      }
+    },
+
+    _songChanged: function() {
+      if (!this.song) return;
+      // Create album & album part for the song we are editing if there
+      // currently does not exist one. It is not needed for the tagged song
+      // since its purpose is only output.
+      if (!this.song.albumId) this.song.album = new ss.Album();
+      if (!this.song.albumPartId) {
+        this.song.albumPart = new ss.AlbumPart();
+        this.song.albumPart.album = this.song.album;
+      }
+      // TODO remove
+      if (!!this.song.album.basicGenre) this.basicgenreName = this.song.album.basicGenre.name;
+      // this does not seem to play well when working straight on the array object
+      this._styles = this.song.styles;
+    },
+
+    _hasMoreSongs: function() {
       // There is an issue to update the data bindings of the songs updated
       // from the nextSong call on NewSongManager. Because of the dirty
       // checking in notifyPath, and the internals of the object are updated
@@ -167,26 +193,9 @@
       if (this._newSongManager.nextSong(tmpSong, tmpTaggedSong)) {
         this._taggedSong = tmpTaggedSong;
         this.song = tmpSong;
-      } else {
-        // for some reason there is no song after importing filepaths, so just exit.
-        this.fire('page-main');
+        return true;
       }
-    },
-
-    _songChanged: function() {
-      if (!this.song) return;
-      // Create album & album part for the song we are editing if there
-      // currently does not exist one. It is not needed for the tagged song
-      // since its purpose is only output.
-      if (!this.song.albumId) this.song.album = new ss.Album();
-      if (!this.song.albumPartId) {
-        this.song.albumPart = new ss.AlbumPart();
-        this.song.albumPart.album = this.song.album;
-      }
-      // TODO remove
-      if (!!this.song.album.basicGenre) this.basicgenreName = this.song.album.basicGenre.name;
-      // this does not seem to play well when working straight on the array object
-      this._styles = this.song.styles;
+      return false;
     },
   });
 </script>
