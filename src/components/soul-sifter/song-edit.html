@@ -45,13 +45,24 @@
     .label {
       font-size: 0.75em;
     }
+    .prev {
+      font-size: 13px;
+      margin-top: 8px;
+      margin-bottom: -28px;
+      text-align: right;
+      color: #666;  /* TODO pull into theme */
+    }
   </style>
   <template>
     <abstract-action-page id="abstractActionPage" do-not-call-exit>
       <div class="fields">
+        <div class="prev">&nbsp;<span>[[_taggedSong.artist]]</span></div>
         <paper-input label="Artist" value="{{song.artist}}" required="true" floatingLabel></paper-input>
+        <div class="prev">&nbsp;<span>[[_taggedSong.track]]</span></div>
         <paper-input label="Track Num" value="{{song.track}}" floatingLabel></paper-input>
+        <div class="prev">&nbsp;<span>[[_taggedSong.title]]</span></div>
         <paper-input label="Title" value="{{song.title}}" required="true" floatingLabel></paper-input>
+        <div class="prev">&nbsp;<span>[[_taggedSong.remixer]]</span></div>
         <paper-input label="Remixer" value="{{song.remixer}}" floatingLabel></paper-input>
         <paper-input label="Comments" value="{{song.comments}}" floatingLabel></paper-input>
         <div id="ratingContainer">
@@ -64,15 +75,24 @@
         <paper-checkbox checked="{{song.album.mixed}}">Mixed</paper-checkbox>
       </div>
       <div class="fields">
+        <div class="prev">&nbsp;<span>[[_taggedSong.album.artist]]</span></div>
         <paper-input label="Album Artist" value="{{song.album.artist}}" floatingLabel></paper-input>
+        <div class="prev">&nbsp;<span>[[_taggedSong.album.name]]</span></div>
         <paper-input label="Album Name" value="{{song.album.name}}" required="true" floatingLabel></paper-input>
+        <div class="prev">&nbsp;<span>[[_taggedSong.albumPart.pos]]</span></div>
         <paper-input label="POS" value="{{song.albumPart.pos}}" floatingLabel></paper-input>
+        <div class="prev">&nbsp;<span>[[_taggedSong.albumPart.name]]</span></div>
         <paper-input label="Subtitle" value="{{song.albumPart.name}}" floatingLabel></paper-input>
+        <div class="prev">&nbsp;<span>[[_taggedSong.album.label]]</span></div>
         <paper-input label="Label" value="{{song.album.label}}" floatingLabel></paper-input>
+        <div class="prev">&nbsp;<span>[[_taggedSong.album.catalogId]]</span></div>
         <paper-input label="Catalog ID" value="{{song.album.catalogId}}" floatingLabel></paper-input>
         <paper-input label="Genre" value="{{basicgenreName}}" required="true" floatingLabel></paper-input>
+        <div class="prev">&nbsp;<span>[[_taggedSong.album.releaseDateYear]]</span></div>
         <paper-input label="Release Year" value="{{song.album.releaseDateYear}}" required="true" type="number" min="1600" max="2099" floatingLabel></paper-input>
+        <div class="prev">&nbsp;<span>[[_taggedSong.album.releaseDateMonth]]</span></div>
         <paper-input label="Release Month" value="{{song.album.releaseDateMonth}}" type="number" min="1" max="12" floatingLabel></paper-input>
+        <div class="prev">&nbsp;<span>[[_taggedSong.album.releaseDateDay]]</span></div>
         <paper-input label="Release Day" value="{{song.album.releaseDateDay}}" type="number" min="1" max="31" floatingLabel></paper-input>
       </div>
       <div class="genres">
