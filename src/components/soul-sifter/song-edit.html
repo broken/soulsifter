@@ -182,8 +182,8 @@
       // Create album & album part for the song we are editing if there
       // currently does not exist one. It is not needed for the tagged song
       // since its purpose is only output.
-      if (!this.song.albumId) this.song.album = new ss.Album();
-      if (!this.song.albumPartId) {
+      if (!this.song.album) this.song.album = new ss.Album();
+      if (!this.song.albumPart) {
         this.song.albumPart = new ss.AlbumPart();
         this.song.albumPart.album = this.song.album;
       }
