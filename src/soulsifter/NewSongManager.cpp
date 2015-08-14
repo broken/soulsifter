@@ -95,6 +95,20 @@ bool NewSongManager::nextSong(Song* updatedSong, Song* originalSong) {
     MusicManager::getInstance().readTagsFromSong(originalSong);
     MusicManager::getInstance().updateSongWithChanges(*originalSong, updatedSong);
 
+    {
+      if (updatedSong->getAlbum()->getArtist().empty()) {
+        updatedSong->getAlbum()->setArtist(updatedSong->getArtist());
+      }
+      if (updatedSong->getAlbum()->getName().empty()) {
+        updatedSong->getAlbum()->setName(updatedSong->getTitle());
+      }
+    }
+
+    // TODO currently this will chain and update the album and album part.
+    // However, we would prefer to sync those separately, and then sync the song,
+    // b/c if the song exists, we should not be processing it here.
+    updatedSong->sync();
+
     // TODO do this in a different thread and have it update the UI when finished
     // TODO this goes in caller
     /*const Bpms *bpms = AudioAnalyzer::analyzeBpm(updatedSong);
