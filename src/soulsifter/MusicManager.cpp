@@ -409,6 +409,16 @@ void MusicManager::writeTagsToSong(Song* song) {
       updatedSong->getRemixer().length() == 0) {
       updatedSong->setRemixer(rmxrMatch[1]);
     }
+    // add an album artist if one does not exist
+    if (updatedSong->getAlbum()->getArtist().empty()) {
+      if (boost::regex_search(updatedSong->getArtist(), featMatch, featRegex, boost::match_extra)) {
+        updatedSong->getAlbum()->setArtist(featMatch[1]);
+      }
+    }
+    // add an album name if one does not exist
+    if (updatedSong->getAlbum()->getName().empty()) {
+      updatedSong->getAlbum()->setName(updatedSong->getTitle());
+    }
     
     delete lastParsedSong;
     lastParsedSong = new Song(song);
