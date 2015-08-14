@@ -87,10 +87,12 @@ void NewSongManager::preprocessAllFiles(const vector<filesystem::path>& filepath
 }
 
 bool NewSongManager::nextSong(Song* updatedSong, Song* originalSong) {
-  Song* songToAdd = NULL;
-  if (filesToAdd->pullSong(&songToAdd)) {
-    *originalSong = *songToAdd;
-    delete songToAdd;
+  // Try to pull the next songs first if there is one.
+  string* path = NULL;
+  if (filesToAdd->pullSong(&path)) {
+    originalSong->clear();
+    originalSong->setFilepath(*path);
+    MusicManager::getInstance().readTagsFromSong(originalSong);
     MusicManager::getInstance().updateSongWithChanges(*originalSong, updatedSong);
 
     // TODO do this in a different thread and have it update the UI when finished
@@ -112,7 +114,6 @@ bool NewSongManager::nextSong(Song* updatedSong, Song* originalSong) {
     return true;
   }
   
-  string *path;
   if (filesToAdd->pullFile(&path)) {
     // TODO only move image if a song has been moved or a song has not been skipped
     if (hasMovedFile) {

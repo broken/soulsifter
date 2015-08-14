@@ -26,17 +26,16 @@ namespace dogatech {
       
       void clear();
     
-      void addFile(string path);
-      void addSong(Song *song);
+      void addFile(const string& path);
       
-      bool pullSong(Song** song);
+      bool pullSong(string** song);
       bool pullFile(string** path);
       
       const string* coverPath() const;
       void switchCover();
     
     private:
-      queue<Song*> songs;
+      queue<string*> songs;
       vector<string*> images;
       queue<string*> misc;
       int coverIndex;

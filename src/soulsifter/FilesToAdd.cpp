@@ -41,14 +41,12 @@ namespace dogatech {
     }
   
     // TODO test if it's a directory and loop over it and process zips & rars
-    void FilesToAdd::addFile(string path) {
+    void FilesToAdd::addFile(const string& path) {
     
       // music files
       // TODO support more than just mp3
       if (boost::algorithm::iends_with(path, ".mp3")) {
-        Song *song = new Song();
-        song->setFilepath(path);
-        MusicManager::getInstance().readTagsFromSong(song);
+        string* song = new string(path);
         songs.push(song);
         return;
       }
@@ -75,15 +73,7 @@ namespace dogatech {
       misc.push(file);
     }
     
-    void FilesToAdd::addSong(Song *song) {
-      songs.push(song);
-      
-      if (song->getAlbum() != NULL && song->getAlbum()->getCoverFilepath().length() > 0) {
-        images.push_back(new string(song->getAlbum()->getCoverFilepath()));
-      }
-    }
-    
-    bool FilesToAdd::pullSong(Song** song) {
+    bool FilesToAdd::pullSong(string** song) {
       if (songs.empty()) return false;
       *song = songs.front();
       songs.pop();
