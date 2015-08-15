@@ -8,7 +8,7 @@
   </style>
   <template>
     <template is="dom-repeat" items="[[genreParents]]">
-      <genre-list-item genre="[[item]]" on-genre-select="_selectGenre"></genre-list-item>
+      <genre-list-item genre="[[item]]" on-genre-select="_selectGenre" single-select="[[singleSelect]]"></genre-list-item>
     </template>
     <array-selector id="selector" items="[[allGenres]]" selected="{{selection}}" multi toggle></array-selector>
   </template>
@@ -32,7 +32,11 @@
         type: Array,
         notify: true,
         observer: '_selectionChanged'
-      }
+      },
+      singleSelect: {
+        type: Boolean,
+        value: false,
+      },
     },
 
     _selectionChanged: function(genres) {
