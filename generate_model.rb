@@ -439,9 +439,9 @@ def cUpdateFunction(name, fields)
     str << "            if (!#{vectorIds(f)}.empty()) {\n"
     str << "                stringstream ss(\"insert ignore into #{t[0]} (#{t[2]}, #{t[1]}) values (?, ?)\", ios_base::app | ios_base::out | ios_base::ate);\n                for (int i = 1; i < #{vectorIds(f)}.size(); ++i) {\n                    ss << \", (?, ?)\";\n                }\n                ps = MysqlAccess::getInstance().getPreparedStatement(ss.str());\n"
     str << "                for (int i = 0; i < #{vectorIds(f)}.size(); ++i) {\n                    ps->setInt(i * 2 + 1, id);\n                    ps->setInt(i * 2 + 2, #{vectorIds(f)}[i]);\n                }\n                ps->executeUpdate();\n"
-    str << "                ss.str(std::string());\n                ss << \"delete from #{t[0]} where #{t[2]} = ? and #{t[1]} not in (?\";\n                for (int i = 1; i < #{vectorIds(f)}.size(); ++i) {\n                    ss << \", ?\";\n                }\n                ss << \")\";\n"
+    str << "                ss.str(std::string());\n                ss << \"delete ignore from #{t[0]} where #{t[2]} = ? and #{t[1]} not in (?\";\n                for (int i = 1; i < #{vectorIds(f)}.size(); ++i) {\n                    ss << \", ?\";\n                }\n                ss << \")\";\n"
     str << "                ps = MysqlAccess::getInstance().getPreparedStatement(ss.str());\n                ps->setInt(1, id);\n                for (int i = 0; i < #{vectorIds(f)}.size(); ++i) {\n                    ps->setInt(i + 2, #{vectorIds(f)}[i]);\n                }\n                ps->executeUpdate();\n"
-    str << "            } else {\n                ps = MysqlAccess::getInstance().getPreparedStatement(\"delete from #{t[0]} where #{t[2]} = ?\");\n                ps->setInt(1, id);\n                ps->executeUpdate();\n            }\n"
+    str << "            } else {\n                ps = MysqlAccess::getInstance().getPreparedStatement(\"delete ignore from #{t[0]} where #{t[2]} = ?\");\n                ps->setInt(1, id);\n                ps->executeUpdate();\n            }\n"
   end
   str << "            return result;\n"
   str << sqlCatchBlock()

@@ -188,7 +188,7 @@ namespace soulsifter {
                 }
                 ps->executeUpdate();
                 ss.str(std::string());
-                ss << "delete from StyleChildren where parentId = ? and childId not in (?";
+                ss << "delete ignore from StyleChildren where parentId = ? and childId not in (?";
                 for (int i = 1; i < childIds.size(); ++i) {
                     ss << ", ?";
                 }
@@ -200,7 +200,7 @@ namespace soulsifter {
                 }
                 ps->executeUpdate();
             } else {
-                ps = MysqlAccess::getInstance().getPreparedStatement("delete from StyleChildren where parentId = ?");
+                ps = MysqlAccess::getInstance().getPreparedStatement("delete ignore from StyleChildren where parentId = ?");
                 ps->setInt(1, id);
                 ps->executeUpdate();
             }
@@ -216,7 +216,7 @@ namespace soulsifter {
                 }
                 ps->executeUpdate();
                 ss.str(std::string());
-                ss << "delete from StyleChildren where childId = ? and parentId not in (?";
+                ss << "delete ignore from StyleChildren where childId = ? and parentId not in (?";
                 for (int i = 1; i < parentIds.size(); ++i) {
                     ss << ", ?";
                 }
@@ -228,7 +228,7 @@ namespace soulsifter {
                 }
                 ps->executeUpdate();
             } else {
-                ps = MysqlAccess::getInstance().getPreparedStatement("delete from StyleChildren where childId = ?");
+                ps = MysqlAccess::getInstance().getPreparedStatement("delete ignore from StyleChildren where childId = ?");
                 ps->setInt(1, id);
                 ps->executeUpdate();
             }

@@ -189,7 +189,7 @@ namespace soulsifter {
                 }
                 ps->executeUpdate();
                 ss.str(std::string());
-                ss << "delete from PlaylistEntries where playlistId = ? and playlistEntryId not in (?";
+                ss << "delete ignore from PlaylistEntries where playlistId = ? and playlistEntryId not in (?";
                 for (int i = 1; i < playlistEntryIds.size(); ++i) {
                     ss << ", ?";
                 }
@@ -201,7 +201,7 @@ namespace soulsifter {
                 }
                 ps->executeUpdate();
             } else {
-                ps = MysqlAccess::getInstance().getPreparedStatement("delete from PlaylistEntries where playlistId = ?");
+                ps = MysqlAccess::getInstance().getPreparedStatement("delete ignore from PlaylistEntries where playlistId = ?");
                 ps->setInt(1, id);
                 ps->executeUpdate();
             }
@@ -217,7 +217,7 @@ namespace soulsifter {
                 }
                 ps->executeUpdate();
                 ss.str(std::string());
-                ss << "delete from PlaylistStyles where playlistId = ? and styleId not in (?";
+                ss << "delete ignore from PlaylistStyles where playlistId = ? and styleId not in (?";
                 for (int i = 1; i < styleIds.size(); ++i) {
                     ss << ", ?";
                 }
@@ -229,7 +229,7 @@ namespace soulsifter {
                 }
                 ps->executeUpdate();
             } else {
-                ps = MysqlAccess::getInstance().getPreparedStatement("delete from PlaylistStyles where playlistId = ?");
+                ps = MysqlAccess::getInstance().getPreparedStatement("delete ignore from PlaylistStyles where playlistId = ?");
                 ps->setInt(1, id);
                 ps->executeUpdate();
             }
