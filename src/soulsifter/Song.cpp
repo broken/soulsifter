@@ -108,11 +108,29 @@ namespace soulsifter {
         trashed = song.getTrashed();
         lowQuality = song.getLowQuality();
         reSongId = song.getRESongId();
-        reSong = NULL;
+        if (!song.getRESongId() && song.getRESong()) {
+            if (!reSong) reSong = new RESong(*song.getRESong());
+            else *reSong = *song.getRESong();
+        } else {
+            delete reSong;
+            reSong = NULL;
+        }
         albumId = song.getAlbumId();
-        album = NULL;
+        if (!song.getAlbumId() && song.getAlbum()) {
+            if (!album) album = new Album(*song.getAlbum());
+            else *album = *song.getAlbum();
+        } else {
+            delete album;
+            album = NULL;
+        }
         albumPartId = song.getAlbumPartId();
-        albumPart = NULL;
+        if (!song.getAlbumPartId() && song.getAlbumPart()) {
+            if (!albumPart) albumPart = new AlbumPart(*song.getAlbumPart());
+            else *albumPart = *song.getAlbumPart();
+        } else {
+            delete albumPart;
+            albumPart = NULL;
+        }
         styleIds = song.getStyleIds();
         deleteVectorPointers(&styles);
     }

@@ -193,7 +193,7 @@ def cAssignmentConstructor(name, fields)
   str = "    void #{cap(name)}::operator=(const #{cap(name)}& #{name}) {\n"
   fields.each do |f|
     if (f[$attrib] & Attrib::PTR > 0)
-      str << "        #{f[$name]} = NULL;\n"
+      str << "        if (!#{name}.get#{cap(f[$name])}Id() && #{name}.get#{cap(f[$name])}()) {\n            if (!#{f[$name]}) #{f[$name]} = new #{f[$type]}(*#{name}.get#{cap(f[$name])}());\n            else *#{f[$name]} = *#{name}.get#{cap(f[$name])}();\n        } else {\n            delete #{f[$name]};\n            #{f[$name]} = NULL;\n        }\n"
     elsif (isVector(f[$type]) && f[$attrib] & Attrib::ID == 0)
       str << "        deleteVectorPointers(&#{f[$name]});\n"
     else

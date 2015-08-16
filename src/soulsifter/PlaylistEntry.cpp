@@ -59,9 +59,21 @@ namespace soulsifter {
     void PlaylistEntry::operator=(const PlaylistEntry& playlistEntry) {
         id = playlistEntry.getId();
         playlistId = playlistEntry.getPlaylistId();
-        playlist = NULL;
+        if (!playlistEntry.getPlaylistId() && playlistEntry.getPlaylist()) {
+            if (!playlist) playlist = new Playlist(*playlistEntry.getPlaylist());
+            else *playlist = *playlistEntry.getPlaylist();
+        } else {
+            delete playlist;
+            playlist = NULL;
+        }
         songId = playlistEntry.getSongId();
-        song = NULL;
+        if (!playlistEntry.getSongId() && playlistEntry.getSong()) {
+            if (!song) song = new Song(*playlistEntry.getSong());
+            else *song = *playlistEntry.getSong();
+        } else {
+            delete song;
+            song = NULL;
+        }
         position = playlistEntry.getPosition();
         time = playlistEntry.getTime();
     }

@@ -55,7 +55,13 @@ namespace soulsifter {
         pos = albumPart.getPos();
         name = albumPart.getName();
         albumId = albumPart.getAlbumId();
-        album = NULL;
+        if (!albumPart.getAlbumId() && albumPart.getAlbum()) {
+            if (!album) album = new Album(*albumPart.getAlbum());
+            else *album = *albumPart.getAlbum();
+        } else {
+            delete album;
+            album = NULL;
+        }
     }
 
     AlbumPart::~AlbumPart() {

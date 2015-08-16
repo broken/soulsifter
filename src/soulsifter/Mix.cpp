@@ -62,9 +62,21 @@ namespace soulsifter {
     void Mix::operator=(const Mix& mix) {
         id = mix.getId();
         outSongId = mix.getOutSongId();
-        outSong = NULL;
+        if (!mix.getOutSongId() && mix.getOutSong()) {
+            if (!outSong) outSong = new Song(*mix.getOutSong());
+            else *outSong = *mix.getOutSong();
+        } else {
+            delete outSong;
+            outSong = NULL;
+        }
         inSongId = mix.getInSongId();
-        inSong = NULL;
+        if (!mix.getInSongId() && mix.getInSong()) {
+            if (!inSong) inSong = new Song(*mix.getInSong());
+            else *inSong = *mix.getInSong();
+        } else {
+            delete inSong;
+            inSong = NULL;
+        }
         bpmDiff = mix.getBpmDiff();
         rank = mix.getRank();
         comments = mix.getComments();

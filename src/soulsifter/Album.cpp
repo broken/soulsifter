@@ -76,7 +76,13 @@ namespace soulsifter {
         releaseDateMonth = album.getReleaseDateMonth();
         releaseDateDay = album.getReleaseDateDay();
         basicGenreId = album.getBasicGenreId();
-        basicGenre = NULL;
+        if (!album.getBasicGenreId() && album.getBasicGenre()) {
+            if (!basicGenre) basicGenre = new BasicGenre(*album.getBasicGenre());
+            else *basicGenre = *album.getBasicGenre();
+        } else {
+            delete basicGenre;
+            basicGenre = NULL;
+        }
     }
 
     Album::~Album() {
