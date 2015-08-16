@@ -124,7 +124,10 @@
         type: Array,
         observer: '_filepathsChanged'
       },
-      _styles: Array
+      _styles: {
+        type: Array,
+        value: function() { return []; }
+      },
     },
 
     attached: function() {

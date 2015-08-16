@@ -10,7 +10,6 @@
     <template is="dom-repeat" items="[[genreParents]]">
       <genre-list-item genre="[[item]]" on-genre-select="_selectGenre" single-select="[[singleSelect]]"></genre-list-item>
     </template>
-    <array-selector id="selector" items="[[allGenres]]" selected="{{selection}}" multi toggle></array-selector>
   </template>
 </dom-module>
 
@@ -22,11 +21,6 @@
       genreParents: {
         type: Array,
         value: function() { return ss.Style.findAllParents(); }
-      },
-      allGenres: {
-        type: Array,
-        value: function() { return ss.Style.findAll(); },
-        readOnly: true
       },
       selection: {
         type: Array,
@@ -47,7 +41,14 @@
     },
 
     _selectGenre: function(e, detail) {
-      this.$.selector.select(detail.genre);
+      for (var i = 0; i < this.selection.length; ++i) {
+        if (this.selection[i].id == detail.genre.id) {
+          this.selection.splice(i, 1);
+          return;
+        }
+      }
+      var g = new ss.Style(detail.genre);
+      this.selection.push(g);
     },
     
   });
