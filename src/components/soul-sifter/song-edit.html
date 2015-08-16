@@ -52,6 +52,13 @@
       text-align: right;
       color: #666;  /* TODO pull into theme */
     }
+    .filepath {
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      font-size: 13px;
+      color: #777777;  /* TODO put into theme */
+    }
   </style>
   <template>
     <abstract-action-page id="abstractActionPage" do-not-call-exit>
@@ -99,6 +106,7 @@
         <genre-list id="genreList" selection="{{_styles}}" single-select></genre-list>
       </div>
     </abstract-action-page>
+    <div class="filepath">[[song.filepath]]</div>
   </template>
 </dom-module>
 
