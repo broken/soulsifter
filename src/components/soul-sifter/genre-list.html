@@ -24,6 +24,7 @@
       },
       selection: {
         type: Array,
+        value: function() { return []; },
         notify: true,
         observer: '_selectionChanged'
       },
@@ -43,12 +44,12 @@
     _selectGenre: function(e, detail) {
       for (var i = 0; i < this.selection.length; ++i) {
         if (this.selection[i].id == detail.genre.id) {
-          this.selection.splice(i, 1);
+          this.splice('selection', i, 1);
           return;
         }
       }
       var g = new ss.Style(detail.genre);
-      this.selection.push(g);
+      this.push('selection', g);
     },
     
   });
