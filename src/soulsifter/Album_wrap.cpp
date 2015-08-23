@@ -24,7 +24,16 @@ void Album::setNwcpValue(dogatech::soulsifter::Album* v, bool own) {
 NAN_METHOD(Album::New) {
   NanScope();
 
-  Album* obj = new Album(new dogatech::soulsifter::Album());
+  dogatech::soulsifter::Album* wrappedObj = NULL;
+  if (args.Length()) {
+    dogatech::soulsifter::Album* xtmp(node::ObjectWrap::Unwrap<Album>(args[0]->ToObject())->getNwcpValue());
+    dogatech::soulsifter::Album& x = *xtmp;
+    wrappedObj = new dogatech::soulsifter::Album(x);
+  } else {
+    wrappedObj = new dogatech::soulsifter::Album();
+  }
+
+  Album* obj = new Album(wrappedObj);
   obj->Wrap(args.This());
 
   NanReturnValue(args.This());

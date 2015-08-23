@@ -26,7 +26,16 @@ void PlaylistEntry::setNwcpValue(dogatech::soulsifter::PlaylistEntry* v, bool ow
 NAN_METHOD(PlaylistEntry::New) {
   NanScope();
 
-  PlaylistEntry* obj = new PlaylistEntry(new dogatech::soulsifter::PlaylistEntry());
+  dogatech::soulsifter::PlaylistEntry* wrappedObj = NULL;
+  if (args.Length()) {
+    dogatech::soulsifter::PlaylistEntry* xtmp(node::ObjectWrap::Unwrap<PlaylistEntry>(args[0]->ToObject())->getNwcpValue());
+    dogatech::soulsifter::PlaylistEntry& x = *xtmp;
+    wrappedObj = new dogatech::soulsifter::PlaylistEntry(x);
+  } else {
+    wrappedObj = new dogatech::soulsifter::PlaylistEntry();
+  }
+
+  PlaylistEntry* obj = new PlaylistEntry(wrappedObj);
   obj->Wrap(args.This());
 
   NanReturnValue(args.This());

@@ -22,7 +22,16 @@ void Style::setNwcpValue(dogatech::soulsifter::Style* v, bool own) {
 NAN_METHOD(Style::New) {
   NanScope();
 
-  Style* obj = new Style(new dogatech::soulsifter::Style());
+  dogatech::soulsifter::Style* wrappedObj = NULL;
+  if (args.Length()) {
+    dogatech::soulsifter::Style* xtmp(node::ObjectWrap::Unwrap<Style>(args[0]->ToObject())->getNwcpValue());
+    dogatech::soulsifter::Style& x = *xtmp;
+    wrappedObj = new dogatech::soulsifter::Style(x);
+  } else {
+    wrappedObj = new dogatech::soulsifter::Style();
+  }
+
+  Style* obj = new Style(wrappedObj);
   obj->Wrap(args.This());
 
   NanReturnValue(args.This());

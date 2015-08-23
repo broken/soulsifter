@@ -22,7 +22,16 @@ void BasicGenre::setNwcpValue(dogatech::soulsifter::BasicGenre* v, bool own) {
 NAN_METHOD(BasicGenre::New) {
   NanScope();
 
-  BasicGenre* obj = new BasicGenre(new dogatech::soulsifter::BasicGenre());
+  dogatech::soulsifter::BasicGenre* wrappedObj = NULL;
+  if (args.Length()) {
+    dogatech::soulsifter::BasicGenre* xtmp(node::ObjectWrap::Unwrap<BasicGenre>(args[0]->ToObject())->getNwcpValue());
+    dogatech::soulsifter::BasicGenre& x = *xtmp;
+    wrappedObj = new dogatech::soulsifter::BasicGenre(x);
+  } else {
+    wrappedObj = new dogatech::soulsifter::BasicGenre();
+  }
+
+  BasicGenre* obj = new BasicGenre(wrappedObj);
   obj->Wrap(args.This());
 
   NanReturnValue(args.This());

@@ -24,7 +24,16 @@ void Mix::setNwcpValue(dogatech::soulsifter::Mix* v, bool own) {
 NAN_METHOD(Mix::New) {
   NanScope();
 
-  Mix* obj = new Mix(new dogatech::soulsifter::Mix());
+  dogatech::soulsifter::Mix* wrappedObj = NULL;
+  if (args.Length()) {
+    dogatech::soulsifter::Mix* xtmp(node::ObjectWrap::Unwrap<Mix>(args[0]->ToObject())->getNwcpValue());
+    dogatech::soulsifter::Mix& x = *xtmp;
+    wrappedObj = new dogatech::soulsifter::Mix(x);
+  } else {
+    wrappedObj = new dogatech::soulsifter::Mix();
+  }
+
+  Mix* obj = new Mix(wrappedObj);
   obj->Wrap(args.This());
 
   NanReturnValue(args.This());
