@@ -134,7 +134,8 @@ namespace soulsifter {
     Style* Style::findByREId(int reId) {
         try {
             sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select Styles.*, group_concat(children.childId) as childIds, group_concat(parents.parentId) as parentIds from Styles left outer join StyleChildren children on Styles.id = children.parentId left outer join StyleChildren parents on Styles.id = parents.childId where reId = ? group by Styles.id");
-            ps->setInt(1, reId);
+            if (reId > 0) ps->setInt(1, reId);
+            else ps->setNull(1, sql::DataType::INTEGER);
             sql::ResultSet *rs = ps->executeQuery();
             Style *style = NULL;
             if (rs->next()) {

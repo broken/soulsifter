@@ -94,7 +94,8 @@ namespace soulsifter {
     REXml* REXml::findByName(const string& name) {
         try {
             sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select REXml.* from REXml where name = ?");
-            ps->setString(1, name);
+            if (!name.empty()) ps->setString(1, name);
+            else ps->setNull(1, sql::DataType::VARCHAR);
             sql::ResultSet *rs = ps->executeQuery();
             REXml *reXml = NULL;
             if (rs->next()) {

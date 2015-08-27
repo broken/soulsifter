@@ -123,6 +123,24 @@ def groupBy(name, fields)
   return ""
 end
 
+def setField(f, i, indent)
+  str = ""
+  if (f[$type] == :bool)
+    str << indent << "ps->set#{cap(f[$type].to_s)}ean(#{i}, #{f[$name]});\n"
+  elsif (f[$type] == :time_t)
+    str << indent << "ps->setString(#{i}, stringFromTime(#{f[$name]}));\n"
+  elsif (isSet(f[$type]))
+    str << indent << "ps->set#{cap(getSetGeneric(f[$type]))}(#{i}, setToCsv(#{f[$name]}));\n"
+  elsif (f[$type] == :int)
+    str << indent << "if (#{f[$name]} > 0) ps->set#{cap(f[$type].to_s)}(#{i}, #{f[$name]});\n"
+    str << indent << "else ps->setNull(#{i}, sql::DataType::INTEGER);\n"
+  else
+    str << indent << "if (!#{f[$name]}.empty()) ps->set#{cap(f[$type].to_s)}(#{i}, #{f[$name]});\n"
+    str << indent << "else ps->setNull(#{i}, sql::DataType::VARCHAR);\n"
+  end
+  return str
+end
+
 ######################### h & cc outputs
 
 def sqlCatchBlock()
@@ -320,7 +338,7 @@ def cSecondaryKeysFindFunction(name, secondaryKeys, fields)
   end
   str << "#{groupBy(name,fields)}\");\n"
   secondaryKeys.each_with_index do |f,idx|
-    str << "            ps->set#{cap(f[$type].to_s)}(#{idx+1}, #{f[$name]});\n"
+    str << setField(f, idx+1, "            ")
   end
   str << "            sql::ResultSet *rs = ps->executeQuery();\n            #{cap(name)} *#{name} = NULL;\n            if (rs->next()) {\n                #{name} = new #{cap(name)}();\n                populateFields(rs, #{name});\n            }\n            rs->close();\n            delete rs;\n\n            return #{name};\n"
   str << sqlCatchBlock()
@@ -419,19 +437,7 @@ def cUpdateFunction(name, fields)
   fields.each do |f|
     next if (f[$name] == "id" || f[$attrib] & Attrib::PTR > 0 || isVector(f[$type]) || f[$attrib] & Attrib::TRANSIENT > 0)
     i += 1
-    if (f[$type] == :bool)
-      str << "            ps->setBoolean(#{i}, #{f[$name]});\n"
-    elsif (f[$type] == :time_t)
-      str << "            ps->setString(#{i}, stringFromTime(#{f[$name]}));\n"
-    elsif (isSet(f[$type]))
-      str << "            ps->set#{cap(getSetGeneric(f[$type]))}(#{i}, setToCsv(#{f[$name]}));\n"
-    elsif (f[$type] == :int)
-      str << "            if (#{f[$name]} > 0) ps->set#{cap(f[$type].to_s)}(#{i}, #{f[$name]});\n"
-      str << "            else ps->setNull(#{i}, sql::DataType::INTEGER);\n"
-    else
-      str << "            if (!#{f[$name]}.empty()) ps->set#{cap(f[$type].to_s)}(#{i}, #{f[$name]});\n"
-      str << "            else ps->setNull(#{i}, sql::DataType::VARCHAR);\n"
-    end
+    str << setField(f, i, "            ")
   end
   str << "            ps->setInt(#{i + 1}, id);\n            int result = ps->executeUpdate();\n"
   fields.select{|f| isVector(f[$type]) && f[$attrib] & Attrib::ID == 0}.each do |f|
@@ -478,19 +484,7 @@ def cSaveFunction(name, fields, attribs)
   fields.each do |f|
     next if ((f[$name] == "id" && attribs & Attrib::SAVEID == 0) || f[$attrib] & Attrib::PTR > 0 || isVector(f[$type]) || f[$attrib] & Attrib::TRANSIENT > 0)
     i += 1
-    if (f[$type] == :bool)
-      str << "            ps->set#{cap(f[$type].to_s)}ean(#{i}, #{f[$name]});\n"
-    elsif (f[$type] == :time_t)
-      str << "            ps->setString(#{i}, stringFromTime(#{f[$name]}));\n"
-    elsif (isSet(f[$type]))
-      str << "            ps->set#{cap(getSetGeneric(f[$type]))}(#{i}, setToCsv(#{f[$name]}));\n"
-    elsif (f[$type] == :int)
-      str << "            if (#{f[$name]} > 0) ps->set#{cap(f[$type].to_s)}(#{i}, #{f[$name]});\n"
-      str << "            else ps->setNull(#{i}, sql::DataType::INTEGER);\n"
-    else
-      str << "            if (!#{f[$name]}.empty()) ps->set#{cap(f[$type].to_s)}(#{i}, #{f[$name]});\n"
-      str << "            else ps->setNull(#{i}, sql::DataType::VARCHAR);\n"
-    end
+    str << setField(f, i, "            ")
   end
   str << "            int saved = ps->executeUpdate();\n            if (!saved) {\n"
   str << "                cerr << \"Not able to save #{name}\" << endl;\n                return saved;\n"

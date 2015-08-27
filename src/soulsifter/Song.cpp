@@ -259,7 +259,8 @@ namespace soulsifter {
     Song* Song::findByRESongId(int reSongId) {
         try {
             sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select Songs.*, group_concat(styles.styleId) as styleIds from Songs left outer join SongStyles styles on Songs.id = styles.songId where reSongId = ? group by Songs.id");
-            ps->setInt(1, reSongId);
+            if (reSongId > 0) ps->setInt(1, reSongId);
+            else ps->setNull(1, sql::DataType::INTEGER);
             sql::ResultSet *rs = ps->executeQuery();
             Song *song = NULL;
             if (rs->next()) {
