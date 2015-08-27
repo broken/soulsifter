@@ -95,10 +95,9 @@ bool NewSongManager::nextSong(Song* updatedSong, Song* originalSong) {
     MusicManager::getInstance().readTagsFromSong(originalSong);
     MusicManager::getInstance().updateSongWithChanges(*originalSong, updatedSong);
 
-    // TODO currently this will chain and update the album and album part.
-    // However, we would prefer to sync those separately, and then sync the song,
-    // b/c if the song exists, we should not be processing it here.
-    updatedSong->sync();
+    // Do not sync the song here. Since we just udpated the album with possible
+    // values, we may sync to an improper album, at which point things will be
+    // fucked when we save.
 
     // TODO do this in a different thread and have it update the UI when finished
     // TODO this goes in caller
