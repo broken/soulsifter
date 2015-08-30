@@ -1,6 +1,8 @@
 #include "NewSongManager.h"
 
+#include <fstream>
 #include <iostream>
+#include <stdio.h>
 #include <string>
 #include <vector>
 
@@ -169,39 +171,27 @@ bool NewSongManager::processSong(Song* song) {
     song->update();
   }
 
+  if (song->getTrashed()) trashMusicFile(song);
+
   return true;
 }
 
-// TODO
 void NewSongManager::trashMusicFile(Song* song) {
-  if (!processSong(song)) return;
+  // create new file
+  ofstream outputFile;
+  string newPath = song->getFilepath() + ".txt";
+  outputFile.open(newPath);
+  outputFile.close();
+
+  // trash old file
+  if (remove(song->getFilepath().c_str()) != 0) {
+    cerr << "Unable to delete trashed song file at " << song->getFilepath() << endl;
+  }
     
-  // NSFileManager *fileManager = [NSFileManager defaultManager];
-  // NSURL *oldPath = [NSURL fileURLWithPath:[NSString stringWithUTF8String:song->getFilepath().c_str()]];
-  // std::string newPath = song->getFilepath() + ".txt";
-  // if (![fileManager createFileAtPath:[NSString stringWithUTF8String:newPath.c_str()]
-  //                           contents:nil
-  //                         attributes:nil]) {
-  //   NSBeep();
-  //   // TODO can't tell by id, then how do we tell?
-  //   if (!song->getId()) {
-  //     delete song;
-  //   }
-  //   return;
-  // }
-    
-  // song->setTrashed(true);
-  // song->setFilepath(newPath);
-  // song->update();
-    
-  // [fileManager trashItemAtURL:oldPath resultingItemURL:nil error:nil];
-  
-  // // TODO can't tell by id, then how do we tell?
-  // if (!song->getId()) {
-  //   delete song;
-  // }
-  
-  // [self loadNextSong];
+  song->setTrashed(true);
+  song->setFilepath(newPath);
+  song->setRating(0);
+  song->update();
 }
 
 string NewSongManager::coverImagePath() const {
