@@ -37,14 +37,14 @@ namespace dogatech {
       }
     }
     
-    const Bpms* AudioAnalyzer::analyzeBpm(Song *song) {
+    const vector<double> AudioAnalyzer::analyzeBpm(Song *song) {
       cout << "analyze bpm" << endl;
 
       struct stat statBuffer;
       if (stat(song->getFilepath().c_str(), &statBuffer) != 0) {
         cerr << "File does not exist for song " << song->getId() << endl;
-        Bpms *bpm = new Bpms();
-        return bpm;
+        vector<double> bpms;
+        return bpms;
       }
       
       breakfastquay::MiniBPM miniBpm(44100);
@@ -53,21 +53,15 @@ namespace dogatech {
         detectBpm(song->getFilepath().c_str(), boost::bind(&breakfastquay::MiniBPM::process, boost::ref(miniBpm), _1, _2));
       } else {
         cerr << "Unrecognizable file type when analyzing BPM for " << song->getFilepath() << endl;
-        return new Bpms;
+        vector<double> bpms;
+        return bpms;
       }
     
       char buffer[8];
       sprintf(buffer, "%.2f", miniBpm.estimateTempo());
       song->setBpm(buffer);
       
-      Bpms *bpm = new Bpms();
-      vector<double> candidates = miniBpm.getTempoCandidates();
-      int i = 0;
-      for (vector<double>::const_iterator it = candidates.begin(); it != candidates.end() && i < 3; ++it, ++i) {
-        bpm->candidate[i] = *it;
-      }
-      
-      return bpm;
+      return miniBpm.getTempoCandidates();
     }
 
     void AudioAnalyzer::analyzeBpms() {

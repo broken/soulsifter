@@ -18,10 +18,6 @@ namespace dogatech {
     
     class Song;
     
-    struct Bpms {
-      float candidate[3];
-    };
-    
     struct Keys {
       std::vector<std::pair<std::string, float> > candidate;
       
@@ -34,7 +30,7 @@ namespace dogatech {
     public:
       static const Keys* analyzeKey(Song* song);
       
-      static const Bpms* analyzeBpm(Song* song);
+      static const std::vector<double> analyzeBpm(Song* song);
       static void analyzeBpms();
     };
     

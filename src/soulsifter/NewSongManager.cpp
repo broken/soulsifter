@@ -11,6 +11,7 @@
 
 #include "Album.h"
 #include "AlbumPart.h"
+#include "AudioAnalyzer.h"
 #include "FilesToAdd.h"
 #include "MusicManager.h"
 #include "Song.h"
@@ -100,18 +101,24 @@ bool NewSongManager::nextSong(Song* updatedSong, Song* originalSong) {
     MusicManager::getInstance().readTagsFromSong(originalSong);
     MusicManager::getInstance().updateSongWithChanges(*originalSong, updatedSong);
 
-    // Do not sync the song here. Since we just udpated the album with possible
+    // Do not sync the song here. Since we just updated the album with possible
     // values, we may sync to an improper album, at which point things will be
     // fucked when we save.
 
     // TODO do this in a different thread and have it update the UI when finished
-    // TODO this goes in caller
-    /*const Bpms *bpms = AudioAnalyzer::analyzeBpm(updatedSong);
-    if (!updatedSong->getBpm().empty()) [bpm setStringValue:[NSString stringWithFormat:@"%.2f",bpms->candidate[0]]];
-    [bpmAnalyzed setStringValue:[NSString stringWithFormat:@"%.2f, %.2f, %.2f",bpms->candidate[0],bpms->candidate[1],bpms->candidate[2]]];
-    delete bpms;
+    if (originalSong->getBpm().empty()) {
+      const vector<double> candidates = AudioAnalyzer::analyzeBpm(updatedSong);
+      stringstream ss;
+      int i = 0;
+      char buffer[8];
+      for (vector<double>::const_iterator it = candidates.begin(); it != candidates.end() && i < 4; ++it, ++i) {
+        sprintf(buffer, "%.2f", *it);
+        ss << buffer << ",";
+      }
+      originalSong->setBpm(ss.str());
+    }
     
-    const Keys *keys = AudioAnalyzer::analyzeKey(updatedSong);
+    /*const Keys *keys = AudioAnalyzer::analyzeKey(updatedSong);
     if (updatedSong->getTonicKeys().empty()) [key setStringValue:[NSString stringWithFormat:@"%s",keys->candidate[0].first.c_str()]];
     stringstream ss;
     boost::format fmt("%.1f");
