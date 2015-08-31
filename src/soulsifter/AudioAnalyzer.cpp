@@ -80,7 +80,7 @@ namespace dogatech {
       for (int i = 0; i <= maxId; i += span) {
         stringstream ss;
         ss << "q:\"s.id >= " << i << "\" q:\"s.id < " << (i + span) << "\"";
-        ss << " trashed:0";
+        ss << " trashed:0 q:\"bpm is null\"";
         query = ss.str();
         songs = SearchUtil::searchSongs(query, 0, 0, "", emptyStyles, emptySongs, span);
 
