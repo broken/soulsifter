@@ -20,7 +20,7 @@
     properties: {
       genreParents: {
         type: Array,
-        value: function() { return ss.Style.findAllParents(); }
+        value: function() { return ss.Style.findAllParents().sort(this._compareGenres); }
       },
       selection: {
         type: Array,
@@ -52,5 +52,8 @@
       this.push('selection', g);
     },
     
+    _compareGenres: function(a, b) {
+      return a.name.localeCompare(b.name);
+    },
   });
 </script>

@@ -80,7 +80,7 @@
     },
 
     _getSubGenres: function(genre) {
-      return genre.children;
+      return genre.children.sort(this._compareGenres);
     },
 
     /** @event genre-select */
@@ -126,7 +126,7 @@
     },
 
     ready: function() {
-      var children = this.genre.children;
+      var children = this.genre.children.sort(this._compareGenres);
       if (children.length > 0) {
         this.genre.subGenre = children;
       }
@@ -162,6 +162,10 @@
 
     _computePaddingLeftStyle: function(indent) {
       return 'padding-left: ' + indent + 'px;';
+    },
+
+    _compareGenres: function(a, b) {
+      return a.name.localeCompare(b.name);
     },
   });
 </script>
