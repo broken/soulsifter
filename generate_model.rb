@@ -7,7 +7,7 @@ module Attrib
   SAVEID = 2**3  # class: saving the object must explicitly set id
   TRANSIENT = 2**4  # field: not persistent
   KEY2 = 2**5  # field: secondary key, can be multiple fields which make it up
-  NULLABLE = 2**6 # field: if this field is nullable (deprecated / unused)
+  NON_NULLABLE = 2**6 # field: if this field is not nullable. Note that this does not mean required. in fact, required fields should be allowed to be set to null so a proper error by the database is thrown.
   JOINTABLE = 2**7 # field: if this field is to a many-to-many join table versus though one
   DELETABLE = 2**8 # class: create delete method
 end
@@ -131,9 +131,13 @@ def setField(f, i, indent)
     str << indent << "ps->setString(#{i}, stringFromTime(#{f[$name]}));\n"
   elsif (isSet(f[$type]))
     str << indent << "ps->set#{cap(getSetGeneric(f[$type]))}(#{i}, setToCsv(#{f[$name]}));\n"
+  elsif (f[$type] == :int && f[$attrib] & Attrib::NON_NULLABLE > 0)
+    str << indent << "ps->set#{cap(f[$type].to_s)}(#{i}, #{f[$name]});\n"
   elsif (f[$type] == :int)
     str << indent << "if (#{f[$name]} > 0) ps->set#{cap(f[$type].to_s)}(#{i}, #{f[$name]});\n"
     str << indent << "else ps->setNull(#{i}, sql::DataType::INTEGER);\n"
+  elsif (f[$attrib] & Attrib::NON_NULLABLE > 0)
+    str << indent << "ps->set#{cap(f[$type].to_s)}(#{i}, #{f[$name]});\n"
   else
     str << indent << "if (!#{f[$name]}.empty()) ps->set#{cap(f[$type].to_s)}(#{i}, #{f[$name]});\n"
     str << indent << "else ps->setNull(#{i}, sql::DataType::VARCHAR);\n"
@@ -836,7 +840,7 @@ songFields = [
   [:string, "remixer", 0],
   [:string, "featuring", 0],
   [:string, "filepath", Attrib::FIND],
-  [:int, "rating", 0],
+  [:int, "rating", Attrib::NON_NULLABLE],
   [:time_t, "dateAdded", 0],
   [:string, "bpm", 0],
   ["set<string>", "tonicKeys", 0],
@@ -848,7 +852,7 @@ songFields = [
   ["RESong", "reSong", Attrib::PTR],
   [:int, "albumId", Attrib::ID],
   ["Album", "album", Attrib::PTR],
-  [:int, "albumPartId", Attrib::ID | Attrib::NULLABLE],
+  [:int, "albumPartId", Attrib::ID],
   ["AlbumPart", "albumPart", Attrib::PTR],
   ["vector<int>", "styleIds", Attrib::ID],
   ["vector<Style*>", "styles", 0],

@@ -336,8 +336,7 @@ namespace soulsifter {
             else ps->setNull(5, sql::DataType::VARCHAR);
             if (!filepath.empty()) ps->setString(6, filepath);
             else ps->setNull(6, sql::DataType::VARCHAR);
-            if (rating > 0) ps->setInt(7, rating);
-            else ps->setNull(7, sql::DataType::INTEGER);
+            ps->setInt(7, rating);
             ps->setString(8, stringFromTime(dateAdded));
             if (!bpm.empty()) ps->setString(9, bpm);
             else ps->setNull(9, sql::DataType::VARCHAR);
@@ -441,8 +440,7 @@ namespace soulsifter {
             else ps->setNull(5, sql::DataType::VARCHAR);
             if (!filepath.empty()) ps->setString(6, filepath);
             else ps->setNull(6, sql::DataType::VARCHAR);
-            if (rating > 0) ps->setInt(7, rating);
-            else ps->setNull(7, sql::DataType::INTEGER);
+            ps->setInt(7, rating);
             ps->setString(8, stringFromTime(dateAdded));
             if (!bpm.empty()) ps->setString(9, bpm);
             else ps->setNull(9, sql::DataType::VARCHAR);
