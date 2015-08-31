@@ -89,6 +89,9 @@ void NewSongManager::preprocessAllFiles(const vector<filesystem::path>& filepath
 }
 
 bool NewSongManager::nextSong(Song* updatedSong, Song* originalSong) {
+  if (filesToAdd == NULL) {
+    return false;
+  }
   // Try to pull the next songs first if there is one.
   string* path = NULL;
   if (filesToAdd->pullSong(&path)) {
