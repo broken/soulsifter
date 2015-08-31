@@ -149,6 +149,7 @@
     },
 
     save: function() {
+      if (!this._validate()) return;
       // perhaps allow genre list to select a set of IDs in the future?
       var styleIds = this._styles.map(function(g) { return g.id; });
       this._editedSong.styleIds = styleIds;
@@ -229,6 +230,15 @@
         return true;
       }
       return false;
+    },
+
+    _validate: function() {
+      var valid = 1;
+      var inputs = Polymer.dom(this.root).querySelectorAll('paper-input');
+      for (var i = 0; i < inputs.length; ++i) {
+        valid &= inputs[i].validate();
+      }
+      return valid;
     },
   });
 </script>
