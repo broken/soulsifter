@@ -124,10 +124,8 @@ namespace {
   }
   
   string* cleanDirName(string* name) {
-    std::replace(name->begin(), name->end(), '/', '+');
+    std::replace(name->begin(), name->end(), '/', '-');
     std::replace(name->begin(), name->end(), ':', ' ');
-    std::replace(name->begin(), name->end(), '-', ' ');
-    //std::replace(name->begin(), name->end(), '.', '');
     return name;
   }
 }

@@ -64,6 +64,30 @@ namespace soulsifter {
         }
         (*genresPtr) = &basicGenres;
     }
+
+    BasicGenre* BasicGenre::findByArtist(const string& artist) {
+        try {
+            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select g.*, count(*) as cnt from Albums a join BasicGenres g on a.basicGenreId=g.id where a.artist=? group by g.id order by cnt desc limit 1");
+            ps->setString(1, artist);
+            sql::ResultSet *rs = ps->executeQuery();
+            BasicGenre* basicGenre = NULL;
+            if (rs->next()) {
+                basicGenre = new BasicGenre();
+                populateFields(rs, basicGenre);
+            }
+            rs->close();
+            delete rs;
+
+            return basicGenre;
+        } catch (sql::SQLException &e) {
+            cerr << "ERRO: SQLExceptionR in " << __FILE__;
+            cerr << " (" << __func__<< ") on line " << __LINE__ << endl;
+            cerr << "ERROR: " << e.what();
+            cerr << " (MySQL error code: " << e.getErrorCode();
+            cerr << ", SQLState: " << e.getSQLState() << ")" << endl;
+            exit(1);
+        }
+    }
     
 }
 }

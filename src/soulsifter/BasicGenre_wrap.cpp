@@ -60,6 +60,7 @@ void BasicGenre::Init(v8::Handle<v8::Object> exports) {
   NanSetPrototypeTemplate(tpl, "save", NanNew<v8::FunctionTemplate>(save)->GetFunction());
   NanSetPrototypeTemplate(tpl, "sync", NanNew<v8::FunctionTemplate>(sync)->GetFunction());
   NanSetTemplate(tpl, "findByFilepath", NanNew<v8::FunctionTemplate>(findByFilepath)->GetFunction());
+  NanSetTemplate(tpl, "findByArtist", NanNew<v8::FunctionTemplate>(findByArtist)->GetFunction());
   tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("id"), getId, setId);
   tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("name"), getName, setName);
 
@@ -158,6 +159,21 @@ NAN_METHOD(BasicGenre::findByFilepath) {
   string a0(*v8::String::Utf8Value(args[0]->ToString()));
   dogatech::soulsifter::BasicGenre* result =
       dogatech::soulsifter::BasicGenre::findByFilepath(a0);
+
+  if (result == NULL) NanReturnUndefined();
+  v8::Local<v8::Object> instance = BasicGenre::NewInstance();
+  BasicGenre* r = ObjectWrap::Unwrap<BasicGenre>(instance);
+  r->setNwcpValue(result, true);
+
+  NanReturnValue(instance);
+}
+
+NAN_METHOD(BasicGenre::findByArtist) {
+  NanScope();
+
+  string a0(*v8::String::Utf8Value(args[0]->ToString()));
+  dogatech::soulsifter::BasicGenre* result =
+      dogatech::soulsifter::BasicGenre::findByArtist(a0);
 
   if (result == NULL) NanReturnUndefined();
   v8::Local<v8::Object> instance = BasicGenre::NewInstance();

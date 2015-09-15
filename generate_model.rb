@@ -758,7 +758,7 @@ basicGenreFields = [
   [:string, "name", Attrib::KEY2],
 ]
 basicGenreAttribs = 0
-basicGenreCustomMethods = "        static BasicGenre* findByFilepath(const string& filepath);\n        static void findAll(const vector<const BasicGenre*>** genresPtr);\n\n"
+basicGenreCustomMethods = "        static BasicGenre* findByFilepath(const string& filepath);\n        static void findAll(const vector<const BasicGenre*>** genresPtr);\n        static BasicGenre* findByArtist(const string& artist);\n\n"
 mixFields = [
   [:int, "id", Attrib::FIND],
   [:int, "outSongId", Attrib::ID | Attrib::KEY2],

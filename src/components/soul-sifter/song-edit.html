@@ -141,6 +141,10 @@
       },
     },
 
+    observers: [
+      '_albumArtistChanged(_editedSong.album.artist)',
+    ],
+
     attached: function() {
       // https://www.polymer-project.org/1.0/docs/migration.html#domready
       this.async(function() {
@@ -204,6 +208,7 @@
       }
       // TODO remove
       if (!!this._editedSong.album.basicGenre) this.basicgenreName = this._editedSong.album.basicGenre.name;
+      else this.basicgenreName = '';
       // this does not seem to play well when working straight on the array object
       this._styles = this._editedSong.styles;
     },
@@ -240,6 +245,15 @@
         valid &= inputs[i].validate();
       }
       return valid;
+    },
+
+    _albumArtistChanged: function(artist) {
+      if (!!artist && !this.basicgenreName) {
+        this.debounce('findBasicGenreByArtist', function() {
+          var basicGenre = ss.BasicGenre.findByArtist(artist);
+          if (!!basicGenre) this.basicgenreName = basicGenre.name;
+        }, 750);
+      }
     },
   });
 </script>
