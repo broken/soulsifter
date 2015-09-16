@@ -101,7 +101,8 @@
             <paper-checkbox checked="{{_editedSong.album.mixed}}">Mixed</paper-checkbox>
             <paper-checkbox checked="{{_editedSong.trashed}}" disabled$="[[song.trashed]]">Trash</paper-checkbox>
           </div>
-          <div id="cover"></div>
+          <div id="cover" on-click="_changeCover"></div>
+          <input style="display:none;" id="fileDialog" type="file"/>
         </div>
       </div>
       <div class="fields">
@@ -164,6 +165,10 @@
         type: Number,
         value: 750
       },
+      _changedAlbumCover: {
+        type: Boolean,
+        value: false
+      },
     },
 
     observers: [
@@ -176,7 +181,20 @@
       this.async(function() {
         this.$.abstractActionPage.setAcceptAction(this.save);
         this.$.abstractActionPage.setCancelAction(this.skip);
+        // select file dialog
+        var that = this;
+        this.$.fileDialog.addEventListener("change", function(e) {
+          that._editedSong.album.coverFilepath = this.value;
+          that.$.cover.style.backgroundImage = 'url("' + that._editedSong.album.coverFilepath + '")';
+          that._changedAlbumCover = true;
+        }, false);
       }.bind(this));
+    },
+
+    ready: function() {
+      // used for moving cover files
+      this.fs = require('fs');
+      this.path = require('path');
     },
 
     save: function() {
@@ -201,6 +219,19 @@
         if (this._hasMoreSongs()) {
           return;  // stay on this page
         }
+      }
+
+      // Currently you cannot edit the cover of newly added songs. The
+      // NewSongManager processes it last, so anything changed will just be
+      // overwritten.
+      if (this._changedAlbumCover) {
+        // TODO the file moving should be done externally
+        var basename = this.path.basename(this._editedSong.album.coverFilepath);
+        var dirname = this.path.dirname(this._editedSong.filepath);
+        var newpath = dirname + '/' + basename;
+        this.fs.rename(this._editedSong.album.coverFilepath, newpath);
+        this._editedSong.album.coverFilepath = newpath;
+        this._editedSong.album.update();
       }
 
       this.$.abstractActionPage.exit();
@@ -236,6 +267,7 @@
       if (!!this._editedSong.album.basicGenre) this.basicgenreName = this._editedSong.album.basicGenre.name;
       else this.basicgenreName = '';
       this.$.cover.style.backgroundImage = 'url("' + this._editedSong.album.coverFilepath + '")';
+      this._changedAlbumCover = false;
       // this does not seem to play well when working straight on the array object
       this._styles = this._editedSong.styles;
     },
@@ -290,6 +322,10 @@
           this.notifyPath('_editedSong.album.artist', artist);
         }, this.debounceTime);
       }
+    },
+
+    _changeCover: function() {
+      this.$.fileDialog.click();
     },
   });
 </script>
