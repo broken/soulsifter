@@ -59,6 +59,22 @@
       font-size: 13px;
       color: #777777;  /* TODO put into theme */
     }
+
+    .cols {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+    }
+    .rows {
+      display: flex;
+      flex-direction: column;
+    }
+    #cover {
+      align-self: flex-end;
+      background-size: cover;
+      height: 108px;
+      width: 108px;
+    }
   </style>
   <template>
     <abstract-action-page id="abstractActionPage" do-not-call-exit>
@@ -79,9 +95,14 @@
         <div class="prev">&nbsp;<span>[[_taggedSong.bpm]]</span></div>
         <paper-input label="BPM" value="{{_editedSong.bpm}}" floatingLabel></paper-input>
         <paper-input label="Key" value="{{_editedSong.tonicKey}}" floatingLabel></paper-input>
-        <paper-checkbox checked="{{_editedSong.lowQuality}}">Low Quality</paper-checkbox>
-        <paper-checkbox checked="{{_editedSong.album.mixed}}">Mixed</paper-checkbox>
-        <paper-checkbox checked="{{_editedSong.trashed}}" disabled$="[[song.trashed]]">Trash</paper-checkbox>
+        <div class="cols">
+          <div class="rows">
+            <paper-checkbox checked="{{_editedSong.lowQuality}}">Low Quality</paper-checkbox>
+            <paper-checkbox checked="{{_editedSong.album.mixed}}">Mixed</paper-checkbox>
+            <paper-checkbox checked="{{_editedSong.trashed}}" disabled$="[[song.trashed]]">Trash</paper-checkbox>
+          </div>
+          <div id="cover"></div>
+        </div>
       </div>
       <div class="fields">
         <div class="prev">&nbsp;<span>[[_taggedSong.album.artist]]</span></div>
@@ -214,6 +235,7 @@
       // TODO remove
       if (!!this._editedSong.album.basicGenre) this.basicgenreName = this._editedSong.album.basicGenre.name;
       else this.basicgenreName = '';
+      this.$.cover.style.backgroundImage = 'url("' + this._editedSong.album.coverFilepath + '")';
       // this does not seem to play well when working straight on the array object
       this._styles = this._editedSong.styles;
     },
