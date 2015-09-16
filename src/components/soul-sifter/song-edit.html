@@ -139,10 +139,15 @@
         type: Array,
         value: function() { return []; }
       },
+      debounceTime: {
+        type: Number,
+        value: 750
+      },
     },
 
     observers: [
       '_albumArtistChanged(_editedSong.album.artist)',
+      '_artistChanged(_editedSong.artist)',
     ],
 
     attached: function() {
@@ -252,7 +257,16 @@
         this.debounce('findBasicGenreByArtist', function() {
           var basicGenre = ss.BasicGenre.findByArtist(artist);
           if (!!basicGenre) this.basicgenreName = basicGenre.name;
-        }, 750);
+        }, this.debounceTime);
+      }
+    },
+
+    _artistChanged: function(artist) {
+      if (!!artist && !this._editedSong.album.artist) {
+        this.debounce('setAlbumArtist', function() {
+          this._editedSong.album.artist = artist;
+          this.notifyPath('_editedSong.album.artist', artist);
+        }, this.debounceTime);
       }
     },
   });
