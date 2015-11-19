@@ -417,6 +417,10 @@ void MusicManager::writeTagsToSong(Song* song) {
     if (updatedSong->getAlbum()->getName().empty()) {
       updatedSong->getAlbum()->setName(updatedSong->getTitle());
     }
+    // remove album part if there is just one
+    if (!updatedSong->getAlbumPart()->getPos().compare("1/1")) {
+      updatedSong->getAlbumPart()->setPos("");
+    }
     
     delete lastParsedSong;
     lastParsedSong = new Song(song);
