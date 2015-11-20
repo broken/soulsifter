@@ -2,7 +2,10 @@
 
 <link href="../iron-flex-layout/iron-flex-layout.html" rel="import">
 <link href="../paper-checkbox/paper-checkbox.html" rel="import">
+<link href="../paper-dropdown-menu/paper-dropdown-menu.html" rel="import">
 <link href="../paper-input/paper-input.html" rel="import">
+<link href="../paper-item/paper-item.html" rel="import">
+<link href="../paper-menu/paper-menu.html" rel="import">
 
 <link href="abstract-action-page.html" rel="import">
 <link href="genre-list.html" rel="import">
@@ -118,7 +121,13 @@
         <paper-input label="Label" value="{{_editedSong.album.label}}" floatingLabel></paper-input>
         <div class="prev">&nbsp;<span>[[_taggedSong.album.catalogId]]</span></div>
         <paper-input label="Catalog ID" value="{{_editedSong.album.catalogId}}" floatingLabel></paper-input>
-        <paper-input label="Genre" value="{{basicgenreName}}" required="true" floatingLabel></paper-input>
+        <paper-dropdown-menu label="Basic Genre" required>
+          <paper-menu class="dropdown-content" selected="{{basicgenreName}}" attr-for-selected="label">
+            <template is="dom-repeat" items="[[_basicGenreList]]">
+              <paper-item label="[[item.name]]">[[item.name]]</paper-item>
+            </template>
+          </paper-menu>
+        </paper-dropdown-menu>
         <div class="prev">&nbsp;<span>[[_taggedSong.album.releaseDateYear]]</span></div>
         <paper-input label="Release Year" value="{{_editedSong.album.releaseDateYear}}" required="true" type="number" min="1600" max="2099" floatingLabel></paper-input>
         <div class="prev">&nbsp;<span>[[_taggedSong.album.releaseDateMonth]]</span></div>
@@ -168,6 +177,11 @@
       _changedAlbumCover: {
         type: Boolean,
         value: false
+      },
+      _basicGenreList: {
+        type: Array,
+        value: function() { return ss.BasicGenre.findAll(); },
+        readOnly: true
       },
     },
 
