@@ -40,7 +40,7 @@
           # organization
           "FilesToAdd.cpp",
           "MusicManager.cpp",
-          #"MusicManager_wrap.cpp",
+          "MusicManager_wrap.cpp",
           "NewSongManager.cpp",
           "NewSongManager_wrap.cpp",
           "SearchUtil.cpp",

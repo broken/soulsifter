@@ -48,6 +48,7 @@
     <paper-icon-button icon="add-circle" on-click="_openCreateSongPage" id="createSongButton"></paper-icon-button>
     <paper-icon-button icon="settings" on-click="_openSettingsPage"></paper-icon-button>
     <ss-options-menu>
+      <ss-options-menu-item on-click="updateSongAttributesFromTags">Update Song Attributes From Tags</ss-options-menu-item>
       <ss-options-menu-item on-click="analyzeBpms">Analyze BPMs</ss-options-menu-item>
       <div class="menuItem"> <!-- cannot use ss-options-menu-item here since the ripple will prevent click on btn -->
         <paper-toggle-button checked="{{djSearch}}"></paper-toggle-button>
@@ -110,6 +111,10 @@
 
     analyzeBpms: function(e, detail, sender) {
       ss.AudioAnalyzer.analyzeBpms();
+    },
+
+    updateSongAttributesFromTags: function(e, detail, sender) {
+      ss.MusicManager.getInstance().updateSongAttributesFromTags();
     },
 
     _toggleSearchInfoDialog: function(e, detail, sender) {

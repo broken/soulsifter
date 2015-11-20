@@ -148,7 +148,10 @@ MusicManager::~MusicManager() {
   void MusicManager::readId3v2Tag(Song* song) {
     TagLib::MPEG::File f(song->getFilepath().c_str());
     TagLib::ID3v2::Tag* id3v2 = f.ID3v2Tag();
-    if (id3v2) {
+    if (!id3v2) {
+      return;
+    }
+
       if (id3v2->artist() != TagLib::String::null) song->setArtist(id3v2->artist().to8Bit());
       song->setTrack(getId3v2Text(id3v2, "TRCK"));
       if (id3v2->title() != TagLib::String::null) song->setTitle(id3v2->title().to8Bit());
@@ -190,7 +193,46 @@ MusicManager::~MusicManager() {
       tmp[1] = date[3];
       song->getAlbum()->setReleaseDateMonth(atoi(tmp));
       delete [] tmp;
+
+    readId3v2TagAttributes(song, id3v2);
+  }
+
+  bool MusicManager::readId3v2TagAttributes(Song* song) {
+    TagLib::MPEG::File f(song->getFilepath().c_str());
+    TagLib::ID3v2::Tag* id3v2 = f.ID3v2Tag();  // still owned by file
+    return readId3v2TagAttributes(song, id3v2);
+  }
+
+  bool MusicManager::readId3v2TagAttributes(Song* song, TagLib::ID3v2::Tag* id3v2) {
+    bool updated = false;
+    if (!id3v2 || !song) {
+      return updated;
     }
+
+    const string bpm = getId3v2Text(id3v2, "TBPM");
+    if (bpm.compare(song.getBpm())) {
+      cout << "updating song " << song.getId()
+           << " bpm from " << song.getBpm()
+           << " to " << bpm << endl;
+      song.setBpm(bpm);
+      updated = true;
+    }
+    const string key = getId3v2Text(id3v2, "TKEY");
+    if (key.compare(song.getKey())) {
+      cout << "updating song " << song.getId()
+           << " key from " << song.getKey()
+           << " to " << key << endl;
+      song.setKey(key);
+      updated = true;
+    }
+    const string energy = getId3v2Text(id3v2, "GRID");
+    //if (energy.compare(song.getEnergy())) {
+      cout << "updating song " << song.getId()
+    //       << " energy from " << song.getEnergy()
+           << " energy to " << energy << endl;
+    //  song.setEnergy(energy);
+    //}
+    return updated;
   }
 
 void MusicManager::readTagsFromSong(Song* song) {
@@ -215,21 +257,6 @@ void MusicManager::readTagsFromSong(Song* song) {
                 ss << id3v1->track();
                 song->setTrack(ss.str());
             }
-        }
-        TagLib::APE::Tag* ape = f.APETag();
-        if (ape) {
-            stringstream ss;
-            /*if (ape->title() != TagLib::String::null) song->setTitle(ape->title().to8Bit());
-            if (ape->artist() != TagLib::String::null) song->setArtist(ape->artist().to8Bit());
-            if (ape->album() != TagLib::String::null) song->getAlbum()->setName(ape->album().to8Bit());
-            if (ape->comment() != TagLib::String::null) song->setComments(ape->comment().to8Bit());
-            //TODO if (ape->genre() != TagLib::String::null) song->setGenre(ape->genre().to8Bit());
-            if (ape->year() != 0) song->getAlbum()->setReleaseDateYear(ape->year());
-            if (ape->track() != 0) {
-                ss.clear();
-                ss << ape->track();
-                song->setTrack(ss.str());
-            }*/
         }
         readId3v2Tag(song);
     } else if (boost::algorithm::iends_with(song->getFilepath(), ".m4a") ||
@@ -319,6 +346,38 @@ void MusicManager::writeTagsToSong(Song* song) {
             cerr << "unable to save " << song->getFilepath() << endl;
         }
     }
+}
+
+void MusicManager::updateSongAttributesFromTags() {
+  cout << "updating song attributes from tags" << endl;
+
+  // get max id
+  vector<Style*> emptyStyles;
+  vector<Song*> emptySongs;
+  string query = "id:\"(select max(id) from songs)\"";
+  vector<Song*>* songs = SearchUtil::searchSongs(query, 0, 0, "", emptyStyles, emptySongs, 1);
+  int maxId = 0;
+  for (Song* song : *songs) {
+    maxId = song->getId();
+  }
+
+  // loop through songs
+  int span = 100;
+  for (int i = 0; i <= maxId; i += span) {
+    stringstream ss;
+    ss << "q:\"s.id >= " << i << "\" q:\"s.id < " << (i + span) << "\"";
+    ss << " trashed:0"; // q:\"bpm is null\"";
+    query = ss.str();
+    songs = SearchUtil::searchSongs(query, 0, 0, "", emptyStyles, emptySongs, span);
+
+    for (Song* song : *songs) {
+      if (readId3v2TagAttributes(song)) {
+        // song->update();
+        cout << "updating song" << endl;
+      }
+    }
+    return;  // remove once tested
+  }
 }
     
 # pragma mark monitor changes
