@@ -58,6 +58,8 @@ class Song : public node::ObjectWrap {
   static NAN_METHOD(removeTonicKey);
   static NAN_GETTER(getTonicKey);
   static NAN_SETTER(setTonicKey);
+  static NAN_GETTER(getEnergy);
+  static NAN_SETTER(setEnergy);
   static NAN_GETTER(getComments);
   static NAN_SETTER(setComments);
   static NAN_GETTER(getTrashed);

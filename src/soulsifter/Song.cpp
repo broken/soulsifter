@@ -49,6 +49,7 @@ namespace soulsifter {
     bpm(),
     tonicKeys(),
     tonicKey(),
+    energy(0),
     comments(),
     trashed(false),
     lowQuality(false),
@@ -75,6 +76,7 @@ namespace soulsifter {
     bpm(song.getBpm()),
     tonicKeys(song.getTonicKeys()),
     tonicKey(song.getTonicKey()),
+    energy(song.getEnergy()),
     comments(song.getComments()),
     trashed(song.getTrashed()),
     lowQuality(song.getLowQuality()),
@@ -104,6 +106,7 @@ namespace soulsifter {
         bpm = song.getBpm();
         tonicKeys = song.getTonicKeys();
         tonicKey = song.getTonicKey();
+        energy = song.getEnergy();
         comments = song.getComments();
         trashed = song.getTrashed();
         lowQuality = song.getLowQuality();
@@ -158,6 +161,7 @@ namespace soulsifter {
         bpm.clear();
         tonicKeys.clear();
         tonicKey.clear();
+        energy = 0;
         comments.clear();
         trashed = false;
         lowQuality = false;
@@ -188,6 +192,7 @@ namespace soulsifter {
         song->setDateAdded(timeFromString(rs->getString("dateAdded")));
         song->setBpm(rs->getString("bpm"));
         song->setTonicKey(rs->getString("tonicKey"));
+        song->setEnergy(rs->getInt("energy"));
         song->setComments(rs->getString("comments"));
         song->setTrashed(rs->getBoolean("trashed"));
         song->setLowQuality(rs->getBoolean("lowQuality"));
@@ -323,7 +328,7 @@ namespace soulsifter {
                 albumPartId = albumPart->getId();
             }
 
-            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("update Songs set artist=?, track=?, title=?, remixer=?, featuring=?, filepath=?, rating=?, dateAdded=?, bpm=?, tonicKeys=?, tonicKey=?, comments=?, trashed=?, lowQuality=?, reSongId=?, albumId=?, albumPartId=? where id=?");
+            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("update Songs set artist=?, track=?, title=?, remixer=?, featuring=?, filepath=?, rating=?, dateAdded=?, bpm=?, tonicKeys=?, tonicKey=?, energy=?, comments=?, trashed=?, lowQuality=?, reSongId=?, albumId=?, albumPartId=? where id=?");
             if (!artist.empty()) ps->setString(1, artist);
             else ps->setNull(1, sql::DataType::VARCHAR);
             if (!track.empty()) ps->setString(2, track);
@@ -343,17 +348,19 @@ namespace soulsifter {
             ps->setString(10, setToCsv(tonicKeys));
             if (!tonicKey.empty()) ps->setString(11, tonicKey);
             else ps->setNull(11, sql::DataType::VARCHAR);
-            if (!comments.empty()) ps->setString(12, comments);
-            else ps->setNull(12, sql::DataType::VARCHAR);
-            ps->setBoolean(13, trashed);
-            ps->setBoolean(14, lowQuality);
-            if (reSongId > 0) ps->setInt(15, reSongId);
-            else ps->setNull(15, sql::DataType::INTEGER);
-            if (albumId > 0) ps->setInt(16, albumId);
+            if (energy > 0) ps->setInt(12, energy);
+            else ps->setNull(12, sql::DataType::INTEGER);
+            if (!comments.empty()) ps->setString(13, comments);
+            else ps->setNull(13, sql::DataType::VARCHAR);
+            ps->setBoolean(14, trashed);
+            ps->setBoolean(15, lowQuality);
+            if (reSongId > 0) ps->setInt(16, reSongId);
             else ps->setNull(16, sql::DataType::INTEGER);
-            if (albumPartId > 0) ps->setInt(17, albumPartId);
+            if (albumId > 0) ps->setInt(17, albumId);
             else ps->setNull(17, sql::DataType::INTEGER);
-            ps->setInt(18, id);
+            if (albumPartId > 0) ps->setInt(18, albumPartId);
+            else ps->setNull(18, sql::DataType::INTEGER);
+            ps->setInt(19, id);
             int result = ps->executeUpdate();
             if (!styleIds.empty()) {
                 stringstream ss("insert ignore into SongStyles (songId, styleId) values (?, ?)", ios_base::app | ios_base::out | ios_base::ate);
@@ -427,7 +434,7 @@ namespace soulsifter {
                 albumPartId = albumPart->getId();
             }
 
-            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("insert into Songs (artist, track, title, remixer, featuring, filepath, rating, dateAdded, bpm, tonicKeys, tonicKey, comments, trashed, lowQuality, reSongId, albumId, albumPartId) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("insert into Songs (artist, track, title, remixer, featuring, filepath, rating, dateAdded, bpm, tonicKeys, tonicKey, energy, comments, trashed, lowQuality, reSongId, albumId, albumPartId) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
             if (!artist.empty()) ps->setString(1, artist);
             else ps->setNull(1, sql::DataType::VARCHAR);
             if (!track.empty()) ps->setString(2, track);
@@ -447,16 +454,18 @@ namespace soulsifter {
             ps->setString(10, setToCsv(tonicKeys));
             if (!tonicKey.empty()) ps->setString(11, tonicKey);
             else ps->setNull(11, sql::DataType::VARCHAR);
-            if (!comments.empty()) ps->setString(12, comments);
-            else ps->setNull(12, sql::DataType::VARCHAR);
-            ps->setBoolean(13, trashed);
-            ps->setBoolean(14, lowQuality);
-            if (reSongId > 0) ps->setInt(15, reSongId);
-            else ps->setNull(15, sql::DataType::INTEGER);
-            if (albumId > 0) ps->setInt(16, albumId);
+            if (energy > 0) ps->setInt(12, energy);
+            else ps->setNull(12, sql::DataType::INTEGER);
+            if (!comments.empty()) ps->setString(13, comments);
+            else ps->setNull(13, sql::DataType::VARCHAR);
+            ps->setBoolean(14, trashed);
+            ps->setBoolean(15, lowQuality);
+            if (reSongId > 0) ps->setInt(16, reSongId);
             else ps->setNull(16, sql::DataType::INTEGER);
-            if (albumPartId > 0) ps->setInt(17, albumPartId);
+            if (albumId > 0) ps->setInt(17, albumId);
             else ps->setNull(17, sql::DataType::INTEGER);
+            if (albumPartId > 0) ps->setInt(18, albumPartId);
+            else ps->setNull(18, sql::DataType::INTEGER);
             int saved = ps->executeUpdate();
             if (!saved) {
                 cerr << "Not able to save song" << endl;
@@ -612,6 +621,14 @@ namespace soulsifter {
                 tonicKey = song->getTonicKey();
             }
         }
+        if (energy != song->getEnergy()) {
+            if (energy) {
+                cout << "updating song " << id << " energy from " << song->getEnergy() << " to " << energy << endl;
+                needsUpdate = true;
+            } else {
+                energy = song->getEnergy();
+            }
+        }
         if (comments.compare(song->getComments())  && (!boost::regex_match(comments, match1, decimal) || !boost::regex_match(song->getComments(), match2, decimal) || match1[1].str().compare(match2[1].str()))) {
             if (!comments.empty()) {
                 cout << "updating song " << id << " comments from " << song->getComments() << " to " << comments << endl;
@@ -721,6 +738,9 @@ namespace soulsifter {
 
     const string& Song::getTonicKey() const { return tonicKey; }
     void Song::setTonicKey(const string& tonicKey) { this->tonicKey = tonicKey; }
+
+    const int Song::getEnergy() const { return energy; }
+    void Song::setEnergy(const int energy) { this->energy = energy; }
 
     const string& Song::getComments() const { return comments; }
     void Song::setComments(const string& comments) { this->comments = comments; }

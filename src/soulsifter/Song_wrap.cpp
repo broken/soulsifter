@@ -85,6 +85,7 @@ void Song::Init(v8::Handle<v8::Object> exports) {
   NanSetPrototypeTemplate(tpl, "addTonicKey", NanNew<v8::FunctionTemplate>(addTonicKey)->GetFunction());
   NanSetPrototypeTemplate(tpl, "removeTonicKey", NanNew<v8::FunctionTemplate>(removeTonicKey)->GetFunction());
   tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("tonicKey"), getTonicKey, setTonicKey);
+  tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("energy"), getEnergy, setEnergy);
   tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("comments"), getComments, setComments);
   tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("trashed"), getTrashed, setTrashed);
   tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("lowQuality"), getLowQuality, setLowQuality);
@@ -454,6 +455,25 @@ NAN_SETTER(Song::setTonicKey) {
   Song* obj = ObjectWrap::Unwrap<Song>(args.This());
   string a0(*v8::String::Utf8Value(value->ToString()));
   obj->song->setTonicKey(a0);
+
+  NanReturnUndefined();
+}
+
+NAN_GETTER(Song::getEnergy) {
+  NanScope();
+
+  Song* obj = ObjectWrap::Unwrap<Song>(args.This());
+  const int result =  obj->song->getEnergy();
+
+  NanReturnValue(NanNew<v8::Number>(result));
+}
+
+NAN_SETTER(Song::setEnergy) {
+  NanScope();
+
+  Song* obj = ObjectWrap::Unwrap<Song>(args.This());
+  int a0(value->Uint32Value());
+  obj->song->setEnergy(a0);
 
   NanReturnUndefined();
 }
