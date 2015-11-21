@@ -121,7 +121,7 @@
         <paper-input label="Label" value="{{_editedSong.album.label}}" floatingLabel></paper-input>
         <div class="prev">&nbsp;<span>[[_taggedSong.album.catalogId]]</span></div>
         <paper-input label="Catalog ID" value="{{_editedSong.album.catalogId}}" floatingLabel></paper-input>
-        <paper-dropdown-menu label="Basic Genre" required>
+        <paper-dropdown-menu label="Artist Genre" required>
           <paper-menu class="dropdown-content" selected="{{basicgenreName}}" attr-for-selected="label">
             <template is="dom-repeat" items="[[_basicGenreList]]">
               <paper-item label="[[item.name]]">[[item.name]]</paper-item>
@@ -222,7 +222,8 @@
       if (!this._editedSong.albumPart.pos && !this._editedSong.albumPart.name) {
         this._editedSong.albumPartId = 0;
       }
-      // TODO this should be replaced with a drop-down containing these genres
+      // Since basicGenre objects should not be shared between objects, we will be
+      // creating another basicGenre here regardless if we selected an object in the dropdown.
       this._editedSong.album.basicGenre = ss.BasicGenre.findByName(this.basicgenreName);
 
       if (this._editedSong.id) {
@@ -277,7 +278,6 @@
         this._editedSong.albumPart = new ss.AlbumPart();
         this._editedSong.albumPart.album = this._editedSong.album;
       }
-      // TODO remove
       if (!!this._editedSong.album.basicGenre) this.basicgenreName = this._editedSong.album.basicGenre.name;
       else this.basicgenreName = '';
       this.$.cover.style.backgroundImage = 'url("' + this._editedSong.album.coverFilepath + '")';
