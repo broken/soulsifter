@@ -5,7 +5,6 @@
 #include "AudioAnalyzer_wrap.h"
 #include "BasicGenre_wrap.h"
 #include "Mix_wrap.h"
-#include "MusicManager_wrap.h"
 #include "NewSongManager_wrap.h"
 #include "Playlist_wrap.h"
 #include "PlaylistEntry_wrap.h"
@@ -13,6 +12,7 @@
 #include "Song_wrap.h"
 #include "SoulSifterSettings_wrap.h"
 #include "Style_wrap.h"
+#include "TagService_wrap.h"
 
 void InitAll(v8::Handle<v8::Object> exports) {
   // model
@@ -27,9 +27,9 @@ void InitAll(v8::Handle<v8::Object> exports) {
 
   // services
   AudioAnalyzer::Init(exports);
-  MusicManager::Init(exports);
   NewSongManager::Init(exports);
   SearchUtil::Init(exports);
+  TagService::Init(exports);
 
   // not auto-generated
   SoulSifterSettings::Init(exports);

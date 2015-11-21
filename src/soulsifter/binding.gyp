@@ -40,14 +40,14 @@
           # organization
           "FilesToAdd.cpp",
           "MusicManager.cpp",
-          "MusicManager_wrap.cpp",
           "NewSongManager.cpp",
           "NewSongManager_wrap.cpp",
           "SearchUtil.cpp",
           "SearchUtil_wrap.cpp",
           "SoulSifterSettings.cpp",
           "SoulSifterSettings_wrap.cpp",
-          #"TagWriter.cpp",
+          "TagService.cpp",
+          "TagService_wrap.cpp",
           # persistence
           "MysqlAccess.h",
           "MysqlAccess.cpp",

@@ -43,10 +43,10 @@
 #include "Album.h"
 #include "AlbumPart.h"
 #include "BasicGenre.h"
-//#import "Constants.h"
 #include "Song.h"
 #include "SoulSifterSettings.h"
 #include "Style.h"
+#include "TagService.h"
 
 using namespace boost;
 using namespace std;
@@ -144,96 +144,6 @@ MusicManager::~MusicManager() {
 }
 
 # pragma mark tagging
-  
-  void MusicManager::readId3v2Tag(Song* song) {
-    TagLib::MPEG::File f(song->getFilepath().c_str());
-    TagLib::ID3v2::Tag* id3v2 = f.ID3v2Tag();
-    if (!id3v2) {
-      return;
-    }
-
-      if (id3v2->artist() != TagLib::String::null) song->setArtist(id3v2->artist().to8Bit());
-      song->setTrack(getId3v2Text(id3v2, "TRCK"));
-      if (id3v2->title() != TagLib::String::null) song->setTitle(id3v2->title().to8Bit());
-      song->setRemixer(getId3v2Text(id3v2, "TPE4"));
-      song->getAlbum()->setArtist(getId3v2Text(id3v2, "TPE2"));
-      if (id3v2->album() != TagLib::String::null) song->getAlbum()->setName(id3v2->album().to8Bit());
-      song->getAlbum()->setLabel(getId3v2Text(id3v2, "TPUB"));
-      song->getAlbum()->setCatalogId(getId3v2Text(id3v2, "TCID"));
-      if (id3v2->year() != 0) song->getAlbum()->setReleaseDateYear(id3v2->year());
-      //TODO if (id3v2->genre() != TagLib::String::null) song->setGenre(id3v2->genre().to8Bit());
-      if (id3v2->comment() != TagLib::String::null) song->setComments(id3v2->comment().to8Bit());
-      
-      TagLib::ID3v2::FrameList frameList = id3v2->frameListMap()["POPM"];
-      if (!frameList.isEmpty()) {
-        TagLib::ID3v2::PopularimeterFrame *popm = static_cast<TagLib::ID3v2::PopularimeterFrame*>(frameList.front());
-        song->setRating(popm->rating());
-      }
-      
-      // part of set
-      const string pos = getId3v2Text(id3v2, "TPOS");
-      if (pos.length() > 0) {
-        if (!song->getAlbumPart()) {
-          AlbumPart ap;
-          song->setAlbumPart(ap);
-        }
-        song->getAlbumPart()->setAlbum(*song->getAlbum());
-        song->getAlbumPart()->setPos(pos);
-      }
-      
-      // string in the DDMM format
-      const string date = getId3v2Text(id3v2, "TDAT");
-      char *tmp = new char[3];
-      tmp[0] = date[0];
-      tmp[1] = date[1];
-      tmp[2] = '\0';
-      if (tmp[0] != '0' || tmp[1] != '0')
-        song->getAlbum()->setReleaseDateDay(atoi(tmp));
-      tmp[0] = date[2];
-      tmp[1] = date[3];
-      song->getAlbum()->setReleaseDateMonth(atoi(tmp));
-      delete [] tmp;
-
-    readId3v2TagAttributes(song, id3v2);
-  }
-
-  bool MusicManager::readId3v2TagAttributes(Song* song) {
-    TagLib::MPEG::File f(song->getFilepath().c_str());
-    TagLib::ID3v2::Tag* id3v2 = f.ID3v2Tag();  // still owned by file
-    return readId3v2TagAttributes(song, id3v2);
-  }
-
-  bool MusicManager::readId3v2TagAttributes(Song* song, TagLib::ID3v2::Tag* id3v2) {
-    bool updated = false;
-    if (!id3v2 || !song) {
-      return updated;
-    }
-
-    const string bpm = getId3v2Text(id3v2, "TBPM");
-    if (bpm.compare(song.getBpm())) {
-      cout << "updating song " << song.getId()
-           << " bpm from " << song.getBpm()
-           << " to " << bpm << endl;
-      song.setBpm(bpm);
-      updated = true;
-    }
-    const string key = getId3v2Text(id3v2, "TKEY");
-    if (key.compare(song.getKey())) {
-      cout << "updating song " << song.getId()
-           << " key from " << song.getKey()
-           << " to " << key << endl;
-      song.setKey(key);
-      updated = true;
-    }
-    const string energy = getId3v2Text(id3v2, "GRID");
-    //if (energy.compare(song.getEnergy())) {
-      cout << "updating song " << song.getId()
-    //       << " energy from " << song.getEnergy()
-           << " energy to " << energy << endl;
-    //  song.setEnergy(energy);
-    //}
-    return updated;
-  }
 
 void MusicManager::readTagsFromSong(Song* song) {
     if (!song->getAlbum()) {
@@ -258,7 +168,7 @@ void MusicManager::readTagsFromSong(Song* song) {
                 song->setTrack(ss.str());
             }
         }
-        readId3v2Tag(song);
+        TagService::readId3v2Tag(song);
     } else if (boost::algorithm::iends_with(song->getFilepath(), ".m4a") ||
                boost::algorithm::iends_with(song->getFilepath(), ".mp4") ||
                boost::algorithm::iends_with(song->getFilepath(), ".aac") ||
@@ -274,7 +184,7 @@ void MusicManager::readTagsFromSong(Song* song) {
         if (tag->comment() != TagLib::String::null) song->setComments(tag->comment().to8Bit());
         if (tag->year() != 0) song->getAlbum()->setReleaseDateYear(tag->year());
       }
-      readId3v2Tag(song);
+      TagService::readId3v2Tag(song);
     }
 }
 
@@ -346,38 +256,6 @@ void MusicManager::writeTagsToSong(Song* song) {
             cerr << "unable to save " << song->getFilepath() << endl;
         }
     }
-}
-
-void MusicManager::updateSongAttributesFromTags() {
-  cout << "updating song attributes from tags" << endl;
-
-  // get max id
-  vector<Style*> emptyStyles;
-  vector<Song*> emptySongs;
-  string query = "id:\"(select max(id) from songs)\"";
-  vector<Song*>* songs = SearchUtil::searchSongs(query, 0, 0, "", emptyStyles, emptySongs, 1);
-  int maxId = 0;
-  for (Song* song : *songs) {
-    maxId = song->getId();
-  }
-
-  // loop through songs
-  int span = 100;
-  for (int i = 0; i <= maxId; i += span) {
-    stringstream ss;
-    ss << "q:\"s.id >= " << i << "\" q:\"s.id < " << (i + span) << "\"";
-    ss << " trashed:0"; // q:\"bpm is null\"";
-    query = ss.str();
-    songs = SearchUtil::searchSongs(query, 0, 0, "", emptyStyles, emptySongs, span);
-
-    for (Song* song : *songs) {
-      if (readId3v2TagAttributes(song)) {
-        // song->update();
-        cout << "updating song" << endl;
-      }
-    }
-    return;  // remove once tested
-  }
 }
     
 # pragma mark monitor changes

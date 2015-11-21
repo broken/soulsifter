@@ -33,7 +33,6 @@ public:
     // tags
     void readTagsFromSong(Song* song);
     void writeTagsToSong(Song* song);  // takes ownership of song here
-    void updateSongAttributesFromTags();
     
     // monitor changes
     void updateSongWithChanges(const Song& song, Song* updatedSong);
@@ -66,11 +65,6 @@ private:
     void operator=(MusicManager const&);
     
     void initializePathMembers();
-  
-    void readId3v2Tag(Song* song);
-    void readId3v2TagAttributes(Song* song);
-    void readId3v2TagAttributes(Song* song, TagLib::ID3v2::Tag* id3v2);
-    void readTagsFromSong(Song* song);
 };
     
 }
