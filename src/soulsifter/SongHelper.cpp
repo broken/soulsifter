@@ -38,6 +38,7 @@ namespace soulsifter {
     dateAdded(timeFromString(song->getDateAdded())),
     bpm(song->getBpmStart()),
     tonicKeys(),
+    energy(0),
     comments(song->getComments()),
     trashed(!song->getDisabled().compare("yes")),
     lowQuality(false),

@@ -390,6 +390,7 @@ vector<Song*>* SearchUtil::searchSongs(const string& query, int min_bpm, int max
       song->setDateAdded(timeFromString(rs->getString("dateAdded")));
       song->setBpm(rs->getString("bpm"));
       song->setTonicKey(rs->getString("tonicKey"));
+      song->setEnergy(rs->getInt("energy"));
       song->setComments(rs->getString("comments"));
       song->setTrashed(rs->getBoolean("trashed"));
       song->setLowQuality(rs->getBoolean("lowQuality"));
@@ -407,10 +408,12 @@ vector<Song*>* SearchUtil::searchSongs(const string& query, int min_bpm, int max
           }
       }
       song->setStyleIds(styleIds);
-      /*if (!rs->isNull("s.tonicKeys")) {
-          string dbSet = rs->getString("s.tonicKeys");
-          boost::split(song->tonicKeys, dbSet, boost::is_any_of(","));
-      }*/
+      if (!rs->isNull("tonicKeys")) {
+          string dbSet = rs->getString("tonicKeys");
+          set<string> keys;
+          boost::split(keys, dbSet, boost::is_any_of(","));
+          song->setTonicKeys(keys);
+      }
       // copied *yuck* from album.cpp
       Album* album = new Album();
       album->setId(rs->getInt("albumid"));
