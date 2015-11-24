@@ -23,6 +23,7 @@
 #include <boost/bind.hpp>
 #include <boost/ref.hpp>
 
+#include "DTVectorUtil.h"
 #include "madlld.h"
 #include "MiniBpm.h"
 #include "SearchUtil.h"
@@ -75,6 +76,7 @@ namespace dogatech {
       for (Song* song : *songs) {
         maxId = song->getId();
       }
+    deleteVectorPointers(songs);
 
       int span = 100;
       for (int i = 0; i <= maxId; i += span) {
@@ -91,6 +93,7 @@ namespace dogatech {
             song->update();
           }
         }
+        deleteVectorPointers(songs);
       }
     }
     

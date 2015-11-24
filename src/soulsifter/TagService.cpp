@@ -25,6 +25,7 @@
 
 #include "Album.h"
 #include "AlbumPart.h"
+#include "DTVectorUtil.h"
 #include "SearchUtil.h"
 #include "Song.h"
 #include "Style.h"
@@ -35,6 +36,7 @@ namespace soulsifter {
 namespace {
 
 int canonicalizeBpm(const int bpm) {
+  if (bpm <= 0) return 0;
   if (bpm < 75) return canonicalizeBpm(bpm << 1);
   if (bpm >= 150) return canonicalizeBpm(bpm >> 1);
   return bpm;
@@ -50,44 +52,45 @@ const string getId3v2Text(TagLib::ID3v2::Tag* id3v2, const char* name) {
 }
 
 bool readId3v2TagAttributes(Song* song, TagLib::ID3v2::Tag* id3v2) {
+  std::cout << "reading tags for song " << song->getId() << std::endl;
   bool updated = false;
   if (!id3v2 || !song) {
     return updated;
   }
   // bpm
   const string bpm = getId3v2Text(id3v2, "TBPM");
-  if (bpm.compare(song->getBpm())) {
+  if (canonicalizeBpm(bpm) != canonicalizeBpm(song->getBpm())) {
     std::cout << "updating song " << song->getId()
          << " bpm from " << song->getBpm()
          << " to " << bpm << std::endl;
     if (abs(canonicalizeBpm(bpm) - canonicalizeBpm(song->getBpm())) > 3) {
       std::cerr << "BPM for song " << song->getId() << " was WAY off!" << std::endl;
     }
-    song->setBpm(bpm);
-    updated = true;
+    if (canonicalizeBpm(bpm) > 0) {
+      song->setBpm(bpm);
+      updated = true;
+    }
   }
   // energy
   const string grpTag = getId3v2Text(id3v2, "TIT1");
-  boost::regex grpRegex("^(\\d+)(?: - 1?\\d\\u (.{1,3}))?");
+  boost::regex grpRegex("^(\\d+)?(?: - )?(?:1?\\d\\u (.{1,3}))?$");
   boost::smatch grpMatch;
   string oldKey;
   if (boost::regex_search(grpTag, grpMatch, grpRegex, boost::match_default)) {
     std::cout << "from " << grpTag
-              << " found energy " << grpMatch[1];
-    if (grpMatch.size() >= 2) {
-      oldKey = grpMatch[2];
-      std::cout << " and key " << oldKey << std::endl;
-    } else {
-      std::cout << " but no key " << std::endl;
-    }
+              << " found energy " << grpMatch[1]
+              << " and key " << oldKey << std::endl;
+    oldKey = grpMatch[2];
     string energystr = grpMatch[1];
     int energy = std::atoi(energystr.c_str());
     if (energy != song->getEnergy()) {
       std::cout << "updating song " << song->getId()
                 << " energy from " << song->getEnergy()
                 << " to " << energy << std::endl;
-      song->setEnergy(energy);
-      updated = true;
+      if (energy > 0) {
+        song->setEnergy(energy);
+        updated = true;
+      }
     }
   }
   // key
@@ -98,9 +101,11 @@ bool readId3v2TagAttributes(Song* song, TagLib::ID3v2::Tag* id3v2) {
     std::cout << "updating song " << song->getId()
          << " keys from " << boost::algorithm::join(song->getTonicKeys(), ",") << " or " << oldKey
          << " to " << boost::algorithm::join(keys, ",") << std::endl;
-    song->setTonicKey(oldKey);
-    song->setTonicKeys(keys);
-    updated = true;
+    if (keys.size() > 0) {
+      song->setTonicKey(oldKey);
+      song->setTonicKeys(keys);
+      updated = true;
+    }
   }
 
   return updated;
@@ -178,6 +183,7 @@ void TagService::updateSongAttributesFromTags() {
   for (Song* song : *songs) {
     maxId = song->getId();
   }
+  deleteVectorPointers(songs);
 
   // loop through songs
   int span = 100;
@@ -194,6 +200,7 @@ void TagService::updateSongAttributesFromTags() {
         song->update();
       }
     }
+    deleteVectorPointers(songs);
   }
 }
     
