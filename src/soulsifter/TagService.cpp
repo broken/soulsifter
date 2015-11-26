@@ -73,15 +73,15 @@ bool readId3v2TagAttributes(Song* song, TagLib::ID3v2::Tag* id3v2) {
   }
   // energy
   const string grpTag = getId3v2Text(id3v2, "TIT1");
-  boost::regex grpRegex("^(\\d+)?(?: - )?(?:1?\\d\\u (.{1,3}))?$");
+  boost::regex grpRegex("^(\\d+(?![\\w\\d]))?(?: - )?(?:1?\\d[AB] (.{1,3}))?$");
   boost::smatch grpMatch;
   string oldKey;
   if (boost::regex_search(grpTag, grpMatch, grpRegex, boost::match_default)) {
-    std::cout << "from " << grpTag
-              << " found energy " << grpMatch[1]
-              << " and key " << oldKey << std::endl;
-    oldKey = grpMatch[2];
     string energystr = grpMatch[1];
+    oldKey = grpMatch[2];
+    std::cout << "song " << song->getId() << " from " << grpTag
+              << " found energy " << energystr
+              << " and key " << oldKey << std::endl;
     int energy = std::atoi(energystr.c_str());
     if (energy != song->getEnergy()) {
       std::cout << "updating song " << song->getId()
@@ -102,6 +102,12 @@ bool readId3v2TagAttributes(Song* song, TagLib::ID3v2::Tag* id3v2) {
          << " keys from " << boost::algorithm::join(song->getTonicKeys(), ",") << " or " << oldKey
          << " to " << boost::algorithm::join(keys, ",") << std::endl;
     if (keys.size() > 0) {
+      // convert old key from sharp to flat
+      if (oldKey.length() >= 2 && oldKey[1] == '#') {
+        if (oldKey[0] == 'G') oldKey[0] = 'A';
+        else oldKey[0] = oldKey[0] + 1;
+        oldKey[1] = 'b';
+      }
       song->setTonicKey(oldKey);
       song->setTonicKeys(keys);
       updated = true;
