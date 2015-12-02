@@ -43,6 +43,11 @@
       pitchPctMin: {
         type: Number,
         value: -8
+      },
+      // indicates whether the pitch was changed internally from a bpm or song change, or externally by a user moving the pitch bar. only a user initiated pitch change causes the bpm to update.
+      _userPitchChange: {
+        type: Boolean,
+        value: true
       }
     },
 
@@ -60,25 +65,36 @@
 
     _globalSongChanged: function(song) {
       if (!song || !song.bpm) return;
-      if (this.global.bpm == 0) {
+      if (!this.global.bpm) {
         this.set('global.bpm', parseFloat(song.bpm).toFixed(1));
       } else {
-        var pitch = this._canonicalizeBpm(this.global.bpm) / this._canonicalizeBpm(song.bpm);
-        pitch = (pitch - 1) * 100;
-        if (pitch > this.pitchPctMax) pitch = this.pitchPctMax;
-        if (pitch < this.pitchPctMin) pitch = this.pitchPctMin;
-        this.pitch = pitch;
+        this._updatePitch();
       }
     },
 
     _globalBpmChanged: function(bpm) {
-      if (this.global.song && this.global.song.bpm)
-        this.pitch = (this.global.bpm - this.global.song.bpm) / this.global.song.bpm * 100;
+      this._updatePitch();
     },
 
     _pitchChanged: function(newValue, oldValue) {
-      if (this.global && this.global.song && this.global.song.bpm)
+      if (this._userPitchChange && this.global && this.global.song && this.global.song.bpm) {
         this.set('global.bpm', (this.global.song.bpm * (this.pitch/100) + this.global.song.bpm * 1).toFixed(1));
+      }
+      // we debounce the reset here since changing the bpm can cause the pitchChanged observer to be called multiple times
+      var that = this;
+      this.debounce('pitch-changed', function() {
+        that._userPitchChange = true;
+      }, 50);
+    },
+
+    _updatePitch: function() {
+      if (!this.global || !this.global.bpm || !this.global.song || !this.global.song.bpm) return;
+      this._userPitchChange = false;
+      var pitch = this._canonicalizeBpm(this.global.bpm) / this._canonicalizeBpm(this.global.song.bpm);
+      pitch = (pitch - 1) * 100;
+      if (pitch > this.pitchPctMax) pitch = this.pitchPctMax;
+      if (pitch < this.pitchPctMin) pitch = this.pitchPctMin;
+      this.pitch = pitch;
     },
   });
 </script>
