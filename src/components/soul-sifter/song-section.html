@@ -76,8 +76,8 @@
     <paper-scroll-header-panel id="shp" condenses keepCondensedHeader condensedHeaderHeight="40" headerHeight="256">
       <paper-toolbar id="header" draggable="true" on-dragstart="dragSong">
         <div id="nav">
-          <paper-icon-button icon="arrow-back" on-click="backAction" disabled$="[[_isIndexAtStartOfSongTrail(songTrailIndex, songTrail)]]"></paper-icon-button>
-          <paper-icon-button icon="arrow-forward" on-click="forwardAction" disabled$="[[_isIndexAtEndOfSongTrail(songTrailIndex, songTrail)]]"></paper-icon-button>
+          <paper-icon-button icon="arrow-back" on-click="backAction" disabled$="[[_isArrayEmpty(songTrail.*)]]"></paper-icon-button>
+          <paper-icon-button icon="arrow-forward" on-click="forwardAction" disabled$="[[_isArrayEmpty(_songTrailCache.*)]]"></paper-icon-button>
         </div>
       </paper-toolbar>
       <div class="content vertical">
@@ -125,13 +125,18 @@
         notify: true,
         value: function() { return []; }
       },
-      songTrailIndex: {
-        type: Number,
-        value: -1
+      _songTrailCache: {
+        type: Array,
+        value: function() { return []; }
       },
       localeDateTime: {
         type: String,
         value: ''
+      },
+      // do not clear the cache when the songtrail is changed using the fwd or back btns
+      _clearCache: {
+        type: Boolean,
+        value: false
       }
     },
 
@@ -155,11 +160,12 @@
         return;
       }
 
-      this.set('songTrailIndex', this.songTrailIndex+1);
       var entry = new ss.PlaylistEntry();
       entry.song = song;
-      entry.position = this.songTrailIndex;
-      this.set(['songTrail', entry.position], entry);
+      entry.position = this.songTrail.length;
+      this.push('songTrail', entry);
+      if (this._clearCache) this._songTrailCache = [];
+      else this._clearCache = true;
 
       this.localeDateTime = new Date(this.song.dateAdded).toLocaleString();
 
@@ -200,25 +206,26 @@
     },
 
     backAction: function(e, detail, sender) {
-      if (this.songTrailIndex) {
-        // we push the index back two since changing the song will cause it to increment one again.
-        this.set('songTrailIndex', this.songTrailIndex - 2);
-        this.set('global.song', this.songTrail[this.songTrailIndex+1].song);
+      var entry = this.pop('songTrail');
+      if (!!entry) {
+        this.push('_songTrailCache', entry);
+      }
+      this._clearCache = false;
+      if (this.songTrail.length) {
+        this.set('global.song', this.pop('songTrail').song);
       } else {
-        // already at last song
-        this.set('songTrailIndex', this.songTrailIndex - 1);
         this.set('global.song', undefined);
       }
     },
 
     forwardAction: function(e, detail, sender) {
-      // we do not increment the songTrailIndex here, since setting the global song will cause it to increment.
-      this.set('global.song', this.songTrail[this.songTrailIndex+1].song);
+      this._clearCache = false;
+      this.set('global.song', this.pop('_songTrailCache').song);
     },
 
     saveSongTrail: function(e, detail, sender) {
       var playlist = detail.playlist;
-      for (var i = 0; i <= this.songTrailIndex; ++i) {
+      for (var i = 0; i < this.songTrail.length; ++i) {
         var entry = this.songTrail[i];
         entry.playlist = playlist;
         entry.save();
@@ -243,12 +250,8 @@
       e.stopPropagation();
     },
 
-    _isIndexAtStartOfSongTrail: function(songTrailIndex, songTrail) {
-      return songTrailIndex < 0;
-    },
-
-    _isIndexAtEndOfSongTrail: function(songTrailIndex, songTrail) {
-      return songTrailIndex + 1 >= songTrail.length;
+    _isArrayEmpty: function(arrayChange) {
+      return arrayChange.base.length === 0;
     },
   });
 </script>
