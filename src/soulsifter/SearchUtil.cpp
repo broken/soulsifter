@@ -312,8 +312,9 @@ string buildOptionPredicate(int min_bpm, int max_bpm, const string& key, const v
   }
   if (max_bpm > 0 && min_bpm > 0) {
     ss << " and (bpm between " << min_bpm << " and " << max_bpm;
-    ss << " or bpm between " << min_bpm / 2 << " and " << max_bpm / 2;
-    ss << " or bpm between " << min_bpm * 2 << " and " << max_bpm * 2 << ")";
+    if (max_bpm > 130) ss << " or bpm between " << min_bpm / 2 << " and " << max_bpm / 2;
+    if (min_bpm < 90) ss << " or bpm between " << min_bpm * 2 << " and " << max_bpm * 2;
+    ss << ")";
   }
   if (styles.size() > 0) {
     ss << " and exists (select 1 from SongStyles g where s.id = g.songId and g.styleId in (";

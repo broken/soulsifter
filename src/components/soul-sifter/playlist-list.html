@@ -7,6 +7,7 @@
 <link href="../paper-input/paper-input.html" rel="import">
 
 <link href="playlist-list-item.html" rel="import">
+<link href="ss-global-behavior.html" rel="import">
 
 
 <dom-module id="playlist-list">
@@ -31,6 +32,10 @@
   Polymer({
     is: 'playlist-list',
 
+    behaviors: [
+      GlobalBehavior
+    ],
+
     properties: {
       selected: Object
     },
@@ -53,17 +58,7 @@
 
     _selectPlaylist: function(e, detail, sender) {
       this.selected = (this.selected === e.model.item) ? null : e.model.item;
-
-      // update the query
-      // var playlist = detail.item.playlist;
-      // if (detail.isSelected) {
-      //   if (playlist.query) {
-      //     this.fire('genre-change', playlist.styles);
-      //     this.fire('query-change', playlist.query);
-      //   } else {
-      //     this.fire('iron-signal', {name: 'search', data: {playlist: playlist}});
-      //   }
-      // }
+      this.set('global.playlist', this.selected);
     },
 
     _isSelected: function(item, selected) {

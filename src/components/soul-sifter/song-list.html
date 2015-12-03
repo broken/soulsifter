@@ -70,7 +70,8 @@
     },
 
     observers: [
-      '_globalBpmChanged(global.bpm)'
+      '_globalBpmChanged(global.bpm)',
+      '_globalPlaylistChanged(global.playlist)'
     ],
 
     attached: function() {
@@ -82,6 +83,10 @@
 
     _globalBpmChanged: function(bpm) {
       if (this.djSearch) this.search();
+    },
+
+    _globalPlaylistChanged: function(playlist) {
+      if (!!playlist) this.search();
     },
 
     _selectedSongChanged: function(e) {
@@ -104,25 +109,32 @@
       var that = this;
       // give the tooltip a chance to show
       setTimeout(function() {
-        if (detail && detail.playlist) {
-          var entries = detail.playlist.playlistEntries;
-          that.songs = entries.sort(function(a, b) { return a.position - b.position; })
-                              .map(function(x) { return x.song; });
-        } else {
-          var genreIds = that.genres.map(function(g) { return g.id; });
-          var p = {q: that.query, genres: genreIds.join(','), min: 0, max: 0};
-          var omitSongs = [];
-          if (that.djSearch) {
-            if (that.global.bpm) {
-              var pitchPctMax = 8;
-              p.min  = that.global.bpm * (100 - pitchPctMax) / 100;
-              p.max = that.global.bpm * (100 + pitchPctMax) / 100;
-            }
-            //if (that.global.song) p.key = that.global.song.tonicKey;  // todo
-            omitSongs = that.songTrail.map(function(e) { return e.song; });
+        if (!!that.global.playlist) {
+          var playlist = that.global.playlist;
+          if (!playlist.query) {
+            var entries = playlist.playlistEntries;
+            that.songs = entries.sort(function(a, b) { return a.position - b.position; })
+                                .map(function(x) { return x.song; });
+            return;
+          } else {
+            that.query = playlist.query;
+            that.genres = playlist.styles;
           }
-          that.songs = ss.SearchUtil.searchSongs(p.q, p.min, p.max, p.key, that.genres, omitSongs, that.settings.getInt('songList.limit'));
         }
+        var genreIds = that.genres.map(function(g) { return g.id; });
+        var p = {q: that.query, genres: genreIds.join(','), min: 0, max: 0};
+        var omitSongs = [];
+        if (that.djSearch) {
+          if (that.global.bpm) {
+            var pitchPctMax = 8;
+            p.min  = that.global.bpm * (100 - pitchPctMax) / 100;
+            p.max = that.global.bpm * (100 + pitchPctMax) / 100;
+          }
+          //if (that.global.song) p.key = that.global.song.tonicKey;  // todo
+          omitSongs = that.songTrail.map(function(e) { return e.song; });
+          p.q += " trashed:0";
+        }
+        that.songs = ss.SearchUtil.searchSongs(p.q, p.min, p.max, p.key, that.genres, omitSongs, that.settings.getInt('songList.limit'));
         // A couple things to note here. First, this timeout will activate when the template repeat has finished loading, which is 99% of the wait time here. Next, I would love to use paper-toast, but it appears that loading the template repeat consumes all the resources that would allow it to animate in. I could set a timeout for the toast animation, but what a waste.
         setTimeout(function() {
           that.$.tooltip.show = false;
