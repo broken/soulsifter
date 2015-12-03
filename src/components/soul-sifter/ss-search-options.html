@@ -1,0 +1,44 @@
+<link href="../polymer/polymer.html" rel="import">
+
+<link href="../paper-toggle-button/paper-toggle-button.html" rel="import">
+
+
+<dom-module id="ss-search-options">
+  <style is="custom-style">
+    :host {
+      display: flex;
+      flex-direction: column;
+      white-space: nowrap;
+    }
+    section {
+      display: flex;
+      flex-direction: row;
+    }
+    paper-toggle-button {
+      padding-top: 3px;
+    }
+    span {
+      padding-left: 10px;
+    }
+  </style>
+  <template>
+    <section>
+      <paper-toggle-button checked="{{searchOptionBpmRestrict}}"></paper-toggle-button>
+      <span>BPM restrict</span>
+    <section>
+  </template>
+</dom-module>
+
+<script>
+  Polymer({
+    is: 'ss-search-options',
+  
+    properties: {
+      searchOptionBpmRestrict: {
+        type: Boolean,
+        notify: true,
+        value: false
+      },
+    },
+  });
+</script>

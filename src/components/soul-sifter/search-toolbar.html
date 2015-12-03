@@ -10,6 +10,7 @@
 <link href="ss-global-behavior.html" rel="import">
 <link href="ss-options-menu.html" rel="import">
 <link href="ss-options-menu-item.html" rel="import">
+<link href="ss-search-options.html" rel="import">
 
 
 <dom-module id="search-toolbar">
@@ -44,19 +45,19 @@
     <paper-icon-button icon="search" on-click="search"></paper-icon-button>
     <paper-input label="search" value="{{query}}" class="flex" no-label-float></paper-input>
     <paper-icon-button icon="info-outline" on-click="_toggleSearchInfoDialog"></paper-icon-button>
+    <paper-icon-button icon="build" on-click="_toggleSearchOptionsDialog"></paper-icon-button>
     <paper-input label="bpm" value="{{global.bpm}}" id="bpm" no-label-float></paper-input>
     <paper-icon-button icon="add-circle" on-click="_openCreateSongPage" id="createSongButton"></paper-icon-button>
     <paper-icon-button icon="settings" on-click="_openSettingsPage"></paper-icon-button>
     <ss-options-menu>
       <ss-options-menu-item on-click="updateSongAttributesFromTags">Update Song Attributes From Tags</ss-options-menu-item>
       <ss-options-menu-item on-click="analyzeBpms">Analyze BPMs</ss-options-menu-item>
-      <div class="menuItem"> <!-- cannot use ss-options-menu-item here since the ripple will prevent click on btn -->
-        <paper-toggle-button checked="{{djSearch}}"></paper-toggle-button>
-        <span>DJ Search Mode</span>
-      </div>
     </ss-options-menu>
     <paper-dialog id="searchInfoDialog" entry-animation="fade-in-animation" exit-animation="fade-out-animation">
       <search-info></search-info>
+    </paper-dialog>
+    <paper-dialog id="searchOptionsDialog" entry-animation="fade-in-animation" exit-animation="fade-out-animation">
+      <ss-search-options search-option-bpm-restrict="{{searchOptionBpmRestrict}}"></ss-search-options>
     </paper-dialog>
   </template>
 </dom-module>
@@ -74,7 +75,7 @@
         type: String,
         notify: true
       },
-      djSearch: {
+      searchOptionBpmRestrict: {
         type: Boolean,
         notify: true
       },
@@ -119,6 +120,10 @@
 
     _toggleSearchInfoDialog: function(e, detail, sender) {
       this.$.searchInfoDialog.toggle();
+    },
+
+    _toggleSearchOptionsDialog: function(e, detail, sender) {
+      this.$.searchOptionsDialog.toggle();
     },
 
     _openSettingsPage: function(e, detail, sender) {

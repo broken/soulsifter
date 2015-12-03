@@ -46,10 +46,6 @@
         type: String,
         observer: '_queryChanged'
       },
-      djSearch: {
-        type: Boolean,
-        value: true
-      },
       songTrail: {
         type: Array,
         value: function() { return []; }
@@ -67,6 +63,7 @@
         value: function() { return new ss.SoulSifterSettings(); },
         readOnly: true
       },
+      searchOptionBpmRestrict: Boolean,
     },
 
     observers: [
@@ -82,7 +79,7 @@
     },
 
     _globalBpmChanged: function(bpm) {
-      if (this.djSearch) this.search();
+      if (this.searchOptionBpmRestrict) this.search();
     },
 
     _globalPlaylistChanged: function(playlist) {
@@ -124,7 +121,7 @@
         var genreIds = that.genres.map(function(g) { return g.id; });
         var p = {q: that.query, genres: genreIds.join(','), min: 0, max: 0};
         var omitSongs = [];
-        if (that.djSearch) {
+        if (that.searchOptionBpmRestrict) {
           if (that.global.bpm) {
             var pitchPctMax = 8;
             p.min  = that.global.bpm * (100 - pitchPctMax) / 100;
