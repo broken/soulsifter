@@ -56,7 +56,13 @@ NAN_METHOD(SearchUtil::searchSongs) {
   string a0(*v8::String::Utf8Value(args[0]->ToString()));
   int a1(args[1]->Uint32Value());
   int a2(args[2]->Uint32Value());
-  string a3(*v8::String::Utf8Value(args[3]->ToString()));
+  v8::Local<v8::Array> a3Array = v8::Local<v8::Array>::Cast(args[3]);
+  std::set<string> a3;
+  for (int i = 0; i < a3Array->Length(); ++i) {
+    v8::Local<v8::Value> tmp = a3Array->Get(i);
+    string x(*v8::String::Utf8Value(tmp->ToString()));
+    a3.insert(x);
+  }
   v8::Local<v8::Array> a4Array = v8::Local<v8::Array>::Cast(args[4]);
   std::vector<dogatech::soulsifter::Style*> a4;
   for (int i = 0; i < a4Array->Length(); ++i) {

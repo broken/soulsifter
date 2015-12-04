@@ -64,6 +64,8 @@
         readOnly: true
       },
       searchOptionBpmRestrict: Boolean,
+      searchOptionKeyRestrict: Boolean,
+      searchOptionTrashedRestrict: Boolean,
     },
 
     observers: [
@@ -121,17 +123,23 @@
         var genreIds = that.genres.map(function(g) { return g.id; });
         var p = {q: that.query, genres: genreIds.join(','), min: 0, max: 0};
         var omitSongs = [];
-        if (that.searchOptionBpmRestrict) {
-          if (that.global.bpm) {
-            var pitchPctMax = 8;
-            p.min  = that.global.bpm * (100 - pitchPctMax) / 100;
-            p.max = that.global.bpm * (100 + pitchPctMax) / 100;
-          }
-          //if (that.global.song) p.key = that.global.song.tonicKey;  // todo
-          omitSongs = that.songTrail.map(function(e) { return e.song; });
+        if (that.searchOptionBpmRestrict && that.global.bpm) {
+          var pitchPctMax = 8;
+          p.min  = that.global.bpm * (100 - pitchPctMax) / 100;
+          p.max = that.global.bpm * (100 + pitchPctMax) / 100;
+        }
+        if (that.searchOptionKeyRestrict && that.global.song) {
+          p.keys = that.global.song.tonicKeys;
+        } else {
+          p.keys = [];
+        }
+        if (that.searchOptionTrashedRestrict) {
           p.q += " trashed:0";
         }
-        that.songs = ss.SearchUtil.searchSongs(p.q, p.min, p.max, p.key, that.genres, omitSongs, that.settings.getInt('songList.limit'));
+        if (true) {
+          omitSongs = that.songTrail.map(function(e) { return e.song; });
+        }
+        that.songs = ss.SearchUtil.searchSongs(p.q, p.min, p.max, p.keys, that.genres, omitSongs, that.settings.getInt('songList.limit'));
         // A couple things to note here. First, this timeout will activate when the template repeat has finished loading, which is 99% of the wait time here. Next, I would love to use paper-toast, but it appears that loading the template repeat consumes all the resources that would allow it to animate in. I could set a timeout for the toast animation, but what a waste.
         setTimeout(function() {
           that.$.tooltip.show = false;

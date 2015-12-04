@@ -21,6 +21,7 @@
 
 #include "Album.h"
 #include "AlbumPart.h"
+#include "DTVectorUtil.h"
 #include "MysqlAccess.h"
 #include "Song.h"
 #include "Style.h"
@@ -35,58 +36,58 @@ namespace {
 struct CamelotKeys {
   static boost::unordered_map<string, string> init() {
     boost::unordered_map<string, string> camelotKeys;
-    camelotKeys["1A"] = "Ab minor";
-    camelotKeys["1B"] = "B major";
-    camelotKeys["2A"] = "Eb minor";
-    camelotKeys["2B"] = "F# major";
-    camelotKeys["3A"] = "Bb minor";
-    camelotKeys["3B"] = "Db major";
-    camelotKeys["4A"] = "F minor";
-    camelotKeys["4B"] = "Ab major";
-    camelotKeys["5A"] = "C minor";
-    camelotKeys["5B"] = "Eb major";
-    camelotKeys["6A"] = "G minor";
-    camelotKeys["6B"] = "Bb major";
-    camelotKeys["7A"] = "D minor";
-    camelotKeys["7B"] = "F major";
-    camelotKeys["8A"] = "A minor";
-    camelotKeys["8B"] = "C major";
-    camelotKeys["9A"] = "E minor";
-    camelotKeys["9B"] = "G major";
-    camelotKeys["10A"] = "B minor";
-    camelotKeys["10B"] = "D major";
-    camelotKeys["11A"] = "F# minor";
-    camelotKeys["11B"] = "A major";
-    camelotKeys["12A"] = "Db minor";
-    camelotKeys["12B"] = "E major";
+    camelotKeys["1A"] = "Abm";
+    camelotKeys["1B"] = "B";
+    camelotKeys["2A"] = "Ebm";
+    camelotKeys["2B"] = "Gb";
+    camelotKeys["3A"] = "Bbm";
+    camelotKeys["3B"] = "Db";
+    camelotKeys["4A"] = "Fm";
+    camelotKeys["4B"] = "Ab";
+    camelotKeys["5A"] = "Cm";
+    camelotKeys["5B"] = "Eb";
+    camelotKeys["6A"] = "Gm";
+    camelotKeys["6B"] = "Bb";
+    camelotKeys["7A"] = "Dm";
+    camelotKeys["7B"] = "F";
+    camelotKeys["8A"] = "Am";
+    camelotKeys["8B"] = "C";
+    camelotKeys["9A"] = "Em";
+    camelotKeys["9B"] = "G";
+    camelotKeys["10A"] = "Bm";
+    camelotKeys["10B"] = "D";
+    camelotKeys["11A"] = "Gbm";
+    camelotKeys["11B"] = "A";
+    camelotKeys["12A"] = "Dbm";
+    camelotKeys["12B"] = "E";
     return camelotKeys;
   }
   static boost::unordered_map<string, int> initReverse() {
     boost::unordered_map<string, int> camelotKeys;
-    camelotKeys["Ab minor"] = 17;
-    camelotKeys["B major"] = 5;
-    camelotKeys["Eb minor"] = 18;
-    camelotKeys["F# major"] = 6;
-    camelotKeys["Bb minor"] = 19;
-    camelotKeys["Db major"] = 7;
-    camelotKeys["F minor"] = 20;
-    camelotKeys["Ab major"] = 8;
-    camelotKeys["C minor"] = 21;
-    camelotKeys["Eb major"] = 9;
-    camelotKeys["G minor"] = 22;
-    camelotKeys["Bb major"] = 10;
-    camelotKeys["D minor"] = 23;
-    camelotKeys["F major"] = 11;
-    camelotKeys["A minor"] = 12;
-    camelotKeys["C major"] = 0;
-    camelotKeys["E minor"] = 13;
-    camelotKeys["G major"] = 1;
-    camelotKeys["B minor"] = 14;
-    camelotKeys["D major"] = 2;
-    camelotKeys["F# minor"] = 15;
-    camelotKeys["A major"] = 3;
-    camelotKeys["Db minor"] = 16;
-    camelotKeys["E major"] = 4;
+    camelotKeys["Abm"] = 17;
+    camelotKeys["B"] = 5;
+    camelotKeys["Ebm"] = 18;
+    camelotKeys["Gb"] = 6;
+    camelotKeys["Bbm"] = 19;
+    camelotKeys["Db"] = 7;
+    camelotKeys["Fm"] = 20;
+    camelotKeys["Ab"] = 8;
+    camelotKeys["Cm"] = 21;
+    camelotKeys["Eb"] = 9;
+    camelotKeys["Gm"] = 22;
+    camelotKeys["Bb"] = 10;
+    camelotKeys["Dm"] = 23;
+    camelotKeys["F"] = 11;
+    camelotKeys["Am"] = 12;
+    camelotKeys["C"] = 0;
+    camelotKeys["Em"] = 13;
+    camelotKeys["G"] = 1;
+    camelotKeys["Bm"] = 14;
+    camelotKeys["D"] = 2;
+    camelotKeys["Gbm"] = 15;
+    camelotKeys["A"] = 3;
+    camelotKeys["Dbm"] = 16;
+    camelotKeys["E"] = 4;
     return camelotKeys;
   }
   static const boost::unordered_map<string, string> map;
@@ -234,81 +235,83 @@ string buildQueryPredicate(const vector<Atom>& atoms) {
   return ss.str();
 }
 
-string buildOptionPredicate(int min_bpm, int max_bpm, const string& key, const vector<Style*>& styles, const vector<Song*>& songsToOmit, int limit) {
+string buildOptionPredicate(int min_bpm, int max_bpm, const set<string>& keys, const vector<Style*>& styles, const vector<Song*>& songsToOmit, int limit) {
   stringstream ss;
-  if (CamelotKeys::rmap.find(key) != CamelotKeys::rmap.end()) {
-    // assume key lock always on for now
-    ss << " and (";
-    int num = 0;
-    switch (CamelotKeys::rmap.at(key)) {
-      case 17: // Gsm = 1A
-      case 5:  // B = 1B
-        ss << "find_in_set('" << CamelotKeys::map.at("12A") << "', tonicKeys)>0 or find_in_set('" << CamelotKeys::map.at("12B") << "', tonicKeys)>0";
-        if (++num == 3) break;
-      case 18: // Ebm = 2A
-      case 6:  // Fs = 2B
-        if (num != 0) ss << " or ";
-        ss << "find_in_set('" << CamelotKeys::map.at("1A") << "', tonicKeys)>0 or find_in_set('" << CamelotKeys::map.at("1B") << "', tonicKeys)>0";
-        if (++num == 3) break;
-      case 19: // Bbm = 3A
-      case 7:  // Db = 3B
-        if (num != 0) ss << " or ";
-        ss << "find_in_set('" << CamelotKeys::map.at("2A") << "', tonicKeys)>0 or find_in_set('" << CamelotKeys::map.at("2B") << "', tonicKeys)>0";
-        if (++num == 3) break;
-      case 20: // Fm = 4A
-      case 8:  // Ab = 4B
-        if (num != 0) ss << " or ";
-        ss << "find_in_set('" << CamelotKeys::map.at("3A") << "', tonicKeys)>0 or find_in_set('" << CamelotKeys::map.at("3B") << "', tonicKeys)>0";
-        if (++num == 3) break;
-      case 21: // Cm = 5A
-      case 9:  // Eb = 5B
-        if (num != 0) ss << " or ";
-        ss << "find_in_set('" << CamelotKeys::map.at("4A") << "', tonicKeys)>0 or find_in_set('" << CamelotKeys::map.at("4B") << "', tonicKeys)>0";
-        if (++num == 3) break;
-      case 22: // Gm = 6A
-      case 10: // Bb = 6B
-        if (num != 0) ss << " or ";
-        ss << "find_in_set('" << CamelotKeys::map.at("5A") << "', tonicKeys)>0 or find_in_set('" << CamelotKeys::map.at("5B") << "', tonicKeys)>0";
-        if (++num == 3) break;
-      case 23: // Dm = 7A
-      case 11: // F = 7B
-        if (num != 0) ss << " or ";
-        ss << "find_in_set('" << CamelotKeys::map.at("6A") << "', tonicKeys)>0 or find_in_set('" << CamelotKeys::map.at("6B") << "', tonicKeys)>0";
-        if (++num == 3) break;
-      case 12: // Am = 8A
-      case 0:  // C = 8B
-        if (num != 0) ss << " or ";
-        ss << "find_in_set('" << CamelotKeys::map.at("7A") << "', tonicKeys)>0 or find_in_set('" << CamelotKeys::map.at("7B") << "', tonicKeys)>0";
-        if (++num == 3) break;
-      case 13: // Em = 9A
-      case 1:  // G = 9B
-        if (num != 0) ss << " or ";
-        ss << "find_in_set('" << CamelotKeys::map.at("8A") << "', tonicKeys)>0 or find_in_set('" << CamelotKeys::map.at("8B") << "', tonicKeys)>0";
-        if (++num == 3) break;
-      case 14: // Bm = 10A
-      case 2:  // D = 10B
-        if (num != 0) ss << " or ";
-        ss << "find_in_set('" << CamelotKeys::map.at("9A") << "', tonicKeys)>0 or find_in_set('" << CamelotKeys::map.at("9B") << "', tonicKeys)>0";
-        if (++num == 3) break;
-      case 15: // Fsm = 11A
-      case 3:  // A = 11B
-        if (num != 0) ss << " or ";
-        ss << "find_in_set('" << CamelotKeys::map.at("10A") << "', tonicKeys)>0 or find_in_set('" << CamelotKeys::map.at("10B") << "', tonicKeys)>0";
-        if (++num == 3) break;
-      case 16: // Csm = 12A
-      case 4:  // E = 12B
-        if (num != 0) ss << " or ";
-        ss << "find_in_set('" << CamelotKeys::map.at("11A") << "', tonicKeys)>0 or find_in_set('" << CamelotKeys::map.at("11B") << "', tonicKeys)>0";
-        if (++num == 3) break;
-        ss << " or find_in_set('" << CamelotKeys::map.at("12A") << "', tonicKeys)>0 or find_in_set('" << CamelotKeys::map.at("12B") << "', tonicKeys)>0";
-        if (++num == 3) break;
-        ss << " or find_in_set('" << CamelotKeys::map.at("1A") << "', tonicKeys)>0 or find_in_set('" << CamelotKeys::map.at("1B") << "', tonicKeys)>0";
-        if (++num == 3) break;
-      default:
-        cout << "Error. Unable to find key." << endl;
-        return "";
+  for (const string& key : keys) {
+    if (CamelotKeys::rmap.find(key) != CamelotKeys::rmap.end()) {
+      // assume key lock always on for now
+      ss << " and (";
+      int num = 0;
+      switch (CamelotKeys::rmap.at(key)) {
+        case 17: // Abm = 1A
+        case 5:  // B = 1B
+          ss << "find_in_set('" << CamelotKeys::map.at("12A") << "', tonicKeys)>0 or find_in_set('" << CamelotKeys::map.at("12B") << "', tonicKeys)>0";
+          if (++num == 3) break;
+        case 18: // Ebm = 2A
+        case 6:  // Gb = 2B
+          if (num != 0) ss << " or ";
+          ss << "find_in_set('" << CamelotKeys::map.at("1A") << "', tonicKeys)>0 or find_in_set('" << CamelotKeys::map.at("1B") << "', tonicKeys)>0";
+          if (++num == 3) break;
+        case 19: // Bbm = 3A
+        case 7:  // Db = 3B
+          if (num != 0) ss << " or ";
+          ss << "find_in_set('" << CamelotKeys::map.at("2A") << "', tonicKeys)>0 or find_in_set('" << CamelotKeys::map.at("2B") << "', tonicKeys)>0";
+          if (++num == 3) break;
+        case 20: // Fm = 4A
+        case 8:  // Ab = 4B
+          if (num != 0) ss << " or ";
+          ss << "find_in_set('" << CamelotKeys::map.at("3A") << "', tonicKeys)>0 or find_in_set('" << CamelotKeys::map.at("3B") << "', tonicKeys)>0";
+          if (++num == 3) break;
+        case 21: // Cm = 5A
+        case 9:  // Eb = 5B
+          if (num != 0) ss << " or ";
+          ss << "find_in_set('" << CamelotKeys::map.at("4A") << "', tonicKeys)>0 or find_in_set('" << CamelotKeys::map.at("4B") << "', tonicKeys)>0";
+          if (++num == 3) break;
+        case 22: // Gm = 6A
+        case 10: // Bb = 6B
+          if (num != 0) ss << " or ";
+          ss << "find_in_set('" << CamelotKeys::map.at("5A") << "', tonicKeys)>0 or find_in_set('" << CamelotKeys::map.at("5B") << "', tonicKeys)>0";
+          if (++num == 3) break;
+        case 23: // Dm = 7A
+        case 11: // F = 7B
+          if (num != 0) ss << " or ";
+          ss << "find_in_set('" << CamelotKeys::map.at("6A") << "', tonicKeys)>0 or find_in_set('" << CamelotKeys::map.at("6B") << "', tonicKeys)>0";
+          if (++num == 3) break;
+        case 12: // Am = 8A
+        case 0:  // C = 8B
+          if (num != 0) ss << " or ";
+          ss << "find_in_set('" << CamelotKeys::map.at("7A") << "', tonicKeys)>0 or find_in_set('" << CamelotKeys::map.at("7B") << "', tonicKeys)>0";
+          if (++num == 3) break;
+        case 13: // Em = 9A
+        case 1:  // G = 9B
+          if (num != 0) ss << " or ";
+          ss << "find_in_set('" << CamelotKeys::map.at("8A") << "', tonicKeys)>0 or find_in_set('" << CamelotKeys::map.at("8B") << "', tonicKeys)>0";
+          if (++num == 3) break;
+        case 14: // Bm = 10A
+        case 2:  // D = 10B
+          if (num != 0) ss << " or ";
+          ss << "find_in_set('" << CamelotKeys::map.at("9A") << "', tonicKeys)>0 or find_in_set('" << CamelotKeys::map.at("9B") << "', tonicKeys)>0";
+          if (++num == 3) break;
+        case 15: // Gbm = 11A
+        case 3:  // A = 11B
+          if (num != 0) ss << " or ";
+          ss << "find_in_set('" << CamelotKeys::map.at("10A") << "', tonicKeys)>0 or find_in_set('" << CamelotKeys::map.at("10B") << "', tonicKeys)>0";
+          if (++num == 3) break;
+        case 16: // Csm = 12A
+        case 4:  // E = 12B
+          if (num != 0) ss << " or ";
+          ss << "find_in_set('" << CamelotKeys::map.at("11A") << "', tonicKeys)>0 or find_in_set('" << CamelotKeys::map.at("11B") << "', tonicKeys)>0";
+          if (++num == 3) break;
+          ss << " or find_in_set('" << CamelotKeys::map.at("12A") << "', tonicKeys)>0 or find_in_set('" << CamelotKeys::map.at("12B") << "', tonicKeys)>0";
+          if (++num == 3) break;
+          ss << " or find_in_set('" << CamelotKeys::map.at("1A") << "', tonicKeys)>0 or find_in_set('" << CamelotKeys::map.at("1B") << "', tonicKeys)>0";
+          if (++num == 3) break;
+        default:
+          cout << "Error. Unable to find key." << endl;
+          return "";
+      }
+      ss << ")";
     }
-    ss << ")";
   }
   if (max_bpm > 0 && min_bpm > 0) {
     ss << " and (bpm between " << min_bpm << " and " << max_bpm;
@@ -345,8 +348,8 @@ bool isLimit(const Atom& a) {
 
 }  // anon namespace
 
-vector<Song*>* SearchUtil::searchSongs(const string& query, int min_bpm, int max_bpm, const string& key, const vector<Style*>& styles, const vector<Song*>& songsToOmit, int limit) {
-  cout << "q:" << query << ", min:" << min_bpm << ", max:" << max_bpm << ", key:" << key << ", styles:" << ", limit:" << limit << endl;
+vector<Song*>* SearchUtil::searchSongs(const string& query, int min_bpm, int max_bpm, const set<string>& keys, const vector<Style*>& styles, const vector<Song*>& songsToOmit, int limit) {
+  cout << "q:" << query << ", min:" << min_bpm << ", max:" << max_bpm << ", keys:" << setToCsv(keys) << ", styles:" << ", limit:" << limit << endl;
   vector<string> fragments;
   splitString(query, &fragments);
   
@@ -369,7 +372,7 @@ vector<Song*>* SearchUtil::searchSongs(const string& query, int min_bpm, int max
   stringstream ss;
   ss << "select s.*, s.id as songid, s.artist as songartist, group_concat(ss.styleid) as styleIds, a.*, a.id as albumid, a.artist as albumartist from Songs s inner join Albums a on s.albumid = a.id left outer join SongStyles ss on ss.songid=s.id where true";
   ss << buildQueryPredicate(atoms);
-  ss << buildOptionPredicate(min_bpm, max_bpm, key, styles, songsToOmit, limit);
+  ss << buildOptionPredicate(min_bpm, max_bpm, keys, styles, songsToOmit, limit);
   
   cout << "Query:" << endl << ss.str() << endl;
   
@@ -411,9 +414,9 @@ vector<Song*>* SearchUtil::searchSongs(const string& query, int min_bpm, int max
       song->setStyleIds(styleIds);
       if (!rs->isNull("tonicKeys")) {
           string dbSet = rs->getString("tonicKeys");
-          set<string> keys;
-          boost::split(keys, dbSet, boost::is_any_of(","));
-          song->setTonicKeys(keys);
+          set<string> dbKeys;
+          boost::split(dbKeys, dbSet, boost::is_any_of(","));
+          song->setTonicKeys(dbKeys);
       }
       // copied *yuck* from album.cpp
       Album* album = new Album();
