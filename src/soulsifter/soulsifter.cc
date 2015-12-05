@@ -5,6 +5,7 @@
 #include "AudioAnalyzer_wrap.h"
 #include "BasicGenre_wrap.h"
 #include "Mix_wrap.h"
+#include "MusicVideo_wrap.h"
 #include "NewSongManager_wrap.h"
 #include "Playlist_wrap.h"
 #include "PlaylistEntry_wrap.h"
@@ -20,6 +21,7 @@ void InitAll(v8::Handle<v8::Object> exports) {
   AlbumPart::Init(exports);
   BasicGenre::Init(exports);
   Mix::Init(exports);
+  MusicVideo::Init(exports);
   Playlist::Init(exports);
   PlaylistEntry::Init(exports);
   Song::Init(exports);

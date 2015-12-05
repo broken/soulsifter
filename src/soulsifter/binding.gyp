@@ -17,6 +17,8 @@
           "Mix.cpp",
           "Mix_wrap.cpp",
           "MixHelper.cpp",
+          "MusicVideo.cpp",
+          "MusicVideo_wrap.cpp",
           "Playlist.cpp",
           "Playlist_wrap.cpp",
           "PlaylistEntry.cpp",

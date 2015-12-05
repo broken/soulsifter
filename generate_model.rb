@@ -772,6 +772,15 @@ mixFields = [
 ]
 mixAttribs = 0
 mixCustomMethods = "        friend class RapidEvolutionDatabaseMixoutsMixoutHandler;\n\n        static int mixoutCountForRESongId(int outSongId);\n\n"
+musicVideoFields = [
+  [:int, "id", Attrib::FIND],
+  [:int, "songId", Attrib::ID | Attrib::FIND],
+  ["Song", "song", Attrib::PTR],
+  [:string, "filePath", 0],
+  [:string, "thumbnailFilePath", 0],
+]
+musicVideoAttribs = 0
+musicVideoCustomMethods = ""
 playlistFields = [
   [:int, "id", Attrib::FIND],
   [:string, "name", Attrib::FIND],
@@ -924,6 +933,12 @@ output << writeHeader("mix", mixFields, mixAttribs, mixCustomMethods, "")
 output.close
 output = File.open("src/soulsifter/Mix.cpp", "w")
 output << writeCode("mix", mixFields, mixAttribs)
+output.close
+output = File.open("src/soulsifter/MusicVideo.h", "w")
+output << writeHeader("musicVideo", musicVideoFields, musicVideoAttribs, musicVideoCustomMethods, "")
+output.close
+output = File.open("src/soulsifter/MusicVideo.cpp", "w")
+output << writeCode("musicVideo", musicVideoFields, musicVideoAttribs)
 output.close
 output = File.open("src/soulsifter/Playlist.h", "w")
 output << writeHeader("playlist", playlistFields, playlistAttribs, "", playlistCustomHeaders)
