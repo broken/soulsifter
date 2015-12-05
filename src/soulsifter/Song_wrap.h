@@ -52,8 +52,8 @@ class Song : public node::ObjectWrap {
   static NAN_SETTER(setDateAdded);
   static NAN_GETTER(getBpm);
   static NAN_SETTER(setBpm);
-  // Unable to process getTonicKeys
-  // Unable to process setTonicKeys
+  static NAN_GETTER(getTonicKeys);
+  static NAN_SETTER(setTonicKeys);
   static NAN_METHOD(addTonicKey);
   static NAN_METHOD(removeTonicKey);
   static NAN_GETTER(getTonicKey);

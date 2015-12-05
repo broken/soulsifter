@@ -80,8 +80,7 @@ void Song::Init(v8::Handle<v8::Object> exports) {
   tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("rating"), getRating, setRating);
   tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("dateAdded"), getDateAdded, setDateAdded);
   tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("bpm"), getBpm, setBpm);
-  // Unable to process getTonicKeys
-  // Unable to process setTonicKeys
+  tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("tonicKeys"), getTonicKeys, setTonicKeys);
   NanSetPrototypeTemplate(tpl, "addTonicKey", NanNew<v8::FunctionTemplate>(addTonicKey)->GetFunction());
   NanSetPrototypeTemplate(tpl, "removeTonicKey", NanNew<v8::FunctionTemplate>(removeTonicKey)->GetFunction());
   tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("tonicKey"), getTonicKey, setTonicKey);
@@ -416,6 +415,37 @@ NAN_SETTER(Song::setBpm) {
   Song* obj = ObjectWrap::Unwrap<Song>(args.This());
   string a0(*v8::String::Utf8Value(value->ToString()));
   obj->song->setBpm(a0);
+
+  NanReturnUndefined();
+}
+
+NAN_GETTER(Song::getTonicKeys) {
+  NanScope();
+
+  Song* obj = ObjectWrap::Unwrap<Song>(args.This());
+  const std::set<string> result =  obj->song->getTonicKeys();
+
+  v8::Handle<v8::Array> a = NanNew<v8::Array>((int) result.size());
+  int idx = 0;
+  for (const auto& element : result) {
+    a->Set(NanNew<v8::Number>(idx), NanNew<v8::String>(element.c_str(), element.length()));
+    ++idx;
+  }
+  NanReturnValue(a);
+}
+
+NAN_SETTER(Song::setTonicKeys) {
+  NanScope();
+
+  Song* obj = ObjectWrap::Unwrap<Song>(args.This());
+  v8::Local<v8::Array> a0Array = v8::Local<v8::Array>::Cast(value);
+  std::set<string> a0;
+  for (int i = 0; i < a0Array->Length(); ++i) {
+    v8::Local<v8::Value> tmp = a0Array->Get(i);
+    string x(*v8::String::Utf8Value(tmp->ToString()));
+    a0.insert(x);
+  }
+  obj->song->setTonicKeys(a0);
 
   NanReturnUndefined();
 }
