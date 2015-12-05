@@ -145,7 +145,7 @@
             console.log('Successfully added playlist ' + playlist.name);
             var playlistId = data.mutate_response[0].id;
             var async = require('async');
-            var songs = ss.SearchUtil.searchSongs(playlist.query, 0, 0, '', playlist.styles, 100);
+            var songs = ss.SearchUtil.searchSongs(playlist.query, 0, [], playlist.styles, 100);
             async.eachLimit(songs,
               1,  // add one at a time. be nice to Google
               function(item, callback) {

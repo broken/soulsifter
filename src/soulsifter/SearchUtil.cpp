@@ -235,7 +235,7 @@ string buildQueryPredicate(const vector<Atom>& atoms) {
   return ss.str();
 }
 
-string buildOptionPredicate(int min_bpm, int max_bpm, const set<string>& keys, const vector<Style*>& styles, const vector<Song*>& songsToOmit, int limit) {
+string buildOptionPredicate(int bpm, const set<string>& keys, const vector<Style*>& styles, const vector<Song*>& songsToOmit, int limit) {
   stringstream ss;
   for (const string& key : keys) {
     if (CamelotKeys::rmap.find(key) != CamelotKeys::rmap.end()) {
@@ -313,6 +313,9 @@ string buildOptionPredicate(int min_bpm, int max_bpm, const set<string>& keys, c
       ss << ")";
     }
   }
+  int pitchPctMax = 8;  // TODO should be a setting
+  int max_bpm = bpm * (100 + pitchPctMax) / 100;
+  int min_bpm = bpm * (100 - pitchPctMax) / 100;
   if (max_bpm > 0 && min_bpm > 0) {
     ss << " and (bpm between " << min_bpm << " and " << max_bpm;
     if (max_bpm > 130) ss << " or bpm between " << min_bpm / 2 << " and " << max_bpm / 2;
@@ -348,8 +351,8 @@ bool isLimit(const Atom& a) {
 
 }  // anon namespace
 
-vector<Song*>* SearchUtil::searchSongs(const string& query, int min_bpm, int max_bpm, const set<string>& keys, const vector<Style*>& styles, const vector<Song*>& songsToOmit, int limit) {
-  cout << "q:" << query << ", min:" << min_bpm << ", max:" << max_bpm << ", keys:" << setToCsv(keys) << ", styles:" << ", limit:" << limit << endl;
+vector<Song*>* SearchUtil::searchSongs(const string& query, int bpm, const set<string>& keys, const vector<Style*>& styles, const vector<Song*>& songsToOmit, int limit) {
+  cout << "q:" << query << ", bpm:" << bpm << ", keys:" << setToCsv(keys) << ", styles:" << ", limit:" << limit << endl;
   vector<string> fragments;
   splitString(query, &fragments);
   
@@ -372,7 +375,7 @@ vector<Song*>* SearchUtil::searchSongs(const string& query, int min_bpm, int max
   stringstream ss;
   ss << "select s.*, s.id as songid, s.artist as songartist, group_concat(ss.styleid) as styleIds, a.*, a.id as albumid, a.artist as albumartist from Songs s inner join Albums a on s.albumid = a.id left outer join SongStyles ss on ss.songid=s.id where true";
   ss << buildQueryPredicate(atoms);
-  ss << buildOptionPredicate(min_bpm, max_bpm, keys, styles, songsToOmit, limit);
+  ss << buildOptionPredicate(bpm, keys, styles, songsToOmit, limit);
   
   cout << "Query:" << endl << ss.str() << endl;
   

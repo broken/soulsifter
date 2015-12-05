@@ -22,7 +22,7 @@ class Style;
 
 class SearchUtil {
 public:
-  static vector<Song*>* searchSongs(const string& query, int min_bpm, int max_bpm, const set<string>& keys, const vector<Style*>& styles, const vector<Song*>& songsToOmit, int limit);
+  static vector<Song*>* searchSongs(const string& query, int bpm, const set<string>& keys, const vector<Style*>& styles, const vector<Song*>& songsToOmit, int limit);
 };
   
 }  // namespace soulsifter
