@@ -6,6 +6,7 @@
 #include "BasicGenre_wrap.h"
 #include "Mix_wrap.h"
 #include "MusicVideo_wrap.h"
+#include "MusicVideoService_wrap.h"
 #include "NewSongManager_wrap.h"
 #include "Playlist_wrap.h"
 #include "PlaylistEntry_wrap.h"
@@ -29,6 +30,7 @@ void InitAll(v8::Handle<v8::Object> exports) {
 
   // services
   AudioAnalyzer::Init(exports);
+  MusicVideoService::Init(exports);
   NewSongManager::Init(exports);
   SearchUtil::Init(exports);
   TagService::Init(exports);

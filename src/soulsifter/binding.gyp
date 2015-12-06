@@ -42,6 +42,8 @@
           # organization
           "FilesToAdd.cpp",
           "MusicManager.cpp",
+          "MusicVideoService.cpp",
+          "MusicVideoService_wrap.cpp",
           "NewSongManager.cpp",
           "NewSongManager_wrap.cpp",
           "SearchUtil.cpp",
