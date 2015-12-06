@@ -49,7 +49,7 @@ MusicVideo* MusicVideoService::associateYouTubeVideo(const Song* const song, con
       
   FILE *fpipe;
   stringstream command;
-  command << "youtube-dl --write-thumbnail -k www.youtube.com/watch?v=" << id;
+  command << "cd " << mvArtistDir << "; youtube-dl --write-thumbnail -k www.youtube.com/watch?v=" << id;
   if (!(fpipe = (FILE*)popen(command.str().c_str(), "r"))) {
     cerr << "Problem with youtube-dl pipe." << endl;
     return NULL;
@@ -69,16 +69,20 @@ MusicVideo* MusicVideoService::associateYouTubeVideo(const Song* const song, con
   string output(ss.str());
   boost::regex thumbnailRegex("Writing thumbnail to: (.*)$");
   boost::smatch thumbnailMatch;
-  boost::regex videoRegex("[download] Destination: (.*).mp4$");
+  boost::regex videoRegex("\\[download\\] Destination: (.*mp4)$");
   boost::smatch videoMatch;
   MusicVideo* musicVideo = new MusicVideo();
   vector<string> lines;
   boost::split(lines, output, boost::is_any_of("\n"));
   for (string line : lines) {
     if (boost::regex_search(line, thumbnailMatch, thumbnailRegex)) {
-      musicVideo->setThumbnailFilePath(thumbnailMatch[1]);
+      stringstream ssTn;
+      ssTn << mvArtistDir << "/" << thumbnailMatch[1];
+      musicVideo->setThumbnailFilePath(ssTn.str());
     } else if (boost::regex_search(line, videoMatch, videoRegex)) {
-      musicVideo->setFilePath(videoMatch[1]);
+      stringstream ssMv;
+      ssMv << mvArtistDir << "/" << videoMatch[1];
+      musicVideo->setFilePath(ssMv.str());
     }
   }
   if (musicVideo->getFilePath().empty()) {
@@ -86,6 +90,8 @@ MusicVideo* MusicVideoService::associateYouTubeVideo(const Song* const song, con
     cerr << "Did not find music video file from youtube-dl output." <<endl;
     return NULL;
   }
+
+  // TODO remove special chars like quotes
   
   musicVideo->setSongId(song->getId());
   musicVideo->save();
