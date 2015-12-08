@@ -68,6 +68,18 @@
       height: 30px;
       width: 100%;
     }
+    .hasMusicVideo {
+      display: none !important;
+    }
+    #musicVideoInput {
+      display: flex;
+      flex-direction: row;
+    }
+    #musicVideoThumbnail {
+      width: 100%;
+      height: 144px;
+      background-size: cover;
+    }
   </style>
   <template>
     <ss-googleplaymusic id="gpm"></ss-googleplaymusic>
@@ -105,6 +117,11 @@
             </paper-dropdown>
           </paper-menu-button>
         </div>
+        <div id="musicVideoInput">
+          <paper-input label="video id" value="{{_videoId}}" class="flex" no-label-float></paper-input>
+          <paper-icon-button icon="av:movie" on-click="_associateVideo"></paper-icon-button>
+        </div>
+        <div id="musicVideoThumbnail" draggable="true" on-dragstart="_dragMusicVideo"></div>
       </div>
     </paper-scroll-header-panel>
   </template>
@@ -137,7 +154,9 @@
       _clearCache: {
         type: Boolean,
         value: false
-      }
+      },
+      _musicVideo: Object,
+      _videoId: String,
     },
 
     observers: [
@@ -157,6 +176,7 @@
       this.song = song;
       if (!song) {
         this._setCoverImage();
+        this._setMusicVideo();
         return;
       }
 
@@ -175,6 +195,7 @@
           if (!err) {
             that.$.audio.src = "file://" + that.song.filepath;
             that._setCoverImage(that.song.album.coverFilepath);
+            that._setMusicVideo(ss.MusicVideo.findBySongId(that.song.id));
           } else {
             that.$.gpm.findSong(that.song,
                 function(s) {
@@ -189,11 +210,13 @@
                   } else {
                     that._setCoverImage();
                   }
+                  that._setMusicVideo();
                 },
                 function(msg, body, err, resp) {
                   console.warn(msg);
                   that.$.audio.src = '';
                   that._setCoverImage();
+                  that._setMusicVideo();
                 }
               );
           }
@@ -239,6 +262,27 @@
       }
       var root = this.$.shp.shadowRoot || this.$.shp;
       root.querySelector('#headerBg').style.backgroundImage = url;
+    },
+
+    _setMusicVideo: function(mv) {
+      this._musicVideo = mv;
+      var url = '';
+      if (!!mv && !!mv.thumbnailFilePath) {
+        url = 'url("file://' + mv.thumbnailFilePath + '")';
+      }
+      this.$.musicVideoThumbnail.style.backgroundImage = url;
+      this.toggleClass('hasMusicVideo', !mv, this.$.musicVideoThumbnail);
+      this.toggleClass('hasMusicVideo', !!mv, this.$.musicVideoInput);
+    },
+
+    _associateVideo: function() {
+      if (!this.global.song) return;
+      this._setMusicVideo(ss.MusicVideoService.associateYouTubeVideo(this.global.song, this._videoId));
+    },
+
+    _dragMusicVideo: function(e) {
+      e.dataTransfer.effectAllowed = 'move';
+      e.dataTransfer.setData('text/plain', 'extensis-filenames-type:' + this._musicVideo.filePath);
     },
 
     editAction: function(e, detail, sender) {

@@ -69,7 +69,7 @@ MusicVideo* MusicVideoService::associateYouTubeVideo(const Song* const song, con
   string output(ss.str());
   boost::regex thumbnailRegex("Writing thumbnail to: (.*)$");
   boost::smatch thumbnailMatch;
-  boost::regex videoRegex("\\[download\\] Destination: (.*mp4)$");
+  boost::regex videoRegex("Merging formats into \"(.*mp4)\"$");
   boost::smatch videoMatch;
   MusicVideo* musicVideo = new MusicVideo();
   vector<string> lines;
