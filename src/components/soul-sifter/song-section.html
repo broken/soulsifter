@@ -39,10 +39,6 @@
       @apply(--layout-horizontal);
       @apply(--layout-center);
     }
-    .audio {
-      @apply(--layout-horizontal);
-      @apply(--layout-flex);
-    }
     .flex {
       @apply(--layout-flex);
     }
@@ -107,21 +103,21 @@
           <pitch-slider></pitch-slider>
         </div>
         <div class="audio">
-          <ss-audio class="flex" id="audio"></ss-audio>
-          <paper-menu-button on-click="stopPropagation">
-            <paper-icon-button icon="more-vert"></paper-icon-button>
-            <paper-dropdown class="dropdown" transition="cascade" halign="right" valign="bottom">
-              <paper-menu>
-                <paper-item on-click="editAction">Edit info</paper-item>
-              </paper-menu>
-            </paper-dropdown>
-          </paper-menu-button>
+          <ss-audio id="audio"></ss-audio>
         </div>
         <div id="musicVideoInput">
           <paper-input label="video id" value="{{_videoId}}" class="flex" no-label-float></paper-input>
           <paper-icon-button icon="av:movie" on-click="_associateVideo"></paper-icon-button>
         </div>
         <div id="musicVideoThumbnail" draggable="true" on-dragstart="_dragMusicVideo"></div>
+        <paper-menu-button on-click="stopPropagation">
+          <paper-icon-button icon="more-vert"></paper-icon-button>
+          <paper-dropdown class="dropdown" transition="cascade" halign="right" valign="bottom">
+            <paper-menu>
+              <paper-item on-click="editAction">Edit info</paper-item>
+            </paper-menu>
+          </paper-dropdown>
+        </paper-menu-button>
       </div>
     </paper-scroll-header-panel>
   </template>
