@@ -49,7 +49,7 @@ MusicVideo* MusicVideoService::associateYouTubeVideo(const Song* const song, con
       
   FILE *fpipe;
   stringstream command;
-  command << "cd " << mvArtistDir << "; youtube-dl --write-thumbnail -k www.youtube.com/watch?v=" << id;
+  command << "cd " << mvArtistDir << "; youtube-dl --write-thumbnail www.youtube.com/watch?v=" << id;
   if (!(fpipe = (FILE*)popen(command.str().c_str(), "r"))) {
     cerr << "Problem with youtube-dl pipe." << endl;
     return NULL;
