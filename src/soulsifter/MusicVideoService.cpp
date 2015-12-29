@@ -9,22 +9,44 @@
 #include <boost/algorithm/string/classification.hpp>
 #include <boost/algorithm/string/split.hpp>
 #include <boost/filesystem.hpp>
+#include <boost/range/algorithm_ext/erase.hpp>
 #include <boost/regex.hpp>
 
 #include "Album.h"
 #include "BasicGenre.h"
 #include "Song.h"
 #include "MusicVideo.h"
+#include "SoulSifterSettings.h"
 
 using namespace std;
 
 namespace dogatech {
 namespace soulsifter {
 
+namespace {
+
+string removeSpecialCharsFromPath(string filepath) {
+  string newPath = boost::remove_erase_if(filepath, boost::is_any_of("'\""));
+  if (!newPath.compare(filepath)) return filepath;
+
+  cout << "Renaming '" << filepath << "'' to '" << newPath << "'" << endl;
+  try {
+      boost::filesystem::path src(filepath);
+      boost::filesystem::path dest(newPath);
+      boost::filesystem::rename(src, dest);
+      return newPath;
+  } catch (const boost::filesystem::filesystem_error& ex) {
+      cerr << "Unable to rename music video related file '" << filepath << "'\n" << ex.what() << endl;
+      return filepath;
+  }
+}
+
+}  // namespace
+
 MusicVideo* MusicVideoService::associateYouTubeVideo(const Song* const song, const string& id) {
   cout << "Associate YouTube video " << id << " with song " << song->getId() << endl;
 
-  boost::filesystem::path mvBasePath("/Users/dogatech/Music/mv");  // TODO as a setting
+  boost::filesystem::path mvBasePath(SoulSifterSettings::getInstance().get<string>("mv.path"));
   if (!boost::filesystem::exists(mvBasePath) || !boost::filesystem::is_directory(mvBasePath)) {
     cerr << "Music video base path does not exist. " << mvBasePath << endl;
     return NULL;
@@ -49,7 +71,7 @@ MusicVideo* MusicVideoService::associateYouTubeVideo(const Song* const song, con
       
   FILE *fpipe;
   stringstream command;
-  command << "cd " << mvArtistDir << "; youtube-dl --write-thumbnail www.youtube.com/watch?v=" << id;
+  command << "cd " << mvArtistDir << "; youtube-dl --write-thumbnail --restrict-filenames --merge-output-format mp4 www.youtube.com/watch?v=" << id;
   if (!(fpipe = (FILE*)popen(command.str().c_str(), "r"))) {
     cerr << "Problem with youtube-dl pipe." << endl;
     return NULL;
@@ -91,7 +113,10 @@ MusicVideo* MusicVideoService::associateYouTubeVideo(const Song* const song, con
     return NULL;
   }
 
-  // TODO remove special chars like quotes
+  // remove special chars from files
+  // TODO remove if --restrict-filenames works
+  musicVideo->setFilePath(removeSpecialCharsFromPath(musicVideo->getFilePath()));
+  musicVideo->setThumbnailFilePath(removeSpecialCharsFromPath(musicVideo->getThumbnailFilePath()));
   
   musicVideo->setSongId(song->getId());
   musicVideo->save();
