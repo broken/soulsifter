@@ -355,7 +355,7 @@ void MusicManager::writeTagsToSong(Song* song) {
       updatedSong->getAlbum()->setName(updatedSong->getTitle());
     }
     // remove album part if there is just one
-    if (!updatedSong->getAlbumPart()->getPos().compare("1/1")) {
+    if (updatedSong->getAlbumPart() && !updatedSong->getAlbumPart()->getPos().compare("1/1")) {
       updatedSong->getAlbumPart()->setPos("");
     }
     
