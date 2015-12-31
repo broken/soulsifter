@@ -408,7 +408,7 @@ bool MusicManager::moveSong(Song* song) {
             ssdirpath << SoulSifterSettings::getInstance().getStagingPath() << "/" << song->getAlbum()->getBasicGenre()->getName() << "/" << *cleanDirName(&albumartist) << "/" << *cleanDirName(&albumname);
             imgDestinationPath = ssdirpath.str();
             transform(imgDestinationPath.begin(), imgDestinationPath.end(), imgDestinationPath.begin(), ::tolower);
-            if (song->getAlbumPart()) {
+            if (song->getAlbumPart() && song->getAlbumPart()->getName().length()) {
                 string part = song->getAlbumPart()->getName();
                 ssdirpath << "/" << *cleanDirName(&part);
             }
