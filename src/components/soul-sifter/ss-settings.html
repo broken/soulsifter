@@ -13,6 +13,7 @@
     <abstract-action-page id="abstractActionPage">
       <div class="fields">
         <paper-input label="Music Directory" value="{{musicDir}}"></paper-input>
+        <paper-input label="Music Video Directory" value="{{musicVideoDir}}"></paper-input>
         <br>
         <paper-input label="Google Music Email" value="{{googleEmail}}"></paper-input>
         <paper-input label="Google Music App Key" value="{{googleAppKey}}"></paper-input>
@@ -37,6 +38,7 @@
     ready: function() {
       this.settings = new ss.SoulSifterSettings();
       this.musicDir = this.settings.getString('music.dir');
+      this.musicVideoDir = this.settings.getString('mv.dir');
       this.googleAppKey = this.settings.getString('google.appKey');
       this.googleEmail = this.settings.getString('google.email');
       this.dbName = this.settings.getString('db.name');
@@ -55,6 +57,7 @@
 
     save: function(e, detail, sender) {
       this.puts('music.dir', this.musicDir);
+      this.puts('mv.dir', this.musicVideoDir);
       this.puts('google.appKey', this.googleAppKey);
       this.puts('google.email', this.googleEmail);
       this.puts('db.name', this.dbName);

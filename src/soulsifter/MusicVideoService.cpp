@@ -46,7 +46,7 @@ string removeSpecialCharsFromPath(string filepath) {
 MusicVideo* MusicVideoService::associateYouTubeVideo(const Song* const song, const string& id) {
   cout << "Associate YouTube video " << id << " with song " << song->getId() << endl;
 
-  boost::filesystem::path mvBasePath(SoulSifterSettings::getInstance().get<string>("mv.path"));
+  boost::filesystem::path mvBasePath(SoulSifterSettings::getInstance().get<string>("mv.dir"));
   if (!boost::filesystem::exists(mvBasePath) || !boost::filesystem::is_directory(mvBasePath)) {
     cerr << "Music video base path does not exist. " << mvBasePath << endl;
     return NULL;
