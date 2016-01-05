@@ -31,6 +31,10 @@
   var mb = new gui.Menu({type:"menubar"});
   mb.createMacBuiltin("Soul Sifter");
   gui.Window.get().menu = mb;
+
+  // position window
+  gui.Window.get().moveTo(0,0);
+  gui.Window.get().width = window.screen.availWidth;
 </script>
 
 <script>
