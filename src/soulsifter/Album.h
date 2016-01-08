@@ -68,7 +68,8 @@ namespace soulsifter {
         void setReleaseDateDay(int releaseDateDay);
         const int getBasicGenreId() const;
         void setBasicGenreId(int basicGenreId);
-        BasicGenre* getBasicGenre() const;
+        BasicGenre* getBasicGenre();
+        BasicGenre* getBasicGenreOnce() const;
         void setBasicGenre(const BasicGenre& basicGenre);
         void setBasicGenre(BasicGenre* basicGenre);  // takes ownership
 

@@ -49,12 +49,14 @@ namespace soulsifter {
         void setId(int id);
         const int getPlaylistId() const;
         void setPlaylistId(int playlistId);
-        Playlist* getPlaylist() const;
+        Playlist* getPlaylist();
+        Playlist* getPlaylistOnce() const;
         void setPlaylist(const Playlist& playlist);
         void setPlaylist(Playlist* playlist);  // takes ownership
         const int getSongId() const;
         void setSongId(int songId);
-        Song* getSong() const;
+        Song* getSong();
+        Song* getSongOnce() const;
         void setSong(const Song& song);
         void setSong(Song* song);  // takes ownership
         const int getPosition() const;

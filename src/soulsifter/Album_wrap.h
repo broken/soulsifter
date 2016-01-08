@@ -52,6 +52,7 @@ class Album : public node::ObjectWrap {
   static NAN_GETTER(getBasicGenreId);
   static NAN_SETTER(setBasicGenreId);
   static NAN_GETTER(getBasicGenre);
+  static NAN_GETTER(getBasicGenreOnce);
   static NAN_SETTER(setBasicGenre);
 
   static v8::Persistent<v8::Function> constructor;

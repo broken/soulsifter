@@ -89,7 +89,7 @@ namespace soulsifter {
         // TODO tonicKeys.insert(<RE KEY TO KEY>);
     }
     
-    const string Song::reAlbum() const {
+    const string Song::reAlbum() {
         if (!getAlbum()->getName().empty()) {
             return getAlbum()->getName();
         } else {
@@ -100,7 +100,7 @@ namespace soulsifter {
     const string Song::getDateAddedString() const { return stringFromTime(dateAdded); }
     void Song::setDateAddedToNow() { dateAdded = time(0); }
     
-    RESong* Song::createRESongFromSong(const Song& song) {
+    RESong* Song::createRESongFromSong(Song& song) {
         RESong* re = new RESong();
         re->setId(0);
         re->setArtist(song.getArtist());

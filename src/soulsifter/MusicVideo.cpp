@@ -47,15 +47,15 @@ namespace soulsifter {
     song(NULL),
     filePath(musicVideo.getFilePath()),
     thumbnailFilePath(musicVideo.getThumbnailFilePath()) {
-        if (musicVideo.getSong()) setSong(*musicVideo.getSong());
+        if (musicVideo.song) setSong(*musicVideo.song);
     }
 
     void MusicVideo::operator=(const MusicVideo& musicVideo) {
         id = musicVideo.getId();
         songId = musicVideo.getSongId();
-        if (!musicVideo.getSongId() && musicVideo.getSong()) {
-            if (!song) song = new Song(*musicVideo.getSong());
-            else *song = *musicVideo.getSong();
+        if (!musicVideo.getSongId() && musicVideo.song) {
+            if (!song) song = new Song(*musicVideo.song);
+            else *song = *musicVideo.song;
         } else {
             delete song;
             song = NULL;
@@ -276,17 +276,23 @@ namespace soulsifter {
     const int MusicVideo::getId() const { return id; }
     void MusicVideo::setId(const int id) { this->id = id; }
 
-    const int MusicVideo::getSongId() const { return songId; }
+    const int MusicVideo::getSongId() const { 
+        return (!songId && song) ? song->getId() : songId;
+    }
     void MusicVideo::setSongId(const int songId) {
         this->songId = songId;
         delete song;
         song = NULL;
     }
 
-    Song* MusicVideo::getSong() const {
-        if (!song && songId)
-            return Song::findById(songId);
+    Song* MusicVideo::getSong() {
+        if (!song && songId) {
+            song = Song::findById(songId);
+        }
         return song;
+    }
+    Song* MusicVideo::getSongOnce() const {
+        return (!song && songId) ? Song::findById(songId) : song;
     }
     void MusicVideo::setSong(const Song& song) {
         this->songId = song.getId();

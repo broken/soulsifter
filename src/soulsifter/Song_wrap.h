@@ -69,14 +69,17 @@ class Song : public node::ObjectWrap {
   static NAN_GETTER(getRESongId);
   static NAN_SETTER(setRESongId);
   // Unable to process getRESong
+  // Unable to process getRESongOnce
   // Unable to process setRESong
   static NAN_GETTER(getAlbumId);
   static NAN_SETTER(setAlbumId);
   static NAN_GETTER(getAlbum);
+  static NAN_GETTER(getAlbumOnce);
   static NAN_SETTER(setAlbum);
   static NAN_GETTER(getAlbumPartId);
   static NAN_SETTER(setAlbumPartId);
   static NAN_GETTER(getAlbumPart);
+  static NAN_GETTER(getAlbumPartOnce);
   static NAN_SETTER(setAlbumPart);
   static NAN_GETTER(getStyleIds);
   static NAN_SETTER(setStyleIds);

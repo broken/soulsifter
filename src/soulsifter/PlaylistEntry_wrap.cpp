@@ -67,8 +67,10 @@ void PlaylistEntry::Init(v8::Handle<v8::Object> exports) {
   tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("id"), getId, setId);
   tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("playlistId"), getPlaylistId, setPlaylistId);
   tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("playlist"), getPlaylist, setPlaylist);
+  tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("playlistOnce"), getPlaylistOnce);
   tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("songId"), getSongId, setSongId);
   tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("song"), getSong, setSong);
+  tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("songOnce"), getSongOnce);
   tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("position"), getPosition, setPosition);
   tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("time"), getTime, setTime);
 
@@ -223,6 +225,20 @@ NAN_GETTER(PlaylistEntry::getPlaylist) {
   NanReturnValue(instance);
 }
 
+NAN_GETTER(PlaylistEntry::getPlaylistOnce) {
+  NanScope();
+
+  PlaylistEntry* obj = ObjectWrap::Unwrap<PlaylistEntry>(args.This());
+  dogatech::soulsifter::Playlist* result =  obj->playlistentry->getPlaylistOnce();
+
+  if (result == NULL) NanReturnUndefined();
+  v8::Local<v8::Object> instance = Playlist::NewInstance();
+  Playlist* r = ObjectWrap::Unwrap<Playlist>(instance);
+  r->setNwcpValue(result, false);
+
+  NanReturnValue(instance);
+}
+
 NAN_SETTER(PlaylistEntry::setPlaylist) {
   NanScope();
 
@@ -258,6 +274,20 @@ NAN_GETTER(PlaylistEntry::getSong) {
 
   PlaylistEntry* obj = ObjectWrap::Unwrap<PlaylistEntry>(args.This());
   dogatech::soulsifter::Song* result =  obj->playlistentry->getSong();
+
+  if (result == NULL) NanReturnUndefined();
+  v8::Local<v8::Object> instance = Song::NewInstance();
+  Song* r = ObjectWrap::Unwrap<Song>(instance);
+  r->setNwcpValue(result, false);
+
+  NanReturnValue(instance);
+}
+
+NAN_GETTER(PlaylistEntry::getSongOnce) {
+  NanScope();
+
+  PlaylistEntry* obj = ObjectWrap::Unwrap<PlaylistEntry>(args.This());
+  dogatech::soulsifter::Song* result =  obj->playlistentry->getSongOnce();
 
   if (result == NULL) NanReturnUndefined();
   v8::Local<v8::Object> instance = Song::NewInstance();

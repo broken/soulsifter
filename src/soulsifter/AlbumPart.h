@@ -51,7 +51,8 @@ namespace soulsifter {
         void setName(const string& name);
         const int getAlbumId() const;
         void setAlbumId(int albumId);
-        Album* getAlbum() const;
+        Album* getAlbum();
+        Album* getAlbumOnce() const;
         void setAlbum(const Album& album);
         void setAlbum(Album* album);  // takes ownership
 

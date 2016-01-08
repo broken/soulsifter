@@ -52,24 +52,24 @@ namespace soulsifter {
     song(NULL),
     position(playlistEntry.getPosition()),
     time(playlistEntry.getTime()) {
-        if (playlistEntry.getPlaylist()) setPlaylist(*playlistEntry.getPlaylist());
-        if (playlistEntry.getSong()) setSong(*playlistEntry.getSong());
+        if (playlistEntry.playlist) setPlaylist(*playlistEntry.playlist);
+        if (playlistEntry.song) setSong(*playlistEntry.song);
     }
 
     void PlaylistEntry::operator=(const PlaylistEntry& playlistEntry) {
         id = playlistEntry.getId();
         playlistId = playlistEntry.getPlaylistId();
-        if (!playlistEntry.getPlaylistId() && playlistEntry.getPlaylist()) {
-            if (!playlist) playlist = new Playlist(*playlistEntry.getPlaylist());
-            else *playlist = *playlistEntry.getPlaylist();
+        if (!playlistEntry.getPlaylistId() && playlistEntry.playlist) {
+            if (!playlist) playlist = new Playlist(*playlistEntry.playlist);
+            else *playlist = *playlistEntry.playlist;
         } else {
             delete playlist;
             playlist = NULL;
         }
         songId = playlistEntry.getSongId();
-        if (!playlistEntry.getSongId() && playlistEntry.getSong()) {
-            if (!song) song = new Song(*playlistEntry.getSong());
-            else *song = *playlistEntry.getSong();
+        if (!playlistEntry.getSongId() && playlistEntry.song) {
+            if (!song) song = new Song(*playlistEntry.song);
+            else *song = *playlistEntry.song;
         } else {
             delete song;
             song = NULL;
@@ -268,7 +268,7 @@ namespace soulsifter {
 
     bool PlaylistEntry::sync() {
         PlaylistEntry* playlistEntry = findById(id);
-        if (!playlistEntry) playlistEntry = findByPlaylistIdAndSongId(playlistId, songId);
+        if (!playlistEntry) playlistEntry = findByPlaylistIdAndSongId(getPlaylistId(), getSongId());
         if (!playlistEntry) {
             if (!playlistId && playlist) {
                 playlist->sync();
@@ -356,17 +356,23 @@ namespace soulsifter {
     const int PlaylistEntry::getId() const { return id; }
     void PlaylistEntry::setId(const int id) { this->id = id; }
 
-    const int PlaylistEntry::getPlaylistId() const { return playlistId; }
+    const int PlaylistEntry::getPlaylistId() const { 
+        return (!playlistId && playlist) ? playlist->getId() : playlistId;
+    }
     void PlaylistEntry::setPlaylistId(const int playlistId) {
         this->playlistId = playlistId;
         delete playlist;
         playlist = NULL;
     }
 
-    Playlist* PlaylistEntry::getPlaylist() const {
-        if (!playlist && playlistId)
-            return Playlist::findById(playlistId);
+    Playlist* PlaylistEntry::getPlaylist() {
+        if (!playlist && playlistId) {
+            playlist = Playlist::findById(playlistId);
+        }
         return playlist;
+    }
+    Playlist* PlaylistEntry::getPlaylistOnce() const {
+        return (!playlist && playlistId) ? Playlist::findById(playlistId) : playlist;
     }
     void PlaylistEntry::setPlaylist(const Playlist& playlist) {
         this->playlistId = playlist.getId();
@@ -379,17 +385,23 @@ namespace soulsifter {
         this->playlist = playlist;
     }
 
-    const int PlaylistEntry::getSongId() const { return songId; }
+    const int PlaylistEntry::getSongId() const { 
+        return (!songId && song) ? song->getId() : songId;
+    }
     void PlaylistEntry::setSongId(const int songId) {
         this->songId = songId;
         delete song;
         song = NULL;
     }
 
-    Song* PlaylistEntry::getSong() const {
-        if (!song && songId)
-            return Song::findById(songId);
+    Song* PlaylistEntry::getSong() {
+        if (!song && songId) {
+            song = Song::findById(songId);
+        }
         return song;
+    }
+    Song* PlaylistEntry::getSongOnce() const {
+        return (!song && songId) ? Song::findById(songId) : song;
     }
     void PlaylistEntry::setSong(const Song& song) {
         this->songId = song.getId();

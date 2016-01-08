@@ -88,9 +88,9 @@ namespace soulsifter {
     albumPart(NULL),
     styleIds(song.getStyleIds()),
     styles() {
-        if (song.getRESong()) setRESong(*song.getRESong());
-        if (song.getAlbum()) setAlbum(*song.getAlbum());
-        if (song.getAlbumPart()) setAlbumPart(*song.getAlbumPart());
+        if (song.reSong) setRESong(*song.reSong);
+        if (song.album) setAlbum(*song.album);
+        if (song.albumPart) setAlbumPart(*song.albumPart);
     }
 
     void Song::operator=(const Song& song) {
@@ -111,25 +111,25 @@ namespace soulsifter {
         trashed = song.getTrashed();
         lowQuality = song.getLowQuality();
         reSongId = song.getRESongId();
-        if (!song.getRESongId() && song.getRESong()) {
-            if (!reSong) reSong = new RESong(*song.getRESong());
-            else *reSong = *song.getRESong();
+        if (!song.getRESongId() && song.reSong) {
+            if (!reSong) reSong = new RESong(*song.reSong);
+            else *reSong = *song.reSong;
         } else {
             delete reSong;
             reSong = NULL;
         }
         albumId = song.getAlbumId();
-        if (!song.getAlbumId() && song.getAlbum()) {
-            if (!album) album = new Album(*song.getAlbum());
-            else *album = *song.getAlbum();
+        if (!song.getAlbumId() && song.album) {
+            if (!album) album = new Album(*song.album);
+            else *album = *song.album;
         } else {
             delete album;
             album = NULL;
         }
         albumPartId = song.getAlbumPartId();
-        if (!song.getAlbumPartId() && song.getAlbumPart()) {
-            if (!albumPart) albumPart = new AlbumPart(*song.getAlbumPart());
-            else *albumPart = *song.getAlbumPart();
+        if (!song.getAlbumPartId() && song.albumPart) {
+            if (!albumPart) albumPart = new AlbumPart(*song.albumPart);
+            else *albumPart = *song.albumPart;
         } else {
             delete albumPart;
             albumPart = NULL;
@@ -504,7 +504,7 @@ namespace soulsifter {
 
     bool Song::sync() {
         Song* song = findById(id);
-        if (!song) song = findByRESongId(reSongId);
+        if (!song) song = findByRESongId(getRESongId());
         if (!song) {
             if (!reSongId && reSong) {
                 reSong->sync();
@@ -751,17 +751,23 @@ namespace soulsifter {
     const bool Song::getLowQuality() const { return lowQuality; }
     void Song::setLowQuality(const bool lowQuality) { this->lowQuality = lowQuality; }
 
-    const int Song::getRESongId() const { return reSongId; }
+    const int Song::getRESongId() const { 
+        return (!reSongId && reSong) ? reSong->getId() : reSongId;
+    }
     void Song::setRESongId(const int reSongId) {
         this->reSongId = reSongId;
         delete reSong;
         reSong = NULL;
     }
 
-    RESong* Song::getRESong() const {
-        if (!reSong && reSongId)
-            return RESong::findById(reSongId);
+    RESong* Song::getRESong() {
+        if (!reSong && reSongId) {
+            reSong = RESong::findById(reSongId);
+        }
         return reSong;
+    }
+    RESong* Song::getRESongOnce() const {
+        return (!reSong && reSongId) ? RESong::findById(reSongId) : reSong;
     }
     void Song::setRESong(const RESong& reSong) {
         this->reSongId = reSong.getId();
@@ -774,17 +780,23 @@ namespace soulsifter {
         this->reSong = reSong;
     }
 
-    const int Song::getAlbumId() const { return albumId; }
+    const int Song::getAlbumId() const { 
+        return (!albumId && album) ? album->getId() : albumId;
+    }
     void Song::setAlbumId(const int albumId) {
         this->albumId = albumId;
         delete album;
         album = NULL;
     }
 
-    Album* Song::getAlbum() const {
-        if (!album && albumId)
-            return Album::findById(albumId);
+    Album* Song::getAlbum() {
+        if (!album && albumId) {
+            album = Album::findById(albumId);
+        }
         return album;
+    }
+    Album* Song::getAlbumOnce() const {
+        return (!album && albumId) ? Album::findById(albumId) : album;
     }
     void Song::setAlbum(const Album& album) {
         this->albumId = album.getId();
@@ -797,17 +809,23 @@ namespace soulsifter {
         this->album = album;
     }
 
-    const int Song::getAlbumPartId() const { return albumPartId; }
+    const int Song::getAlbumPartId() const { 
+        return (!albumPartId && albumPart) ? albumPart->getId() : albumPartId;
+    }
     void Song::setAlbumPartId(const int albumPartId) {
         this->albumPartId = albumPartId;
         delete albumPart;
         albumPart = NULL;
     }
 
-    AlbumPart* Song::getAlbumPart() const {
-        if (!albumPart && albumPartId)
-            return AlbumPart::findById(albumPartId);
+    AlbumPart* Song::getAlbumPart() {
+        if (!albumPart && albumPartId) {
+            albumPart = AlbumPart::findById(albumPartId);
+        }
         return albumPart;
+    }
+    AlbumPart* Song::getAlbumPartOnce() const {
+        return (!albumPart && albumPartId) ? AlbumPart::findById(albumPartId) : albumPart;
     }
     void Song::setAlbumPart(const AlbumPart& albumPart) {
         this->albumPartId = albumPart.getId();

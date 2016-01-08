@@ -61,7 +61,7 @@ namespace soulsifter {
     releaseDateDay(album.getReleaseDateDay()),
     basicGenreId(album.getBasicGenreId()),
     basicGenre(NULL) {
-        if (album.getBasicGenre()) setBasicGenre(*album.getBasicGenre());
+        if (album.basicGenre) setBasicGenre(*album.basicGenre);
     }
 
     void Album::operator=(const Album& album) {
@@ -76,9 +76,9 @@ namespace soulsifter {
         releaseDateMonth = album.getReleaseDateMonth();
         releaseDateDay = album.getReleaseDateDay();
         basicGenreId = album.getBasicGenreId();
-        if (!album.getBasicGenreId() && album.getBasicGenre()) {
-            if (!basicGenre) basicGenre = new BasicGenre(*album.getBasicGenre());
-            else *basicGenre = *album.getBasicGenre();
+        if (!album.getBasicGenreId() && album.basicGenre) {
+            if (!basicGenre) basicGenre = new BasicGenre(*album.basicGenre);
+            else *basicGenre = *album.basicGenre;
         } else {
             delete basicGenre;
             basicGenre = NULL;
@@ -309,7 +309,7 @@ namespace soulsifter {
 
     bool Album::sync() {
         Album* album = findById(id);
-        if (!album) album = findByNameAndArtist(name, artist);
+        if (!album) album = findByNameAndArtist(getName(), getArtist());
         if (!album) {
             if (!basicGenreId && basicGenre) {
                 basicGenre->sync();
@@ -448,17 +448,23 @@ namespace soulsifter {
     const int Album::getReleaseDateDay() const { return releaseDateDay; }
     void Album::setReleaseDateDay(const int releaseDateDay) { this->releaseDateDay = releaseDateDay; }
 
-    const int Album::getBasicGenreId() const { return basicGenreId; }
+    const int Album::getBasicGenreId() const { 
+        return (!basicGenreId && basicGenre) ? basicGenre->getId() : basicGenreId;
+    }
     void Album::setBasicGenreId(const int basicGenreId) {
         this->basicGenreId = basicGenreId;
         delete basicGenre;
         basicGenre = NULL;
     }
 
-    BasicGenre* Album::getBasicGenre() const {
-        if (!basicGenre && basicGenreId)
-            return BasicGenre::findById(basicGenreId);
+    BasicGenre* Album::getBasicGenre() {
+        if (!basicGenre && basicGenreId) {
+            basicGenre = BasicGenre::findById(basicGenreId);
+        }
         return basicGenre;
+    }
+    BasicGenre* Album::getBasicGenreOnce() const {
+        return (!basicGenre && basicGenreId) ? BasicGenre::findById(basicGenreId) : basicGenre;
     }
     void Album::setBasicGenre(const BasicGenre& basicGenre) {
         this->basicGenreId = basicGenre.getId();

@@ -47,7 +47,7 @@ namespace soulsifter {
     name(albumPart.getName()),
     albumId(albumPart.getAlbumId()),
     album(NULL) {
-        if (albumPart.getAlbum()) setAlbum(*albumPart.getAlbum());
+        if (albumPart.album) setAlbum(*albumPart.album);
     }
 
     void AlbumPart::operator=(const AlbumPart& albumPart) {
@@ -55,9 +55,9 @@ namespace soulsifter {
         pos = albumPart.getPos();
         name = albumPart.getName();
         albumId = albumPart.getAlbumId();
-        if (!albumPart.getAlbumId() && albumPart.getAlbum()) {
-            if (!album) album = new Album(*albumPart.getAlbum());
-            else *album = *albumPart.getAlbum();
+        if (!albumPart.getAlbumId() && albumPart.album) {
+            if (!album) album = new Album(*albumPart.album);
+            else *album = *albumPart.album;
         } else {
             delete album;
             album = NULL;
@@ -224,7 +224,7 @@ namespace soulsifter {
 
     bool AlbumPart::sync() {
         AlbumPart* albumPart = findById(id);
-        if (!albumPart) albumPart = findByPosAndAlbumId(pos, albumId);
+        if (!albumPart) albumPart = findByPosAndAlbumId(getPos(), getAlbumId());
         if (!albumPart) {
             if (!albumId && album) {
                 album->sync();
@@ -286,17 +286,23 @@ namespace soulsifter {
     const string& AlbumPart::getName() const { return name; }
     void AlbumPart::setName(const string& name) { this->name = name; }
 
-    const int AlbumPart::getAlbumId() const { return albumId; }
+    const int AlbumPart::getAlbumId() const { 
+        return (!albumId && album) ? album->getId() : albumId;
+    }
     void AlbumPart::setAlbumId(const int albumId) {
         this->albumId = albumId;
         delete album;
         album = NULL;
     }
 
-    Album* AlbumPart::getAlbum() const {
-        if (!album && albumId)
-            return Album::findById(albumId);
+    Album* AlbumPart::getAlbum() {
+        if (!album && albumId) {
+            album = Album::findById(albumId);
+        }
         return album;
+    }
+    Album* AlbumPart::getAlbumOnce() const {
+        return (!album && albumId) ? Album::findById(albumId) : album;
     }
     void AlbumPart::setAlbum(const Album& album) {
         this->albumId = album.getId();

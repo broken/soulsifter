@@ -33,10 +33,12 @@ class Mix : public node::ObjectWrap {
   static NAN_GETTER(getOutSongId);
   static NAN_SETTER(setOutSongId);
   static NAN_GETTER(getOutSong);
+  static NAN_GETTER(getOutSongOnce);
   static NAN_SETTER(setOutSong);
   static NAN_GETTER(getInSongId);
   static NAN_SETTER(setInSongId);
   static NAN_GETTER(getInSong);
+  static NAN_GETTER(getInSongOnce);
   static NAN_SETTER(setInSong);
   static NAN_GETTER(getBpmDiff);
   static NAN_SETTER(setBpmDiff);

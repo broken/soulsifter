@@ -64,6 +64,7 @@ void MusicVideo::Init(v8::Handle<v8::Object> exports) {
   tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("id"), getId, setId);
   tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("songId"), getSongId, setSongId);
   tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("song"), getSong, setSong);
+  tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("songOnce"), getSongOnce);
   tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("filePath"), getFilePath, setFilePath);
   tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("thumbnailFilePath"), getThumbnailFilePath, setThumbnailFilePath);
 
@@ -199,6 +200,20 @@ NAN_GETTER(MusicVideo::getSong) {
 
   MusicVideo* obj = ObjectWrap::Unwrap<MusicVideo>(args.This());
   dogatech::soulsifter::Song* result =  obj->musicvideo->getSong();
+
+  if (result == NULL) NanReturnUndefined();
+  v8::Local<v8::Object> instance = Song::NewInstance();
+  Song* r = ObjectWrap::Unwrap<Song>(instance);
+  r->setNwcpValue(result, false);
+
+  NanReturnValue(instance);
+}
+
+NAN_GETTER(MusicVideo::getSongOnce) {
+  NanScope();
+
+  MusicVideo* obj = ObjectWrap::Unwrap<MusicVideo>(args.This());
+  dogatech::soulsifter::Song* result =  obj->musicvideo->getSongOnce();
 
   if (result == NULL) NanReturnUndefined();
   v8::Local<v8::Object> instance = Song::NewInstance();

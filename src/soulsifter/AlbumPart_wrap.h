@@ -36,6 +36,7 @@ class AlbumPart : public node::ObjectWrap {
   static NAN_GETTER(getAlbumId);
   static NAN_SETTER(setAlbumId);
   static NAN_GETTER(getAlbum);
+  static NAN_GETTER(getAlbumOnce);
   static NAN_SETTER(setAlbum);
 
   static v8::Persistent<v8::Function> constructor;

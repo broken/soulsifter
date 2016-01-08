@@ -43,7 +43,7 @@ string removeSpecialCharsFromPath(string filepath) {
 
 }  // namespace
 
-MusicVideo* MusicVideoService::associateYouTubeVideo(const Song* const song, const string& id) {
+MusicVideo* MusicVideoService::associateYouTubeVideo(Song* const song, const string& id) {
   cout << "Associate YouTube video " << id << " with song " << song->getId() << endl;
 
   boost::filesystem::path mvBasePath(SoulSifterSettings::getInstance().get<string>("mv.dir"));

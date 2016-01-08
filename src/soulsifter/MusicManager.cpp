@@ -280,50 +280,52 @@ void MusicManager::writeTagsToSong(Song* song) {
           }
         }
       }
+      Album* songAlbum = song.getAlbumOnce();
+      AlbumPart* songAlbumPart = song.getAlbumPartOnce();
       // we shouldn't auto set track title b/c it changes so much
       // nor should we auto update remixer
-      if (!song.getAlbum()->getArtist().compare(lastParsedSong->getAlbum()->getArtist())) {
+      if (!songAlbum->getArtist().compare(lastParsedSong->getAlbum()->getArtist())) {
         updatedSong->getAlbum()->setArtist(lastSongFixed->getAlbum()->getArtist());
       }
-      if (!song.getAlbum()->getName().compare(lastParsedSong->getAlbum()->getName())) {
+      if (!songAlbum->getName().compare(lastParsedSong->getAlbum()->getName())) {
         updatedSong->getAlbum()->setName(lastSongFixed->getAlbum()->getName());
       }
       updatedSong->getAlbum()->setMixed(lastSongFixed->getAlbum()->getMixed());
-      if (!song.getAlbum()->getLabel().compare(lastParsedSong->getAlbum()->getLabel())) {
+      if (!songAlbum->getLabel().compare(lastParsedSong->getAlbum()->getLabel())) {
         updatedSong->getAlbum()->setLabel(lastSongFixed->getAlbum()->getLabel());
       }
-      if (!song.getAlbum()->getCatalogId().compare(lastParsedSong->getAlbum()->getCatalogId())) {
+      if (!songAlbum->getCatalogId().compare(lastParsedSong->getAlbum()->getCatalogId())) {
         updatedSong->getAlbum()->setCatalogId(lastSongFixed->getAlbum()->getCatalogId());
       }
-      if (song.getAlbum()->getReleaseDateYear() == lastParsedSong->getAlbum()->getReleaseDateYear()) {
+      if (songAlbum->getReleaseDateYear() == lastParsedSong->getAlbum()->getReleaseDateYear()) {
         updatedSong->getAlbum()->setReleaseDateYear(lastSongFixed->getAlbum()->getReleaseDateYear());
       }
-      if (song.getAlbum()->getReleaseDateMonth() == lastParsedSong->getAlbum()->getReleaseDateMonth()) {
+      if (songAlbum->getReleaseDateMonth() == lastParsedSong->getAlbum()->getReleaseDateMonth()) {
         updatedSong->getAlbum()->setReleaseDateMonth(lastSongFixed->getAlbum()->getReleaseDateMonth());
       }
-      if (song.getAlbum()->getReleaseDateDay() == lastParsedSong->getAlbum()->getReleaseDateDay()) {
+      if (songAlbum->getReleaseDateDay() == lastParsedSong->getAlbum()->getReleaseDateDay()) {
         updatedSong->getAlbum()->setReleaseDateDay(lastSongFixed->getAlbum()->getReleaseDateDay());
       }
-      if (song.getAlbum()->getBasicGenreId() == lastParsedSong->getAlbum()->getBasicGenreId()) {
+      if (songAlbum->getBasicGenreId() == lastParsedSong->getAlbum()->getBasicGenreId()) {
         updatedSong->getAlbum()->setBasicGenreId(lastSongFixed->getAlbum()->getBasicGenreId());
       }
       if (song.getComments().size() > 0 && !song.getComments().compare(lastParsedSong->getComments())) {
         updatedSong->setComments(lastSongFixed->getComments());
       }
       // we may not always have an album part
-      if (song.getAlbumPart() && lastParsedSong->getAlbumPart()) {
-        if (!song.getAlbumPart()->getName().compare(lastParsedSong->getAlbumPart()->getName()) &&
-            !song.getAlbumPart()->getPos().compare(lastParsedSong->getAlbumPart()->getPos())) {
+      if (songAlbumPart && lastParsedSong->getAlbumPart()) {
+        if (!songAlbumPart->getName().compare(lastParsedSong->getAlbumPart()->getName()) &&
+            !songAlbumPart->getPos().compare(lastParsedSong->getAlbumPart()->getPos())) {
           if (lastSongFixed->getAlbumPart()) {
             updatedSong->getAlbumPart()->setName(lastSongFixed->getAlbumPart()->getName());
             updatedSong->getAlbumPart()->setPos(lastSongFixed->getAlbumPart()->getPos());
           } else {
             updatedSong->setAlbumPartId(0);
           }
-        } else if (!song.getAlbumPart()->getName().compare(lastParsedSong->getAlbumPart()->getName()) &&
+        } else if (!songAlbumPart->getName().compare(lastParsedSong->getAlbumPart()->getName()) &&
                    lastSongFixed->getAlbumPart()) {
           updatedSong->getAlbumPart()->setName(lastSongFixed->getAlbumPart()->getName());
-        } else if (!song.getAlbumPart()->getPos().compare(lastParsedSong->getAlbumPart()->getPos()) &&
+        } else if (!songAlbumPart->getPos().compare(lastParsedSong->getAlbumPart()->getPos()) &&
                    lastSongFixed->getAlbumPart()) {
           updatedSong->getAlbumPart()->setPos(lastSongFixed->getAlbumPart()->getPos());
         }

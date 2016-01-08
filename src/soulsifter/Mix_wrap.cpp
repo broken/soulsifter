@@ -65,8 +65,10 @@ void Mix::Init(v8::Handle<v8::Object> exports) {
   tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("id"), getId, setId);
   tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("outSongId"), getOutSongId, setOutSongId);
   tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("outSong"), getOutSong, setOutSong);
+  tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("outSongOnce"), getOutSongOnce);
   tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("inSongId"), getInSongId, setInSongId);
   tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("inSong"), getInSong, setInSong);
+  tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("inSongOnce"), getInSongOnce);
   tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("bpmDiff"), getBpmDiff, setBpmDiff);
   tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("rank"), getRank, setRank);
   tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("comments"), getComments, setComments);
@@ -224,6 +226,20 @@ NAN_GETTER(Mix::getOutSong) {
   NanReturnValue(instance);
 }
 
+NAN_GETTER(Mix::getOutSongOnce) {
+  NanScope();
+
+  Mix* obj = ObjectWrap::Unwrap<Mix>(args.This());
+  dogatech::soulsifter::Song* result =  obj->mix->getOutSongOnce();
+
+  if (result == NULL) NanReturnUndefined();
+  v8::Local<v8::Object> instance = Song::NewInstance();
+  Song* r = ObjectWrap::Unwrap<Song>(instance);
+  r->setNwcpValue(result, false);
+
+  NanReturnValue(instance);
+}
+
 NAN_SETTER(Mix::setOutSong) {
   NanScope();
 
@@ -259,6 +275,20 @@ NAN_GETTER(Mix::getInSong) {
 
   Mix* obj = ObjectWrap::Unwrap<Mix>(args.This());
   dogatech::soulsifter::Song* result =  obj->mix->getInSong();
+
+  if (result == NULL) NanReturnUndefined();
+  v8::Local<v8::Object> instance = Song::NewInstance();
+  Song* r = ObjectWrap::Unwrap<Song>(instance);
+  r->setNwcpValue(result, false);
+
+  NanReturnValue(instance);
+}
+
+NAN_GETTER(Mix::getInSongOnce) {
+  NanScope();
+
+  Mix* obj = ObjectWrap::Unwrap<Mix>(args.This());
+  dogatech::soulsifter::Song* result =  obj->mix->getInSongOnce();
 
   if (result == NULL) NanReturnUndefined();
   v8::Local<v8::Object> instance = Song::NewInstance();

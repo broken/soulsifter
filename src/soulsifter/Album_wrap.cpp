@@ -75,6 +75,7 @@ void Album::Init(v8::Handle<v8::Object> exports) {
   tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("releaseDateDay"), getReleaseDateDay, setReleaseDateDay);
   tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("basicGenreId"), getBasicGenreId, setBasicGenreId);
   tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("basicGenre"), getBasicGenre, setBasicGenre);
+  tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("basicGenreOnce"), getBasicGenreOnce);
 
   NanAssignPersistent<v8::Function>(constructor, tpl->GetFunction());
   exports->Set(NanNew<v8::String>("Album"), tpl->GetFunction());
@@ -404,6 +405,20 @@ NAN_GETTER(Album::getBasicGenre) {
 
   Album* obj = ObjectWrap::Unwrap<Album>(args.This());
   dogatech::soulsifter::BasicGenre* result =  obj->album->getBasicGenre();
+
+  if (result == NULL) NanReturnUndefined();
+  v8::Local<v8::Object> instance = BasicGenre::NewInstance();
+  BasicGenre* r = ObjectWrap::Unwrap<BasicGenre>(instance);
+  r->setNwcpValue(result, false);
+
+  NanReturnValue(instance);
+}
+
+NAN_GETTER(Album::getBasicGenreOnce) {
+  NanScope();
+
+  Album* obj = ObjectWrap::Unwrap<Album>(args.This());
+  dogatech::soulsifter::BasicGenre* result =  obj->album->getBasicGenreOnce();
 
   if (result == NULL) NanReturnUndefined();
   v8::Local<v8::Object> instance = BasicGenre::NewInstance();

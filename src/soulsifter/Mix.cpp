@@ -55,24 +55,24 @@ namespace soulsifter {
     rank(mix.getRank()),
     comments(mix.getComments()),
     addon(mix.getAddon()) {
-        if (mix.getOutSong()) setOutSong(*mix.getOutSong());
-        if (mix.getInSong()) setInSong(*mix.getInSong());
+        if (mix.outSong) setOutSong(*mix.outSong);
+        if (mix.inSong) setInSong(*mix.inSong);
     }
 
     void Mix::operator=(const Mix& mix) {
         id = mix.getId();
         outSongId = mix.getOutSongId();
-        if (!mix.getOutSongId() && mix.getOutSong()) {
-            if (!outSong) outSong = new Song(*mix.getOutSong());
-            else *outSong = *mix.getOutSong();
+        if (!mix.getOutSongId() && mix.outSong) {
+            if (!outSong) outSong = new Song(*mix.outSong);
+            else *outSong = *mix.outSong;
         } else {
             delete outSong;
             outSong = NULL;
         }
         inSongId = mix.getInSongId();
-        if (!mix.getInSongId() && mix.getInSong()) {
-            if (!inSong) inSong = new Song(*mix.getInSong());
-            else *inSong = *mix.getInSong();
+        if (!mix.getInSongId() && mix.inSong) {
+            if (!inSong) inSong = new Song(*mix.inSong);
+            else *inSong = *mix.inSong;
         } else {
             delete inSong;
             inSong = NULL;
@@ -283,7 +283,7 @@ namespace soulsifter {
 
     bool Mix::sync() {
         Mix* mix = findById(id);
-        if (!mix) mix = findByOutSongIdAndInSongId(outSongId, inSongId);
+        if (!mix) mix = findByOutSongIdAndInSongId(getOutSongId(), getInSongId());
         if (!mix) {
             if (!outSongId && outSong) {
                 outSong->sync();
@@ -368,17 +368,23 @@ namespace soulsifter {
     const int Mix::getId() const { return id; }
     void Mix::setId(const int id) { this->id = id; }
 
-    const int Mix::getOutSongId() const { return outSongId; }
+    const int Mix::getOutSongId() const { 
+        return (!outSongId && outSong) ? outSong->getId() : outSongId;
+    }
     void Mix::setOutSongId(const int outSongId) {
         this->outSongId = outSongId;
         delete outSong;
         outSong = NULL;
     }
 
-    Song* Mix::getOutSong() const {
-        if (!outSong && outSongId)
-            return Song::findById(outSongId);
+    Song* Mix::getOutSong() {
+        if (!outSong && outSongId) {
+            outSong = Song::findById(outSongId);
+        }
         return outSong;
+    }
+    Song* Mix::getOutSongOnce() const {
+        return (!outSong && outSongId) ? Song::findById(outSongId) : outSong;
     }
     void Mix::setOutSong(const Song& outSong) {
         this->outSongId = outSong.getId();
@@ -391,17 +397,23 @@ namespace soulsifter {
         this->outSong = outSong;
     }
 
-    const int Mix::getInSongId() const { return inSongId; }
+    const int Mix::getInSongId() const { 
+        return (!inSongId && inSong) ? inSong->getId() : inSongId;
+    }
     void Mix::setInSongId(const int inSongId) {
         this->inSongId = inSongId;
         delete inSong;
         inSong = NULL;
     }
 
-    Song* Mix::getInSong() const {
-        if (!inSong && inSongId)
-            return Song::findById(inSongId);
+    Song* Mix::getInSong() {
+        if (!inSong && inSongId) {
+            inSong = Song::findById(inSongId);
+        }
         return inSong;
+    }
+    Song* Mix::getInSongOnce() const {
+        return (!inSong && inSongId) ? Song::findById(inSongId) : inSong;
     }
     void Mix::setInSong(const Song& inSong) {
         this->inSongId = inSong.getId();

@@ -66,6 +66,7 @@ void AlbumPart::Init(v8::Handle<v8::Object> exports) {
   tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("name"), getName, setName);
   tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("albumId"), getAlbumId, setAlbumId);
   tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("album"), getAlbum, setAlbum);
+  tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("albumOnce"), getAlbumOnce);
 
   NanAssignPersistent<v8::Function>(constructor, tpl->GetFunction());
   exports->Set(NanNew<v8::String>("AlbumPart"), tpl->GetFunction());
@@ -238,6 +239,20 @@ NAN_GETTER(AlbumPart::getAlbum) {
 
   AlbumPart* obj = ObjectWrap::Unwrap<AlbumPart>(args.This());
   dogatech::soulsifter::Album* result =  obj->albumpart->getAlbum();
+
+  if (result == NULL) NanReturnUndefined();
+  v8::Local<v8::Object> instance = Album::NewInstance();
+  Album* r = ObjectWrap::Unwrap<Album>(instance);
+  r->setNwcpValue(result, false);
+
+  NanReturnValue(instance);
+}
+
+NAN_GETTER(AlbumPart::getAlbumOnce) {
+  NanScope();
+
+  AlbumPart* obj = ObjectWrap::Unwrap<AlbumPart>(args.This());
+  dogatech::soulsifter::Album* result =  obj->albumpart->getAlbumOnce();
 
   if (result == NULL) NanReturnUndefined();
   v8::Local<v8::Object> instance = Album::NewInstance();

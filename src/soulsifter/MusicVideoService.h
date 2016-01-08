@@ -13,7 +13,7 @@ class MusicVideo;
 
 class MusicVideoService {
 public:
-  static MusicVideo* associateYouTubeVideo(const Song* const song, const string& id);
+  static MusicVideo* associateYouTubeVideo(Song* const song, const string& id);
 };
 
 }  // namespace soulsifter

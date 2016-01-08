@@ -32,6 +32,7 @@ class MusicVideo : public node::ObjectWrap {
   static NAN_GETTER(getSongId);
   static NAN_SETTER(setSongId);
   static NAN_GETTER(getSong);
+  static NAN_GETTER(getSongOnce);
   static NAN_SETTER(setSong);
   static NAN_GETTER(getFilePath);
   static NAN_SETTER(setFilePath);

@@ -49,9 +49,9 @@ namespace soulsifter {
 
         explicit Song(RESong* song);
 
-        static RESong* createRESongFromSong(const Song& song);
+        static RESong* createRESongFromSong(Song& song);
 
-        const string reAlbum() const;
+        const string reAlbum();
         const string getDateAddedString() const;
         void setDateAddedToNow();
 
@@ -91,17 +91,20 @@ namespace soulsifter {
         void setLowQuality(bool lowQuality);
         const int getRESongId() const;
         void setRESongId(int reSongId);
-        RESong* getRESong() const;
+        RESong* getRESong();
+        RESong* getRESongOnce() const;
         void setRESong(const RESong& reSong);
         void setRESong(RESong* reSong);  // takes ownership
         const int getAlbumId() const;
         void setAlbumId(int albumId);
-        Album* getAlbum() const;
+        Album* getAlbum();
+        Album* getAlbumOnce() const;
         void setAlbum(const Album& album);
         void setAlbum(Album* album);  // takes ownership
         const int getAlbumPartId() const;
         void setAlbumPartId(int albumPartId);
-        AlbumPart* getAlbumPart() const;
+        AlbumPart* getAlbumPart();
+        AlbumPart* getAlbumPartOnce() const;
         void setAlbumPart(const AlbumPart& albumPart);
         void setAlbumPart(AlbumPart* albumPart);  // takes ownership
         const vector<int>& getStyleIds() const;

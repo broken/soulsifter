@@ -90,11 +90,14 @@ void Song::Init(v8::Handle<v8::Object> exports) {
   tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("lowQuality"), getLowQuality, setLowQuality);
   tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("rESongId"), getRESongId, setRESongId);
   // Unable to process getRESong
+  // Unable to process getRESongOnce
   // Unable to process setRESong
   tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("albumId"), getAlbumId, setAlbumId);
   tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("album"), getAlbum, setAlbum);
+  tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("albumOnce"), getAlbumOnce);
   tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("albumPartId"), getAlbumPartId, setAlbumPartId);
   tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("albumPart"), getAlbumPart, setAlbumPart);
+  tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("albumPartOnce"), getAlbumPartOnce);
   tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("styleIds"), getStyleIds, setStyleIds);
   tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("styles"), getStyles, setStyles);
 
@@ -617,6 +620,20 @@ NAN_GETTER(Song::getAlbum) {
   NanReturnValue(instance);
 }
 
+NAN_GETTER(Song::getAlbumOnce) {
+  NanScope();
+
+  Song* obj = ObjectWrap::Unwrap<Song>(args.This());
+  dogatech::soulsifter::Album* result =  obj->song->getAlbumOnce();
+
+  if (result == NULL) NanReturnUndefined();
+  v8::Local<v8::Object> instance = Album::NewInstance();
+  Album* r = ObjectWrap::Unwrap<Album>(instance);
+  r->setNwcpValue(result, false);
+
+  NanReturnValue(instance);
+}
+
 NAN_SETTER(Song::setAlbum) {
   NanScope();
 
@@ -652,6 +669,20 @@ NAN_GETTER(Song::getAlbumPart) {
 
   Song* obj = ObjectWrap::Unwrap<Song>(args.This());
   dogatech::soulsifter::AlbumPart* result =  obj->song->getAlbumPart();
+
+  if (result == NULL) NanReturnUndefined();
+  v8::Local<v8::Object> instance = AlbumPart::NewInstance();
+  AlbumPart* r = ObjectWrap::Unwrap<AlbumPart>(instance);
+  r->setNwcpValue(result, false);
+
+  NanReturnValue(instance);
+}
+
+NAN_GETTER(Song::getAlbumPartOnce) {
+  NanScope();
+
+  Song* obj = ObjectWrap::Unwrap<Song>(args.This());
+  dogatech::soulsifter::AlbumPart* result =  obj->song->getAlbumPartOnce();
 
   if (result == NULL) NanReturnUndefined();
   v8::Local<v8::Object> instance = AlbumPart::NewInstance();

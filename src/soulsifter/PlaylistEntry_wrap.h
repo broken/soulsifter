@@ -33,10 +33,12 @@ class PlaylistEntry : public node::ObjectWrap {
   static NAN_GETTER(getPlaylistId);
   static NAN_SETTER(setPlaylistId);
   static NAN_GETTER(getPlaylist);
+  static NAN_GETTER(getPlaylistOnce);
   static NAN_SETTER(setPlaylist);
   static NAN_GETTER(getSongId);
   static NAN_SETTER(setSongId);
   static NAN_GETTER(getSong);
+  static NAN_GETTER(getSongOnce);
   static NAN_SETTER(setSong);
   static NAN_GETTER(getPosition);
   static NAN_SETTER(setPosition);

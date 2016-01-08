@@ -201,7 +201,7 @@ def cCopyConstructor(name, fields)
   str << " {\n"
   fields.each do |f|
     if (f[$attrib] & Attrib::PTR > 0)
-      str << "        if (#{name}.get#{cap(f[$name])}()) set#{cap(f[$name])}(*#{name}.get#{cap(f[$name])}());\n"
+      str << "        if (#{name}.#{f[$name]}) set#{cap(f[$name])}(*#{name}.#{f[$name]});\n"
     end
   end
   str << "    }\n\n"
@@ -215,7 +215,7 @@ def cAssignmentConstructor(name, fields)
   str = "    void #{cap(name)}::operator=(const #{cap(name)}& #{name}) {\n"
   fields.each do |f|
     if (f[$attrib] & Attrib::PTR > 0)
-      str << "        if (!#{name}.get#{cap(f[$name])}Id() && #{name}.get#{cap(f[$name])}()) {\n            if (!#{f[$name]}) #{f[$name]} = new #{f[$type]}(*#{name}.get#{cap(f[$name])}());\n            else *#{f[$name]} = *#{name}.get#{cap(f[$name])}();\n        } else {\n            delete #{f[$name]};\n            #{f[$name]} = NULL;\n        }\n"
+      str << "        if (!#{name}.get#{cap(f[$name])}Id() && #{name}.#{f[$name]}) {\n            if (!#{f[$name]}) #{f[$name]} = new #{f[$type]}(*#{name}.#{f[$name]});\n            else *#{f[$name]} = *#{name}.#{f[$name]};\n        } else {\n            delete #{f[$name]};\n            #{f[$name]} = NULL;\n        }\n"
     elsif (isVector(f[$type]) && f[$attrib] & Attrib::ID == 0)
       str << "        deleteVectorPointers(&#{f[$name]});\n"
     else
@@ -376,7 +376,7 @@ def cSyncFunction(name, fields, secondaryKeys)
       if (idx > 0)
         str << ", "
       end
-      str << "#{f[$name]}"
+      str << "get#{cap(f[$name])}()"
     end
     str << ");\n"
   end
@@ -563,7 +563,8 @@ def hAccessor(f)
     str << "        const #{f[$type]} get#{cap(f[$name])}() const;\n"
     str << "        void set#{cap(f[$name])}(#{f[$type]} #{f[$name]});\n"
   elsif (f[$attrib] & Attrib::PTR > 0)
-    str << "        #{f[$type]}* get#{cap(f[$name])}() const;\n"
+    str << "        #{f[$type]}* get#{cap(f[$name])}();\n"
+    str << "        #{f[$type]}* get#{cap(f[$name])}Once() const;\n"
     str << "        void set#{cap(f[$name])}(const #{f[$type]}& #{f[$name]});\n"
     str << "        void set#{cap(f[$name])}(#{f[$type]}* #{f[$name]});  // takes ownership\n"
   elsif (isVector(f[$type]))
@@ -593,7 +594,8 @@ def cAccessor(name, f)
     str << "    const string& #{cap(name)}::get#{cap(f[$name])}() const { return #{f[$name]}; }\n"
     str << "    void #{cap(name)}::set#{cap(f[$name])}(const string& #{f[$name]}) { this->#{f[$name]} = #{f[$name]}; }\n"
   elsif (f[$attrib] & Attrib::PTR > 0)
-    str << "    #{f[$type]}* #{cap(name)}::get#{cap(f[$name])}() const {\n        if (!#{f[$name]} && #{f[$name]}Id)\n            return #{f[$type][0..-1]}::findById(#{f[$name]}Id);\n        return #{f[$name]};\n    }\n"
+    str << "    #{f[$type]}* #{cap(name)}::get#{cap(f[$name])}() {\n        if (!#{f[$name]} && #{f[$name]}Id) {\n            #{f[$name]} = #{f[$type][0..-1]}::findById(#{f[$name]}Id);\n        }\n        return #{f[$name]};\n    }\n"
+    str << "    #{f[$type]}* #{cap(name)}::get#{cap(f[$name])}Once() const {\n        return (!#{f[$name]} && #{f[$name]}Id) ? #{f[$type][0..-1]}::findById(#{f[$name]}Id) : #{f[$name]};\n    }\n"
     str << "    void #{cap(name)}::set#{cap(f[$name])}(const #{f[$type]}& #{f[$name]}) {\n        this->#{f[$name]}Id = #{f[$name]}.getId();\n        delete this->#{f[$name]};\n        this->#{f[$name]} = new #{f[$type]}(#{f[$name]});\n    }\n"
     str << "    void #{cap(name)}::set#{cap(f[$name])}(#{f[$type]}* #{f[$name]}) {\n        this->#{f[$name]}Id = #{f[$name]}->getId();\n        delete this->#{f[$name]};\n        this->#{f[$name]} = #{f[$name]};\n    }\n"
   elsif (isVector(f[$type]) && f[$attrib] & Attrib::ID == 0)
@@ -612,13 +614,12 @@ def cAccessor(name, f)
     str << "    void #{cap(name)}::set#{cap(f[$name])}(const #{f[$type]}& #{f[$name]}) {\n        this->#{f[$name]} = #{f[$name]};\n    }\n"
     str << "    void #{cap(name)}::add#{cap(single(f[$name]))}(const #{getSetGeneric(f[$type])}& #{single(f[$name])}) {\n        this->#{f[$name]}.insert(#{single(f[$name])});\n    }\n"
     str << "    void #{cap(name)}::remove#{cap(single(f[$name]))}(const #{getSetGeneric(f[$type])}& #{single(f[$name])}) {\n        this->#{f[$name]}.erase(#{single(f[$name])});\n    }\n"
+  elsif (f[$type] == :int && f[$attrib] & Attrib::ID > 0)
+    str << "    const #{f[$type]} #{cap(name)}::get#{cap(f[$name])}() const { \n        return (!#{f[$name]} && #{f[$name][0..-3]}) ? #{f[$name][0..-3]}->getId() : #{f[$name]};\n    }\n"
+    str << "    void #{cap(name)}::set#{cap(f[$name])}(const #{f[$type]} #{f[$name]}) {\n        this->#{f[$name]} = #{f[$name]};\n        delete #{f[$name][0..-3]};\n        #{f[$name][0..-3]} = NULL;\n    }\n"
   else
     str << "    const #{f[$type]} #{cap(name)}::get#{cap(f[$name])}() const { return #{f[$name]}; }\n"
-    if (f[$type] == :int && f[$name] =~ /Id$/ && f[$attrib] & Attrib::ID > 0)
-      str << "    void #{cap(name)}::set#{cap(f[$name])}(const #{f[$type]} #{f[$name]}) {\n        this->#{f[$name]} = #{f[$name]};\n        delete #{f[$name][0..-3]};\n        #{f[$name][0..-3]} = NULL;\n    }\n"
-    else
-      str << "    void #{cap(name)}::set#{cap(f[$name])}(const #{f[$type]} #{f[$name]}) { this->#{f[$name]} = #{f[$name]}; }\n"
-    end
+    str << "    void #{cap(name)}::set#{cap(f[$name])}(const #{f[$type]} #{f[$name]}) { this->#{f[$name]} = #{f[$name]}; }\n"
   end
   str << "\n"
 end
@@ -868,7 +869,7 @@ songFields = [
   ["vector<Style*>", "styles", 0],
 ]
 songAttribs = 0
-songCustomMethods = "        explicit Song(RESong* song);\n\n        static RESong* createRESongFromSong(const Song& song);\n\n        const string reAlbum() const;\n        const string getDateAddedString() const;\n        void setDateAddedToNow();\n\n"
+songCustomMethods = "        explicit Song(RESong* song);\n\n        static RESong* createRESongFromSong(Song& song);\n\n        const string reAlbum();\n        const string getDateAddedString() const;\n        void setDateAddedToNow();\n\n"
 songCustomHeaders = ""
 styleFields = [
   [:int, "id", Attrib::FIND],

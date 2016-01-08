@@ -47,7 +47,8 @@ namespace soulsifter {
         void setId(int id);
         const int getSongId() const;
         void setSongId(int songId);
-        Song* getSong() const;
+        Song* getSong();
+        Song* getSongOnce() const;
         void setSong(const Song& song);
         void setSong(Song* song);  // takes ownership
         const string& getFilePath() const;
