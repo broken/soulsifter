@@ -338,11 +338,15 @@ void MusicManager::writeTagsToSong(Song* song) {
       updatedSong->setTitle(boost::regex_replace(updatedSong->getTitle(), featRegex, ""));
     }
     // copy remixer
-    boost::regex rmxrRegex("[(](.*) ([Rr]emix|[Rr]mx|[Mm]ix|[Rr]efix)[)]$");
+    boost::regex rmxrRegex("[(](.+) ([Rr]emix|[Rr]mx|[Mm]ix|[Rr]efix|[Dd]ub)[)]$");
     boost::smatch rmxrMatch;
     if (boost::regex_search(song.getTitle(), rmxrMatch, rmxrRegex, boost::match_extra) &&
-      updatedSong->getRemixer().length() == 0) {
-      updatedSong->setRemixer(rmxrMatch[1]);
+        updatedSong->getRemixer().length() == 0) {
+      string remixer(rmxrMatch[1]);
+      transform(remixer.begin(), remixer.end(), remixer.begin(), ::tolower);
+      if (!!remixer.compare("original")) {
+        updatedSong->setRemixer(remixer);
+      }
     }
     // add an album artist if one does not exist
     if (updatedSong->getAlbum()->getArtist().empty()) {
