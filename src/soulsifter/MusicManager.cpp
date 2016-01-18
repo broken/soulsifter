@@ -345,8 +345,7 @@ void MusicManager::writeTagsToSong(Song* song) {
     if (boost::regex_search(song.getTitle(), rmxrMatch, rmxrRegex, boost::match_extra) &&
         updatedSong->getRemixer().length() == 0) {
       string remixer(rmxrMatch[1]);
-      transform(remixer.begin(), remixer.end(), remixer.begin(), ::tolower);
-      if (!!remixer.compare("original")) {
+      if (!!remixer.compare("original") && !!remixer.compare("Original")) {
         updatedSong->setRemixer(remixer);
       }
     }
