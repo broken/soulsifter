@@ -55,7 +55,8 @@ namespace dogatech {
       if (boost::algorithm::iends_with(path, ".jpg") ||
           boost::algorithm::iends_with(path, ".jpeg") ||
           boost::algorithm::iends_with(path, ".gif") ||
-          boost::algorithm::iends_with(path, ".png")) {
+          boost::algorithm::iends_with(path, ".png") ||
+          boost::algorithm::iends_with(path, ".bmp")) {
         string* image = new string(path);
         images.push_back(image);
         cover = images.at(coverIndex);
