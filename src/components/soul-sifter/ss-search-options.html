@@ -31,6 +31,8 @@
       <span>Key restrict</span>
       <paper-toggle-button checked="{{searchOptionTrashedRestrict}}"></paper-toggle-button>
       <span>Trashed restrict</span>
+      <paper-toggle-button checked="{{searchOptionRepeatRestrict}}"></paper-toggle-button>
+      <span>Repeat restrict</span>
     <section>
   </template>
 </dom-module>
@@ -51,6 +53,11 @@
         value: false
       },
       searchOptionTrashedRestrict: {
+        type: Boolean,
+        notify: true,
+        value: false
+      },
+      searchOptionRepeatRestrict: {
         type: Boolean,
         notify: true,
         value: false

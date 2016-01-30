@@ -66,6 +66,7 @@
       searchOptionBpmRestrict: Boolean,
       searchOptionKeyRestrict: Boolean,
       searchOptionTrashedRestrict: Boolean,
+      searchOptionRepeatRestrict: Boolean,
     },
 
     observers: [
@@ -126,7 +127,7 @@
         p.bpm = that.searchOptionBpmRestrict && that.global.bpm ? that.global.bpm : 0;
         p.keys = that.searchOptionKeyRestrict && that.global.song ? that.global.song.tonicKeys : [];
         p.q += !that.searchOptionTrashedRestrict ? '' : (p.q.length ? ' ' : '') + 'trashed:0';
-        omitSongs = that.songTrail.map(function(e) { return e.song; });
+        omitSongs = !that.searchOptionRepeatRestrict ? [] : that.songTrail.map(function(e) { return e.song; });
         that.songs = ss.SearchUtil.searchSongs(p.q, p.bpm, p.keys, that.genres, omitSongs, that.settings.getInt('songList.limit'));
         // A couple things to note here. First, this timeout will activate when the template repeat has finished loading, which is 99% of the wait time here. Next, I would love to use paper-toast, but it appears that loading the template repeat consumes all the resources that would allow it to animate in. I could set a timeout for the toast animation, but what a waste.
         setTimeout(function() {

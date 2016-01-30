@@ -57,7 +57,7 @@
       <search-info></search-info>
     </paper-dialog>
     <paper-dialog id="searchOptionsDialog" entry-animation="fade-in-animation" exit-animation="fade-out-animation">
-      <ss-search-options search-option-bpm-restrict="{{searchOptionBpmRestrict}}" search-option-key-restrict="{{searchOptionKeyRestrict}}" search-option-trashed-restrict="{{searchOptionTrashedRestrict}}"></ss-search-options>
+      <ss-search-options search-option-bpm-restrict="{{searchOptionBpmRestrict}}" search-option-key-restrict="{{searchOptionKeyRestrict}}" search-option-trashed-restrict="{{searchOptionTrashedRestrict}}" search-option-repeat-restrict="{{searchOptionRepeatRestrict}}"></ss-search-options>
     </paper-dialog>
   </template>
 </dom-module>
@@ -84,6 +84,10 @@
         notify: true
       },
       searchOptionTrashedRestrict: {
+        type: Boolean,
+        notify: true
+      },
+      searchOptionRepeatRestrict: {
         type: Boolean,
         notify: true
       },
