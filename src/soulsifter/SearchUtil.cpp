@@ -142,7 +142,7 @@ void splitString(const string& query, vector<string>* atoms) {
 
 bool parse(const string& queryFragment, Atom* atom) {
   atom->clear();
-  boost::regex regex("^(-)?((id|a|artist|t|title|r|remixer|rating|comment|trashed|lowq|aid|n|album|m|mixed|l|label|y|year|q|query|limit):)?(.+)$");
+  boost::regex regex("^(-)?((id|a|artist|t|title|remixer|r|rating|comment|trashed|lowq|aid|n|album|m|mixed|l|label|y|year|q|query|limit):)?(.+)$");
   boost::smatch match;
   if (!boost::regex_match(queryFragment, match, regex)) {
     return false;
@@ -157,9 +157,9 @@ bool parse(const string& queryFragment, Atom* atom) {
       atom->type = Atom::S_ARTIST;
     } else if (!match[3].compare("t") || !match[3].compare("title")) {
       atom->type = Atom::S_TITLE;
-    } else if (!match[3].compare("r") || !match[3].compare("remixer")) {
+    } else if (!match[3].compare("remixer")) {
       atom->type = Atom::S_REMIXER;
-    } else if (!match[3].compare("rating")) {
+    } else if (!match[3].compare("r") || !match[3].compare("rating")) {
       atom->type = Atom::S_RATING;
     } else if (!match[3].compare("comment")) {
       atom->type = Atom::S_COMMENT;
