@@ -199,19 +199,19 @@ string buildQueryPredicate(const vector<Atom>& atoms) {
       ss << "not ";
     }
     if (atom.type == Atom::ANY) {
-      ss << "(s.artist like '%" << atom.value << "%' or s.title like '%" << atom.value << "%' or s.remixer like '%" << atom.value << "%' or s.comments like '%" << atom.value << "%' or a.name like '%" << atom.value << "%')";
+      ss << "(ifnull(s.artist,'') like '%" << atom.value << "%' or ifnull(s.title,'') like '%" << atom.value << "%' or ifnull(s.remixer,'') like '%" << atom.value << "%' or ifnull(s.comments,'') like '%" << atom.value << "%' or ifnull(a.name,'') like '%" << atom.value << "%')";
     } else if (atom.type == Atom::S_ID) {
       ss << "s.id = " << atom.value;
     } else if (atom.type == Atom::S_ARTIST) {
-      ss << "s.artist like '%" << atom.value << "%'";
+      ss << "ifnull(s.artist,'') like '%" << atom.value << "%'";
     } else if (atom.type == Atom::S_TITLE) {
-      ss << "s.title like '%" << atom.value << "%'";
+      ss << "ifnull(s.title,'') like '%" << atom.value << "%'";
     } else if (atom.type == Atom::S_REMIXER) {
-      ss << "s.remixer like '%" << atom.value << "%'";
+      ss << "ifnull(s.remixer,'') like '%" << atom.value << "%'";
     } else if (atom.type == Atom::S_RATING) {
       ss << "s.rating >= " << atom.value;
     } else if (atom.type == Atom::S_COMMENT) {
-      ss << "s.comment like '%" << atom.value << "%'";
+      ss << "ifnull(s.comment,'') like '%" << atom.value << "%'";
     } else if (atom.type == Atom::S_TRASHED) {
       ss << "s.trashed = " << atom.value;
     } else if (atom.type == Atom::S_LOW_QUALITY) {
@@ -219,11 +219,11 @@ string buildQueryPredicate(const vector<Atom>& atoms) {
     } else if (atom.type == Atom::A_ID) {
       ss << "a.id = " << atom.value;
     } else if (atom.type == Atom::A_NAME) {
-      ss << "a.name like '%" << atom.value << "%'";
+      ss << "ifnull(a.name,'') like '%" << atom.value << "%'";
     } else if (atom.type == Atom::A_MIXED) {
       ss << "a.mixed = " << atom.value;
     } else if (atom.type == Atom::A_LABEL) {
-      ss << "a.label like '%" << atom.value << "%'";
+      ss << "ifnull(a.label,'') like '%" << atom.value << "%'";
     } else if (atom.type == Atom::A_YEAR) {
       ss << "a.releaseDateYear = " << atom.value;
     } else if (atom.type == Atom::CUSTOM_QUERY_PREDICATE) {
