@@ -7,11 +7,15 @@
   <style is="custom-style">
     :host {
       white-space: nowrap;
+      color: var(--ss-star-rating-color);
+    }
+    :host(.trashed) {
+      color: var(--ss-star-rating-trashed-color);
     }
     iron-icon {
       height: 13px;
       width: 13px;
-      color: var(--ss-star-rating-color);
+      color: inherit;
     }
     iron-icon[selected] {
       color: var(--ss-star-rating-selected-color);

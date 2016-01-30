@@ -142,7 +142,7 @@
       </ss-options-menu>
       <div>[[_computeBpmShift(song, global.bpm)]]</div>
       <div class$="energy-[[song.energy]]">[[song.energy]]</div>
-      <ss-star-rating value="[[song.rating]]" read-only></ss-star-rating>
+      <ss-star-rating value="[[song.rating]]" class$="[[_trashedClass(song.trashed)]]" read-only></ss-star-rating>
       <time class="added">[[_computeLocaleDateString(song)]]</time>
     </div>
   </template>
@@ -187,6 +187,10 @@
 
     _openEditSongPage: function(e, detail, sender) {
       this.fire('page-song-edit', {song: this.song});
+    },
+
+    _trashedClass: function(trashed) {
+      return trashed ? 'trashed' : '';
     },
   });
 </script>
