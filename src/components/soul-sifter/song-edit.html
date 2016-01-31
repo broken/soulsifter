@@ -53,7 +53,9 @@
       text-align: right;
       color: #666;  /* TODO pull into theme */
     }
-    .filepath {
+    .metadata {
+      display: flex;
+      flex-direction: row;
       position: absolute;
       bottom: 0;
       right: 0;
@@ -137,8 +139,12 @@
         <genre-list id="genreList" selection="{{_styles}}" single-select></genre-list>
       </div>
     </abstract-action-page>
-    <div class="filepath" on-click="_changeSong">[[_editedSong.filepath]]</div>
-    <input style="display:none;" id="songFileDialog" type="file"/>
+    <div class="metadata">
+      <div>[[_editedSong.id]]</div>
+      <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
+      <div on-click="_changeSong">[[_editedSong.filepath]]</div>
+      <input style="display:none;" id="songFileDialog" type="file"/>
+    </div>
   </template>
 </dom-module>
 
