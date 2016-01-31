@@ -137,7 +137,7 @@
         <genre-list id="genreList" selection="{{_styles}}" single-select></genre-list>
       </div>
     </abstract-action-page>
-    <div class="filepath" on-click="_changeSong">[[song.filepath]]</div>
+    <div class="filepath" on-click="_changeSong">[[_editedSong.filepath]]</div>
     <input style="display:none;" id="songFileDialog" type="file"/>
   </template>
 </dom-module>
@@ -202,7 +202,8 @@
           that._changedAlbumCover = true;
         }, false);
         this.$.songFileDialog.addEventListener("change", function(e) {
-          that.set(that._editedSong.filepath, this.value);
+          that._editedSong.filepath = this.value;
+          that.notifyPath('_editedSong.filepath', this.value);
         }, false);
       }.bind(this));
     },
