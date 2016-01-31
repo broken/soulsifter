@@ -106,7 +106,7 @@
             <paper-checkbox checked="{{_editedSong.trashed}}" disabled$="[[song.trashed]]">Trash</paper-checkbox>
           </div>
           <div id="cover" on-click="_changeCover"></div>
-          <input style="display:none;" id="fileDialog" type="file"/>
+          <input style="display:none;" id="coverFileDialog" type="file"/>
         </div>
       </div>
       <div class="fields">
@@ -140,7 +140,8 @@
         <genre-list id="genreList" selection="{{_styles}}" single-select></genre-list>
       </div>
     </abstract-action-page>
-    <div class="filepath">[[song.filepath]]</div>
+    <div class="filepath" on-click="_changeSong">[[song.filepath]]</div>
+    <input style="display:none;" id="songFileDialog" type="file"/>
   </template>
 </dom-module>
 
@@ -198,10 +199,13 @@
         this.$.abstractActionPage.setCancelAction(this.skip);
         // select file dialog
         var that = this;
-        this.$.fileDialog.addEventListener("change", function(e) {
+        this.$.coverFileDialog.addEventListener("change", function(e) {
           that._editedSong.album.coverFilepath = this.value;
           that.$.cover.style.backgroundImage = 'url("' + that._editedSong.album.coverFilepath + '")';
           that._changedAlbumCover = true;
+        }, false);
+        this.$.songFileDialog.addEventListener("change", function(e) {
+          that.set(that._editedSong.filepath, this.value);
         }, false);
       }.bind(this));
     },
@@ -340,7 +344,11 @@
     },
 
     _changeCover: function() {
-      this.$.fileDialog.click();
+      this.$.coverFileDialog.click();
+    },
+
+    _changeSong: function() {
+      this.$.songFileDialog.click();
     },
   });
 </script>
