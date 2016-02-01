@@ -44,22 +44,18 @@
   Polymer({
     is: 'ss-options-menu',
 
-    attached: function() {
-      // prevent ripples further down the chain
-      this.addEventListener('down', function(e) { e.preventDefault(); });
-      // prevent selection further down the chain
-      this.addEventListener('click', function(e) { e.preventDefault(); });
-      // prevent selection further down the chain
-      this.addEventListener('tap', function(e) { e.preventDefault(); });
+    listeners: {
+      'click': '_openMenu',
+    },
 
-      // open & close menu
-      var menu = this.$.menu;
-      var btn = this.$.btn;
-      document.addEventListener('click', function(event) {
-          if (!menu.classList.contains('hide') || btn.contains(event.target)) {
-            menu.classList.toggle('hide');
-          }
-        });
+    _openMenu: function(e) {
+      this.$.menu.classList.toggle('hide');
+      this._closeMenu = function(e) {
+        this.$.menu.classList.toggle('hide');
+        document.removeEventListener('click', this._closeMenu, true);
+      }.bind(this);
+      document.addEventListener('click', this._closeMenu, true);
+      e.stopPropagation();
     },
   });
 </script>

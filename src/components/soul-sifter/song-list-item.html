@@ -40,6 +40,7 @@
     ss-options-menu {
       --iron-icon-height: 16px;
       --iron-icon-width: 16px;
+      top: -4px;
     }
     /*.song-item #menuButton {
       margin-top: 4px;
@@ -163,6 +164,10 @@
       }
     },
 
+    listeners: {
+      'click': '_selectSong',
+    },
+
     _songChanged: function() {
       this.$.cover.style.backgroundImage = 'url("' + this.song.album.coverFilepath + '")';
     },
@@ -187,10 +192,15 @@
 
     _openEditSongPage: function(e, detail, sender) {
       this.fire('page-song-edit', {song: this.song});
+      e.stopPropagation();
     },
 
     _trashedClass: function(trashed) {
       return trashed ? 'trashed' : '';
+    },
+
+    _selectSong: function(e) {
+      this.set('global.song', this.song);
     },
   });
 </script>

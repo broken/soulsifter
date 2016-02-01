@@ -1,6 +1,5 @@
 <link href="../polymer/polymer.html" rel="import">
 
-<link href="../iron-selector/iron-selector.html" rel="import">
 <link href="../iron-signals/iron-signals.html" rel="import">
 <link href="../core-tooltip/core-tooltip.html" rel="import">
 
@@ -24,12 +23,9 @@
     <iron-signals on-iron-signal-search="search"></iron-signals>
 
     <core-tooltip id="tooltip" label="Searching..." noarrow position top></core-tooltip>
-    <!-- due to multiple bugs in iron-selector, we listen for the iron-activate event -->
-    <iron-selector on-iron-activate="_selectedSongChanged">
-      <template is="dom-repeat" items="{{songs}}">
-        <song-list-item song="{{item}}"></song-list-item>
-      </template>
-    </iron-selector>
+    <template is="dom-repeat" items="{{songs}}">
+      <song-list-item song="{{item}}"></song-list-item>
+    </template>
   </template>
 </dom-module>
 
@@ -87,10 +83,6 @@
 
     _globalPlaylistChanged: function(playlist) {
       if (!!playlist) this.search();
-    },
-
-    _selectedSongChanged: function(e) {
-      this.set('global.song', e.detail.item.song);
     },
 
     _queryChanged: function(newValue, oldValue) {
