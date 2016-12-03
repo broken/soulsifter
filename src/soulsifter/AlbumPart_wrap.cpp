@@ -8,10 +8,10 @@
 #include "Album_wrap.h"
 #include "ResultSetIterator.h"
 
-v8::Persistent<v8::Function> AlbumPart::constructor;
+Nan::Persistent<v8::Function> AlbumPart::constructor;
 
-AlbumPart::AlbumPart() : ObjectWrap(), albumpart(NULL), ownWrappedObject(true) {};
-AlbumPart::AlbumPart(dogatech::soulsifter::AlbumPart* o) : ObjectWrap(), albumpart(o), ownWrappedObject(true) {};
+AlbumPart::AlbumPart() : Nan::ObjectWrap(), albumpart(NULL), ownWrappedObject(true) {};
+AlbumPart::AlbumPart(dogatech::soulsifter::AlbumPart* o) : Nan::ObjectWrap(), albumpart(o), ownWrappedObject(true) {};
 AlbumPart::~AlbumPart() { if (ownWrappedObject) delete albumpart; };
 
 void AlbumPart::setNwcpValue(dogatech::soulsifter::AlbumPart* v, bool own) {
@@ -21,12 +21,10 @@ void AlbumPart::setNwcpValue(dogatech::soulsifter::AlbumPart* v, bool own) {
   ownWrappedObject = own;
 }
 
-NAN_METHOD(AlbumPart::New) {
-  NanScope();
-
+void AlbumPart::New(const Nan::FunctionCallbackInfo<v8::Value>& info) {
   dogatech::soulsifter::AlbumPart* wrappedObj = NULL;
-  if (args.Length()) {
-    dogatech::soulsifter::AlbumPart* xtmp(node::ObjectWrap::Unwrap<AlbumPart>(args[0]->ToObject())->getNwcpValue());
+  if (info.Length()) {
+    dogatech::soulsifter::AlbumPart* xtmp(Nan::ObjectWrap::Unwrap<AlbumPart>(info[0]->ToObject())->getNwcpValue());
     dogatech::soulsifter::AlbumPart& x = *xtmp;
     wrappedObj = new dogatech::soulsifter::AlbumPart(x);
   } else {
@@ -34,242 +32,215 @@ NAN_METHOD(AlbumPart::New) {
   }
 
   AlbumPart* obj = new AlbumPart(wrappedObj);
-  obj->Wrap(args.This());
+  obj->Wrap(info.This());
 
-  NanReturnValue(args.This());
+  info.GetReturnValue().Set(info.This());
 }
 
 v8::Local<v8::Object> AlbumPart::NewInstance() {
-  v8::Local<v8::Function> cons = NanNew<v8::Function>(constructor);
-  v8::Local<v8::Object> instance = cons->NewInstance();
-
-  return instance;
+  v8::Local<v8::Function> cons = Nan::New<v8::Function>(constructor);
+  return Nan::NewInstance(cons).ToLocalChecked();
 }
 
-void AlbumPart::Init(v8::Handle<v8::Object> exports) {
-  NanScope();
-
+void AlbumPart::Init(v8::Local<v8::Object> exports) {
   // Prepare constructor template
-  v8::Local<v8::FunctionTemplate> tpl = NanNew<v8::FunctionTemplate>(New);
-  tpl->SetClassName(NanNew<v8::String>("AlbumPart"));
+  v8::Local<v8::FunctionTemplate> tpl = Nan::New<v8::FunctionTemplate>(New);
+  tpl->SetClassName(Nan::New("AlbumPart").ToLocalChecked());
   tpl->InstanceTemplate()->SetInternalFieldCount(1);
 
-  NanSetPrototypeTemplate(tpl, "clear", NanNew<v8::FunctionTemplate>(clear)->GetFunction());
-  NanSetTemplate(tpl, "findById", NanNew<v8::FunctionTemplate>(findById)->GetFunction());
-  NanSetTemplate(tpl, "findByPosAndAlbumId", NanNew<v8::FunctionTemplate>(findByPosAndAlbumId)->GetFunction());
-  NanSetTemplate(tpl, "findAll", NanNew<v8::FunctionTemplate>(findAll)->GetFunction());
-  NanSetPrototypeTemplate(tpl, "update", NanNew<v8::FunctionTemplate>(update)->GetFunction());
-  NanSetPrototypeTemplate(tpl, "save", NanNew<v8::FunctionTemplate>(save)->GetFunction());
-  NanSetPrototypeTemplate(tpl, "sync", NanNew<v8::FunctionTemplate>(sync)->GetFunction());
-  tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("id"), getId, setId);
-  tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("pos"), getPos, setPos);
-  tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("name"), getName, setName);
-  tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("albumId"), getAlbumId, setAlbumId);
-  tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("album"), getAlbum, setAlbum);
-  tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("albumOnce"), getAlbumOnce);
+  // Prototype
+  Nan::SetPrototypeMethod(tpl, "clear", clear);
+  Nan::SetMethod(tpl, "findById", findById);
+  Nan::SetMethod(tpl, "findByPosAndAlbumId", findByPosAndAlbumId);
+  Nan::SetMethod(tpl, "findAll", findAll);
+  Nan::SetPrototypeMethod(tpl, "update", update);
+  Nan::SetPrototypeMethod(tpl, "save", save);
+  Nan::SetPrototypeMethod(tpl, "sync", sync);
+  Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("id").ToLocalChecked(), getId, setId);
+  Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("pos").ToLocalChecked(), getPos, setPos);
+  Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("name").ToLocalChecked(), getName, setName);
+  Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("albumId").ToLocalChecked(), getAlbumId, setAlbumId);
+  Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("album").ToLocalChecked(), getAlbum, setAlbum);
+  Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("albumOnce").ToLocalChecked(), getAlbumOnce);
 
-  NanAssignPersistent<v8::Function>(constructor, tpl->GetFunction());
-  exports->Set(NanNew<v8::String>("AlbumPart"), tpl->GetFunction());
+  constructor.Reset(tpl->GetFunction());
+  exports->Set(Nan::New<v8::String>("AlbumPart").ToLocalChecked(), tpl->GetFunction());
 }
 
-NAN_METHOD(AlbumPart::clear) {
-  NanScope();
-
-  AlbumPart* obj = ObjectWrap::Unwrap<AlbumPart>(args.This());
+void AlbumPart::clear(const Nan::FunctionCallbackInfo<v8::Value>& info) {
+  AlbumPart* obj = Nan::ObjectWrap::Unwrap<AlbumPart>(info.Holder());
   obj->albumpart->clear();
 
-  NanReturnUndefined();
+  info.GetReturnValue().SetUndefined();
 }
 
-NAN_METHOD(AlbumPart::findById) {
-  NanScope();
-
-  int a0(args[0]->Uint32Value());
+void AlbumPart::findById(const Nan::FunctionCallbackInfo<v8::Value>& info) {
+  int a0(info[0]->IntegerValue());
   dogatech::soulsifter::AlbumPart* result =
       dogatech::soulsifter::AlbumPart::findById(a0);
 
-  if (result == NULL) NanReturnUndefined();
-  v8::Local<v8::Object> instance = AlbumPart::NewInstance();
-  AlbumPart* r = ObjectWrap::Unwrap<AlbumPart>(instance);
-  r->setNwcpValue(result, true);
+  if (result == NULL) {
+    info.GetReturnValue().SetNull();
+  } else {
+    v8::Local<v8::Object> instance = AlbumPart::NewInstance();
+    AlbumPart* r = Nan::ObjectWrap::Unwrap<AlbumPart>(instance);
+    r->setNwcpValue(result, true);
 
-  NanReturnValue(instance);
+    info.GetReturnValue().Set(instance);
+  }
 }
 
-NAN_METHOD(AlbumPart::findByPosAndAlbumId) {
-  NanScope();
-
-  string a0(*v8::String::Utf8Value(args[0]->ToString()));
-  int a1(args[1]->Uint32Value());
+void AlbumPart::findByPosAndAlbumId(const Nan::FunctionCallbackInfo<v8::Value>& info) {
+  string a0(*v8::String::Utf8Value(info[0]->ToString()));
+  int a1(info[1]->IntegerValue());
   dogatech::soulsifter::AlbumPart* result =
       dogatech::soulsifter::AlbumPart::findByPosAndAlbumId(a0, a1);
 
-  if (result == NULL) NanReturnUndefined();
-  v8::Local<v8::Object> instance = AlbumPart::NewInstance();
-  AlbumPart* r = ObjectWrap::Unwrap<AlbumPart>(instance);
-  r->setNwcpValue(result, true);
+  if (result == NULL) {
+    info.GetReturnValue().SetNull();
+  } else {
+    v8::Local<v8::Object> instance = AlbumPart::NewInstance();
+    AlbumPart* r = Nan::ObjectWrap::Unwrap<AlbumPart>(instance);
+    r->setNwcpValue(result, true);
 
-  NanReturnValue(instance);
+    info.GetReturnValue().Set(instance);
+  }
 }
 
-NAN_METHOD(AlbumPart::findAll) {
-  NanScope();
-
+void AlbumPart::findAll(const Nan::FunctionCallbackInfo<v8::Value>& info) {
   dogatech::ResultSetIterator<dogatech::soulsifter::AlbumPart>* result =
       dogatech::soulsifter::AlbumPart::findAll();
 
   vector<dogatech::soulsifter::AlbumPart*>* v = result->toVector();
-  v8::Handle<v8::Array> a = NanNew<v8::Array>((int) v->size());
+  v8::Local<v8::Array> a = Nan::New<v8::Array>((int) v->size());
   for (int i = 0; i < (int) v->size(); i++) {
-    v8::Local<v8::Function> cons = NanNew<v8::Function>(constructor);
+    v8::Local<v8::Function> cons = Nan::New<v8::Function>(constructor);
     v8::Local<v8::Object> instance = cons->NewInstance();
-    AlbumPart* o = ObjectWrap::Unwrap<AlbumPart>(instance);
+    AlbumPart* o = Nan::ObjectWrap::Unwrap<AlbumPart>(instance);
     o->albumpart = (*v)[i];
-    a->Set(NanNew<v8::Number>(i), instance);
+    a->Set(Nan::New<v8::Number>(i), instance);
   }
   delete v;
-  NanReturnValue(a);
+  info.GetReturnValue().Set(a);
 }
 
-NAN_METHOD(AlbumPart::update) {
-  NanScope();
-
-  AlbumPart* obj = ObjectWrap::Unwrap<AlbumPart>(args.This());
+void AlbumPart::update(const Nan::FunctionCallbackInfo<v8::Value>& info) {
+  AlbumPart* obj = Nan::ObjectWrap::Unwrap<AlbumPart>(info.Holder());
   int result =  obj->albumpart->update();
 
-  NanReturnValue(NanNew<v8::Number>(result));
+  info.GetReturnValue().Set(Nan::New<v8::Number>(result));
 }
 
-NAN_METHOD(AlbumPart::save) {
-  NanScope();
-
-  AlbumPart* obj = ObjectWrap::Unwrap<AlbumPart>(args.This());
+void AlbumPart::save(const Nan::FunctionCallbackInfo<v8::Value>& info) {
+  AlbumPart* obj = Nan::ObjectWrap::Unwrap<AlbumPart>(info.Holder());
   int result =  obj->albumpart->save();
 
-  NanReturnValue(NanNew<v8::Number>(result));
+  info.GetReturnValue().Set(Nan::New<v8::Number>(result));
 }
 
-NAN_METHOD(AlbumPart::sync) {
-  NanScope();
-
-  AlbumPart* obj = ObjectWrap::Unwrap<AlbumPart>(args.This());
+void AlbumPart::sync(const Nan::FunctionCallbackInfo<v8::Value>& info) {
+  AlbumPart* obj = Nan::ObjectWrap::Unwrap<AlbumPart>(info.Holder());
   bool result =  obj->albumpart->sync();
 
-  NanReturnValue(NanNew<v8::Boolean>(result));
+  info.GetReturnValue().Set(Nan::New<v8::Boolean>(result));
 }
 
 NAN_GETTER(AlbumPart::getId) {
-  NanScope();
-
-  AlbumPart* obj = ObjectWrap::Unwrap<AlbumPart>(args.This());
+  AlbumPart* obj = Nan::ObjectWrap::Unwrap<AlbumPart>(info.Holder());
   const int result =  obj->albumpart->getId();
 
-  NanReturnValue(NanNew<v8::Number>(result));
+  info.GetReturnValue().Set(Nan::New<v8::Number>(result));
 }
 
 NAN_SETTER(AlbumPart::setId) {
-  NanScope();
-
-  AlbumPart* obj = ObjectWrap::Unwrap<AlbumPart>(args.This());
-  int a0(value->Uint32Value());
+  AlbumPart* obj = Nan::ObjectWrap::Unwrap<AlbumPart>(info.Holder());
+  int a0(value->IntegerValue());
   obj->albumpart->setId(a0);
 
-  NanReturnUndefined();
+  info.GetReturnValue().SetUndefined();
 }
 
 NAN_GETTER(AlbumPart::getPos) {
-  NanScope();
-
-  AlbumPart* obj = ObjectWrap::Unwrap<AlbumPart>(args.This());
+  AlbumPart* obj = Nan::ObjectWrap::Unwrap<AlbumPart>(info.Holder());
   const string result =  obj->albumpart->getPos();
 
-  NanReturnValue(NanNew<v8::String>(result.c_str(), result.length()));
+  info.GetReturnValue().Set(Nan::New<v8::String>(result).ToLocalChecked());
 }
 
 NAN_SETTER(AlbumPart::setPos) {
-  NanScope();
-
-  AlbumPart* obj = ObjectWrap::Unwrap<AlbumPart>(args.This());
+  AlbumPart* obj = Nan::ObjectWrap::Unwrap<AlbumPart>(info.Holder());
   string a0(*v8::String::Utf8Value(value->ToString()));
   obj->albumpart->setPos(a0);
 
-  NanReturnUndefined();
+  info.GetReturnValue().SetUndefined();
 }
 
 NAN_GETTER(AlbumPart::getName) {
-  NanScope();
-
-  AlbumPart* obj = ObjectWrap::Unwrap<AlbumPart>(args.This());
+  AlbumPart* obj = Nan::ObjectWrap::Unwrap<AlbumPart>(info.Holder());
   const string result =  obj->albumpart->getName();
 
-  NanReturnValue(NanNew<v8::String>(result.c_str(), result.length()));
+  info.GetReturnValue().Set(Nan::New<v8::String>(result).ToLocalChecked());
 }
 
 NAN_SETTER(AlbumPart::setName) {
-  NanScope();
-
-  AlbumPart* obj = ObjectWrap::Unwrap<AlbumPart>(args.This());
+  AlbumPart* obj = Nan::ObjectWrap::Unwrap<AlbumPart>(info.Holder());
   string a0(*v8::String::Utf8Value(value->ToString()));
   obj->albumpart->setName(a0);
 
-  NanReturnUndefined();
+  info.GetReturnValue().SetUndefined();
 }
 
 NAN_GETTER(AlbumPart::getAlbumId) {
-  NanScope();
-
-  AlbumPart* obj = ObjectWrap::Unwrap<AlbumPart>(args.This());
+  AlbumPart* obj = Nan::ObjectWrap::Unwrap<AlbumPart>(info.Holder());
   const int result =  obj->albumpart->getAlbumId();
 
-  NanReturnValue(NanNew<v8::Number>(result));
+  info.GetReturnValue().Set(Nan::New<v8::Number>(result));
 }
 
 NAN_SETTER(AlbumPart::setAlbumId) {
-  NanScope();
-
-  AlbumPart* obj = ObjectWrap::Unwrap<AlbumPart>(args.This());
-  int a0(value->Uint32Value());
+  AlbumPart* obj = Nan::ObjectWrap::Unwrap<AlbumPart>(info.Holder());
+  int a0(value->IntegerValue());
   obj->albumpart->setAlbumId(a0);
 
-  NanReturnUndefined();
+  info.GetReturnValue().SetUndefined();
 }
 
 NAN_GETTER(AlbumPart::getAlbum) {
-  NanScope();
-
-  AlbumPart* obj = ObjectWrap::Unwrap<AlbumPart>(args.This());
+  AlbumPart* obj = Nan::ObjectWrap::Unwrap<AlbumPart>(info.Holder());
   dogatech::soulsifter::Album* result =  obj->albumpart->getAlbum();
 
-  if (result == NULL) NanReturnUndefined();
-  v8::Local<v8::Object> instance = Album::NewInstance();
-  Album* r = ObjectWrap::Unwrap<Album>(instance);
-  r->setNwcpValue(result, false);
+  if (result == NULL) {
+    info.GetReturnValue().SetNull();
+  } else {
+    v8::Local<v8::Object> instance = Album::NewInstance();
+    Album* r = Nan::ObjectWrap::Unwrap<Album>(instance);
+    r->setNwcpValue(result, false);
 
-  NanReturnValue(instance);
+    info.GetReturnValue().Set(instance);
+  }
 }
 
 NAN_GETTER(AlbumPart::getAlbumOnce) {
-  NanScope();
-
-  AlbumPart* obj = ObjectWrap::Unwrap<AlbumPart>(args.This());
+  AlbumPart* obj = Nan::ObjectWrap::Unwrap<AlbumPart>(info.Holder());
   dogatech::soulsifter::Album* result =  obj->albumpart->getAlbumOnce();
 
-  if (result == NULL) NanReturnUndefined();
-  v8::Local<v8::Object> instance = Album::NewInstance();
-  Album* r = ObjectWrap::Unwrap<Album>(instance);
-  r->setNwcpValue(result, false);
+  if (result == NULL) {
+    info.GetReturnValue().SetNull();
+  } else {
+    v8::Local<v8::Object> instance = Album::NewInstance();
+    Album* r = Nan::ObjectWrap::Unwrap<Album>(instance);
+    r->setNwcpValue(result, false);
 
-  NanReturnValue(instance);
+    info.GetReturnValue().Set(instance);
+  }
 }
 
 NAN_SETTER(AlbumPart::setAlbum) {
-  NanScope();
-
-  AlbumPart* obj = ObjectWrap::Unwrap<AlbumPart>(args.This());
-  dogatech::soulsifter::Album* a0tmp(node::ObjectWrap::Unwrap<Album>(value->ToObject())->getNwcpValue());
+  AlbumPart* obj = Nan::ObjectWrap::Unwrap<AlbumPart>(info.Holder());
+  dogatech::soulsifter::Album* a0tmp(Nan::ObjectWrap::Unwrap<Album>(value->ToObject())->getNwcpValue());
   dogatech::soulsifter::Album& a0 = *a0tmp;
   obj->albumpart->setAlbum(a0);
 
-  NanReturnUndefined();
+  info.GetReturnValue().SetUndefined();
 }
 

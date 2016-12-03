@@ -7,10 +7,10 @@
 #include "Song.h"
 #include "Song_wrap.h"
 
-v8::Persistent<v8::Function> MusicVideoService::constructor;
+Nan::Persistent<v8::Function> MusicVideoService::constructor;
 
-MusicVideoService::MusicVideoService() : ObjectWrap(), musicvideoservice(NULL), ownWrappedObject(true) {};
-MusicVideoService::MusicVideoService(dogatech::soulsifter::MusicVideoService* o) : ObjectWrap(), musicvideoservice(o), ownWrappedObject(true) {};
+MusicVideoService::MusicVideoService() : Nan::ObjectWrap(), musicvideoservice(NULL), ownWrappedObject(true) {};
+MusicVideoService::MusicVideoService(dogatech::soulsifter::MusicVideoService* o) : Nan::ObjectWrap(), musicvideoservice(o), ownWrappedObject(true) {};
 MusicVideoService::~MusicVideoService() { if (ownWrappedObject) delete musicvideoservice; };
 
 void MusicVideoService::setNwcpValue(dogatech::soulsifter::MusicVideoService* v, bool own) {
@@ -20,49 +20,45 @@ void MusicVideoService::setNwcpValue(dogatech::soulsifter::MusicVideoService* v,
   ownWrappedObject = own;
 }
 
-NAN_METHOD(MusicVideoService::New) {
-  NanScope();
-
+void MusicVideoService::New(const Nan::FunctionCallbackInfo<v8::Value>& info) {
   MusicVideoService* obj = new MusicVideoService(new dogatech::soulsifter::MusicVideoService());
-  obj->Wrap(args.This());
+  obj->Wrap(info.This());
 
-  NanReturnValue(args.This());
+  info.GetReturnValue().Set(info.This());
 }
 
 v8::Local<v8::Object> MusicVideoService::NewInstance() {
-  v8::Local<v8::Function> cons = NanNew<v8::Function>(constructor);
-  v8::Local<v8::Object> instance = cons->NewInstance();
-
-  return instance;
+  v8::Local<v8::Function> cons = Nan::New<v8::Function>(constructor);
+  return Nan::NewInstance(cons).ToLocalChecked();
 }
 
-void MusicVideoService::Init(v8::Handle<v8::Object> exports) {
-  NanScope();
-
+void MusicVideoService::Init(v8::Local<v8::Object> exports) {
   // Prepare constructor template
-  v8::Local<v8::FunctionTemplate> tpl = NanNew<v8::FunctionTemplate>(New);
-  tpl->SetClassName(NanNew<v8::String>("MusicVideoService"));
+  v8::Local<v8::FunctionTemplate> tpl = Nan::New<v8::FunctionTemplate>(New);
+  tpl->SetClassName(Nan::New("MusicVideoService").ToLocalChecked());
   tpl->InstanceTemplate()->SetInternalFieldCount(1);
 
-  NanSetTemplate(tpl, "associateYouTubeVideo", NanNew<v8::FunctionTemplate>(associateYouTubeVideo)->GetFunction());
+  // Prototype
+  Nan::SetMethod(tpl, "associateYouTubeVideo", associateYouTubeVideo);
 
-  NanAssignPersistent<v8::Function>(constructor, tpl->GetFunction());
-  exports->Set(NanNew<v8::String>("MusicVideoService"), tpl->GetFunction());
+  constructor.Reset(tpl->GetFunction());
+  exports->Set(Nan::New<v8::String>("MusicVideoService").ToLocalChecked(), tpl->GetFunction());
 }
 
-NAN_METHOD(MusicVideoService::associateYouTubeVideo) {
-  NanScope();
-
-  dogatech::soulsifter::Song* a0(node::ObjectWrap::Unwrap<Song>(args[0]->ToObject())->getNwcpValue());
-  string a1(*v8::String::Utf8Value(args[1]->ToString()));
+void MusicVideoService::associateYouTubeVideo(const Nan::FunctionCallbackInfo<v8::Value>& info) {
+  dogatech::soulsifter::Song* a0(Nan::ObjectWrap::Unwrap<Song>(info[0]->ToObject())->getNwcpValue());
+  string a1(*v8::String::Utf8Value(info[1]->ToString()));
   dogatech::soulsifter::MusicVideo* result =
       dogatech::soulsifter::MusicVideoService::associateYouTubeVideo(a0, a1);
 
-  if (result == NULL) NanReturnUndefined();
-  v8::Local<v8::Object> instance = MusicVideo::NewInstance();
-  MusicVideo* r = ObjectWrap::Unwrap<MusicVideo>(instance);
-  r->setNwcpValue(result, false);
+  if (result == NULL) {
+    info.GetReturnValue().SetNull();
+  } else {
+    v8::Local<v8::Object> instance = MusicVideo::NewInstance();
+    MusicVideo* r = Nan::ObjectWrap::Unwrap<MusicVideo>(instance);
+    r->setNwcpValue(result, false);
 
-  NanReturnValue(instance);
+    info.GetReturnValue().Set(instance);
+  }
 }
 

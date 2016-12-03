@@ -5,9 +5,9 @@
 #include <nan.h>
 #include "Song.h"
 
-class Song : public node::ObjectWrap {
+class Song : public Nan::ObjectWrap {
  public:
-  static void Init(v8::Handle<v8::Object> exports);
+  static void Init(v8::Local<v8::Object> exports);
   static v8::Local<v8::Object> NewInstance();
 
   void setNwcpValue(dogatech::soulsifter::Song* v, bool own);
@@ -18,75 +18,75 @@ class Song : public node::ObjectWrap {
   explicit Song(dogatech::soulsifter::Song* song);
   ~Song();
 
-  static NAN_METHOD(New);
+  static void New(const Nan::FunctionCallbackInfo<v8::Value>& info);
 
-  static NAN_METHOD(clear);
-  static NAN_METHOD(findById);
-  static NAN_METHOD(findByFilepath);
-  static NAN_METHOD(findByRESongId);
-  static NAN_METHOD(findAll);
-  static NAN_METHOD(update);
-  static NAN_METHOD(save);
-  static NAN_METHOD(sync);
+  static void clear(const Nan::FunctionCallbackInfo<v8::Value>& info);
+  static void findById(const Nan::FunctionCallbackInfo<v8::Value>& info);
+  static void findByFilepath(const Nan::FunctionCallbackInfo<v8::Value>& info);
+  static void findByRESongId(const Nan::FunctionCallbackInfo<v8::Value>& info);
+  static void findAll(const Nan::FunctionCallbackInfo<v8::Value>& info);
+  static void update(const Nan::FunctionCallbackInfo<v8::Value>& info);
+  static void save(const Nan::FunctionCallbackInfo<v8::Value>& info);
+  static void sync(const Nan::FunctionCallbackInfo<v8::Value>& info);
   // Unable to process createRESongFromSong
-  static NAN_METHOD(reAlbum);
-  static NAN_GETTER(getDateAddedString);
-  static NAN_METHOD(setDateAddedToNow);
-  static NAN_GETTER(getId);
-  static NAN_SETTER(setId);
-  static NAN_GETTER(getArtist);
-  static NAN_SETTER(setArtist);
-  static NAN_GETTER(getTrack);
-  static NAN_SETTER(setTrack);
-  static NAN_GETTER(getTitle);
-  static NAN_SETTER(setTitle);
-  static NAN_GETTER(getRemixer);
-  static NAN_SETTER(setRemixer);
-  static NAN_GETTER(getFeaturing);
-  static NAN_SETTER(setFeaturing);
-  static NAN_GETTER(getFilepath);
-  static NAN_SETTER(setFilepath);
-  static NAN_GETTER(getRating);
-  static NAN_SETTER(setRating);
-  static NAN_GETTER(getDateAdded);
-  static NAN_SETTER(setDateAdded);
-  static NAN_GETTER(getBpm);
-  static NAN_SETTER(setBpm);
-  static NAN_GETTER(getTonicKeys);
-  static NAN_SETTER(setTonicKeys);
-  static NAN_METHOD(addTonicKey);
-  static NAN_METHOD(removeTonicKey);
-  static NAN_GETTER(getTonicKey);
-  static NAN_SETTER(setTonicKey);
-  static NAN_GETTER(getEnergy);
-  static NAN_SETTER(setEnergy);
-  static NAN_GETTER(getComments);
-  static NAN_SETTER(setComments);
-  static NAN_GETTER(getTrashed);
-  static NAN_SETTER(setTrashed);
-  static NAN_GETTER(getLowQuality);
-  static NAN_SETTER(setLowQuality);
-  static NAN_GETTER(getRESongId);
-  static NAN_SETTER(setRESongId);
+  static void reAlbum(const Nan::FunctionCallbackInfo<v8::Value>& info);
+  static void getDateAddedString(v8::Local<v8::String> property, const Nan::PropertyCallbackInfo<v8::Value>& info);
+  static void setDateAddedToNow(const Nan::FunctionCallbackInfo<v8::Value>& info);
+  static void getId(v8::Local<v8::String> property, const Nan::PropertyCallbackInfo<v8::Value>& info);
+  static void setId(v8::Local<v8::String> property, v8::Local<v8::Value> value, const Nan::PropertyCallbackInfo<void>& info);
+  static void getArtist(v8::Local<v8::String> property, const Nan::PropertyCallbackInfo<v8::Value>& info);
+  static void setArtist(v8::Local<v8::String> property, v8::Local<v8::Value> value, const Nan::PropertyCallbackInfo<void>& info);
+  static void getTrack(v8::Local<v8::String> property, const Nan::PropertyCallbackInfo<v8::Value>& info);
+  static void setTrack(v8::Local<v8::String> property, v8::Local<v8::Value> value, const Nan::PropertyCallbackInfo<void>& info);
+  static void getTitle(v8::Local<v8::String> property, const Nan::PropertyCallbackInfo<v8::Value>& info);
+  static void setTitle(v8::Local<v8::String> property, v8::Local<v8::Value> value, const Nan::PropertyCallbackInfo<void>& info);
+  static void getRemixer(v8::Local<v8::String> property, const Nan::PropertyCallbackInfo<v8::Value>& info);
+  static void setRemixer(v8::Local<v8::String> property, v8::Local<v8::Value> value, const Nan::PropertyCallbackInfo<void>& info);
+  static void getFeaturing(v8::Local<v8::String> property, const Nan::PropertyCallbackInfo<v8::Value>& info);
+  static void setFeaturing(v8::Local<v8::String> property, v8::Local<v8::Value> value, const Nan::PropertyCallbackInfo<void>& info);
+  static void getFilepath(v8::Local<v8::String> property, const Nan::PropertyCallbackInfo<v8::Value>& info);
+  static void setFilepath(v8::Local<v8::String> property, v8::Local<v8::Value> value, const Nan::PropertyCallbackInfo<void>& info);
+  static void getRating(v8::Local<v8::String> property, const Nan::PropertyCallbackInfo<v8::Value>& info);
+  static void setRating(v8::Local<v8::String> property, v8::Local<v8::Value> value, const Nan::PropertyCallbackInfo<void>& info);
+  static void getDateAdded(v8::Local<v8::String> property, const Nan::PropertyCallbackInfo<v8::Value>& info);
+  static void setDateAdded(v8::Local<v8::String> property, v8::Local<v8::Value> value, const Nan::PropertyCallbackInfo<void>& info);
+  static void getBpm(v8::Local<v8::String> property, const Nan::PropertyCallbackInfo<v8::Value>& info);
+  static void setBpm(v8::Local<v8::String> property, v8::Local<v8::Value> value, const Nan::PropertyCallbackInfo<void>& info);
+  static void getTonicKeys(v8::Local<v8::String> property, const Nan::PropertyCallbackInfo<v8::Value>& info);
+  static void setTonicKeys(v8::Local<v8::String> property, v8::Local<v8::Value> value, const Nan::PropertyCallbackInfo<void>& info);
+  static void addTonicKey(const Nan::FunctionCallbackInfo<v8::Value>& info);
+  static void removeTonicKey(const Nan::FunctionCallbackInfo<v8::Value>& info);
+  static void getTonicKey(v8::Local<v8::String> property, const Nan::PropertyCallbackInfo<v8::Value>& info);
+  static void setTonicKey(v8::Local<v8::String> property, v8::Local<v8::Value> value, const Nan::PropertyCallbackInfo<void>& info);
+  static void getEnergy(v8::Local<v8::String> property, const Nan::PropertyCallbackInfo<v8::Value>& info);
+  static void setEnergy(v8::Local<v8::String> property, v8::Local<v8::Value> value, const Nan::PropertyCallbackInfo<void>& info);
+  static void getComments(v8::Local<v8::String> property, const Nan::PropertyCallbackInfo<v8::Value>& info);
+  static void setComments(v8::Local<v8::String> property, v8::Local<v8::Value> value, const Nan::PropertyCallbackInfo<void>& info);
+  static void getTrashed(v8::Local<v8::String> property, const Nan::PropertyCallbackInfo<v8::Value>& info);
+  static void setTrashed(v8::Local<v8::String> property, v8::Local<v8::Value> value, const Nan::PropertyCallbackInfo<void>& info);
+  static void getLowQuality(v8::Local<v8::String> property, const Nan::PropertyCallbackInfo<v8::Value>& info);
+  static void setLowQuality(v8::Local<v8::String> property, v8::Local<v8::Value> value, const Nan::PropertyCallbackInfo<void>& info);
+  static void getRESongId(v8::Local<v8::String> property, const Nan::PropertyCallbackInfo<v8::Value>& info);
+  static void setRESongId(v8::Local<v8::String> property, v8::Local<v8::Value> value, const Nan::PropertyCallbackInfo<void>& info);
   // Unable to process getRESong
   // Unable to process getRESongOnce
   // Unable to process setRESong
-  static NAN_GETTER(getAlbumId);
-  static NAN_SETTER(setAlbumId);
-  static NAN_GETTER(getAlbum);
-  static NAN_GETTER(getAlbumOnce);
-  static NAN_SETTER(setAlbum);
-  static NAN_GETTER(getAlbumPartId);
-  static NAN_SETTER(setAlbumPartId);
-  static NAN_GETTER(getAlbumPart);
-  static NAN_GETTER(getAlbumPartOnce);
-  static NAN_SETTER(setAlbumPart);
-  static NAN_GETTER(getStyleIds);
-  static NAN_SETTER(setStyleIds);
-  static NAN_GETTER(getStyles);
-  static NAN_SETTER(setStyles);
+  static void getAlbumId(v8::Local<v8::String> property, const Nan::PropertyCallbackInfo<v8::Value>& info);
+  static void setAlbumId(v8::Local<v8::String> property, v8::Local<v8::Value> value, const Nan::PropertyCallbackInfo<void>& info);
+  static void getAlbum(v8::Local<v8::String> property, const Nan::PropertyCallbackInfo<v8::Value>& info);
+  static void getAlbumOnce(v8::Local<v8::String> property, const Nan::PropertyCallbackInfo<v8::Value>& info);
+  static void setAlbum(v8::Local<v8::String> property, v8::Local<v8::Value> value, const Nan::PropertyCallbackInfo<void>& info);
+  static void getAlbumPartId(v8::Local<v8::String> property, const Nan::PropertyCallbackInfo<v8::Value>& info);
+  static void setAlbumPartId(v8::Local<v8::String> property, v8::Local<v8::Value> value, const Nan::PropertyCallbackInfo<void>& info);
+  static void getAlbumPart(v8::Local<v8::String> property, const Nan::PropertyCallbackInfo<v8::Value>& info);
+  static void getAlbumPartOnce(v8::Local<v8::String> property, const Nan::PropertyCallbackInfo<v8::Value>& info);
+  static void setAlbumPart(v8::Local<v8::String> property, v8::Local<v8::Value> value, const Nan::PropertyCallbackInfo<void>& info);
+  static void getStyleIds(v8::Local<v8::String> property, const Nan::PropertyCallbackInfo<v8::Value>& info);
+  static void setStyleIds(v8::Local<v8::String> property, v8::Local<v8::Value> value, const Nan::PropertyCallbackInfo<void>& info);
+  static void getStyles(v8::Local<v8::String> property, const Nan::PropertyCallbackInfo<v8::Value>& info);
+  static void setStyles(v8::Local<v8::String> property, v8::Local<v8::Value> value, const Nan::PropertyCallbackInfo<void>& info);
 
-  static v8::Persistent<v8::Function> constructor;
+  static Nan::Persistent<v8::Function> constructor;
   dogatech::soulsifter::Song* song;
   bool ownWrappedObject;
 };

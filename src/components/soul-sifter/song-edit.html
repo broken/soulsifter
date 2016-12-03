@@ -204,7 +204,7 @@
         var that = this;
         this.$.coverFileDialog.addEventListener("change", function(e) {
           that._editedSong.album.coverFilepath = this.value;
-          that.$.cover.style.backgroundImage = 'url("' + that._editedSong.album.coverFilepath + '")';
+          that.$.cover.style.backgroundImage = 'url("file://' + that._editedSong.album.coverFilepath + '")';
           that._changedAlbumCover = true;
         }, false);
         this.$.songFileDialog.addEventListener("change", function(e) {
@@ -289,7 +289,7 @@
       }
       if (!!this._editedSong.album.basicGenre) this.basicgenreName = this._editedSong.album.basicGenre.name;
       else this.basicgenreName = '';
-      this.$.cover.style.backgroundImage = 'url("' + this._editedSong.album.coverFilepath + '")';
+      this.$.cover.style.backgroundImage = 'url("file://' + this._editedSong.album.coverFilepath + '")';
       this._changedAlbumCover = false;
       // this does not seem to play well when working straight on the array object
       this._styles = this._editedSong.styles;

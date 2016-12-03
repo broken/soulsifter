@@ -5,9 +5,9 @@
 #include <nan.h>
 #include "PlaylistEntry.h"
 
-class PlaylistEntry : public node::ObjectWrap {
+class PlaylistEntry : public Nan::ObjectWrap {
  public:
-  static void Init(v8::Handle<v8::Object> exports);
+  static void Init(v8::Local<v8::Object> exports);
   static v8::Local<v8::Object> NewInstance();
 
   void setNwcpValue(dogatech::soulsifter::PlaylistEntry* v, bool own);
@@ -18,34 +18,34 @@ class PlaylistEntry : public node::ObjectWrap {
   explicit PlaylistEntry(dogatech::soulsifter::PlaylistEntry* playlistentry);
   ~PlaylistEntry();
 
-  static NAN_METHOD(New);
+  static void New(const Nan::FunctionCallbackInfo<v8::Value>& info);
 
-  static NAN_METHOD(clear);
-  static NAN_METHOD(findById);
-  static NAN_METHOD(findByPlaylistIdAndSongId);
-  static NAN_METHOD(findAll);
-  static NAN_METHOD(update);
-  static NAN_METHOD(save);
-  static NAN_METHOD(sync);
-  static NAN_METHOD(erase);
-  static NAN_GETTER(getId);
-  static NAN_SETTER(setId);
-  static NAN_GETTER(getPlaylistId);
-  static NAN_SETTER(setPlaylistId);
-  static NAN_GETTER(getPlaylist);
-  static NAN_GETTER(getPlaylistOnce);
-  static NAN_SETTER(setPlaylist);
-  static NAN_GETTER(getSongId);
-  static NAN_SETTER(setSongId);
-  static NAN_GETTER(getSong);
-  static NAN_GETTER(getSongOnce);
-  static NAN_SETTER(setSong);
-  static NAN_GETTER(getPosition);
-  static NAN_SETTER(setPosition);
-  static NAN_GETTER(getTime);
-  static NAN_SETTER(setTime);
+  static void clear(const Nan::FunctionCallbackInfo<v8::Value>& info);
+  static void findById(const Nan::FunctionCallbackInfo<v8::Value>& info);
+  static void findByPlaylistIdAndSongId(const Nan::FunctionCallbackInfo<v8::Value>& info);
+  static void findAll(const Nan::FunctionCallbackInfo<v8::Value>& info);
+  static void update(const Nan::FunctionCallbackInfo<v8::Value>& info);
+  static void save(const Nan::FunctionCallbackInfo<v8::Value>& info);
+  static void sync(const Nan::FunctionCallbackInfo<v8::Value>& info);
+  static void erase(const Nan::FunctionCallbackInfo<v8::Value>& info);
+  static void getId(v8::Local<v8::String> property, const Nan::PropertyCallbackInfo<v8::Value>& info);
+  static void setId(v8::Local<v8::String> property, v8::Local<v8::Value> value, const Nan::PropertyCallbackInfo<void>& info);
+  static void getPlaylistId(v8::Local<v8::String> property, const Nan::PropertyCallbackInfo<v8::Value>& info);
+  static void setPlaylistId(v8::Local<v8::String> property, v8::Local<v8::Value> value, const Nan::PropertyCallbackInfo<void>& info);
+  static void getPlaylist(v8::Local<v8::String> property, const Nan::PropertyCallbackInfo<v8::Value>& info);
+  static void getPlaylistOnce(v8::Local<v8::String> property, const Nan::PropertyCallbackInfo<v8::Value>& info);
+  static void setPlaylist(v8::Local<v8::String> property, v8::Local<v8::Value> value, const Nan::PropertyCallbackInfo<void>& info);
+  static void getSongId(v8::Local<v8::String> property, const Nan::PropertyCallbackInfo<v8::Value>& info);
+  static void setSongId(v8::Local<v8::String> property, v8::Local<v8::Value> value, const Nan::PropertyCallbackInfo<void>& info);
+  static void getSong(v8::Local<v8::String> property, const Nan::PropertyCallbackInfo<v8::Value>& info);
+  static void getSongOnce(v8::Local<v8::String> property, const Nan::PropertyCallbackInfo<v8::Value>& info);
+  static void setSong(v8::Local<v8::String> property, v8::Local<v8::Value> value, const Nan::PropertyCallbackInfo<void>& info);
+  static void getPosition(v8::Local<v8::String> property, const Nan::PropertyCallbackInfo<v8::Value>& info);
+  static void setPosition(v8::Local<v8::String> property, v8::Local<v8::Value> value, const Nan::PropertyCallbackInfo<void>& info);
+  static void getTime(v8::Local<v8::String> property, const Nan::PropertyCallbackInfo<v8::Value>& info);
+  static void setTime(v8::Local<v8::String> property, v8::Local<v8::Value> value, const Nan::PropertyCallbackInfo<void>& info);
 
-  static v8::Persistent<v8::Function> constructor;
+  static Nan::Persistent<v8::Function> constructor;
   dogatech::soulsifter::PlaylistEntry* playlistentry;
   bool ownWrappedObject;
 };

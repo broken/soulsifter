@@ -6,10 +6,10 @@
 #include "BasicGenre_wrap.h"
 #include "ResultSetIterator.h"
 
-v8::Persistent<v8::Function> BasicGenre::constructor;
+Nan::Persistent<v8::Function> BasicGenre::constructor;
 
-BasicGenre::BasicGenre() : ObjectWrap(), basicgenre(NULL), ownWrappedObject(true) {};
-BasicGenre::BasicGenre(dogatech::soulsifter::BasicGenre* o) : ObjectWrap(), basicgenre(o), ownWrappedObject(true) {};
+BasicGenre::BasicGenre() : Nan::ObjectWrap(), basicgenre(NULL), ownWrappedObject(true) {};
+BasicGenre::BasicGenre(dogatech::soulsifter::BasicGenre* o) : Nan::ObjectWrap(), basicgenre(o), ownWrappedObject(true) {};
 BasicGenre::~BasicGenre() { if (ownWrappedObject) delete basicgenre; };
 
 void BasicGenre::setNwcpValue(dogatech::soulsifter::BasicGenre* v, bool own) {
@@ -19,12 +19,10 @@ void BasicGenre::setNwcpValue(dogatech::soulsifter::BasicGenre* v, bool own) {
   ownWrappedObject = own;
 }
 
-NAN_METHOD(BasicGenre::New) {
-  NanScope();
-
+void BasicGenre::New(const Nan::FunctionCallbackInfo<v8::Value>& info) {
   dogatech::soulsifter::BasicGenre* wrappedObj = NULL;
-  if (args.Length()) {
-    dogatech::soulsifter::BasicGenre* xtmp(node::ObjectWrap::Unwrap<BasicGenre>(args[0]->ToObject())->getNwcpValue());
+  if (info.Length()) {
+    dogatech::soulsifter::BasicGenre* xtmp(Nan::ObjectWrap::Unwrap<BasicGenre>(info[0]->ToObject())->getNwcpValue());
     dogatech::soulsifter::BasicGenre& x = *xtmp;
     wrappedObj = new dogatech::soulsifter::BasicGenre(x);
   } else {
@@ -32,192 +30,175 @@ NAN_METHOD(BasicGenre::New) {
   }
 
   BasicGenre* obj = new BasicGenre(wrappedObj);
-  obj->Wrap(args.This());
+  obj->Wrap(info.This());
 
-  NanReturnValue(args.This());
+  info.GetReturnValue().Set(info.This());
 }
 
 v8::Local<v8::Object> BasicGenre::NewInstance() {
-  v8::Local<v8::Function> cons = NanNew<v8::Function>(constructor);
-  v8::Local<v8::Object> instance = cons->NewInstance();
-
-  return instance;
+  v8::Local<v8::Function> cons = Nan::New<v8::Function>(constructor);
+  return Nan::NewInstance(cons).ToLocalChecked();
 }
 
-void BasicGenre::Init(v8::Handle<v8::Object> exports) {
-  NanScope();
-
+void BasicGenre::Init(v8::Local<v8::Object> exports) {
   // Prepare constructor template
-  v8::Local<v8::FunctionTemplate> tpl = NanNew<v8::FunctionTemplate>(New);
-  tpl->SetClassName(NanNew<v8::String>("BasicGenre"));
+  v8::Local<v8::FunctionTemplate> tpl = Nan::New<v8::FunctionTemplate>(New);
+  tpl->SetClassName(Nan::New("BasicGenre").ToLocalChecked());
   tpl->InstanceTemplate()->SetInternalFieldCount(1);
 
-  NanSetPrototypeTemplate(tpl, "clear", NanNew<v8::FunctionTemplate>(clear)->GetFunction());
-  NanSetTemplate(tpl, "findById", NanNew<v8::FunctionTemplate>(findById)->GetFunction());
-  NanSetTemplate(tpl, "findByName", NanNew<v8::FunctionTemplate>(findByName)->GetFunction());
-  NanSetTemplate(tpl, "findAll", NanNew<v8::FunctionTemplate>(findAll)->GetFunction());
-  NanSetPrototypeTemplate(tpl, "update", NanNew<v8::FunctionTemplate>(update)->GetFunction());
-  NanSetPrototypeTemplate(tpl, "save", NanNew<v8::FunctionTemplate>(save)->GetFunction());
-  NanSetPrototypeTemplate(tpl, "sync", NanNew<v8::FunctionTemplate>(sync)->GetFunction());
-  NanSetTemplate(tpl, "findByFilepath", NanNew<v8::FunctionTemplate>(findByFilepath)->GetFunction());
-  NanSetTemplate(tpl, "findByArtist", NanNew<v8::FunctionTemplate>(findByArtist)->GetFunction());
-  tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("id"), getId, setId);
-  tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("name"), getName, setName);
+  // Prototype
+  Nan::SetPrototypeMethod(tpl, "clear", clear);
+  Nan::SetMethod(tpl, "findById", findById);
+  Nan::SetMethod(tpl, "findByName", findByName);
+  Nan::SetMethod(tpl, "findAll", findAll);
+  Nan::SetPrototypeMethod(tpl, "update", update);
+  Nan::SetPrototypeMethod(tpl, "save", save);
+  Nan::SetPrototypeMethod(tpl, "sync", sync);
+  Nan::SetMethod(tpl, "findByFilepath", findByFilepath);
+  Nan::SetMethod(tpl, "findByArtist", findByArtist);
+  Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("id").ToLocalChecked(), getId, setId);
+  Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("name").ToLocalChecked(), getName, setName);
 
-  NanAssignPersistent<v8::Function>(constructor, tpl->GetFunction());
-  exports->Set(NanNew<v8::String>("BasicGenre"), tpl->GetFunction());
+  constructor.Reset(tpl->GetFunction());
+  exports->Set(Nan::New<v8::String>("BasicGenre").ToLocalChecked(), tpl->GetFunction());
 }
 
-NAN_METHOD(BasicGenre::clear) {
-  NanScope();
-
-  BasicGenre* obj = ObjectWrap::Unwrap<BasicGenre>(args.This());
+void BasicGenre::clear(const Nan::FunctionCallbackInfo<v8::Value>& info) {
+  BasicGenre* obj = Nan::ObjectWrap::Unwrap<BasicGenre>(info.Holder());
   obj->basicgenre->clear();
 
-  NanReturnUndefined();
+  info.GetReturnValue().SetUndefined();
 }
 
-NAN_METHOD(BasicGenre::findById) {
-  NanScope();
-
-  int a0(args[0]->Uint32Value());
+void BasicGenre::findById(const Nan::FunctionCallbackInfo<v8::Value>& info) {
+  int a0(info[0]->IntegerValue());
   dogatech::soulsifter::BasicGenre* result =
       dogatech::soulsifter::BasicGenre::findById(a0);
 
-  if (result == NULL) NanReturnUndefined();
-  v8::Local<v8::Object> instance = BasicGenre::NewInstance();
-  BasicGenre* r = ObjectWrap::Unwrap<BasicGenre>(instance);
-  r->setNwcpValue(result, true);
+  if (result == NULL) {
+    info.GetReturnValue().SetNull();
+  } else {
+    v8::Local<v8::Object> instance = BasicGenre::NewInstance();
+    BasicGenre* r = Nan::ObjectWrap::Unwrap<BasicGenre>(instance);
+    r->setNwcpValue(result, true);
 
-  NanReturnValue(instance);
+    info.GetReturnValue().Set(instance);
+  }
 }
 
-NAN_METHOD(BasicGenre::findByName) {
-  NanScope();
-
-  string a0(*v8::String::Utf8Value(args[0]->ToString()));
+void BasicGenre::findByName(const Nan::FunctionCallbackInfo<v8::Value>& info) {
+  string a0(*v8::String::Utf8Value(info[0]->ToString()));
   dogatech::soulsifter::BasicGenre* result =
       dogatech::soulsifter::BasicGenre::findByName(a0);
 
-  if (result == NULL) NanReturnUndefined();
-  v8::Local<v8::Object> instance = BasicGenre::NewInstance();
-  BasicGenre* r = ObjectWrap::Unwrap<BasicGenre>(instance);
-  r->setNwcpValue(result, true);
+  if (result == NULL) {
+    info.GetReturnValue().SetNull();
+  } else {
+    v8::Local<v8::Object> instance = BasicGenre::NewInstance();
+    BasicGenre* r = Nan::ObjectWrap::Unwrap<BasicGenre>(instance);
+    r->setNwcpValue(result, true);
 
-  NanReturnValue(instance);
+    info.GetReturnValue().Set(instance);
+  }
 }
 
-NAN_METHOD(BasicGenre::findAll) {
-  NanScope();
-
+void BasicGenre::findAll(const Nan::FunctionCallbackInfo<v8::Value>& info) {
   dogatech::ResultSetIterator<dogatech::soulsifter::BasicGenre>* result =
       dogatech::soulsifter::BasicGenre::findAll();
 
   vector<dogatech::soulsifter::BasicGenre*>* v = result->toVector();
-  v8::Handle<v8::Array> a = NanNew<v8::Array>((int) v->size());
+  v8::Local<v8::Array> a = Nan::New<v8::Array>((int) v->size());
   for (int i = 0; i < (int) v->size(); i++) {
-    v8::Local<v8::Function> cons = NanNew<v8::Function>(constructor);
+    v8::Local<v8::Function> cons = Nan::New<v8::Function>(constructor);
     v8::Local<v8::Object> instance = cons->NewInstance();
-    BasicGenre* o = ObjectWrap::Unwrap<BasicGenre>(instance);
+    BasicGenre* o = Nan::ObjectWrap::Unwrap<BasicGenre>(instance);
     o->basicgenre = (*v)[i];
-    a->Set(NanNew<v8::Number>(i), instance);
+    a->Set(Nan::New<v8::Number>(i), instance);
   }
   delete v;
-  NanReturnValue(a);
+  info.GetReturnValue().Set(a);
 }
 
-NAN_METHOD(BasicGenre::update) {
-  NanScope();
-
-  BasicGenre* obj = ObjectWrap::Unwrap<BasicGenre>(args.This());
+void BasicGenre::update(const Nan::FunctionCallbackInfo<v8::Value>& info) {
+  BasicGenre* obj = Nan::ObjectWrap::Unwrap<BasicGenre>(info.Holder());
   int result =  obj->basicgenre->update();
 
-  NanReturnValue(NanNew<v8::Number>(result));
+  info.GetReturnValue().Set(Nan::New<v8::Number>(result));
 }
 
-NAN_METHOD(BasicGenre::save) {
-  NanScope();
-
-  BasicGenre* obj = ObjectWrap::Unwrap<BasicGenre>(args.This());
+void BasicGenre::save(const Nan::FunctionCallbackInfo<v8::Value>& info) {
+  BasicGenre* obj = Nan::ObjectWrap::Unwrap<BasicGenre>(info.Holder());
   int result =  obj->basicgenre->save();
 
-  NanReturnValue(NanNew<v8::Number>(result));
+  info.GetReturnValue().Set(Nan::New<v8::Number>(result));
 }
 
-NAN_METHOD(BasicGenre::sync) {
-  NanScope();
-
-  BasicGenre* obj = ObjectWrap::Unwrap<BasicGenre>(args.This());
+void BasicGenre::sync(const Nan::FunctionCallbackInfo<v8::Value>& info) {
+  BasicGenre* obj = Nan::ObjectWrap::Unwrap<BasicGenre>(info.Holder());
   bool result =  obj->basicgenre->sync();
 
-  NanReturnValue(NanNew<v8::Boolean>(result));
+  info.GetReturnValue().Set(Nan::New<v8::Boolean>(result));
 }
 
-NAN_METHOD(BasicGenre::findByFilepath) {
-  NanScope();
-
-  string a0(*v8::String::Utf8Value(args[0]->ToString()));
+void BasicGenre::findByFilepath(const Nan::FunctionCallbackInfo<v8::Value>& info) {
+  string a0(*v8::String::Utf8Value(info[0]->ToString()));
   dogatech::soulsifter::BasicGenre* result =
       dogatech::soulsifter::BasicGenre::findByFilepath(a0);
 
-  if (result == NULL) NanReturnUndefined();
-  v8::Local<v8::Object> instance = BasicGenre::NewInstance();
-  BasicGenre* r = ObjectWrap::Unwrap<BasicGenre>(instance);
-  r->setNwcpValue(result, true);
+  if (result == NULL) {
+    info.GetReturnValue().SetNull();
+  } else {
+    v8::Local<v8::Object> instance = BasicGenre::NewInstance();
+    BasicGenre* r = Nan::ObjectWrap::Unwrap<BasicGenre>(instance);
+    r->setNwcpValue(result, true);
 
-  NanReturnValue(instance);
+    info.GetReturnValue().Set(instance);
+  }
 }
 
-NAN_METHOD(BasicGenre::findByArtist) {
-  NanScope();
-
-  string a0(*v8::String::Utf8Value(args[0]->ToString()));
+void BasicGenre::findByArtist(const Nan::FunctionCallbackInfo<v8::Value>& info) {
+  string a0(*v8::String::Utf8Value(info[0]->ToString()));
   dogatech::soulsifter::BasicGenre* result =
       dogatech::soulsifter::BasicGenre::findByArtist(a0);
 
-  if (result == NULL) NanReturnUndefined();
-  v8::Local<v8::Object> instance = BasicGenre::NewInstance();
-  BasicGenre* r = ObjectWrap::Unwrap<BasicGenre>(instance);
-  r->setNwcpValue(result, true);
+  if (result == NULL) {
+    info.GetReturnValue().SetNull();
+  } else {
+    v8::Local<v8::Object> instance = BasicGenre::NewInstance();
+    BasicGenre* r = Nan::ObjectWrap::Unwrap<BasicGenre>(instance);
+    r->setNwcpValue(result, true);
 
-  NanReturnValue(instance);
+    info.GetReturnValue().Set(instance);
+  }
 }
 
 NAN_GETTER(BasicGenre::getId) {
-  NanScope();
-
-  BasicGenre* obj = ObjectWrap::Unwrap<BasicGenre>(args.This());
+  BasicGenre* obj = Nan::ObjectWrap::Unwrap<BasicGenre>(info.Holder());
   const int result =  obj->basicgenre->getId();
 
-  NanReturnValue(NanNew<v8::Number>(result));
+  info.GetReturnValue().Set(Nan::New<v8::Number>(result));
 }
 
 NAN_SETTER(BasicGenre::setId) {
-  NanScope();
-
-  BasicGenre* obj = ObjectWrap::Unwrap<BasicGenre>(args.This());
-  int a0(value->Uint32Value());
+  BasicGenre* obj = Nan::ObjectWrap::Unwrap<BasicGenre>(info.Holder());
+  int a0(value->IntegerValue());
   obj->basicgenre->setId(a0);
 
-  NanReturnUndefined();
+  info.GetReturnValue().SetUndefined();
 }
 
 NAN_GETTER(BasicGenre::getName) {
-  NanScope();
-
-  BasicGenre* obj = ObjectWrap::Unwrap<BasicGenre>(args.This());
+  BasicGenre* obj = Nan::ObjectWrap::Unwrap<BasicGenre>(info.Holder());
   const string result =  obj->basicgenre->getName();
 
-  NanReturnValue(NanNew<v8::String>(result.c_str(), result.length()));
+  info.GetReturnValue().Set(Nan::New<v8::String>(result).ToLocalChecked());
 }
 
 NAN_SETTER(BasicGenre::setName) {
-  NanScope();
-
-  BasicGenre* obj = ObjectWrap::Unwrap<BasicGenre>(args.This());
+  BasicGenre* obj = Nan::ObjectWrap::Unwrap<BasicGenre>(info.Holder());
   string a0(*v8::String::Utf8Value(value->ToString()));
   obj->basicgenre->setName(a0);
 
-  NanReturnUndefined();
+  info.GetReturnValue().SetUndefined();
 }
 

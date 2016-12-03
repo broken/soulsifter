@@ -5,9 +5,9 @@
 #include <nan.h>
 #include "MusicVideo.h"
 
-class MusicVideo : public node::ObjectWrap {
+class MusicVideo : public Nan::ObjectWrap {
  public:
-  static void Init(v8::Handle<v8::Object> exports);
+  static void Init(v8::Local<v8::Object> exports);
   static v8::Local<v8::Object> NewInstance();
 
   void setNwcpValue(dogatech::soulsifter::MusicVideo* v, bool own);
@@ -18,28 +18,28 @@ class MusicVideo : public node::ObjectWrap {
   explicit MusicVideo(dogatech::soulsifter::MusicVideo* musicvideo);
   ~MusicVideo();
 
-  static NAN_METHOD(New);
+  static void New(const Nan::FunctionCallbackInfo<v8::Value>& info);
 
-  static NAN_METHOD(clear);
-  static NAN_METHOD(findById);
-  static NAN_METHOD(findBySongId);
-  static NAN_METHOD(findAll);
-  static NAN_METHOD(update);
-  static NAN_METHOD(save);
-  static NAN_METHOD(sync);
-  static NAN_GETTER(getId);
-  static NAN_SETTER(setId);
-  static NAN_GETTER(getSongId);
-  static NAN_SETTER(setSongId);
-  static NAN_GETTER(getSong);
-  static NAN_GETTER(getSongOnce);
-  static NAN_SETTER(setSong);
-  static NAN_GETTER(getFilePath);
-  static NAN_SETTER(setFilePath);
-  static NAN_GETTER(getThumbnailFilePath);
-  static NAN_SETTER(setThumbnailFilePath);
+  static void clear(const Nan::FunctionCallbackInfo<v8::Value>& info);
+  static void findById(const Nan::FunctionCallbackInfo<v8::Value>& info);
+  static void findBySongId(const Nan::FunctionCallbackInfo<v8::Value>& info);
+  static void findAll(const Nan::FunctionCallbackInfo<v8::Value>& info);
+  static void update(const Nan::FunctionCallbackInfo<v8::Value>& info);
+  static void save(const Nan::FunctionCallbackInfo<v8::Value>& info);
+  static void sync(const Nan::FunctionCallbackInfo<v8::Value>& info);
+  static void getId(v8::Local<v8::String> property, const Nan::PropertyCallbackInfo<v8::Value>& info);
+  static void setId(v8::Local<v8::String> property, v8::Local<v8::Value> value, const Nan::PropertyCallbackInfo<void>& info);
+  static void getSongId(v8::Local<v8::String> property, const Nan::PropertyCallbackInfo<v8::Value>& info);
+  static void setSongId(v8::Local<v8::String> property, v8::Local<v8::Value> value, const Nan::PropertyCallbackInfo<void>& info);
+  static void getSong(v8::Local<v8::String> property, const Nan::PropertyCallbackInfo<v8::Value>& info);
+  static void getSongOnce(v8::Local<v8::String> property, const Nan::PropertyCallbackInfo<v8::Value>& info);
+  static void setSong(v8::Local<v8::String> property, v8::Local<v8::Value> value, const Nan::PropertyCallbackInfo<void>& info);
+  static void getFilePath(v8::Local<v8::String> property, const Nan::PropertyCallbackInfo<v8::Value>& info);
+  static void setFilePath(v8::Local<v8::String> property, v8::Local<v8::Value> value, const Nan::PropertyCallbackInfo<void>& info);
+  static void getThumbnailFilePath(v8::Local<v8::String> property, const Nan::PropertyCallbackInfo<v8::Value>& info);
+  static void setThumbnailFilePath(v8::Local<v8::String> property, v8::Local<v8::Value> value, const Nan::PropertyCallbackInfo<void>& info);
 
-  static v8::Persistent<v8::Function> constructor;
+  static Nan::Persistent<v8::Function> constructor;
   dogatech::soulsifter::MusicVideo* musicvideo;
   bool ownWrappedObject;
 };

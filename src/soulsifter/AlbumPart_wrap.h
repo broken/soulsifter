@@ -5,9 +5,9 @@
 #include <nan.h>
 #include "AlbumPart.h"
 
-class AlbumPart : public node::ObjectWrap {
+class AlbumPart : public Nan::ObjectWrap {
  public:
-  static void Init(v8::Handle<v8::Object> exports);
+  static void Init(v8::Local<v8::Object> exports);
   static v8::Local<v8::Object> NewInstance();
 
   void setNwcpValue(dogatech::soulsifter::AlbumPart* v, bool own);
@@ -18,28 +18,28 @@ class AlbumPart : public node::ObjectWrap {
   explicit AlbumPart(dogatech::soulsifter::AlbumPart* albumpart);
   ~AlbumPart();
 
-  static NAN_METHOD(New);
+  static void New(const Nan::FunctionCallbackInfo<v8::Value>& info);
 
-  static NAN_METHOD(clear);
-  static NAN_METHOD(findById);
-  static NAN_METHOD(findByPosAndAlbumId);
-  static NAN_METHOD(findAll);
-  static NAN_METHOD(update);
-  static NAN_METHOD(save);
-  static NAN_METHOD(sync);
-  static NAN_GETTER(getId);
-  static NAN_SETTER(setId);
-  static NAN_GETTER(getPos);
-  static NAN_SETTER(setPos);
-  static NAN_GETTER(getName);
-  static NAN_SETTER(setName);
-  static NAN_GETTER(getAlbumId);
-  static NAN_SETTER(setAlbumId);
-  static NAN_GETTER(getAlbum);
-  static NAN_GETTER(getAlbumOnce);
-  static NAN_SETTER(setAlbum);
+  static void clear(const Nan::FunctionCallbackInfo<v8::Value>& info);
+  static void findById(const Nan::FunctionCallbackInfo<v8::Value>& info);
+  static void findByPosAndAlbumId(const Nan::FunctionCallbackInfo<v8::Value>& info);
+  static void findAll(const Nan::FunctionCallbackInfo<v8::Value>& info);
+  static void update(const Nan::FunctionCallbackInfo<v8::Value>& info);
+  static void save(const Nan::FunctionCallbackInfo<v8::Value>& info);
+  static void sync(const Nan::FunctionCallbackInfo<v8::Value>& info);
+  static void getId(v8::Local<v8::String> property, const Nan::PropertyCallbackInfo<v8::Value>& info);
+  static void setId(v8::Local<v8::String> property, v8::Local<v8::Value> value, const Nan::PropertyCallbackInfo<void>& info);
+  static void getPos(v8::Local<v8::String> property, const Nan::PropertyCallbackInfo<v8::Value>& info);
+  static void setPos(v8::Local<v8::String> property, v8::Local<v8::Value> value, const Nan::PropertyCallbackInfo<void>& info);
+  static void getName(v8::Local<v8::String> property, const Nan::PropertyCallbackInfo<v8::Value>& info);
+  static void setName(v8::Local<v8::String> property, v8::Local<v8::Value> value, const Nan::PropertyCallbackInfo<void>& info);
+  static void getAlbumId(v8::Local<v8::String> property, const Nan::PropertyCallbackInfo<v8::Value>& info);
+  static void setAlbumId(v8::Local<v8::String> property, v8::Local<v8::Value> value, const Nan::PropertyCallbackInfo<void>& info);
+  static void getAlbum(v8::Local<v8::String> property, const Nan::PropertyCallbackInfo<v8::Value>& info);
+  static void getAlbumOnce(v8::Local<v8::String> property, const Nan::PropertyCallbackInfo<v8::Value>& info);
+  static void setAlbum(v8::Local<v8::String> property, v8::Local<v8::Value> value, const Nan::PropertyCallbackInfo<void>& info);
 
-  static v8::Persistent<v8::Function> constructor;
+  static Nan::Persistent<v8::Function> constructor;
   dogatech::soulsifter::AlbumPart* albumpart;
   bool ownWrappedObject;
 };

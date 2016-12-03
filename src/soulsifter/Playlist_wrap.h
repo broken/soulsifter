@@ -5,9 +5,9 @@
 #include <nan.h>
 #include "Playlist.h"
 
-class Playlist : public node::ObjectWrap {
+class Playlist : public Nan::ObjectWrap {
  public:
-  static void Init(v8::Handle<v8::Object> exports);
+  static void Init(v8::Local<v8::Object> exports);
   static v8::Local<v8::Object> NewInstance();
 
   void setNwcpValue(dogatech::soulsifter::Playlist* v, bool own);
@@ -18,34 +18,34 @@ class Playlist : public node::ObjectWrap {
   explicit Playlist(dogatech::soulsifter::Playlist* playlist);
   ~Playlist();
 
-  static NAN_METHOD(New);
+  static void New(const Nan::FunctionCallbackInfo<v8::Value>& info);
 
-  static NAN_METHOD(clear);
-  static NAN_METHOD(findById);
-  static NAN_METHOD(findByName);
-  static NAN_METHOD(findAll);
-  static NAN_METHOD(update);
-  static NAN_METHOD(save);
-  static NAN_METHOD(sync);
-  static NAN_METHOD(erase);
-  static NAN_GETTER(getId);
-  static NAN_SETTER(setId);
-  static NAN_GETTER(getName);
-  static NAN_SETTER(setName);
-  static NAN_GETTER(getQuery);
-  static NAN_SETTER(setQuery);
-  static NAN_GETTER(getGmusicId);
-  static NAN_SETTER(setGmusicId);
-  static NAN_GETTER(getPlaylistEntryIds);
-  static NAN_SETTER(setPlaylistEntryIds);
-  static NAN_GETTER(getPlaylistEntries);
-  static NAN_SETTER(setPlaylistEntries);
-  static NAN_GETTER(getStyleIds);
-  static NAN_SETTER(setStyleIds);
-  static NAN_GETTER(getStyles);
-  static NAN_SETTER(setStyles);
+  static void clear(const Nan::FunctionCallbackInfo<v8::Value>& info);
+  static void findById(const Nan::FunctionCallbackInfo<v8::Value>& info);
+  static void findByName(const Nan::FunctionCallbackInfo<v8::Value>& info);
+  static void findAll(const Nan::FunctionCallbackInfo<v8::Value>& info);
+  static void update(const Nan::FunctionCallbackInfo<v8::Value>& info);
+  static void save(const Nan::FunctionCallbackInfo<v8::Value>& info);
+  static void sync(const Nan::FunctionCallbackInfo<v8::Value>& info);
+  static void erase(const Nan::FunctionCallbackInfo<v8::Value>& info);
+  static void getId(v8::Local<v8::String> property, const Nan::PropertyCallbackInfo<v8::Value>& info);
+  static void setId(v8::Local<v8::String> property, v8::Local<v8::Value> value, const Nan::PropertyCallbackInfo<void>& info);
+  static void getName(v8::Local<v8::String> property, const Nan::PropertyCallbackInfo<v8::Value>& info);
+  static void setName(v8::Local<v8::String> property, v8::Local<v8::Value> value, const Nan::PropertyCallbackInfo<void>& info);
+  static void getQuery(v8::Local<v8::String> property, const Nan::PropertyCallbackInfo<v8::Value>& info);
+  static void setQuery(v8::Local<v8::String> property, v8::Local<v8::Value> value, const Nan::PropertyCallbackInfo<void>& info);
+  static void getGmusicId(v8::Local<v8::String> property, const Nan::PropertyCallbackInfo<v8::Value>& info);
+  static void setGmusicId(v8::Local<v8::String> property, v8::Local<v8::Value> value, const Nan::PropertyCallbackInfo<void>& info);
+  static void getPlaylistEntryIds(v8::Local<v8::String> property, const Nan::PropertyCallbackInfo<v8::Value>& info);
+  static void setPlaylistEntryIds(v8::Local<v8::String> property, v8::Local<v8::Value> value, const Nan::PropertyCallbackInfo<void>& info);
+  static void getPlaylistEntries(v8::Local<v8::String> property, const Nan::PropertyCallbackInfo<v8::Value>& info);
+  static void setPlaylistEntries(v8::Local<v8::String> property, v8::Local<v8::Value> value, const Nan::PropertyCallbackInfo<void>& info);
+  static void getStyleIds(v8::Local<v8::String> property, const Nan::PropertyCallbackInfo<v8::Value>& info);
+  static void setStyleIds(v8::Local<v8::String> property, v8::Local<v8::Value> value, const Nan::PropertyCallbackInfo<void>& info);
+  static void getStyles(v8::Local<v8::String> property, const Nan::PropertyCallbackInfo<v8::Value>& info);
+  static void setStyles(v8::Local<v8::String> property, v8::Local<v8::Value> value, const Nan::PropertyCallbackInfo<void>& info);
 
-  static v8::Persistent<v8::Function> constructor;
+  static Nan::Persistent<v8::Function> constructor;
   dogatech::soulsifter::Playlist* playlist;
   bool ownWrappedObject;
 };

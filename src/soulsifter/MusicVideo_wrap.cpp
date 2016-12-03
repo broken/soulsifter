@@ -8,10 +8,10 @@
 #include "Song.h"
 #include "Song_wrap.h"
 
-v8::Persistent<v8::Function> MusicVideo::constructor;
+Nan::Persistent<v8::Function> MusicVideo::constructor;
 
-MusicVideo::MusicVideo() : ObjectWrap(), musicvideo(NULL), ownWrappedObject(true) {};
-MusicVideo::MusicVideo(dogatech::soulsifter::MusicVideo* o) : ObjectWrap(), musicvideo(o), ownWrappedObject(true) {};
+MusicVideo::MusicVideo() : Nan::ObjectWrap(), musicvideo(NULL), ownWrappedObject(true) {};
+MusicVideo::MusicVideo(dogatech::soulsifter::MusicVideo* o) : Nan::ObjectWrap(), musicvideo(o), ownWrappedObject(true) {};
 MusicVideo::~MusicVideo() { if (ownWrappedObject) delete musicvideo; };
 
 void MusicVideo::setNwcpValue(dogatech::soulsifter::MusicVideo* v, bool own) {
@@ -21,12 +21,10 @@ void MusicVideo::setNwcpValue(dogatech::soulsifter::MusicVideo* v, bool own) {
   ownWrappedObject = own;
 }
 
-NAN_METHOD(MusicVideo::New) {
-  NanScope();
-
+void MusicVideo::New(const Nan::FunctionCallbackInfo<v8::Value>& info) {
   dogatech::soulsifter::MusicVideo* wrappedObj = NULL;
-  if (args.Length()) {
-    dogatech::soulsifter::MusicVideo* xtmp(node::ObjectWrap::Unwrap<MusicVideo>(args[0]->ToObject())->getNwcpValue());
+  if (info.Length()) {
+    dogatech::soulsifter::MusicVideo* xtmp(Nan::ObjectWrap::Unwrap<MusicVideo>(info[0]->ToObject())->getNwcpValue());
     dogatech::soulsifter::MusicVideo& x = *xtmp;
     wrappedObj = new dogatech::soulsifter::MusicVideo(x);
   } else {
@@ -34,241 +32,214 @@ NAN_METHOD(MusicVideo::New) {
   }
 
   MusicVideo* obj = new MusicVideo(wrappedObj);
-  obj->Wrap(args.This());
+  obj->Wrap(info.This());
 
-  NanReturnValue(args.This());
+  info.GetReturnValue().Set(info.This());
 }
 
 v8::Local<v8::Object> MusicVideo::NewInstance() {
-  v8::Local<v8::Function> cons = NanNew<v8::Function>(constructor);
-  v8::Local<v8::Object> instance = cons->NewInstance();
-
-  return instance;
+  v8::Local<v8::Function> cons = Nan::New<v8::Function>(constructor);
+  return Nan::NewInstance(cons).ToLocalChecked();
 }
 
-void MusicVideo::Init(v8::Handle<v8::Object> exports) {
-  NanScope();
-
+void MusicVideo::Init(v8::Local<v8::Object> exports) {
   // Prepare constructor template
-  v8::Local<v8::FunctionTemplate> tpl = NanNew<v8::FunctionTemplate>(New);
-  tpl->SetClassName(NanNew<v8::String>("MusicVideo"));
+  v8::Local<v8::FunctionTemplate> tpl = Nan::New<v8::FunctionTemplate>(New);
+  tpl->SetClassName(Nan::New("MusicVideo").ToLocalChecked());
   tpl->InstanceTemplate()->SetInternalFieldCount(1);
 
-  NanSetPrototypeTemplate(tpl, "clear", NanNew<v8::FunctionTemplate>(clear)->GetFunction());
-  NanSetTemplate(tpl, "findById", NanNew<v8::FunctionTemplate>(findById)->GetFunction());
-  NanSetTemplate(tpl, "findBySongId", NanNew<v8::FunctionTemplate>(findBySongId)->GetFunction());
-  NanSetTemplate(tpl, "findAll", NanNew<v8::FunctionTemplate>(findAll)->GetFunction());
-  NanSetPrototypeTemplate(tpl, "update", NanNew<v8::FunctionTemplate>(update)->GetFunction());
-  NanSetPrototypeTemplate(tpl, "save", NanNew<v8::FunctionTemplate>(save)->GetFunction());
-  NanSetPrototypeTemplate(tpl, "sync", NanNew<v8::FunctionTemplate>(sync)->GetFunction());
-  tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("id"), getId, setId);
-  tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("songId"), getSongId, setSongId);
-  tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("song"), getSong, setSong);
-  tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("songOnce"), getSongOnce);
-  tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("filePath"), getFilePath, setFilePath);
-  tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("thumbnailFilePath"), getThumbnailFilePath, setThumbnailFilePath);
+  // Prototype
+  Nan::SetPrototypeMethod(tpl, "clear", clear);
+  Nan::SetMethod(tpl, "findById", findById);
+  Nan::SetMethod(tpl, "findBySongId", findBySongId);
+  Nan::SetMethod(tpl, "findAll", findAll);
+  Nan::SetPrototypeMethod(tpl, "update", update);
+  Nan::SetPrototypeMethod(tpl, "save", save);
+  Nan::SetPrototypeMethod(tpl, "sync", sync);
+  Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("id").ToLocalChecked(), getId, setId);
+  Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("songId").ToLocalChecked(), getSongId, setSongId);
+  Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("song").ToLocalChecked(), getSong, setSong);
+  Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("songOnce").ToLocalChecked(), getSongOnce);
+  Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("filePath").ToLocalChecked(), getFilePath, setFilePath);
+  Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("thumbnailFilePath").ToLocalChecked(), getThumbnailFilePath, setThumbnailFilePath);
 
-  NanAssignPersistent<v8::Function>(constructor, tpl->GetFunction());
-  exports->Set(NanNew<v8::String>("MusicVideo"), tpl->GetFunction());
+  constructor.Reset(tpl->GetFunction());
+  exports->Set(Nan::New<v8::String>("MusicVideo").ToLocalChecked(), tpl->GetFunction());
 }
 
-NAN_METHOD(MusicVideo::clear) {
-  NanScope();
-
-  MusicVideo* obj = ObjectWrap::Unwrap<MusicVideo>(args.This());
+void MusicVideo::clear(const Nan::FunctionCallbackInfo<v8::Value>& info) {
+  MusicVideo* obj = Nan::ObjectWrap::Unwrap<MusicVideo>(info.Holder());
   obj->musicvideo->clear();
 
-  NanReturnUndefined();
+  info.GetReturnValue().SetUndefined();
 }
 
-NAN_METHOD(MusicVideo::findById) {
-  NanScope();
-
-  int a0(args[0]->Uint32Value());
+void MusicVideo::findById(const Nan::FunctionCallbackInfo<v8::Value>& info) {
+  int a0(info[0]->IntegerValue());
   dogatech::soulsifter::MusicVideo* result =
       dogatech::soulsifter::MusicVideo::findById(a0);
 
-  if (result == NULL) NanReturnUndefined();
-  v8::Local<v8::Object> instance = MusicVideo::NewInstance();
-  MusicVideo* r = ObjectWrap::Unwrap<MusicVideo>(instance);
-  r->setNwcpValue(result, true);
+  if (result == NULL) {
+    info.GetReturnValue().SetNull();
+  } else {
+    v8::Local<v8::Object> instance = MusicVideo::NewInstance();
+    MusicVideo* r = Nan::ObjectWrap::Unwrap<MusicVideo>(instance);
+    r->setNwcpValue(result, true);
 
-  NanReturnValue(instance);
+    info.GetReturnValue().Set(instance);
+  }
 }
 
-NAN_METHOD(MusicVideo::findBySongId) {
-  NanScope();
-
-  int a0(args[0]->Uint32Value());
+void MusicVideo::findBySongId(const Nan::FunctionCallbackInfo<v8::Value>& info) {
+  int a0(info[0]->IntegerValue());
   dogatech::soulsifter::MusicVideo* result =
       dogatech::soulsifter::MusicVideo::findBySongId(a0);
 
-  if (result == NULL) NanReturnUndefined();
-  v8::Local<v8::Object> instance = MusicVideo::NewInstance();
-  MusicVideo* r = ObjectWrap::Unwrap<MusicVideo>(instance);
-  r->setNwcpValue(result, true);
+  if (result == NULL) {
+    info.GetReturnValue().SetNull();
+  } else {
+    v8::Local<v8::Object> instance = MusicVideo::NewInstance();
+    MusicVideo* r = Nan::ObjectWrap::Unwrap<MusicVideo>(instance);
+    r->setNwcpValue(result, true);
 
-  NanReturnValue(instance);
+    info.GetReturnValue().Set(instance);
+  }
 }
 
-NAN_METHOD(MusicVideo::findAll) {
-  NanScope();
-
+void MusicVideo::findAll(const Nan::FunctionCallbackInfo<v8::Value>& info) {
   dogatech::ResultSetIterator<dogatech::soulsifter::MusicVideo>* result =
       dogatech::soulsifter::MusicVideo::findAll();
 
   vector<dogatech::soulsifter::MusicVideo*>* v = result->toVector();
-  v8::Handle<v8::Array> a = NanNew<v8::Array>((int) v->size());
+  v8::Local<v8::Array> a = Nan::New<v8::Array>((int) v->size());
   for (int i = 0; i < (int) v->size(); i++) {
-    v8::Local<v8::Function> cons = NanNew<v8::Function>(constructor);
+    v8::Local<v8::Function> cons = Nan::New<v8::Function>(constructor);
     v8::Local<v8::Object> instance = cons->NewInstance();
-    MusicVideo* o = ObjectWrap::Unwrap<MusicVideo>(instance);
+    MusicVideo* o = Nan::ObjectWrap::Unwrap<MusicVideo>(instance);
     o->musicvideo = (*v)[i];
-    a->Set(NanNew<v8::Number>(i), instance);
+    a->Set(Nan::New<v8::Number>(i), instance);
   }
   delete v;
-  NanReturnValue(a);
+  info.GetReturnValue().Set(a);
 }
 
-NAN_METHOD(MusicVideo::update) {
-  NanScope();
-
-  MusicVideo* obj = ObjectWrap::Unwrap<MusicVideo>(args.This());
+void MusicVideo::update(const Nan::FunctionCallbackInfo<v8::Value>& info) {
+  MusicVideo* obj = Nan::ObjectWrap::Unwrap<MusicVideo>(info.Holder());
   int result =  obj->musicvideo->update();
 
-  NanReturnValue(NanNew<v8::Number>(result));
+  info.GetReturnValue().Set(Nan::New<v8::Number>(result));
 }
 
-NAN_METHOD(MusicVideo::save) {
-  NanScope();
-
-  MusicVideo* obj = ObjectWrap::Unwrap<MusicVideo>(args.This());
+void MusicVideo::save(const Nan::FunctionCallbackInfo<v8::Value>& info) {
+  MusicVideo* obj = Nan::ObjectWrap::Unwrap<MusicVideo>(info.Holder());
   int result =  obj->musicvideo->save();
 
-  NanReturnValue(NanNew<v8::Number>(result));
+  info.GetReturnValue().Set(Nan::New<v8::Number>(result));
 }
 
-NAN_METHOD(MusicVideo::sync) {
-  NanScope();
-
-  MusicVideo* obj = ObjectWrap::Unwrap<MusicVideo>(args.This());
+void MusicVideo::sync(const Nan::FunctionCallbackInfo<v8::Value>& info) {
+  MusicVideo* obj = Nan::ObjectWrap::Unwrap<MusicVideo>(info.Holder());
   bool result =  obj->musicvideo->sync();
 
-  NanReturnValue(NanNew<v8::Boolean>(result));
+  info.GetReturnValue().Set(Nan::New<v8::Boolean>(result));
 }
 
 NAN_GETTER(MusicVideo::getId) {
-  NanScope();
-
-  MusicVideo* obj = ObjectWrap::Unwrap<MusicVideo>(args.This());
+  MusicVideo* obj = Nan::ObjectWrap::Unwrap<MusicVideo>(info.Holder());
   const int result =  obj->musicvideo->getId();
 
-  NanReturnValue(NanNew<v8::Number>(result));
+  info.GetReturnValue().Set(Nan::New<v8::Number>(result));
 }
 
 NAN_SETTER(MusicVideo::setId) {
-  NanScope();
-
-  MusicVideo* obj = ObjectWrap::Unwrap<MusicVideo>(args.This());
-  int a0(value->Uint32Value());
+  MusicVideo* obj = Nan::ObjectWrap::Unwrap<MusicVideo>(info.Holder());
+  int a0(value->IntegerValue());
   obj->musicvideo->setId(a0);
 
-  NanReturnUndefined();
+  info.GetReturnValue().SetUndefined();
 }
 
 NAN_GETTER(MusicVideo::getSongId) {
-  NanScope();
-
-  MusicVideo* obj = ObjectWrap::Unwrap<MusicVideo>(args.This());
+  MusicVideo* obj = Nan::ObjectWrap::Unwrap<MusicVideo>(info.Holder());
   const int result =  obj->musicvideo->getSongId();
 
-  NanReturnValue(NanNew<v8::Number>(result));
+  info.GetReturnValue().Set(Nan::New<v8::Number>(result));
 }
 
 NAN_SETTER(MusicVideo::setSongId) {
-  NanScope();
-
-  MusicVideo* obj = ObjectWrap::Unwrap<MusicVideo>(args.This());
-  int a0(value->Uint32Value());
+  MusicVideo* obj = Nan::ObjectWrap::Unwrap<MusicVideo>(info.Holder());
+  int a0(value->IntegerValue());
   obj->musicvideo->setSongId(a0);
 
-  NanReturnUndefined();
+  info.GetReturnValue().SetUndefined();
 }
 
 NAN_GETTER(MusicVideo::getSong) {
-  NanScope();
-
-  MusicVideo* obj = ObjectWrap::Unwrap<MusicVideo>(args.This());
+  MusicVideo* obj = Nan::ObjectWrap::Unwrap<MusicVideo>(info.Holder());
   dogatech::soulsifter::Song* result =  obj->musicvideo->getSong();
 
-  if (result == NULL) NanReturnUndefined();
-  v8::Local<v8::Object> instance = Song::NewInstance();
-  Song* r = ObjectWrap::Unwrap<Song>(instance);
-  r->setNwcpValue(result, false);
+  if (result == NULL) {
+    info.GetReturnValue().SetNull();
+  } else {
+    v8::Local<v8::Object> instance = Song::NewInstance();
+    Song* r = Nan::ObjectWrap::Unwrap<Song>(instance);
+    r->setNwcpValue(result, false);
 
-  NanReturnValue(instance);
+    info.GetReturnValue().Set(instance);
+  }
 }
 
 NAN_GETTER(MusicVideo::getSongOnce) {
-  NanScope();
-
-  MusicVideo* obj = ObjectWrap::Unwrap<MusicVideo>(args.This());
+  MusicVideo* obj = Nan::ObjectWrap::Unwrap<MusicVideo>(info.Holder());
   dogatech::soulsifter::Song* result =  obj->musicvideo->getSongOnce();
 
-  if (result == NULL) NanReturnUndefined();
-  v8::Local<v8::Object> instance = Song::NewInstance();
-  Song* r = ObjectWrap::Unwrap<Song>(instance);
-  r->setNwcpValue(result, false);
+  if (result == NULL) {
+    info.GetReturnValue().SetNull();
+  } else {
+    v8::Local<v8::Object> instance = Song::NewInstance();
+    Song* r = Nan::ObjectWrap::Unwrap<Song>(instance);
+    r->setNwcpValue(result, false);
 
-  NanReturnValue(instance);
+    info.GetReturnValue().Set(instance);
+  }
 }
 
 NAN_SETTER(MusicVideo::setSong) {
-  NanScope();
-
-  MusicVideo* obj = ObjectWrap::Unwrap<MusicVideo>(args.This());
-  dogatech::soulsifter::Song* a0tmp(node::ObjectWrap::Unwrap<Song>(value->ToObject())->getNwcpValue());
+  MusicVideo* obj = Nan::ObjectWrap::Unwrap<MusicVideo>(info.Holder());
+  dogatech::soulsifter::Song* a0tmp(Nan::ObjectWrap::Unwrap<Song>(value->ToObject())->getNwcpValue());
   dogatech::soulsifter::Song& a0 = *a0tmp;
   obj->musicvideo->setSong(a0);
 
-  NanReturnUndefined();
+  info.GetReturnValue().SetUndefined();
 }
 
 NAN_GETTER(MusicVideo::getFilePath) {
-  NanScope();
-
-  MusicVideo* obj = ObjectWrap::Unwrap<MusicVideo>(args.This());
+  MusicVideo* obj = Nan::ObjectWrap::Unwrap<MusicVideo>(info.Holder());
   const string result =  obj->musicvideo->getFilePath();
 
-  NanReturnValue(NanNew<v8::String>(result.c_str(), result.length()));
+  info.GetReturnValue().Set(Nan::New<v8::String>(result).ToLocalChecked());
 }
 
 NAN_SETTER(MusicVideo::setFilePath) {
-  NanScope();
-
-  MusicVideo* obj = ObjectWrap::Unwrap<MusicVideo>(args.This());
+  MusicVideo* obj = Nan::ObjectWrap::Unwrap<MusicVideo>(info.Holder());
   string a0(*v8::String::Utf8Value(value->ToString()));
   obj->musicvideo->setFilePath(a0);
 
-  NanReturnUndefined();
+  info.GetReturnValue().SetUndefined();
 }
 
 NAN_GETTER(MusicVideo::getThumbnailFilePath) {
-  NanScope();
-
-  MusicVideo* obj = ObjectWrap::Unwrap<MusicVideo>(args.This());
+  MusicVideo* obj = Nan::ObjectWrap::Unwrap<MusicVideo>(info.Holder());
   const string result =  obj->musicvideo->getThumbnailFilePath();
 
-  NanReturnValue(NanNew<v8::String>(result.c_str(), result.length()));
+  info.GetReturnValue().Set(Nan::New<v8::String>(result).ToLocalChecked());
 }
 
 NAN_SETTER(MusicVideo::setThumbnailFilePath) {
-  NanScope();
-
-  MusicVideo* obj = ObjectWrap::Unwrap<MusicVideo>(args.This());
+  MusicVideo* obj = Nan::ObjectWrap::Unwrap<MusicVideo>(info.Holder());
   string a0(*v8::String::Utf8Value(value->ToString()));
   obj->musicvideo->setThumbnailFilePath(a0);
 
-  NanReturnUndefined();
+  info.GetReturnValue().SetUndefined();
 }
 

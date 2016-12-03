@@ -5,9 +5,9 @@
 #include <nan.h>
 #include "MusicVideoService.h"
 
-class MusicVideoService : public node::ObjectWrap {
+class MusicVideoService : public Nan::ObjectWrap {
  public:
-  static void Init(v8::Handle<v8::Object> exports);
+  static void Init(v8::Local<v8::Object> exports);
   static v8::Local<v8::Object> NewInstance();
 
   void setNwcpValue(dogatech::soulsifter::MusicVideoService* v, bool own);
@@ -18,11 +18,11 @@ class MusicVideoService : public node::ObjectWrap {
   explicit MusicVideoService(dogatech::soulsifter::MusicVideoService* musicvideoservice);
   ~MusicVideoService();
 
-  static NAN_METHOD(New);
+  static void New(const Nan::FunctionCallbackInfo<v8::Value>& info);
 
-  static NAN_METHOD(associateYouTubeVideo);
+  static void associateYouTubeVideo(const Nan::FunctionCallbackInfo<v8::Value>& info);
 
-  static v8::Persistent<v8::Function> constructor;
+  static Nan::Persistent<v8::Function> constructor;
   dogatech::soulsifter::MusicVideoService* musicvideoservice;
   bool ownWrappedObject;
 };

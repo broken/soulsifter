@@ -1,13 +1,14 @@
 module.exports = function(grunt) {
 
   grunt.initConfig({
-    nodewebkit: {
+    nwjs: {
       options: {
-        version: '0.12.0', // Version of node-webkit
+        version: '0.19.0-rc1', // Version of node-webkit
         buildDir: './build', // Where the build version of my node-webkit app is saved
         credits: './src/credits.html', // Mac credits
         macIcns: './DVDRipper.icns', // Path to the Mac icon file
-        platforms: ['osx64'] // These are the platforms that we want to build
+        platforms: ['osx64'], // These are the platforms that we want to build
+        buildType: 'versioned' // Append version to name
       },
       src: [
           './src/**/*', // Your node-webkit app
@@ -27,7 +28,7 @@ module.exports = function(grunt) {
         },
       },
       nwgypconfigure: {
-        command: 'nw-gyp configure --arch=x64 --target=0.12.0',
+        command: 'nw-gyp configure --arch=x64 --target=0.19.0-rc1',
         options: {
           execOptions: {
             cwd: 'src/soulsifter',
@@ -35,7 +36,7 @@ module.exports = function(grunt) {
         },
       },
       nwgypbuild: {
-        command: 'nw-gyp build',
+        command: 'nw-gyp build --target=0.19.0-rc1',
         options: {
           execOptions: {
             cwd: 'src/soulsifter',
@@ -72,11 +73,11 @@ module.exports = function(grunt) {
       }
     },
     copy: {
-      ffmpegsumo: {
+      ffmpeg: {
         files: [
           {
-            src: 'libraries/ffmpegsumo.so',
-            dest: 'build/soulsifter/osx64/soulsifter.app/Contents/Frameworks/nwjs Framework.framework/Libraries/ffmpegsumo.so',
+            src: 'cache/libffmpeg.dylib',
+            dest: 'build/soulsifter/osx64/soulsifter.app/Contents/Versions/55.0.2883.65/nwjs Framework.framework/libffmpeg.dylib',
             flatten: true
           },
         ]
@@ -127,13 +128,13 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-bump');
   grunt.loadNpmTasks('grunt-contrib-copy');
   grunt.loadNpmTasks('grunt-contrib-less');
-  grunt.loadNpmTasks('grunt-node-webkit-builder');
+  grunt.loadNpmTasks('grunt-nw-builder');
   grunt.loadNpmTasks('grunt-shell');
   grunt.loadNpmTasks('grunt-spawn');
   grunt.loadNpmTasks('grunt-text-replace');
 
   grunt.registerTask('css-hack', ['less:development', 'replace:less']);
-  grunt.registerTask('default', ['nodewebkit', 'css-hack', 'copy:ffmpegsumo', 'buildnumber']);
+  grunt.registerTask('default', ['nwjs', 'css-hack', 'copy:ffmpeg', 'buildnumber']);
   grunt.registerTask('nw-gyp', ['shell:nwgypclean', 'shell:nwgypconfigure', 'replace:rtti', 'shell:nwgypbuild']);
   grunt.registerTask('up', ['shell:updateviews', 'shell:updatecomponents', 'css-hack', 'buildnumber']);
   grunt.registerTask('all', ['nw-gyp', 'default']);

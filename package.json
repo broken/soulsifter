@@ -1,7 +1,7 @@
 {
   "name": "soulsifter",
   "description": "Music organization tool",
-  "version": "0.6.1",
+  "version": "0.7.0",
   "repository": {
     "type": "git",
     "url": "https://github.com/broken/soulsifter.git"
@@ -12,11 +12,11 @@
     "grunt-bump": "^0.3.1",
     "grunt-contrib-copy": "^0.8.0",
     "grunt-contrib-less": "^1.0.1",
-    "grunt-node-webkit-builder": "^1.0.2",
+    "grunt-nw-builder": "^3.1.0",
     "grunt-shell": "^1.1.2",
     "grunt-spawn": "^1.1.72",
     "grunt-text-replace": "^0.4.0",
-    "nan": "^1.7.0"
+    "nan": "^2.4.0"
   },
   "dependencies": {
     "async": "^0.9.0",

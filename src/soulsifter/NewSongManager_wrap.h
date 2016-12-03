@@ -5,9 +5,9 @@
 #include <nan.h>
 #include "NewSongManager.h"
 
-class NewSongManager : public node::ObjectWrap {
+class NewSongManager : public Nan::ObjectWrap {
  public:
-  static void Init(v8::Handle<v8::Object> exports);
+  static void Init(v8::Local<v8::Object> exports);
   static v8::Local<v8::Object> NewInstance();
 
   void setNwcpValue(dogatech::soulsifter::NewSongManager* v, bool own);
@@ -18,15 +18,15 @@ class NewSongManager : public node::ObjectWrap {
   explicit NewSongManager(dogatech::soulsifter::NewSongManager* newsongmanager);
   ~NewSongManager();
 
-  static NAN_METHOD(New);
+  static void New(const Nan::FunctionCallbackInfo<v8::Value>& info);
 
-  static NAN_METHOD(import);
-  static NAN_METHOD(nextSong);
-  static NAN_METHOD(coverImagePath);
-  static NAN_METHOD(processSong);
-  static NAN_METHOD(trashMusicFile);
+  static void import(const Nan::FunctionCallbackInfo<v8::Value>& info);
+  static void nextSong(const Nan::FunctionCallbackInfo<v8::Value>& info);
+  static void coverImagePath(const Nan::FunctionCallbackInfo<v8::Value>& info);
+  static void processSong(const Nan::FunctionCallbackInfo<v8::Value>& info);
+  static void trashMusicFile(const Nan::FunctionCallbackInfo<v8::Value>& info);
 
-  static v8::Persistent<v8::Function> constructor;
+  static Nan::Persistent<v8::Function> constructor;
   dogatech::soulsifter::NewSongManager* newsongmanager;
   bool ownWrappedObject;
 };

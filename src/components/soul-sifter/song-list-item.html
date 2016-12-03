@@ -169,7 +169,7 @@
     },
 
     _songChanged: function() {
-      this.$.cover.style.backgroundImage = 'url("' + this.song.album.coverFilepath + '")';
+      this.$.cover.style.backgroundImage = 'url("file://' + this.song.album.coverFilepath + '")';
     },
 
     _computeLocaleDateString: function(song) {

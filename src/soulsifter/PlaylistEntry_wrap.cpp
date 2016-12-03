@@ -10,10 +10,10 @@
 #include "Song.h"
 #include "Song_wrap.h"
 
-v8::Persistent<v8::Function> PlaylistEntry::constructor;
+Nan::Persistent<v8::Function> PlaylistEntry::constructor;
 
-PlaylistEntry::PlaylistEntry() : ObjectWrap(), playlistentry(NULL), ownWrappedObject(true) {};
-PlaylistEntry::PlaylistEntry(dogatech::soulsifter::PlaylistEntry* o) : ObjectWrap(), playlistentry(o), ownWrappedObject(true) {};
+PlaylistEntry::PlaylistEntry() : Nan::ObjectWrap(), playlistentry(NULL), ownWrappedObject(true) {};
+PlaylistEntry::PlaylistEntry(dogatech::soulsifter::PlaylistEntry* o) : Nan::ObjectWrap(), playlistentry(o), ownWrappedObject(true) {};
 PlaylistEntry::~PlaylistEntry() { if (ownWrappedObject) delete playlistentry; };
 
 void PlaylistEntry::setNwcpValue(dogatech::soulsifter::PlaylistEntry* v, bool own) {
@@ -23,12 +23,10 @@ void PlaylistEntry::setNwcpValue(dogatech::soulsifter::PlaylistEntry* v, bool ow
   ownWrappedObject = own;
 }
 
-NAN_METHOD(PlaylistEntry::New) {
-  NanScope();
-
+void PlaylistEntry::New(const Nan::FunctionCallbackInfo<v8::Value>& info) {
   dogatech::soulsifter::PlaylistEntry* wrappedObj = NULL;
-  if (args.Length()) {
-    dogatech::soulsifter::PlaylistEntry* xtmp(node::ObjectWrap::Unwrap<PlaylistEntry>(args[0]->ToObject())->getNwcpValue());
+  if (info.Length()) {
+    dogatech::soulsifter::PlaylistEntry* xtmp(Nan::ObjectWrap::Unwrap<PlaylistEntry>(info[0]->ToObject())->getNwcpValue());
     dogatech::soulsifter::PlaylistEntry& x = *xtmp;
     wrappedObj = new dogatech::soulsifter::PlaylistEntry(x);
   } else {
@@ -36,313 +34,280 @@ NAN_METHOD(PlaylistEntry::New) {
   }
 
   PlaylistEntry* obj = new PlaylistEntry(wrappedObj);
-  obj->Wrap(args.This());
+  obj->Wrap(info.This());
 
-  NanReturnValue(args.This());
+  info.GetReturnValue().Set(info.This());
 }
 
 v8::Local<v8::Object> PlaylistEntry::NewInstance() {
-  v8::Local<v8::Function> cons = NanNew<v8::Function>(constructor);
-  v8::Local<v8::Object> instance = cons->NewInstance();
-
-  return instance;
+  v8::Local<v8::Function> cons = Nan::New<v8::Function>(constructor);
+  return Nan::NewInstance(cons).ToLocalChecked();
 }
 
-void PlaylistEntry::Init(v8::Handle<v8::Object> exports) {
-  NanScope();
-
+void PlaylistEntry::Init(v8::Local<v8::Object> exports) {
   // Prepare constructor template
-  v8::Local<v8::FunctionTemplate> tpl = NanNew<v8::FunctionTemplate>(New);
-  tpl->SetClassName(NanNew<v8::String>("PlaylistEntry"));
+  v8::Local<v8::FunctionTemplate> tpl = Nan::New<v8::FunctionTemplate>(New);
+  tpl->SetClassName(Nan::New("PlaylistEntry").ToLocalChecked());
   tpl->InstanceTemplate()->SetInternalFieldCount(1);
 
-  NanSetPrototypeTemplate(tpl, "clear", NanNew<v8::FunctionTemplate>(clear)->GetFunction());
-  NanSetTemplate(tpl, "findById", NanNew<v8::FunctionTemplate>(findById)->GetFunction());
-  NanSetTemplate(tpl, "findByPlaylistIdAndSongId", NanNew<v8::FunctionTemplate>(findByPlaylistIdAndSongId)->GetFunction());
-  NanSetTemplate(tpl, "findAll", NanNew<v8::FunctionTemplate>(findAll)->GetFunction());
-  NanSetPrototypeTemplate(tpl, "update", NanNew<v8::FunctionTemplate>(update)->GetFunction());
-  NanSetPrototypeTemplate(tpl, "save", NanNew<v8::FunctionTemplate>(save)->GetFunction());
-  NanSetPrototypeTemplate(tpl, "sync", NanNew<v8::FunctionTemplate>(sync)->GetFunction());
-  NanSetPrototypeTemplate(tpl, "erase", NanNew<v8::FunctionTemplate>(erase)->GetFunction());
-  tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("id"), getId, setId);
-  tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("playlistId"), getPlaylistId, setPlaylistId);
-  tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("playlist"), getPlaylist, setPlaylist);
-  tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("playlistOnce"), getPlaylistOnce);
-  tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("songId"), getSongId, setSongId);
-  tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("song"), getSong, setSong);
-  tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("songOnce"), getSongOnce);
-  tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("position"), getPosition, setPosition);
-  tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("time"), getTime, setTime);
+  // Prototype
+  Nan::SetPrototypeMethod(tpl, "clear", clear);
+  Nan::SetMethod(tpl, "findById", findById);
+  Nan::SetMethod(tpl, "findByPlaylistIdAndSongId", findByPlaylistIdAndSongId);
+  Nan::SetMethod(tpl, "findAll", findAll);
+  Nan::SetPrototypeMethod(tpl, "update", update);
+  Nan::SetPrototypeMethod(tpl, "save", save);
+  Nan::SetPrototypeMethod(tpl, "sync", sync);
+  Nan::SetPrototypeMethod(tpl, "erase", erase);
+  Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("id").ToLocalChecked(), getId, setId);
+  Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("playlistId").ToLocalChecked(), getPlaylistId, setPlaylistId);
+  Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("playlist").ToLocalChecked(), getPlaylist, setPlaylist);
+  Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("playlistOnce").ToLocalChecked(), getPlaylistOnce);
+  Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("songId").ToLocalChecked(), getSongId, setSongId);
+  Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("song").ToLocalChecked(), getSong, setSong);
+  Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("songOnce").ToLocalChecked(), getSongOnce);
+  Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("position").ToLocalChecked(), getPosition, setPosition);
+  Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("time").ToLocalChecked(), getTime, setTime);
 
-  NanAssignPersistent<v8::Function>(constructor, tpl->GetFunction());
-  exports->Set(NanNew<v8::String>("PlaylistEntry"), tpl->GetFunction());
+  constructor.Reset(tpl->GetFunction());
+  exports->Set(Nan::New<v8::String>("PlaylistEntry").ToLocalChecked(), tpl->GetFunction());
 }
 
-NAN_METHOD(PlaylistEntry::clear) {
-  NanScope();
-
-  PlaylistEntry* obj = ObjectWrap::Unwrap<PlaylistEntry>(args.This());
+void PlaylistEntry::clear(const Nan::FunctionCallbackInfo<v8::Value>& info) {
+  PlaylistEntry* obj = Nan::ObjectWrap::Unwrap<PlaylistEntry>(info.Holder());
   obj->playlistentry->clear();
 
-  NanReturnUndefined();
+  info.GetReturnValue().SetUndefined();
 }
 
-NAN_METHOD(PlaylistEntry::findById) {
-  NanScope();
-
-  int a0(args[0]->Uint32Value());
+void PlaylistEntry::findById(const Nan::FunctionCallbackInfo<v8::Value>& info) {
+  int a0(info[0]->IntegerValue());
   dogatech::soulsifter::PlaylistEntry* result =
       dogatech::soulsifter::PlaylistEntry::findById(a0);
 
-  if (result == NULL) NanReturnUndefined();
-  v8::Local<v8::Object> instance = PlaylistEntry::NewInstance();
-  PlaylistEntry* r = ObjectWrap::Unwrap<PlaylistEntry>(instance);
-  r->setNwcpValue(result, true);
+  if (result == NULL) {
+    info.GetReturnValue().SetNull();
+  } else {
+    v8::Local<v8::Object> instance = PlaylistEntry::NewInstance();
+    PlaylistEntry* r = Nan::ObjectWrap::Unwrap<PlaylistEntry>(instance);
+    r->setNwcpValue(result, true);
 
-  NanReturnValue(instance);
+    info.GetReturnValue().Set(instance);
+  }
 }
 
-NAN_METHOD(PlaylistEntry::findByPlaylistIdAndSongId) {
-  NanScope();
-
-  int a0(args[0]->Uint32Value());
-  int a1(args[1]->Uint32Value());
+void PlaylistEntry::findByPlaylistIdAndSongId(const Nan::FunctionCallbackInfo<v8::Value>& info) {
+  int a0(info[0]->IntegerValue());
+  int a1(info[1]->IntegerValue());
   dogatech::soulsifter::PlaylistEntry* result =
       dogatech::soulsifter::PlaylistEntry::findByPlaylistIdAndSongId(a0, a1);
 
-  if (result == NULL) NanReturnUndefined();
-  v8::Local<v8::Object> instance = PlaylistEntry::NewInstance();
-  PlaylistEntry* r = ObjectWrap::Unwrap<PlaylistEntry>(instance);
-  r->setNwcpValue(result, true);
+  if (result == NULL) {
+    info.GetReturnValue().SetNull();
+  } else {
+    v8::Local<v8::Object> instance = PlaylistEntry::NewInstance();
+    PlaylistEntry* r = Nan::ObjectWrap::Unwrap<PlaylistEntry>(instance);
+    r->setNwcpValue(result, true);
 
-  NanReturnValue(instance);
+    info.GetReturnValue().Set(instance);
+  }
 }
 
-NAN_METHOD(PlaylistEntry::findAll) {
-  NanScope();
-
+void PlaylistEntry::findAll(const Nan::FunctionCallbackInfo<v8::Value>& info) {
   dogatech::ResultSetIterator<dogatech::soulsifter::PlaylistEntry>* result =
       dogatech::soulsifter::PlaylistEntry::findAll();
 
   vector<dogatech::soulsifter::PlaylistEntry*>* v = result->toVector();
-  v8::Handle<v8::Array> a = NanNew<v8::Array>((int) v->size());
+  v8::Local<v8::Array> a = Nan::New<v8::Array>((int) v->size());
   for (int i = 0; i < (int) v->size(); i++) {
-    v8::Local<v8::Function> cons = NanNew<v8::Function>(constructor);
+    v8::Local<v8::Function> cons = Nan::New<v8::Function>(constructor);
     v8::Local<v8::Object> instance = cons->NewInstance();
-    PlaylistEntry* o = ObjectWrap::Unwrap<PlaylistEntry>(instance);
+    PlaylistEntry* o = Nan::ObjectWrap::Unwrap<PlaylistEntry>(instance);
     o->playlistentry = (*v)[i];
-    a->Set(NanNew<v8::Number>(i), instance);
+    a->Set(Nan::New<v8::Number>(i), instance);
   }
   delete v;
-  NanReturnValue(a);
+  info.GetReturnValue().Set(a);
 }
 
-NAN_METHOD(PlaylistEntry::update) {
-  NanScope();
-
-  PlaylistEntry* obj = ObjectWrap::Unwrap<PlaylistEntry>(args.This());
+void PlaylistEntry::update(const Nan::FunctionCallbackInfo<v8::Value>& info) {
+  PlaylistEntry* obj = Nan::ObjectWrap::Unwrap<PlaylistEntry>(info.Holder());
   int result =  obj->playlistentry->update();
 
-  NanReturnValue(NanNew<v8::Number>(result));
+  info.GetReturnValue().Set(Nan::New<v8::Number>(result));
 }
 
-NAN_METHOD(PlaylistEntry::save) {
-  NanScope();
-
-  PlaylistEntry* obj = ObjectWrap::Unwrap<PlaylistEntry>(args.This());
+void PlaylistEntry::save(const Nan::FunctionCallbackInfo<v8::Value>& info) {
+  PlaylistEntry* obj = Nan::ObjectWrap::Unwrap<PlaylistEntry>(info.Holder());
   int result =  obj->playlistentry->save();
 
-  NanReturnValue(NanNew<v8::Number>(result));
+  info.GetReturnValue().Set(Nan::New<v8::Number>(result));
 }
 
-NAN_METHOD(PlaylistEntry::sync) {
-  NanScope();
-
-  PlaylistEntry* obj = ObjectWrap::Unwrap<PlaylistEntry>(args.This());
+void PlaylistEntry::sync(const Nan::FunctionCallbackInfo<v8::Value>& info) {
+  PlaylistEntry* obj = Nan::ObjectWrap::Unwrap<PlaylistEntry>(info.Holder());
   bool result =  obj->playlistentry->sync();
 
-  NanReturnValue(NanNew<v8::Boolean>(result));
+  info.GetReturnValue().Set(Nan::New<v8::Boolean>(result));
 }
 
-NAN_METHOD(PlaylistEntry::erase) {
-  NanScope();
-
-  PlaylistEntry* obj = ObjectWrap::Unwrap<PlaylistEntry>(args.This());
+void PlaylistEntry::erase(const Nan::FunctionCallbackInfo<v8::Value>& info) {
+  PlaylistEntry* obj = Nan::ObjectWrap::Unwrap<PlaylistEntry>(info.Holder());
   int result =  obj->playlistentry->erase();
 
-  NanReturnValue(NanNew<v8::Number>(result));
+  info.GetReturnValue().Set(Nan::New<v8::Number>(result));
 }
 
 NAN_GETTER(PlaylistEntry::getId) {
-  NanScope();
-
-  PlaylistEntry* obj = ObjectWrap::Unwrap<PlaylistEntry>(args.This());
+  PlaylistEntry* obj = Nan::ObjectWrap::Unwrap<PlaylistEntry>(info.Holder());
   const int result =  obj->playlistentry->getId();
 
-  NanReturnValue(NanNew<v8::Number>(result));
+  info.GetReturnValue().Set(Nan::New<v8::Number>(result));
 }
 
 NAN_SETTER(PlaylistEntry::setId) {
-  NanScope();
-
-  PlaylistEntry* obj = ObjectWrap::Unwrap<PlaylistEntry>(args.This());
-  int a0(value->Uint32Value());
+  PlaylistEntry* obj = Nan::ObjectWrap::Unwrap<PlaylistEntry>(info.Holder());
+  int a0(value->IntegerValue());
   obj->playlistentry->setId(a0);
 
-  NanReturnUndefined();
+  info.GetReturnValue().SetUndefined();
 }
 
 NAN_GETTER(PlaylistEntry::getPlaylistId) {
-  NanScope();
-
-  PlaylistEntry* obj = ObjectWrap::Unwrap<PlaylistEntry>(args.This());
+  PlaylistEntry* obj = Nan::ObjectWrap::Unwrap<PlaylistEntry>(info.Holder());
   const int result =  obj->playlistentry->getPlaylistId();
 
-  NanReturnValue(NanNew<v8::Number>(result));
+  info.GetReturnValue().Set(Nan::New<v8::Number>(result));
 }
 
 NAN_SETTER(PlaylistEntry::setPlaylistId) {
-  NanScope();
-
-  PlaylistEntry* obj = ObjectWrap::Unwrap<PlaylistEntry>(args.This());
-  int a0(value->Uint32Value());
+  PlaylistEntry* obj = Nan::ObjectWrap::Unwrap<PlaylistEntry>(info.Holder());
+  int a0(value->IntegerValue());
   obj->playlistentry->setPlaylistId(a0);
 
-  NanReturnUndefined();
+  info.GetReturnValue().SetUndefined();
 }
 
 NAN_GETTER(PlaylistEntry::getPlaylist) {
-  NanScope();
-
-  PlaylistEntry* obj = ObjectWrap::Unwrap<PlaylistEntry>(args.This());
+  PlaylistEntry* obj = Nan::ObjectWrap::Unwrap<PlaylistEntry>(info.Holder());
   dogatech::soulsifter::Playlist* result =  obj->playlistentry->getPlaylist();
 
-  if (result == NULL) NanReturnUndefined();
-  v8::Local<v8::Object> instance = Playlist::NewInstance();
-  Playlist* r = ObjectWrap::Unwrap<Playlist>(instance);
-  r->setNwcpValue(result, false);
+  if (result == NULL) {
+    info.GetReturnValue().SetNull();
+  } else {
+    v8::Local<v8::Object> instance = Playlist::NewInstance();
+    Playlist* r = Nan::ObjectWrap::Unwrap<Playlist>(instance);
+    r->setNwcpValue(result, false);
 
-  NanReturnValue(instance);
+    info.GetReturnValue().Set(instance);
+  }
 }
 
 NAN_GETTER(PlaylistEntry::getPlaylistOnce) {
-  NanScope();
-
-  PlaylistEntry* obj = ObjectWrap::Unwrap<PlaylistEntry>(args.This());
+  PlaylistEntry* obj = Nan::ObjectWrap::Unwrap<PlaylistEntry>(info.Holder());
   dogatech::soulsifter::Playlist* result =  obj->playlistentry->getPlaylistOnce();
 
-  if (result == NULL) NanReturnUndefined();
-  v8::Local<v8::Object> instance = Playlist::NewInstance();
-  Playlist* r = ObjectWrap::Unwrap<Playlist>(instance);
-  r->setNwcpValue(result, false);
+  if (result == NULL) {
+    info.GetReturnValue().SetNull();
+  } else {
+    v8::Local<v8::Object> instance = Playlist::NewInstance();
+    Playlist* r = Nan::ObjectWrap::Unwrap<Playlist>(instance);
+    r->setNwcpValue(result, false);
 
-  NanReturnValue(instance);
+    info.GetReturnValue().Set(instance);
+  }
 }
 
 NAN_SETTER(PlaylistEntry::setPlaylist) {
-  NanScope();
-
-  PlaylistEntry* obj = ObjectWrap::Unwrap<PlaylistEntry>(args.This());
-  dogatech::soulsifter::Playlist* a0tmp(node::ObjectWrap::Unwrap<Playlist>(value->ToObject())->getNwcpValue());
+  PlaylistEntry* obj = Nan::ObjectWrap::Unwrap<PlaylistEntry>(info.Holder());
+  dogatech::soulsifter::Playlist* a0tmp(Nan::ObjectWrap::Unwrap<Playlist>(value->ToObject())->getNwcpValue());
   dogatech::soulsifter::Playlist& a0 = *a0tmp;
   obj->playlistentry->setPlaylist(a0);
 
-  NanReturnUndefined();
+  info.GetReturnValue().SetUndefined();
 }
 
 NAN_GETTER(PlaylistEntry::getSongId) {
-  NanScope();
-
-  PlaylistEntry* obj = ObjectWrap::Unwrap<PlaylistEntry>(args.This());
+  PlaylistEntry* obj = Nan::ObjectWrap::Unwrap<PlaylistEntry>(info.Holder());
   const int result =  obj->playlistentry->getSongId();
 
-  NanReturnValue(NanNew<v8::Number>(result));
+  info.GetReturnValue().Set(Nan::New<v8::Number>(result));
 }
 
 NAN_SETTER(PlaylistEntry::setSongId) {
-  NanScope();
-
-  PlaylistEntry* obj = ObjectWrap::Unwrap<PlaylistEntry>(args.This());
-  int a0(value->Uint32Value());
+  PlaylistEntry* obj = Nan::ObjectWrap::Unwrap<PlaylistEntry>(info.Holder());
+  int a0(value->IntegerValue());
   obj->playlistentry->setSongId(a0);
 
-  NanReturnUndefined();
+  info.GetReturnValue().SetUndefined();
 }
 
 NAN_GETTER(PlaylistEntry::getSong) {
-  NanScope();
-
-  PlaylistEntry* obj = ObjectWrap::Unwrap<PlaylistEntry>(args.This());
+  PlaylistEntry* obj = Nan::ObjectWrap::Unwrap<PlaylistEntry>(info.Holder());
   dogatech::soulsifter::Song* result =  obj->playlistentry->getSong();
 
-  if (result == NULL) NanReturnUndefined();
-  v8::Local<v8::Object> instance = Song::NewInstance();
-  Song* r = ObjectWrap::Unwrap<Song>(instance);
-  r->setNwcpValue(result, false);
+  if (result == NULL) {
+    info.GetReturnValue().SetNull();
+  } else {
+    v8::Local<v8::Object> instance = Song::NewInstance();
+    Song* r = Nan::ObjectWrap::Unwrap<Song>(instance);
+    r->setNwcpValue(result, false);
 
-  NanReturnValue(instance);
+    info.GetReturnValue().Set(instance);
+  }
 }
 
 NAN_GETTER(PlaylistEntry::getSongOnce) {
-  NanScope();
-
-  PlaylistEntry* obj = ObjectWrap::Unwrap<PlaylistEntry>(args.This());
+  PlaylistEntry* obj = Nan::ObjectWrap::Unwrap<PlaylistEntry>(info.Holder());
   dogatech::soulsifter::Song* result =  obj->playlistentry->getSongOnce();
 
-  if (result == NULL) NanReturnUndefined();
-  v8::Local<v8::Object> instance = Song::NewInstance();
-  Song* r = ObjectWrap::Unwrap<Song>(instance);
-  r->setNwcpValue(result, false);
+  if (result == NULL) {
+    info.GetReturnValue().SetNull();
+  } else {
+    v8::Local<v8::Object> instance = Song::NewInstance();
+    Song* r = Nan::ObjectWrap::Unwrap<Song>(instance);
+    r->setNwcpValue(result, false);
 
-  NanReturnValue(instance);
+    info.GetReturnValue().Set(instance);
+  }
 }
 
 NAN_SETTER(PlaylistEntry::setSong) {
-  NanScope();
-
-  PlaylistEntry* obj = ObjectWrap::Unwrap<PlaylistEntry>(args.This());
-  dogatech::soulsifter::Song* a0tmp(node::ObjectWrap::Unwrap<Song>(value->ToObject())->getNwcpValue());
+  PlaylistEntry* obj = Nan::ObjectWrap::Unwrap<PlaylistEntry>(info.Holder());
+  dogatech::soulsifter::Song* a0tmp(Nan::ObjectWrap::Unwrap<Song>(value->ToObject())->getNwcpValue());
   dogatech::soulsifter::Song& a0 = *a0tmp;
   obj->playlistentry->setSong(a0);
 
-  NanReturnUndefined();
+  info.GetReturnValue().SetUndefined();
 }
 
 NAN_GETTER(PlaylistEntry::getPosition) {
-  NanScope();
-
-  PlaylistEntry* obj = ObjectWrap::Unwrap<PlaylistEntry>(args.This());
+  PlaylistEntry* obj = Nan::ObjectWrap::Unwrap<PlaylistEntry>(info.Holder());
   const int result =  obj->playlistentry->getPosition();
 
-  NanReturnValue(NanNew<v8::Number>(result));
+  info.GetReturnValue().Set(Nan::New<v8::Number>(result));
 }
 
 NAN_SETTER(PlaylistEntry::setPosition) {
-  NanScope();
-
-  PlaylistEntry* obj = ObjectWrap::Unwrap<PlaylistEntry>(args.This());
-  int a0(value->Uint32Value());
+  PlaylistEntry* obj = Nan::ObjectWrap::Unwrap<PlaylistEntry>(info.Holder());
+  int a0(value->IntegerValue());
   obj->playlistentry->setPosition(a0);
 
-  NanReturnUndefined();
+  info.GetReturnValue().SetUndefined();
 }
 
 NAN_GETTER(PlaylistEntry::getTime) {
-  NanScope();
-
-  PlaylistEntry* obj = ObjectWrap::Unwrap<PlaylistEntry>(args.This());
+  PlaylistEntry* obj = Nan::ObjectWrap::Unwrap<PlaylistEntry>(info.Holder());
   const string result =  obj->playlistentry->getTime();
 
-  NanReturnValue(NanNew<v8::String>(result.c_str(), result.length()));
+  info.GetReturnValue().Set(Nan::New<v8::String>(result).ToLocalChecked());
 }
 
 NAN_SETTER(PlaylistEntry::setTime) {
-  NanScope();
-
-  PlaylistEntry* obj = ObjectWrap::Unwrap<PlaylistEntry>(args.This());
+  PlaylistEntry* obj = Nan::ObjectWrap::Unwrap<PlaylistEntry>(info.Holder());
   string a0(*v8::String::Utf8Value(value->ToString()));
   obj->playlistentry->setTime(a0);
 
-  NanReturnUndefined();
+  info.GetReturnValue().SetUndefined();
 }
 

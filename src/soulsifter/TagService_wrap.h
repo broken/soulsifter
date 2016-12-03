@@ -5,9 +5,9 @@
 #include <nan.h>
 #include "TagService.h"
 
-class TagService : public node::ObjectWrap {
+class TagService : public Nan::ObjectWrap {
  public:
-  static void Init(v8::Handle<v8::Object> exports);
+  static void Init(v8::Local<v8::Object> exports);
   static v8::Local<v8::Object> NewInstance();
 
   void setNwcpValue(dogatech::soulsifter::TagService* v, bool own);
@@ -18,12 +18,12 @@ class TagService : public node::ObjectWrap {
   explicit TagService(dogatech::soulsifter::TagService* tagservice);
   ~TagService();
 
-  static NAN_METHOD(New);
+  static void New(const Nan::FunctionCallbackInfo<v8::Value>& info);
 
-  static NAN_METHOD(readId3v2Tag);
-  static NAN_METHOD(updateSongAttributesFromTags);
+  static void readId3v2Tag(const Nan::FunctionCallbackInfo<v8::Value>& info);
+  static void updateSongAttributesFromTags(const Nan::FunctionCallbackInfo<v8::Value>& info);
 
-  static v8::Persistent<v8::Function> constructor;
+  static Nan::Persistent<v8::Function> constructor;
   dogatech::soulsifter::TagService* tagservice;
   bool ownWrappedObject;
 };

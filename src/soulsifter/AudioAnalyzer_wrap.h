@@ -5,9 +5,9 @@
 #include <nan.h>
 #include "AudioAnalyzer.h"
 
-class AudioAnalyzer : public node::ObjectWrap {
+class AudioAnalyzer : public Nan::ObjectWrap {
  public:
-  static void Init(v8::Handle<v8::Object> exports);
+  static void Init(v8::Local<v8::Object> exports);
   static v8::Local<v8::Object> NewInstance();
 
   void setNwcpValue(dogatech::soulsifter::AudioAnalyzer* v, bool own);
@@ -18,13 +18,13 @@ class AudioAnalyzer : public node::ObjectWrap {
   explicit AudioAnalyzer(dogatech::soulsifter::AudioAnalyzer* audioanalyzer);
   ~AudioAnalyzer();
 
-  static NAN_METHOD(New);
+  static void New(const Nan::FunctionCallbackInfo<v8::Value>& info);
 
   // Unable to process analyzeKey
   // Unable to process analyzeBpm
-  static NAN_METHOD(analyzeBpms);
+  static void analyzeBpms(const Nan::FunctionCallbackInfo<v8::Value>& info);
 
-  static v8::Persistent<v8::Function> constructor;
+  static Nan::Persistent<v8::Function> constructor;
   dogatech::soulsifter::AudioAnalyzer* audioanalyzer;
   bool ownWrappedObject;
 };

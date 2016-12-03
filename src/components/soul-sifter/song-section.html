@@ -254,7 +254,7 @@
     _setCoverImage: function(img) {
       var url = '';
       if (img) {
-        url = 'url("' + img + '")';
+        url = 'url("file://' + img + '")';
       }
       var root = this.$.shp.shadowRoot || this.$.shp;
       root.querySelector('#headerBg').style.backgroundImage = url;

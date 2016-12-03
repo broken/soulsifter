@@ -3,10 +3,10 @@
 #include <nan.h>
 #include "AudioAnalyzer_wrap.h"
 
-v8::Persistent<v8::Function> AudioAnalyzer::constructor;
+Nan::Persistent<v8::Function> AudioAnalyzer::constructor;
 
-AudioAnalyzer::AudioAnalyzer() : ObjectWrap(), audioanalyzer(NULL), ownWrappedObject(true) {};
-AudioAnalyzer::AudioAnalyzer(dogatech::soulsifter::AudioAnalyzer* o) : ObjectWrap(), audioanalyzer(o), ownWrappedObject(true) {};
+AudioAnalyzer::AudioAnalyzer() : Nan::ObjectWrap(), audioanalyzer(NULL), ownWrappedObject(true) {};
+AudioAnalyzer::AudioAnalyzer(dogatech::soulsifter::AudioAnalyzer* o) : Nan::ObjectWrap(), audioanalyzer(o), ownWrappedObject(true) {};
 AudioAnalyzer::~AudioAnalyzer() { if (ownWrappedObject) delete audioanalyzer; };
 
 void AudioAnalyzer::setNwcpValue(dogatech::soulsifter::AudioAnalyzer* v, bool own) {
@@ -16,44 +16,37 @@ void AudioAnalyzer::setNwcpValue(dogatech::soulsifter::AudioAnalyzer* v, bool ow
   ownWrappedObject = own;
 }
 
-NAN_METHOD(AudioAnalyzer::New) {
-  NanScope();
-
+void AudioAnalyzer::New(const Nan::FunctionCallbackInfo<v8::Value>& info) {
   AudioAnalyzer* obj = new AudioAnalyzer(new dogatech::soulsifter::AudioAnalyzer());
-  obj->Wrap(args.This());
+  obj->Wrap(info.This());
 
-  NanReturnValue(args.This());
+  info.GetReturnValue().Set(info.This());
 }
 
 v8::Local<v8::Object> AudioAnalyzer::NewInstance() {
-  v8::Local<v8::Function> cons = NanNew<v8::Function>(constructor);
-  v8::Local<v8::Object> instance = cons->NewInstance();
-
-  return instance;
+  v8::Local<v8::Function> cons = Nan::New<v8::Function>(constructor);
+  return Nan::NewInstance(cons).ToLocalChecked();
 }
 
-void AudioAnalyzer::Init(v8::Handle<v8::Object> exports) {
-  NanScope();
-
+void AudioAnalyzer::Init(v8::Local<v8::Object> exports) {
   // Prepare constructor template
-  v8::Local<v8::FunctionTemplate> tpl = NanNew<v8::FunctionTemplate>(New);
-  tpl->SetClassName(NanNew<v8::String>("AudioAnalyzer"));
+  v8::Local<v8::FunctionTemplate> tpl = Nan::New<v8::FunctionTemplate>(New);
+  tpl->SetClassName(Nan::New("AudioAnalyzer").ToLocalChecked());
   tpl->InstanceTemplate()->SetInternalFieldCount(1);
 
+  // Prototype
   // Unable to process analyzeKey
   // Unable to process analyzeBpm
-  NanSetTemplate(tpl, "analyzeBpms", NanNew<v8::FunctionTemplate>(analyzeBpms)->GetFunction());
+  Nan::SetMethod(tpl, "analyzeBpms", analyzeBpms);
 
-  NanAssignPersistent<v8::Function>(constructor, tpl->GetFunction());
-  exports->Set(NanNew<v8::String>("AudioAnalyzer"), tpl->GetFunction());
+  constructor.Reset(tpl->GetFunction());
+  exports->Set(Nan::New<v8::String>("AudioAnalyzer").ToLocalChecked(), tpl->GetFunction());
 }
 
-NAN_METHOD(AudioAnalyzer::analyzeBpms) {
-  NanScope();
-
+void AudioAnalyzer::analyzeBpms(const Nan::FunctionCallbackInfo<v8::Value>& info) {
 
       dogatech::soulsifter::AudioAnalyzer::analyzeBpms();
 
-  NanReturnUndefined();
+  info.GetReturnValue().SetUndefined();
 }
 

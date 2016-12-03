@@ -8,9 +8,9 @@
 #include <nan.h>
 #include "SoulSifterSettings.h"
 
-class SoulSifterSettings : public node::ObjectWrap {
+class SoulSifterSettings : public Nan::ObjectWrap {
  public:
-  static void Init(v8::Handle<v8::Object> exports);
+  static void Init(v8::Local<v8::Object> exports);
   static v8::Local<v8::Object> NewInstance();
 
   void setNwcpValue(dogatech::soulsifter::SoulSifterSettings* v, bool own);
@@ -21,15 +21,15 @@ class SoulSifterSettings : public node::ObjectWrap {
   explicit SoulSifterSettings(dogatech::soulsifter::SoulSifterSettings* soulsiftersettings);
   ~SoulSifterSettings();
 
-  static NAN_METHOD(New);
+  static void New(const Nan::FunctionCallbackInfo<v8::Value>& info);
 
-  static NAN_METHOD(save);
-  static NAN_METHOD(getString);
-  static NAN_METHOD(putString);
-  static NAN_METHOD(getInt);
-  static NAN_METHOD(putInt);
+  static void save(const Nan::FunctionCallbackInfo<v8::Value>& info);
+  static void getString(const Nan::FunctionCallbackInfo<v8::Value>& info);
+  static void putString(const Nan::FunctionCallbackInfo<v8::Value>& info);
+  static void getInt(const Nan::FunctionCallbackInfo<v8::Value>& info);
+  static void putInt(const Nan::FunctionCallbackInfo<v8::Value>& info);
 
-  static v8::Persistent<v8::Function> constructor;
+  static Nan::Persistent<v8::Function> constructor;
   dogatech::soulsifter::SoulSifterSettings* soulsiftersettings;
   bool ownWrappedObject;
 };

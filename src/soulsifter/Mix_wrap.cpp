@@ -8,10 +8,10 @@
 #include "Song.h"
 #include "Song_wrap.h"
 
-v8::Persistent<v8::Function> Mix::constructor;
+Nan::Persistent<v8::Function> Mix::constructor;
 
-Mix::Mix() : ObjectWrap(), mix(NULL), ownWrappedObject(true) {};
-Mix::Mix(dogatech::soulsifter::Mix* o) : ObjectWrap(), mix(o), ownWrappedObject(true) {};
+Mix::Mix() : Nan::ObjectWrap(), mix(NULL), ownWrappedObject(true) {};
+Mix::Mix(dogatech::soulsifter::Mix* o) : Nan::ObjectWrap(), mix(o), ownWrappedObject(true) {};
 Mix::~Mix() { if (ownWrappedObject) delete mix; };
 
 void Mix::setNwcpValue(dogatech::soulsifter::Mix* v, bool own) {
@@ -21,12 +21,10 @@ void Mix::setNwcpValue(dogatech::soulsifter::Mix* v, bool own) {
   ownWrappedObject = own;
 }
 
-NAN_METHOD(Mix::New) {
-  NanScope();
-
+void Mix::New(const Nan::FunctionCallbackInfo<v8::Value>& info) {
   dogatech::soulsifter::Mix* wrappedObj = NULL;
-  if (args.Length()) {
-    dogatech::soulsifter::Mix* xtmp(node::ObjectWrap::Unwrap<Mix>(args[0]->ToObject())->getNwcpValue());
+  if (info.Length()) {
+    dogatech::soulsifter::Mix* xtmp(Nan::ObjectWrap::Unwrap<Mix>(info[0]->ToObject())->getNwcpValue());
     dogatech::soulsifter::Mix& x = *xtmp;
     wrappedObj = new dogatech::soulsifter::Mix(x);
   } else {
@@ -34,354 +32,313 @@ NAN_METHOD(Mix::New) {
   }
 
   Mix* obj = new Mix(wrappedObj);
-  obj->Wrap(args.This());
+  obj->Wrap(info.This());
 
-  NanReturnValue(args.This());
+  info.GetReturnValue().Set(info.This());
 }
 
 v8::Local<v8::Object> Mix::NewInstance() {
-  v8::Local<v8::Function> cons = NanNew<v8::Function>(constructor);
-  v8::Local<v8::Object> instance = cons->NewInstance();
-
-  return instance;
+  v8::Local<v8::Function> cons = Nan::New<v8::Function>(constructor);
+  return Nan::NewInstance(cons).ToLocalChecked();
 }
 
-void Mix::Init(v8::Handle<v8::Object> exports) {
-  NanScope();
-
+void Mix::Init(v8::Local<v8::Object> exports) {
   // Prepare constructor template
-  v8::Local<v8::FunctionTemplate> tpl = NanNew<v8::FunctionTemplate>(New);
-  tpl->SetClassName(NanNew<v8::String>("Mix"));
+  v8::Local<v8::FunctionTemplate> tpl = Nan::New<v8::FunctionTemplate>(New);
+  tpl->SetClassName(Nan::New("Mix").ToLocalChecked());
   tpl->InstanceTemplate()->SetInternalFieldCount(1);
 
-  NanSetPrototypeTemplate(tpl, "clear", NanNew<v8::FunctionTemplate>(clear)->GetFunction());
-  NanSetTemplate(tpl, "findById", NanNew<v8::FunctionTemplate>(findById)->GetFunction());
-  NanSetTemplate(tpl, "findByOutSongIdAndInSongId", NanNew<v8::FunctionTemplate>(findByOutSongIdAndInSongId)->GetFunction());
-  NanSetTemplate(tpl, "findAll", NanNew<v8::FunctionTemplate>(findAll)->GetFunction());
-  NanSetPrototypeTemplate(tpl, "update", NanNew<v8::FunctionTemplate>(update)->GetFunction());
-  NanSetPrototypeTemplate(tpl, "save", NanNew<v8::FunctionTemplate>(save)->GetFunction());
-  NanSetPrototypeTemplate(tpl, "sync", NanNew<v8::FunctionTemplate>(sync)->GetFunction());
-  NanSetTemplate(tpl, "mixoutCountForRESongId", NanNew<v8::FunctionTemplate>(mixoutCountForRESongId)->GetFunction());
-  tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("id"), getId, setId);
-  tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("outSongId"), getOutSongId, setOutSongId);
-  tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("outSong"), getOutSong, setOutSong);
-  tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("outSongOnce"), getOutSongOnce);
-  tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("inSongId"), getInSongId, setInSongId);
-  tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("inSong"), getInSong, setInSong);
-  tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("inSongOnce"), getInSongOnce);
-  tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("bpmDiff"), getBpmDiff, setBpmDiff);
-  tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("rank"), getRank, setRank);
-  tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("comments"), getComments, setComments);
-  tpl->InstanceTemplate()->SetAccessor(NanNew<v8::String>("addon"), getAddon, setAddon);
+  // Prototype
+  Nan::SetPrototypeMethod(tpl, "clear", clear);
+  Nan::SetMethod(tpl, "findById", findById);
+  Nan::SetMethod(tpl, "findByOutSongIdAndInSongId", findByOutSongIdAndInSongId);
+  Nan::SetMethod(tpl, "findAll", findAll);
+  Nan::SetPrototypeMethod(tpl, "update", update);
+  Nan::SetPrototypeMethod(tpl, "save", save);
+  Nan::SetPrototypeMethod(tpl, "sync", sync);
+  Nan::SetMethod(tpl, "mixoutCountForRESongId", mixoutCountForRESongId);
+  Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("id").ToLocalChecked(), getId, setId);
+  Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("outSongId").ToLocalChecked(), getOutSongId, setOutSongId);
+  Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("outSong").ToLocalChecked(), getOutSong, setOutSong);
+  Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("outSongOnce").ToLocalChecked(), getOutSongOnce);
+  Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("inSongId").ToLocalChecked(), getInSongId, setInSongId);
+  Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("inSong").ToLocalChecked(), getInSong, setInSong);
+  Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("inSongOnce").ToLocalChecked(), getInSongOnce);
+  Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("bpmDiff").ToLocalChecked(), getBpmDiff, setBpmDiff);
+  Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("rank").ToLocalChecked(), getRank, setRank);
+  Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("comments").ToLocalChecked(), getComments, setComments);
+  Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("addon").ToLocalChecked(), getAddon, setAddon);
 
-  NanAssignPersistent<v8::Function>(constructor, tpl->GetFunction());
-  exports->Set(NanNew<v8::String>("Mix"), tpl->GetFunction());
+  constructor.Reset(tpl->GetFunction());
+  exports->Set(Nan::New<v8::String>("Mix").ToLocalChecked(), tpl->GetFunction());
 }
 
-NAN_METHOD(Mix::clear) {
-  NanScope();
-
-  Mix* obj = ObjectWrap::Unwrap<Mix>(args.This());
+void Mix::clear(const Nan::FunctionCallbackInfo<v8::Value>& info) {
+  Mix* obj = Nan::ObjectWrap::Unwrap<Mix>(info.Holder());
   obj->mix->clear();
 
-  NanReturnUndefined();
+  info.GetReturnValue().SetUndefined();
 }
 
-NAN_METHOD(Mix::findById) {
-  NanScope();
-
-  int a0(args[0]->Uint32Value());
+void Mix::findById(const Nan::FunctionCallbackInfo<v8::Value>& info) {
+  int a0(info[0]->IntegerValue());
   dogatech::soulsifter::Mix* result =
       dogatech::soulsifter::Mix::findById(a0);
 
-  if (result == NULL) NanReturnUndefined();
-  v8::Local<v8::Object> instance = Mix::NewInstance();
-  Mix* r = ObjectWrap::Unwrap<Mix>(instance);
-  r->setNwcpValue(result, true);
+  if (result == NULL) {
+    info.GetReturnValue().SetNull();
+  } else {
+    v8::Local<v8::Object> instance = Mix::NewInstance();
+    Mix* r = Nan::ObjectWrap::Unwrap<Mix>(instance);
+    r->setNwcpValue(result, true);
 
-  NanReturnValue(instance);
+    info.GetReturnValue().Set(instance);
+  }
 }
 
-NAN_METHOD(Mix::findByOutSongIdAndInSongId) {
-  NanScope();
-
-  int a0(args[0]->Uint32Value());
-  int a1(args[1]->Uint32Value());
+void Mix::findByOutSongIdAndInSongId(const Nan::FunctionCallbackInfo<v8::Value>& info) {
+  int a0(info[0]->IntegerValue());
+  int a1(info[1]->IntegerValue());
   dogatech::soulsifter::Mix* result =
       dogatech::soulsifter::Mix::findByOutSongIdAndInSongId(a0, a1);
 
-  if (result == NULL) NanReturnUndefined();
-  v8::Local<v8::Object> instance = Mix::NewInstance();
-  Mix* r = ObjectWrap::Unwrap<Mix>(instance);
-  r->setNwcpValue(result, true);
+  if (result == NULL) {
+    info.GetReturnValue().SetNull();
+  } else {
+    v8::Local<v8::Object> instance = Mix::NewInstance();
+    Mix* r = Nan::ObjectWrap::Unwrap<Mix>(instance);
+    r->setNwcpValue(result, true);
 
-  NanReturnValue(instance);
+    info.GetReturnValue().Set(instance);
+  }
 }
 
-NAN_METHOD(Mix::findAll) {
-  NanScope();
-
+void Mix::findAll(const Nan::FunctionCallbackInfo<v8::Value>& info) {
   dogatech::ResultSetIterator<dogatech::soulsifter::Mix>* result =
       dogatech::soulsifter::Mix::findAll();
 
   vector<dogatech::soulsifter::Mix*>* v = result->toVector();
-  v8::Handle<v8::Array> a = NanNew<v8::Array>((int) v->size());
+  v8::Local<v8::Array> a = Nan::New<v8::Array>((int) v->size());
   for (int i = 0; i < (int) v->size(); i++) {
-    v8::Local<v8::Function> cons = NanNew<v8::Function>(constructor);
+    v8::Local<v8::Function> cons = Nan::New<v8::Function>(constructor);
     v8::Local<v8::Object> instance = cons->NewInstance();
-    Mix* o = ObjectWrap::Unwrap<Mix>(instance);
+    Mix* o = Nan::ObjectWrap::Unwrap<Mix>(instance);
     o->mix = (*v)[i];
-    a->Set(NanNew<v8::Number>(i), instance);
+    a->Set(Nan::New<v8::Number>(i), instance);
   }
   delete v;
-  NanReturnValue(a);
+  info.GetReturnValue().Set(a);
 }
 
-NAN_METHOD(Mix::update) {
-  NanScope();
-
-  Mix* obj = ObjectWrap::Unwrap<Mix>(args.This());
+void Mix::update(const Nan::FunctionCallbackInfo<v8::Value>& info) {
+  Mix* obj = Nan::ObjectWrap::Unwrap<Mix>(info.Holder());
   int result =  obj->mix->update();
 
-  NanReturnValue(NanNew<v8::Number>(result));
+  info.GetReturnValue().Set(Nan::New<v8::Number>(result));
 }
 
-NAN_METHOD(Mix::save) {
-  NanScope();
-
-  Mix* obj = ObjectWrap::Unwrap<Mix>(args.This());
+void Mix::save(const Nan::FunctionCallbackInfo<v8::Value>& info) {
+  Mix* obj = Nan::ObjectWrap::Unwrap<Mix>(info.Holder());
   int result =  obj->mix->save();
 
-  NanReturnValue(NanNew<v8::Number>(result));
+  info.GetReturnValue().Set(Nan::New<v8::Number>(result));
 }
 
-NAN_METHOD(Mix::sync) {
-  NanScope();
-
-  Mix* obj = ObjectWrap::Unwrap<Mix>(args.This());
+void Mix::sync(const Nan::FunctionCallbackInfo<v8::Value>& info) {
+  Mix* obj = Nan::ObjectWrap::Unwrap<Mix>(info.Holder());
   bool result =  obj->mix->sync();
 
-  NanReturnValue(NanNew<v8::Boolean>(result));
+  info.GetReturnValue().Set(Nan::New<v8::Boolean>(result));
 }
 
-NAN_METHOD(Mix::mixoutCountForRESongId) {
-  NanScope();
-
-  int a0(args[0]->Uint32Value());
+void Mix::mixoutCountForRESongId(const Nan::FunctionCallbackInfo<v8::Value>& info) {
+  int a0(info[0]->IntegerValue());
   int result =
       dogatech::soulsifter::Mix::mixoutCountForRESongId(a0);
 
-  NanReturnValue(NanNew<v8::Number>(result));
+  info.GetReturnValue().Set(Nan::New<v8::Number>(result));
 }
 
 NAN_GETTER(Mix::getId) {
-  NanScope();
-
-  Mix* obj = ObjectWrap::Unwrap<Mix>(args.This());
+  Mix* obj = Nan::ObjectWrap::Unwrap<Mix>(info.Holder());
   const int result =  obj->mix->getId();
 
-  NanReturnValue(NanNew<v8::Number>(result));
+  info.GetReturnValue().Set(Nan::New<v8::Number>(result));
 }
 
 NAN_SETTER(Mix::setId) {
-  NanScope();
-
-  Mix* obj = ObjectWrap::Unwrap<Mix>(args.This());
-  int a0(value->Uint32Value());
+  Mix* obj = Nan::ObjectWrap::Unwrap<Mix>(info.Holder());
+  int a0(value->IntegerValue());
   obj->mix->setId(a0);
 
-  NanReturnUndefined();
+  info.GetReturnValue().SetUndefined();
 }
 
 NAN_GETTER(Mix::getOutSongId) {
-  NanScope();
-
-  Mix* obj = ObjectWrap::Unwrap<Mix>(args.This());
+  Mix* obj = Nan::ObjectWrap::Unwrap<Mix>(info.Holder());
   const int result =  obj->mix->getOutSongId();
 
-  NanReturnValue(NanNew<v8::Number>(result));
+  info.GetReturnValue().Set(Nan::New<v8::Number>(result));
 }
 
 NAN_SETTER(Mix::setOutSongId) {
-  NanScope();
-
-  Mix* obj = ObjectWrap::Unwrap<Mix>(args.This());
-  int a0(value->Uint32Value());
+  Mix* obj = Nan::ObjectWrap::Unwrap<Mix>(info.Holder());
+  int a0(value->IntegerValue());
   obj->mix->setOutSongId(a0);
 
-  NanReturnUndefined();
+  info.GetReturnValue().SetUndefined();
 }
 
 NAN_GETTER(Mix::getOutSong) {
-  NanScope();
-
-  Mix* obj = ObjectWrap::Unwrap<Mix>(args.This());
+  Mix* obj = Nan::ObjectWrap::Unwrap<Mix>(info.Holder());
   dogatech::soulsifter::Song* result =  obj->mix->getOutSong();
 
-  if (result == NULL) NanReturnUndefined();
-  v8::Local<v8::Object> instance = Song::NewInstance();
-  Song* r = ObjectWrap::Unwrap<Song>(instance);
-  r->setNwcpValue(result, false);
+  if (result == NULL) {
+    info.GetReturnValue().SetNull();
+  } else {
+    v8::Local<v8::Object> instance = Song::NewInstance();
+    Song* r = Nan::ObjectWrap::Unwrap<Song>(instance);
+    r->setNwcpValue(result, false);
 
-  NanReturnValue(instance);
+    info.GetReturnValue().Set(instance);
+  }
 }
 
 NAN_GETTER(Mix::getOutSongOnce) {
-  NanScope();
-
-  Mix* obj = ObjectWrap::Unwrap<Mix>(args.This());
+  Mix* obj = Nan::ObjectWrap::Unwrap<Mix>(info.Holder());
   dogatech::soulsifter::Song* result =  obj->mix->getOutSongOnce();
 
-  if (result == NULL) NanReturnUndefined();
-  v8::Local<v8::Object> instance = Song::NewInstance();
-  Song* r = ObjectWrap::Unwrap<Song>(instance);
-  r->setNwcpValue(result, false);
+  if (result == NULL) {
+    info.GetReturnValue().SetNull();
+  } else {
+    v8::Local<v8::Object> instance = Song::NewInstance();
+    Song* r = Nan::ObjectWrap::Unwrap<Song>(instance);
+    r->setNwcpValue(result, false);
 
-  NanReturnValue(instance);
+    info.GetReturnValue().Set(instance);
+  }
 }
 
 NAN_SETTER(Mix::setOutSong) {
-  NanScope();
-
-  Mix* obj = ObjectWrap::Unwrap<Mix>(args.This());
-  dogatech::soulsifter::Song* a0tmp(node::ObjectWrap::Unwrap<Song>(value->ToObject())->getNwcpValue());
+  Mix* obj = Nan::ObjectWrap::Unwrap<Mix>(info.Holder());
+  dogatech::soulsifter::Song* a0tmp(Nan::ObjectWrap::Unwrap<Song>(value->ToObject())->getNwcpValue());
   dogatech::soulsifter::Song& a0 = *a0tmp;
   obj->mix->setOutSong(a0);
 
-  NanReturnUndefined();
+  info.GetReturnValue().SetUndefined();
 }
 
 NAN_GETTER(Mix::getInSongId) {
-  NanScope();
-
-  Mix* obj = ObjectWrap::Unwrap<Mix>(args.This());
+  Mix* obj = Nan::ObjectWrap::Unwrap<Mix>(info.Holder());
   const int result =  obj->mix->getInSongId();
 
-  NanReturnValue(NanNew<v8::Number>(result));
+  info.GetReturnValue().Set(Nan::New<v8::Number>(result));
 }
 
 NAN_SETTER(Mix::setInSongId) {
-  NanScope();
-
-  Mix* obj = ObjectWrap::Unwrap<Mix>(args.This());
-  int a0(value->Uint32Value());
+  Mix* obj = Nan::ObjectWrap::Unwrap<Mix>(info.Holder());
+  int a0(value->IntegerValue());
   obj->mix->setInSongId(a0);
 
-  NanReturnUndefined();
+  info.GetReturnValue().SetUndefined();
 }
 
 NAN_GETTER(Mix::getInSong) {
-  NanScope();
-
-  Mix* obj = ObjectWrap::Unwrap<Mix>(args.This());
+  Mix* obj = Nan::ObjectWrap::Unwrap<Mix>(info.Holder());
   dogatech::soulsifter::Song* result =  obj->mix->getInSong();
 
-  if (result == NULL) NanReturnUndefined();
-  v8::Local<v8::Object> instance = Song::NewInstance();
-  Song* r = ObjectWrap::Unwrap<Song>(instance);
-  r->setNwcpValue(result, false);
+  if (result == NULL) {
+    info.GetReturnValue().SetNull();
+  } else {
+    v8::Local<v8::Object> instance = Song::NewInstance();
+    Song* r = Nan::ObjectWrap::Unwrap<Song>(instance);
+    r->setNwcpValue(result, false);
 
-  NanReturnValue(instance);
+    info.GetReturnValue().Set(instance);
+  }
 }
 
 NAN_GETTER(Mix::getInSongOnce) {
-  NanScope();
-
-  Mix* obj = ObjectWrap::Unwrap<Mix>(args.This());
+  Mix* obj = Nan::ObjectWrap::Unwrap<Mix>(info.Holder());
   dogatech::soulsifter::Song* result =  obj->mix->getInSongOnce();
 
-  if (result == NULL) NanReturnUndefined();
-  v8::Local<v8::Object> instance = Song::NewInstance();
-  Song* r = ObjectWrap::Unwrap<Song>(instance);
-  r->setNwcpValue(result, false);
+  if (result == NULL) {
+    info.GetReturnValue().SetNull();
+  } else {
+    v8::Local<v8::Object> instance = Song::NewInstance();
+    Song* r = Nan::ObjectWrap::Unwrap<Song>(instance);
+    r->setNwcpValue(result, false);
 
-  NanReturnValue(instance);
+    info.GetReturnValue().Set(instance);
+  }
 }
 
 NAN_SETTER(Mix::setInSong) {
-  NanScope();
-
-  Mix* obj = ObjectWrap::Unwrap<Mix>(args.This());
-  dogatech::soulsifter::Song* a0tmp(node::ObjectWrap::Unwrap<Song>(value->ToObject())->getNwcpValue());
+  Mix* obj = Nan::ObjectWrap::Unwrap<Mix>(info.Holder());
+  dogatech::soulsifter::Song* a0tmp(Nan::ObjectWrap::Unwrap<Song>(value->ToObject())->getNwcpValue());
   dogatech::soulsifter::Song& a0 = *a0tmp;
   obj->mix->setInSong(a0);
 
-  NanReturnUndefined();
+  info.GetReturnValue().SetUndefined();
 }
 
 NAN_GETTER(Mix::getBpmDiff) {
-  NanScope();
-
-  Mix* obj = ObjectWrap::Unwrap<Mix>(args.This());
+  Mix* obj = Nan::ObjectWrap::Unwrap<Mix>(info.Holder());
   const string result =  obj->mix->getBpmDiff();
 
-  NanReturnValue(NanNew<v8::String>(result.c_str(), result.length()));
+  info.GetReturnValue().Set(Nan::New<v8::String>(result).ToLocalChecked());
 }
 
 NAN_SETTER(Mix::setBpmDiff) {
-  NanScope();
-
-  Mix* obj = ObjectWrap::Unwrap<Mix>(args.This());
+  Mix* obj = Nan::ObjectWrap::Unwrap<Mix>(info.Holder());
   string a0(*v8::String::Utf8Value(value->ToString()));
   obj->mix->setBpmDiff(a0);
 
-  NanReturnUndefined();
+  info.GetReturnValue().SetUndefined();
 }
 
 NAN_GETTER(Mix::getRank) {
-  NanScope();
-
-  Mix* obj = ObjectWrap::Unwrap<Mix>(args.This());
+  Mix* obj = Nan::ObjectWrap::Unwrap<Mix>(info.Holder());
   const int result =  obj->mix->getRank();
 
-  NanReturnValue(NanNew<v8::Number>(result));
+  info.GetReturnValue().Set(Nan::New<v8::Number>(result));
 }
 
 NAN_SETTER(Mix::setRank) {
-  NanScope();
-
-  Mix* obj = ObjectWrap::Unwrap<Mix>(args.This());
-  int a0(value->Uint32Value());
+  Mix* obj = Nan::ObjectWrap::Unwrap<Mix>(info.Holder());
+  int a0(value->IntegerValue());
   obj->mix->setRank(a0);
 
-  NanReturnUndefined();
+  info.GetReturnValue().SetUndefined();
 }
 
 NAN_GETTER(Mix::getComments) {
-  NanScope();
-
-  Mix* obj = ObjectWrap::Unwrap<Mix>(args.This());
+  Mix* obj = Nan::ObjectWrap::Unwrap<Mix>(info.Holder());
   const string result =  obj->mix->getComments();
 
-  NanReturnValue(NanNew<v8::String>(result.c_str(), result.length()));
+  info.GetReturnValue().Set(Nan::New<v8::String>(result).ToLocalChecked());
 }
 
 NAN_SETTER(Mix::setComments) {
-  NanScope();
-
-  Mix* obj = ObjectWrap::Unwrap<Mix>(args.This());
+  Mix* obj = Nan::ObjectWrap::Unwrap<Mix>(info.Holder());
   string a0(*v8::String::Utf8Value(value->ToString()));
   obj->mix->setComments(a0);
 
-  NanReturnUndefined();
+  info.GetReturnValue().SetUndefined();
 }
 
 NAN_GETTER(Mix::getAddon) {
-  NanScope();
-
-  Mix* obj = ObjectWrap::Unwrap<Mix>(args.This());
+  Mix* obj = Nan::ObjectWrap::Unwrap<Mix>(info.Holder());
   const bool result =  obj->mix->getAddon();
 
-  NanReturnValue(NanNew<v8::Boolean>(result));
+  info.GetReturnValue().Set(Nan::New<v8::Boolean>(result));
 }
 
 NAN_SETTER(Mix::setAddon) {
-  NanScope();
-
-  Mix* obj = ObjectWrap::Unwrap<Mix>(args.This());
+  Mix* obj = Nan::ObjectWrap::Unwrap<Mix>(info.Holder());
   bool a0(value->BooleanValue());
   obj->mix->setAddon(a0);
 
-  NanReturnUndefined();
+  info.GetReturnValue().SetUndefined();
 }
 
