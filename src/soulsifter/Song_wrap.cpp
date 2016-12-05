@@ -176,14 +176,14 @@ void Song::update(const Nan::FunctionCallbackInfo<v8::Value>& info) {
   Song* obj = Nan::ObjectWrap::Unwrap<Song>(info.Holder());
   int result =  obj->song->update();
 
-  info.GetReturnValue().Set(Nan::New<v8::Number>(result));
+  info.GetReturnValue().Set(Nan::New<v8::Integer>(result));
 }
 
 void Song::save(const Nan::FunctionCallbackInfo<v8::Value>& info) {
   Song* obj = Nan::ObjectWrap::Unwrap<Song>(info.Holder());
   int result =  obj->song->save();
 
-  info.GetReturnValue().Set(Nan::New<v8::Number>(result));
+  info.GetReturnValue().Set(Nan::New<v8::Integer>(result));
 }
 
 void Song::sync(const Nan::FunctionCallbackInfo<v8::Value>& info) {
@@ -218,7 +218,7 @@ NAN_GETTER(Song::getId) {
   Song* obj = Nan::ObjectWrap::Unwrap<Song>(info.Holder());
   const int result =  obj->song->getId();
 
-  info.GetReturnValue().Set(Nan::New<v8::Number>(result));
+  info.GetReturnValue().Set(Nan::New<v8::Integer>(result));
 }
 
 NAN_SETTER(Song::setId) {
@@ -323,7 +323,7 @@ NAN_GETTER(Song::getRating) {
   Song* obj = Nan::ObjectWrap::Unwrap<Song>(info.Holder());
   const int result =  obj->song->getRating();
 
-  info.GetReturnValue().Set(Nan::New<v8::Number>(result));
+  info.GetReturnValue().Set(Nan::New<v8::Integer>(result));
 }
 
 NAN_SETTER(Song::setRating) {
@@ -426,7 +426,7 @@ NAN_GETTER(Song::getEnergy) {
   Song* obj = Nan::ObjectWrap::Unwrap<Song>(info.Holder());
   const int result =  obj->song->getEnergy();
 
-  info.GetReturnValue().Set(Nan::New<v8::Number>(result));
+  info.GetReturnValue().Set(Nan::New<v8::Integer>(result));
 }
 
 NAN_SETTER(Song::setEnergy) {
@@ -486,7 +486,7 @@ NAN_GETTER(Song::getRESongId) {
   Song* obj = Nan::ObjectWrap::Unwrap<Song>(info.Holder());
   const int result =  obj->song->getRESongId();
 
-  info.GetReturnValue().Set(Nan::New<v8::Number>(result));
+  info.GetReturnValue().Set(Nan::New<v8::Integer>(result));
 }
 
 NAN_SETTER(Song::setRESongId) {
@@ -501,7 +501,7 @@ NAN_GETTER(Song::getAlbumId) {
   Song* obj = Nan::ObjectWrap::Unwrap<Song>(info.Holder());
   const int result =  obj->song->getAlbumId();
 
-  info.GetReturnValue().Set(Nan::New<v8::Number>(result));
+  info.GetReturnValue().Set(Nan::New<v8::Integer>(result));
 }
 
 NAN_SETTER(Song::setAlbumId) {
@@ -555,7 +555,7 @@ NAN_GETTER(Song::getAlbumPartId) {
   Song* obj = Nan::ObjectWrap::Unwrap<Song>(info.Holder());
   const int result =  obj->song->getAlbumPartId();
 
-  info.GetReturnValue().Set(Nan::New<v8::Number>(result));
+  info.GetReturnValue().Set(Nan::New<v8::Integer>(result));
 }
 
 NAN_SETTER(Song::setAlbumPartId) {
@@ -611,7 +611,7 @@ NAN_GETTER(Song::getStyleIds) {
 
   v8::Local<v8::Array> a = Nan::New<v8::Array>((int) result.size());
   for (int i = 0; i < (int) result.size(); i++) {
-    a->Set(Nan::New<v8::Number>(i), Nan::New<v8::Number>(result[i]));
+    a->Set(Nan::New<v8::Number>(i), Nan::New<v8::Integer>(result[i]));
   }
   info.GetReturnValue().Set(a);
 }

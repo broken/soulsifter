@@ -130,14 +130,14 @@ void Style::update(const Nan::FunctionCallbackInfo<v8::Value>& info) {
   Style* obj = Nan::ObjectWrap::Unwrap<Style>(info.Holder());
   int result =  obj->style->update();
 
-  info.GetReturnValue().Set(Nan::New<v8::Number>(result));
+  info.GetReturnValue().Set(Nan::New<v8::Integer>(result));
 }
 
 void Style::save(const Nan::FunctionCallbackInfo<v8::Value>& info) {
   Style* obj = Nan::ObjectWrap::Unwrap<Style>(info.Holder());
   int result =  obj->style->save();
 
-  info.GetReturnValue().Set(Nan::New<v8::Number>(result));
+  info.GetReturnValue().Set(Nan::New<v8::Integer>(result));
 }
 
 void Style::sync(const Nan::FunctionCallbackInfo<v8::Value>& info) {
@@ -168,7 +168,7 @@ NAN_GETTER(Style::getId) {
   Style* obj = Nan::ObjectWrap::Unwrap<Style>(info.Holder());
   const int result =  obj->style->getId();
 
-  info.GetReturnValue().Set(Nan::New<v8::Number>(result));
+  info.GetReturnValue().Set(Nan::New<v8::Integer>(result));
 }
 
 NAN_SETTER(Style::setId) {
@@ -198,7 +198,7 @@ NAN_GETTER(Style::getREId) {
   Style* obj = Nan::ObjectWrap::Unwrap<Style>(info.Holder());
   const int result =  obj->style->getREId();
 
-  info.GetReturnValue().Set(Nan::New<v8::Number>(result));
+  info.GetReturnValue().Set(Nan::New<v8::Integer>(result));
 }
 
 NAN_SETTER(Style::setREId) {
@@ -230,7 +230,7 @@ NAN_GETTER(Style::getChildIds) {
 
   v8::Local<v8::Array> a = Nan::New<v8::Array>((int) result.size());
   for (int i = 0; i < (int) result.size(); i++) {
-    a->Set(Nan::New<v8::Number>(i), Nan::New<v8::Number>(result[i]));
+    a->Set(Nan::New<v8::Number>(i), Nan::New<v8::Integer>(result[i]));
   }
   info.GetReturnValue().Set(a);
 }
@@ -283,7 +283,7 @@ NAN_GETTER(Style::getParentIds) {
 
   v8::Local<v8::Array> a = Nan::New<v8::Array>((int) result.size());
   for (int i = 0; i < (int) result.size(); i++) {
-    a->Set(Nan::New<v8::Number>(i), Nan::New<v8::Number>(result[i]));
+    a->Set(Nan::New<v8::Number>(i), Nan::New<v8::Integer>(result[i]));
   }
   info.GetReturnValue().Set(a);
 }

@@ -78,7 +78,7 @@ void SoulSifterSettings::getInt(const Nan::FunctionCallbackInfo<v8::Value>& info
   std::string a0(*v8::String::Utf8Value(info[0]->ToString()));
   const int result = obj->soulsiftersettings->get<int>(a0);
 
-  info.GetReturnValue().Set(Nan::New<v8::Number>(result));
+  info.GetReturnValue().Set(Nan::New<v8::Integer>(result));
 }
 
 void SoulSifterSettings::putInt(const Nan::FunctionCallbackInfo<v8::Value>& info) {

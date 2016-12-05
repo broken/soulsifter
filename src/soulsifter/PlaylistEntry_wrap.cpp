@@ -134,14 +134,14 @@ void PlaylistEntry::update(const Nan::FunctionCallbackInfo<v8::Value>& info) {
   PlaylistEntry* obj = Nan::ObjectWrap::Unwrap<PlaylistEntry>(info.Holder());
   int result =  obj->playlistentry->update();
 
-  info.GetReturnValue().Set(Nan::New<v8::Number>(result));
+  info.GetReturnValue().Set(Nan::New<v8::Integer>(result));
 }
 
 void PlaylistEntry::save(const Nan::FunctionCallbackInfo<v8::Value>& info) {
   PlaylistEntry* obj = Nan::ObjectWrap::Unwrap<PlaylistEntry>(info.Holder());
   int result =  obj->playlistentry->save();
 
-  info.GetReturnValue().Set(Nan::New<v8::Number>(result));
+  info.GetReturnValue().Set(Nan::New<v8::Integer>(result));
 }
 
 void PlaylistEntry::sync(const Nan::FunctionCallbackInfo<v8::Value>& info) {
@@ -155,14 +155,14 @@ void PlaylistEntry::erase(const Nan::FunctionCallbackInfo<v8::Value>& info) {
   PlaylistEntry* obj = Nan::ObjectWrap::Unwrap<PlaylistEntry>(info.Holder());
   int result =  obj->playlistentry->erase();
 
-  info.GetReturnValue().Set(Nan::New<v8::Number>(result));
+  info.GetReturnValue().Set(Nan::New<v8::Integer>(result));
 }
 
 NAN_GETTER(PlaylistEntry::getId) {
   PlaylistEntry* obj = Nan::ObjectWrap::Unwrap<PlaylistEntry>(info.Holder());
   const int result =  obj->playlistentry->getId();
 
-  info.GetReturnValue().Set(Nan::New<v8::Number>(result));
+  info.GetReturnValue().Set(Nan::New<v8::Integer>(result));
 }
 
 NAN_SETTER(PlaylistEntry::setId) {
@@ -177,7 +177,7 @@ NAN_GETTER(PlaylistEntry::getPlaylistId) {
   PlaylistEntry* obj = Nan::ObjectWrap::Unwrap<PlaylistEntry>(info.Holder());
   const int result =  obj->playlistentry->getPlaylistId();
 
-  info.GetReturnValue().Set(Nan::New<v8::Number>(result));
+  info.GetReturnValue().Set(Nan::New<v8::Integer>(result));
 }
 
 NAN_SETTER(PlaylistEntry::setPlaylistId) {
@@ -231,7 +231,7 @@ NAN_GETTER(PlaylistEntry::getSongId) {
   PlaylistEntry* obj = Nan::ObjectWrap::Unwrap<PlaylistEntry>(info.Holder());
   const int result =  obj->playlistentry->getSongId();
 
-  info.GetReturnValue().Set(Nan::New<v8::Number>(result));
+  info.GetReturnValue().Set(Nan::New<v8::Integer>(result));
 }
 
 NAN_SETTER(PlaylistEntry::setSongId) {
@@ -285,7 +285,7 @@ NAN_GETTER(PlaylistEntry::getPosition) {
   PlaylistEntry* obj = Nan::ObjectWrap::Unwrap<PlaylistEntry>(info.Holder());
   const int result =  obj->playlistentry->getPosition();
 
-  info.GetReturnValue().Set(Nan::New<v8::Number>(result));
+  info.GetReturnValue().Set(Nan::New<v8::Integer>(result));
 }
 
 NAN_SETTER(PlaylistEntry::setPosition) {

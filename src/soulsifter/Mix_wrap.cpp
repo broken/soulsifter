@@ -134,14 +134,14 @@ void Mix::update(const Nan::FunctionCallbackInfo<v8::Value>& info) {
   Mix* obj = Nan::ObjectWrap::Unwrap<Mix>(info.Holder());
   int result =  obj->mix->update();
 
-  info.GetReturnValue().Set(Nan::New<v8::Number>(result));
+  info.GetReturnValue().Set(Nan::New<v8::Integer>(result));
 }
 
 void Mix::save(const Nan::FunctionCallbackInfo<v8::Value>& info) {
   Mix* obj = Nan::ObjectWrap::Unwrap<Mix>(info.Holder());
   int result =  obj->mix->save();
 
-  info.GetReturnValue().Set(Nan::New<v8::Number>(result));
+  info.GetReturnValue().Set(Nan::New<v8::Integer>(result));
 }
 
 void Mix::sync(const Nan::FunctionCallbackInfo<v8::Value>& info) {
@@ -156,14 +156,14 @@ void Mix::mixoutCountForRESongId(const Nan::FunctionCallbackInfo<v8::Value>& inf
   int result =
       dogatech::soulsifter::Mix::mixoutCountForRESongId(a0);
 
-  info.GetReturnValue().Set(Nan::New<v8::Number>(result));
+  info.GetReturnValue().Set(Nan::New<v8::Integer>(result));
 }
 
 NAN_GETTER(Mix::getId) {
   Mix* obj = Nan::ObjectWrap::Unwrap<Mix>(info.Holder());
   const int result =  obj->mix->getId();
 
-  info.GetReturnValue().Set(Nan::New<v8::Number>(result));
+  info.GetReturnValue().Set(Nan::New<v8::Integer>(result));
 }
 
 NAN_SETTER(Mix::setId) {
@@ -178,7 +178,7 @@ NAN_GETTER(Mix::getOutSongId) {
   Mix* obj = Nan::ObjectWrap::Unwrap<Mix>(info.Holder());
   const int result =  obj->mix->getOutSongId();
 
-  info.GetReturnValue().Set(Nan::New<v8::Number>(result));
+  info.GetReturnValue().Set(Nan::New<v8::Integer>(result));
 }
 
 NAN_SETTER(Mix::setOutSongId) {
@@ -232,7 +232,7 @@ NAN_GETTER(Mix::getInSongId) {
   Mix* obj = Nan::ObjectWrap::Unwrap<Mix>(info.Holder());
   const int result =  obj->mix->getInSongId();
 
-  info.GetReturnValue().Set(Nan::New<v8::Number>(result));
+  info.GetReturnValue().Set(Nan::New<v8::Integer>(result));
 }
 
 NAN_SETTER(Mix::setInSongId) {
@@ -301,7 +301,7 @@ NAN_GETTER(Mix::getRank) {
   Mix* obj = Nan::ObjectWrap::Unwrap<Mix>(info.Holder());
   const int result =  obj->mix->getRank();
 
-  info.GetReturnValue().Set(Nan::New<v8::Number>(result));
+  info.GetReturnValue().Set(Nan::New<v8::Integer>(result));
 }
 
 NAN_SETTER(Mix::setRank) {

@@ -127,14 +127,14 @@ void MusicVideo::update(const Nan::FunctionCallbackInfo<v8::Value>& info) {
   MusicVideo* obj = Nan::ObjectWrap::Unwrap<MusicVideo>(info.Holder());
   int result =  obj->musicvideo->update();
 
-  info.GetReturnValue().Set(Nan::New<v8::Number>(result));
+  info.GetReturnValue().Set(Nan::New<v8::Integer>(result));
 }
 
 void MusicVideo::save(const Nan::FunctionCallbackInfo<v8::Value>& info) {
   MusicVideo* obj = Nan::ObjectWrap::Unwrap<MusicVideo>(info.Holder());
   int result =  obj->musicvideo->save();
 
-  info.GetReturnValue().Set(Nan::New<v8::Number>(result));
+  info.GetReturnValue().Set(Nan::New<v8::Integer>(result));
 }
 
 void MusicVideo::sync(const Nan::FunctionCallbackInfo<v8::Value>& info) {
@@ -148,7 +148,7 @@ NAN_GETTER(MusicVideo::getId) {
   MusicVideo* obj = Nan::ObjectWrap::Unwrap<MusicVideo>(info.Holder());
   const int result =  obj->musicvideo->getId();
 
-  info.GetReturnValue().Set(Nan::New<v8::Number>(result));
+  info.GetReturnValue().Set(Nan::New<v8::Integer>(result));
 }
 
 NAN_SETTER(MusicVideo::setId) {
@@ -163,7 +163,7 @@ NAN_GETTER(MusicVideo::getSongId) {
   MusicVideo* obj = Nan::ObjectWrap::Unwrap<MusicVideo>(info.Holder());
   const int result =  obj->musicvideo->getSongId();
 
-  info.GetReturnValue().Set(Nan::New<v8::Number>(result));
+  info.GetReturnValue().Set(Nan::New<v8::Integer>(result));
 }
 
 NAN_SETTER(MusicVideo::setSongId) {

@@ -153,14 +153,14 @@ void Album::update(const Nan::FunctionCallbackInfo<v8::Value>& info) {
   Album* obj = Nan::ObjectWrap::Unwrap<Album>(info.Holder());
   int result =  obj->album->update();
 
-  info.GetReturnValue().Set(Nan::New<v8::Number>(result));
+  info.GetReturnValue().Set(Nan::New<v8::Integer>(result));
 }
 
 void Album::save(const Nan::FunctionCallbackInfo<v8::Value>& info) {
   Album* obj = Nan::ObjectWrap::Unwrap<Album>(info.Holder());
   int result =  obj->album->save();
 
-  info.GetReturnValue().Set(Nan::New<v8::Number>(result));
+  info.GetReturnValue().Set(Nan::New<v8::Integer>(result));
 }
 
 void Album::sync(const Nan::FunctionCallbackInfo<v8::Value>& info) {
@@ -181,7 +181,7 @@ NAN_GETTER(Album::getId) {
   Album* obj = Nan::ObjectWrap::Unwrap<Album>(info.Holder());
   const int result =  obj->album->getId();
 
-  info.GetReturnValue().Set(Nan::New<v8::Number>(result));
+  info.GetReturnValue().Set(Nan::New<v8::Integer>(result));
 }
 
 NAN_SETTER(Album::setId) {
@@ -286,7 +286,7 @@ NAN_GETTER(Album::getReleaseDateYear) {
   Album* obj = Nan::ObjectWrap::Unwrap<Album>(info.Holder());
   const int result =  obj->album->getReleaseDateYear();
 
-  info.GetReturnValue().Set(Nan::New<v8::Number>(result));
+  info.GetReturnValue().Set(Nan::New<v8::Integer>(result));
 }
 
 NAN_SETTER(Album::setReleaseDateYear) {
@@ -301,7 +301,7 @@ NAN_GETTER(Album::getReleaseDateMonth) {
   Album* obj = Nan::ObjectWrap::Unwrap<Album>(info.Holder());
   const int result =  obj->album->getReleaseDateMonth();
 
-  info.GetReturnValue().Set(Nan::New<v8::Number>(result));
+  info.GetReturnValue().Set(Nan::New<v8::Integer>(result));
 }
 
 NAN_SETTER(Album::setReleaseDateMonth) {
@@ -316,7 +316,7 @@ NAN_GETTER(Album::getReleaseDateDay) {
   Album* obj = Nan::ObjectWrap::Unwrap<Album>(info.Holder());
   const int result =  obj->album->getReleaseDateDay();
 
-  info.GetReturnValue().Set(Nan::New<v8::Number>(result));
+  info.GetReturnValue().Set(Nan::New<v8::Integer>(result));
 }
 
 NAN_SETTER(Album::setReleaseDateDay) {
@@ -331,7 +331,7 @@ NAN_GETTER(Album::getBasicGenreId) {
   Album* obj = Nan::ObjectWrap::Unwrap<Album>(info.Holder());
   const int result =  obj->album->getBasicGenreId();
 
-  info.GetReturnValue().Set(Nan::New<v8::Number>(result));
+  info.GetReturnValue().Set(Nan::New<v8::Integer>(result));
 }
 
 NAN_SETTER(Album::setBasicGenreId) {

@@ -132,14 +132,14 @@ void Playlist::update(const Nan::FunctionCallbackInfo<v8::Value>& info) {
   Playlist* obj = Nan::ObjectWrap::Unwrap<Playlist>(info.Holder());
   int result =  obj->playlist->update();
 
-  info.GetReturnValue().Set(Nan::New<v8::Number>(result));
+  info.GetReturnValue().Set(Nan::New<v8::Integer>(result));
 }
 
 void Playlist::save(const Nan::FunctionCallbackInfo<v8::Value>& info) {
   Playlist* obj = Nan::ObjectWrap::Unwrap<Playlist>(info.Holder());
   int result =  obj->playlist->save();
 
-  info.GetReturnValue().Set(Nan::New<v8::Number>(result));
+  info.GetReturnValue().Set(Nan::New<v8::Integer>(result));
 }
 
 void Playlist::sync(const Nan::FunctionCallbackInfo<v8::Value>& info) {
@@ -153,14 +153,14 @@ void Playlist::erase(const Nan::FunctionCallbackInfo<v8::Value>& info) {
   Playlist* obj = Nan::ObjectWrap::Unwrap<Playlist>(info.Holder());
   int result =  obj->playlist->erase();
 
-  info.GetReturnValue().Set(Nan::New<v8::Number>(result));
+  info.GetReturnValue().Set(Nan::New<v8::Integer>(result));
 }
 
 NAN_GETTER(Playlist::getId) {
   Playlist* obj = Nan::ObjectWrap::Unwrap<Playlist>(info.Holder());
   const int result =  obj->playlist->getId();
 
-  info.GetReturnValue().Set(Nan::New<v8::Number>(result));
+  info.GetReturnValue().Set(Nan::New<v8::Integer>(result));
 }
 
 NAN_SETTER(Playlist::setId) {
@@ -222,7 +222,7 @@ NAN_GETTER(Playlist::getPlaylistEntryIds) {
 
   v8::Local<v8::Array> a = Nan::New<v8::Array>((int) result.size());
   for (int i = 0; i < (int) result.size(); i++) {
-    a->Set(Nan::New<v8::Number>(i), Nan::New<v8::Number>(result[i]));
+    a->Set(Nan::New<v8::Number>(i), Nan::New<v8::Integer>(result[i]));
   }
   info.GetReturnValue().Set(a);
 }
@@ -275,7 +275,7 @@ NAN_GETTER(Playlist::getStyleIds) {
 
   v8::Local<v8::Array> a = Nan::New<v8::Array>((int) result.size());
   for (int i = 0; i < (int) result.size(); i++) {
-    a->Set(Nan::New<v8::Number>(i), Nan::New<v8::Number>(result[i]));
+    a->Set(Nan::New<v8::Number>(i), Nan::New<v8::Integer>(result[i]));
   }
   info.GetReturnValue().Set(a);
 }

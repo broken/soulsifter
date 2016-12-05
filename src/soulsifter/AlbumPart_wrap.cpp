@@ -128,14 +128,14 @@ void AlbumPart::update(const Nan::FunctionCallbackInfo<v8::Value>& info) {
   AlbumPart* obj = Nan::ObjectWrap::Unwrap<AlbumPart>(info.Holder());
   int result =  obj->albumpart->update();
 
-  info.GetReturnValue().Set(Nan::New<v8::Number>(result));
+  info.GetReturnValue().Set(Nan::New<v8::Integer>(result));
 }
 
 void AlbumPart::save(const Nan::FunctionCallbackInfo<v8::Value>& info) {
   AlbumPart* obj = Nan::ObjectWrap::Unwrap<AlbumPart>(info.Holder());
   int result =  obj->albumpart->save();
 
-  info.GetReturnValue().Set(Nan::New<v8::Number>(result));
+  info.GetReturnValue().Set(Nan::New<v8::Integer>(result));
 }
 
 void AlbumPart::sync(const Nan::FunctionCallbackInfo<v8::Value>& info) {
@@ -149,7 +149,7 @@ NAN_GETTER(AlbumPart::getId) {
   AlbumPart* obj = Nan::ObjectWrap::Unwrap<AlbumPart>(info.Holder());
   const int result =  obj->albumpart->getId();
 
-  info.GetReturnValue().Set(Nan::New<v8::Number>(result));
+  info.GetReturnValue().Set(Nan::New<v8::Integer>(result));
 }
 
 NAN_SETTER(AlbumPart::setId) {
@@ -194,7 +194,7 @@ NAN_GETTER(AlbumPart::getAlbumId) {
   AlbumPart* obj = Nan::ObjectWrap::Unwrap<AlbumPart>(info.Holder());
   const int result =  obj->albumpart->getAlbumId();
 
-  info.GetReturnValue().Set(Nan::New<v8::Number>(result));
+  info.GetReturnValue().Set(Nan::New<v8::Integer>(result));
 }
 
 NAN_SETTER(AlbumPart::setAlbumId) {

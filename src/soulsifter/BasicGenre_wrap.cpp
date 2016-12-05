@@ -123,14 +123,14 @@ void BasicGenre::update(const Nan::FunctionCallbackInfo<v8::Value>& info) {
   BasicGenre* obj = Nan::ObjectWrap::Unwrap<BasicGenre>(info.Holder());
   int result =  obj->basicgenre->update();
 
-  info.GetReturnValue().Set(Nan::New<v8::Number>(result));
+  info.GetReturnValue().Set(Nan::New<v8::Integer>(result));
 }
 
 void BasicGenre::save(const Nan::FunctionCallbackInfo<v8::Value>& info) {
   BasicGenre* obj = Nan::ObjectWrap::Unwrap<BasicGenre>(info.Holder());
   int result =  obj->basicgenre->save();
 
-  info.GetReturnValue().Set(Nan::New<v8::Number>(result));
+  info.GetReturnValue().Set(Nan::New<v8::Integer>(result));
 }
 
 void BasicGenre::sync(const Nan::FunctionCallbackInfo<v8::Value>& info) {
@@ -176,7 +176,7 @@ NAN_GETTER(BasicGenre::getId) {
   BasicGenre* obj = Nan::ObjectWrap::Unwrap<BasicGenre>(info.Holder());
   const int result =  obj->basicgenre->getId();
 
-  info.GetReturnValue().Set(Nan::New<v8::Number>(result));
+  info.GetReturnValue().Set(Nan::New<v8::Integer>(result));
 }
 
 NAN_SETTER(BasicGenre::setId) {
