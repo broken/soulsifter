@@ -161,7 +161,12 @@
       song: {
         type: Object,
         observer: '_songChanged'
-      }
+      },
+      _soulSifterSettings: {
+        type: Object,
+        value: function() { return new ss.SoulSifterSettings(); },
+        readOnly: true
+      },
     },
 
     listeners: {
@@ -169,7 +174,7 @@
     },
 
     _songChanged: function() {
-      this.$.cover.style.backgroundImage = 'url("file://' + this.song.album.coverFilepath + '")';
+      this.$.cover.style.backgroundImage = 'url("file://' + this._soulSifterSettings.getString('music.dir') + this.song.album.coverFilepath + '")';
     },
 
     _computeLocaleDateString: function(song) {
@@ -187,7 +192,7 @@
 
     _dragSong: function(e) {
       e.dataTransfer.effectAllowed = 'move';
-      e.dataTransfer.setData('text/plain', 'extensis-filenames-type:' + this.song.filepath);
+      e.dataTransfer.setData('text/plain', 'extensis-filenames-type:' + this._soulSifterSettings.getString('music.dir') + this.song.filepath);
     },
 
     _openEditSongPage: function(e, detail, sender) {

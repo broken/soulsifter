@@ -188,6 +188,11 @@
         value: function() { return ss.BasicGenre.findAll(); },
         readOnly: true
       },
+      _soulSifterSettings: {
+        type: Object,
+        value: function() { return new ss.SoulSifterSettings(); },
+        readOnly: true
+      },
     },
 
     observers: [
@@ -203,13 +208,15 @@
         // select file dialog
         var that = this;
         this.$.coverFileDialog.addEventListener("change", function(e) {
-          that._editedSong.album.coverFilepath = this.value;
-          that.$.cover.style.backgroundImage = 'url("file://' + that._editedSong.album.coverFilepath + '")';
+          that.$.cover.style.backgroundImage = 'url("file://' + this.value + '")';
+          // TODO should move cover file in place
+          that._editedSong.album.coverFilepath = this._editedSong.id ? this.value.replace(this._soulSifterSettings.getString('music.dir'), '') : this.value;
           that._changedAlbumCover = true;
         }, false);
         this.$.songFileDialog.addEventListener("change", function(e) {
-          that._editedSong.filepath = this.value;
-          that.notifyPath('_editedSong.filepath', this.value);
+          // TODO move song in place if out of place
+          that._editedSong.filepath = this._editedSong.id ? this.value.replace(this._soulSifterSettings.getString('music.dir'), '') : this.value;
+          that.notifyPath('_editedSong.filepath', that._editedSong.filepath);
         }, false);
       }.bind(this));
     },
@@ -252,9 +259,9 @@
         // TODO the file moving should be done externally
         var basename = this.path.basename(this._editedSong.album.coverFilepath);
         var dirname = this.path.dirname(this._editedSong.filepath);
-        var newpath = dirname + '/' + basename;
+        var newpath = this._soulSifterSettings.getString('music.dir') + dirname + '/' + basename;
         this.fs.rename(this._editedSong.album.coverFilepath, newpath);
-        this._editedSong.album.coverFilepath = newpath;
+        this._editedSong.album.coverFilepath = dirname + '/' + basename;
         this._editedSong.album.update();
       }
 
@@ -289,7 +296,7 @@
       }
       if (!!this._editedSong.album.basicGenre) this.basicgenreName = this._editedSong.album.basicGenre.name;
       else this.basicgenreName = '';
-      this.$.cover.style.backgroundImage = 'url("file://' + this._editedSong.album.coverFilepath + '")';
+      this.$.cover.style.backgroundImage = 'url("file://' + this._soulSifterSettings.getString('music.dir') + this._editedSong.album.coverFilepath + '")';
       this._changedAlbumCover = false;
       // this does not seem to play well when working straight on the array object
       this._styles = this._editedSong.styles;

@@ -136,7 +136,7 @@ MusicManager::MusicManager() :
 lastParsedSong(NULL),
 lastSongFixed(NULL),
 artistToGenre(1600),
-imgDestinationPath() {
+albumSubPathForImage() {
 }
 
 MusicManager::~MusicManager() {
@@ -150,9 +150,17 @@ void MusicManager::readTagsFromSong(Song* song) {
         Album album;
         song->setAlbum(album);
     }
+
+    string songFilepath = song->getFilepath();
+    if (!boost::filesystem::exists(songFilepath)) {
+      songFilepath = SoulSifterSettings::getInstance().get<string>("music.dir") + song->getFilepath();
+      if (!boost::filesystem::exists(songFilepath)) {
+        cerr << "unable to find song: " << song->getFilepath() << endl;
+      }
+    }
   
     if (boost::algorithm::iends_with(song->getFilepath(), ".mp3")) {
-        TagLib::MPEG::File f(song->getFilepath().c_str());
+        TagLib::MPEG::File f(songFilepath.c_str());
         TagLib::ID3v1::Tag* id3v1 = f.ID3v1Tag();
         if (id3v1) {
             stringstream ss;
@@ -173,7 +181,7 @@ void MusicManager::readTagsFromSong(Song* song) {
                boost::algorithm::iends_with(song->getFilepath(), ".mp4") ||
                boost::algorithm::iends_with(song->getFilepath(), ".aac") ||
                boost::algorithm::iends_with(song->getFilepath(), ".alac")) {
-      TagLib::MP4::File f(song->getFilepath().c_str());
+      TagLib::MP4::File f(songFilepath.c_str());
       TagLib::MP4::Tag* tag = f.tag();
       if (tag) {
         stringstream ss;
@@ -197,7 +205,7 @@ void MusicManager::writeTagsToSong(Song* song) {
       boost::algorithm::iends_with(song->getFilepath(), ".mp4") ||
       boost::algorithm::iends_with(song->getFilepath(), ".aac") ||
       boost::algorithm::iends_with(song->getFilepath(), ".alac")) {
-        TagLib::MPEG::File f(song->getFilepath().c_str());
+        TagLib::MPEG::File f((SoulSifterSettings::getInstance().get<string>("music.dir") + song->getFilepath()).c_str());
         TagLib::ID3v2::Tag* id3v2 = f.ID3v2Tag(true);
         f.strip(TagLib::MPEG::File::ID3v1);
         id3v2->setArtist(song->getArtist());
@@ -249,11 +257,11 @@ void MusicManager::writeTagsToSong(Song* song) {
             setId3v2Text(id3v2, "TDAT", daymonth.str().c_str());
         }
         // picture
-        setId3v2Picture(id3v2, song->getAlbum()->getCoverFilepath(), false);
+        setId3v2Picture(id3v2, SoulSifterSettings::getInstance().get<string>("music.dir") + song->getAlbum()->getCoverFilepath(), false);
         // save
         bool result = f.save();
         if (!result) {
-            cerr << "unable to save " << song->getFilepath() << endl;
+            cerr << "unable to save " << SoulSifterSettings::getInstance().get<string>("music.dir") << song->getFilepath() << endl;
         }
     }
 }
@@ -266,6 +274,8 @@ void MusicManager::writeTagsToSong(Song* song) {
     // compare with last
     if (lastParsedSong && lastSongFixed) {
       if (!song.getArtist().compare(lastParsedSong->getArtist())) {
+        // featuring normally comes from title field rather than artist,
+        // so we remove it since it rarely matches in practice.
         boost::regex featRegex(" [(]ft[.] .*");
         updatedSong->setArtist(boost::regex_replace(lastSongFixed->getArtist(), featRegex, ""));
       }
@@ -280,6 +290,7 @@ void MusicManager::writeTagsToSong(Song* song) {
           }
         }
       }
+      // TODO I created these 'Once' methods for a reason, but what was it? Still needed?
       Album* songAlbum = song.getAlbumOnce();
       AlbumPart* songAlbumPart = song.getAlbumPartOnce();
       // we shouldn't auto set track title b/c it changes so much
@@ -379,7 +390,7 @@ void MusicManager::writeTagsToSong(Song* song) {
         // code taken from moveImage(img)
         stringstream destpath;
         boost::filesystem::path src(img);
-        destpath << imgDestinationPath << "/" << src.filename().string();
+        destpath << albumSubPathForImage << "/" << src.filename().string();
         
         Album* album = lastSongFixed->getAlbum();
         album->setCoverFilepath(destpath.str());
@@ -400,46 +411,49 @@ string MusicManager::getCopyToPath() {
     return "";
 }
 
-  // TODO shouldn't need to lower case full path
+// TODO shouldn't need to lower case full path
+// TODO removed use of stagingPath. Add back feature?
 bool MusicManager::moveSong(Song* song) {
     try {
-        // create directory
-        string dirpath;
+        string albumPath;
         {
-            string artistpart = song->getAlbum()->getArtist().length() > 0 ? song->getAlbum()->getArtist() : "_compilations_";
             ostringstream ssdirpath;
+            string artistpart = song->getAlbum()->getArtist().length() > 0 ? song->getAlbum()->getArtist() : "_compilations_";
             string albumartist = song->getAlbum()->getArtist();
             string albumname = song->getAlbum()->getName();
-            ssdirpath << SoulSifterSettings::getInstance().getStagingPath() << "/" << song->getAlbum()->getBasicGenre()->getName() << "/" << *cleanDirName(&albumartist) << "/" << *cleanDirName(&albumname);
-            imgDestinationPath = ssdirpath.str();
-            transform(imgDestinationPath.begin(), imgDestinationPath.end(), imgDestinationPath.begin(), ::tolower);
+            ssdirpath << song->getAlbum()->getBasicGenre()->getName() << "/" << *cleanDirName(&albumartist) << "/" << *cleanDirName(&albumname);
+            albumSubPathForImage = ssdirpath.str();
+            transform(albumSubPathForImage.begin(), albumSubPathForImage.end(), albumSubPathForImage.begin(), ::tolower);
             if (song->getAlbumPart() && song->getAlbumPart()->getName().length()) {
                 string part = song->getAlbumPart()->getName();
                 ssdirpath << "/" << *cleanDirName(&part);
             }
-            dirpath = ssdirpath.str();
+            albumPath = ssdirpath.str();
         }
-        transform(dirpath.begin(), dirpath.end(), dirpath.begin(), ::tolower);
-        filesystem::path dir(dirpath);
+        // create directory
+        transform(albumPath.begin(), albumPath.end(), albumPath.begin(), ::tolower);
+        string fullAlbumPath = SoulSifterSettings::getInstance().get<string>("music.dir") + albumPath;
+        filesystem::path dir(fullAlbumPath);
         if (!filesystem::exists(dir)) {
             if (!filesystem::create_directories(dir)) {
-                cerr << "Error occurred while trying to create directory " << dirpath << endl;
+                cerr << "Error occurred while trying to create directory " << fullAlbumPath << endl;
                 return false;
             }
         } else if (!filesystem::is_directory(dir)) {
-            cerr << "Cannot move file b/c destination is not a directory " << dirpath << endl;
+            cerr << "Cannot move file b/c destination is not a directory " << fullAlbumPath << endl;
             return false;
         }
     
         // move file to dest
-        stringstream destpath;
         boost::filesystem::path src(song->getFilepath());
-        destpath << dirpath << "/" << src.filename().string();
-        boost::filesystem::path dest(destpath.str());
+        string songPath = albumPath + "/" + src.filename().string();
+        stringstream destPath;
+        destPath << SoulSifterSettings::getInstance().get<string>("music.dir") << songPath;
+        boost::filesystem::path dest(destPath.str());
         boost::filesystem::rename(src, dest);
         
         // update song path
-        song->setFilepath(destpath.str());
+        song->setFilepath(songPath);
     
         return true;  //TODO better testing
     } catch (const filesystem::filesystem_error& ex) {
@@ -448,12 +462,13 @@ bool MusicManager::moveSong(Song* song) {
     return false;
 }
 
+    // TODO removed use of stagingPath. Add back feature?
     bool MusicManager::moveImage(const string& img) {
         try {
             // move file to dest
             stringstream destpath;
             boost::filesystem::path src(img);
-            destpath << imgDestinationPath << "/" << src.filename().string();
+            destpath << SoulSifterSettings::getInstance().get<string>("music.dir") << albumSubPathForImage << "/" << src.filename().string();
             boost::filesystem::path dest(destpath.str());
             boost::filesystem::rename(src, dest);
             
@@ -504,7 +519,7 @@ bool MusicManager::moveSong(Song* song) {
 */
     void MusicManager::flushStagingDirectory() {
         try {
-            filesystem::path musicPath(SoulSifterSettings::getInstance().getMusicPath());
+            filesystem::path musicPath(SoulSifterSettings::getInstance().get<string>("music.dir"));
             if (!filesystem::exists(musicPath) || !filesystem::is_directory(musicPath)) {
                 cerr << "music path does not exist or is not a directory: " << musicPath.string() << endl;
                 return;
@@ -546,22 +561,6 @@ bool MusicManager::moveSong(Song* song) {
                     if (filesystem::exists(dest)) {
                         filesystem::path trash("/Users/rneale/.Trash/" + it->path().filename().string());
                         filesystem::rename(it->path(), trash);
-                    }
-                    
-                    // update song path
-                    Song *song = Song::findByFilepath(it->path().string());
-                    if (song) {
-                        song->setFilepath(dest.string());
-                        song->update();
-                        delete song;
-                    } else {
-                        // TODO if albums share a cover, then only one here is updated
-                        Album *album = Album::findByCoverFilepath(it->path().string());
-                        if (album) {
-                            album->setCoverFilepath(dest.string());
-                            album->update();
-                            delete album;
-                        }
                     }
                 } else {
                     cerr << "wtf is this? " << it->path().string() << endl;

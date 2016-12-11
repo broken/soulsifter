@@ -28,6 +28,7 @@
 #include "MiniBpm.h"
 #include "SearchUtil.h"
 #include "Song.h"
+#include "SoulSifterSettings.h"
 
 namespace dogatech {
   namespace soulsifter {
@@ -42,7 +43,12 @@ namespace dogatech {
       cout << "analyze bpm" << endl;
 
       struct stat statBuffer;
-      if (stat(song->getFilepath().c_str(), &statBuffer) != 0) {
+      string songFilepath;
+      if (stat(song->getFilepath().c_str(), &statBuffer) == 0) {
+        songFilepath = song->getFilepath();
+      } else if (stat((SoulSifterSettings::getInstance().get<string>("music.dir") + song->getFilepath()).c_str(), &statBuffer) == 0) {
+        songFilepath = SoulSifterSettings::getInstance().get<string>("music.dir") + song->getFilepath();
+      } else {
         cerr << "File does not exist for song " << song->getId() << endl;
         vector<double> bpms;
         return bpms;
@@ -50,10 +56,10 @@ namespace dogatech {
       
       breakfastquay::MiniBPM miniBpm(44100);
       
-      if (boost::algorithm::iends_with(song->getFilepath(), ".mp3")) {
-        detectBpm(song->getFilepath().c_str(), boost::bind(&breakfastquay::MiniBPM::process, boost::ref(miniBpm), _1, _2));
+      if (boost::algorithm::iends_with(songFilepath, ".mp3")) {
+        detectBpm(songFilepath.c_str(), boost::bind(&breakfastquay::MiniBPM::process, boost::ref(miniBpm), _1, _2));
       } else {
-        cerr << "Unrecognizable file type when analyzing BPM for " << song->getFilepath() << endl;
+        cerr << "Unrecognizable file type when analyzing BPM for " << songFilepath << endl;
         vector<double> bpms;
         return bpms;
       }
@@ -103,7 +109,7 @@ namespace dogatech {
       FILE *fpipe;
       stringstream command;
       command << "/Users/rneale/sonic-annotator -d vamp:qm-vamp-plugins:qm-keydetector:key -w csv --csv-stdout ";
-      command << "\"" << song->getFilepath() << "\"";
+      command << "\"" << SoulSifterSettings::getInstance().get<string>("music.dir") << song->getFilepath() << "\"";
       char buffer[1024];
       
       if (!(fpipe = (FILE*)popen(command.str().c_str(), "r")) ) {

@@ -8,6 +8,7 @@
 #include <vector>
 
 #include <boost/algorithm/string.hpp>
+#include <boost/filesystem.hpp>
 #include <boost/regex.hpp>
 #include <taglib/attachedpictureframe.h>
 #include <taglib/fileref.h>
@@ -28,6 +29,7 @@
 #include "DTVectorUtil.h"
 #include "SearchUtil.h"
 #include "Song.h"
+#include "SoulSifterSettings.h"
 #include "Style.h"
 
 namespace dogatech {
@@ -118,7 +120,7 @@ bool readId3v2TagAttributes(Song* song, TagLib::ID3v2::Tag* id3v2) {
 }
 
 bool readId3v2TagAttributes(Song* song) {
-  TagLib::MPEG::File f(song->getFilepath().c_str());
+  TagLib::MPEG::File f((SoulSifterSettings::getInstance().get<string>("music.dir") + song->getFilepath()).c_str());
   TagLib::ID3v2::Tag* id3v2 = f.ID3v2Tag();  // still owned by file
   return readId3v2TagAttributes(song, id3v2);
 }
@@ -126,7 +128,14 @@ bool readId3v2TagAttributes(Song* song) {
 }  // namespace
   
 void TagService::readId3v2Tag(Song* song) {
-  TagLib::MPEG::File f(song->getFilepath().c_str());
+  string songFilepath = song->getFilepath();
+  if (!boost::filesystem::exists(songFilepath)) {
+    songFilepath = SoulSifterSettings::getInstance().get<string>("music.dir") + song->getFilepath();
+    if (!boost::filesystem::exists(songFilepath)) {
+      cerr << "unable to find song: " << song->getFilepath() << endl;
+    }
+  }
+  TagLib::MPEG::File f(songFilepath.c_str());
   TagLib::ID3v2::Tag* id3v2 = f.ID3v2Tag();
   if (!id3v2) {
     return;

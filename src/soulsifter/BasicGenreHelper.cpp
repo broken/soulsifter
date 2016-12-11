@@ -22,26 +22,8 @@ namespace dogatech {
 namespace soulsifter {
     
     BasicGenre* BasicGenre::findByFilepath(const string& filepath) {
-        unsigned long pos = filepath.find("/mp3/");
-        if (pos != string::npos) {
-            pos += 5;
-            unsigned long pos2 = filepath.find("/", pos);
-            return findByName(filepath.substr(pos, pos2-pos));
-        }
-        pos = filepath.find("/staging/");
-        if (pos != string::npos) {
-            pos += 9;
-            unsigned long pos2 = filepath.find("/", pos);
-            return findByName(filepath.substr(pos, pos2-pos));
-        }
-        // TODO remove mixes once they're moved
-        pos = filepath.find("/mixes/");
-        if (pos != string::npos) {
-            pos += 7;
-            unsigned long pos2 = filepath.find("/", pos);
-            return findByName(filepath.substr(pos, pos2-pos));
-        }
-        return NULL;
+        unsigned long pos = filepath.find("/", 0);
+        return findByName(filepath.substr(0, pos));
     }
     
     void BasicGenre::findAll(const vector<const BasicGenre*>** genresPtr) {

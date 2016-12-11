@@ -7,6 +7,7 @@
 #include <vector>
 
 #include <boost/algorithm/string/classification.hpp>
+#include <boost/algorithm/string/replace.hpp>
 #include <boost/algorithm/string/split.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/range/algorithm_ext/erase.hpp>
@@ -55,7 +56,7 @@ MusicVideo* MusicVideoService::associateYouTubeVideo(Song* const song, const str
   string mvArtistDir;
   {
     stringstream ss;
-    ss << mvBasePath.string() << "/" << song->getAlbum()->getBasicGenre()->getName() << "/" << song->getArtist();
+    ss << mvBasePath.string() << song->getAlbum()->getBasicGenre()->getName() << "/" << song->getArtist();
     mvArtistDir = ss.str();
   }
   boost::filesystem::path mvArtistPath(mvArtistDir);
@@ -117,6 +118,10 @@ MusicVideo* MusicVideoService::associateYouTubeVideo(Song* const song, const str
   // TODO remove if --restrict-filenames works
   musicVideo->setFilePath(removeSpecialCharsFromPath(musicVideo->getFilePath()));
   musicVideo->setThumbnailFilePath(removeSpecialCharsFromPath(musicVideo->getThumbnailFilePath()));
+
+  // remove base path
+  musicVideo->setFilePath(boost::algorithm::ireplace_first_copy(musicVideo->getFilePath(), SoulSifterSettings::getInstance().get<string>("mv.dir"), ""));
+  musicVideo->setThumbnailFilePath(boost::algorithm::ireplace_first_copy(musicVideo->getThumbnailFilePath(), SoulSifterSettings::getInstance().get<string>("mv.dir"), ""));
   
   musicVideo->setSongId(song->getId());
   musicVideo->save();

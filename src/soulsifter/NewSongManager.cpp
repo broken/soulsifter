@@ -16,6 +16,7 @@
 #include "FilesToAdd.h"
 #include "MusicManager.h"
 #include "Song.h"
+#include "SoulSifterSettings.h"
 
 using namespace boost;
 using namespace std;
@@ -169,14 +170,14 @@ bool NewSongManager::processSong(Song* song) {
     NSBeep();
     return false;
   }*/
-    
-  // update tag
-  MusicManager::getInstance().writeTagsToSong(song);
   
   // move file
   MusicManager::getInstance().moveSong(song);
   hasMovedFile = true;
   
+  // update tag
+  MusicManager::getInstance().writeTagsToSong(song);
+
   // save song
   if (!song->getId()) {
     song->setDateAddedToNow();
@@ -194,17 +195,18 @@ bool NewSongManager::processSong(Song* song) {
 void NewSongManager::trashMusicFile(Song* song) {
   // create new file
   ofstream outputFile;
-  string newPath = song->getFilepath() + ".txt";
+  string oldPath = SoulSifterSettings::getInstance().get<string>("music.dir") + song->getFilepath();
+  string newPath = oldPath + ".txt";
   outputFile.open(newPath);
   outputFile.close();
 
   // trash old file
-  if (remove(song->getFilepath().c_str()) != 0) {
-    cerr << "Unable to delete trashed song file at " << song->getFilepath() << endl;
+  if (remove(oldPath.c_str()) != 0) {
+    cerr << "Unable to delete trashed song file at " << oldPath << endl;
   }
     
   song->setTrashed(true);
-  song->setFilepath(newPath);
+  song->setFilepath(song->getFilepath() + ".txt");
   song->setRating(0);
   song->update();
 }

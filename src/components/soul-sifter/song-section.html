@@ -153,6 +153,11 @@
       },
       _musicVideo: Object,
       _videoId: String,
+      _soulSifterSettings: {
+        type: Object,
+        value: function() { return new ss.SoulSifterSettings(); },
+        readOnly: true
+      },
     },
 
     observers: [
@@ -187,10 +192,10 @@
 
       // audio source; use local, otherwise contact google api
       var that = this;
-      this.fs.access(this.song.filepath, this.fs.F_OK | this.fs.R_OK, function(err) {
+      this.fs.access(this._soulSifterSettings.getString('music.dir') + this.song.filepath, this.fs.F_OK | this.fs.R_OK, function(err) {
           if (!err) {
-            that.$.audio.src = "file://" + that.song.filepath;
-            that._setCoverImage(that.song.album.coverFilepath);
+            that.$.audio.src = "file://" + that._soulSifterSettings.getString('music.dir') + that.song.filepath;
+            that._setCoverImage(that._soulSifterSettings.getString('music.dir') + that.song.album.coverFilepath);
             that._setMusicVideo(ss.MusicVideo.findBySongId(that.song.id));
           } else {
             that.$.gpm.findSong(that.song,
@@ -221,7 +226,7 @@
 
     dragSong: function(e) {
       e.dataTransfer.effectAllowed = 'move';
-      e.dataTransfer.setData('text/plain', 'extensis-filenames-type:' + this.song.filepath);
+      e.dataTransfer.setData('text/plain', 'extensis-filenames-type:' + this._soulSifterSettings.getString('music.dir') + this.song.filepath);
     },
 
     backAction: function(e, detail, sender) {
@@ -264,7 +269,7 @@
       this._musicVideo = mv;
       var url = '';
       if (!!mv && !!mv.thumbnailFilePath) {
-        url = 'url("file://' + mv.thumbnailFilePath + '")';
+        url = 'url("file://' + this._soulSifterSettings.getString('mv.dir') + mv.thumbnailFilePath + '")';
       }
       this.$.musicVideoThumbnail.style.backgroundImage = url;
       this.toggleClass('hasMusicVideo', !mv, this.$.musicVideoThumbnail);
@@ -278,7 +283,7 @@
 
     _dragMusicVideo: function(e) {
       e.dataTransfer.effectAllowed = 'move';
-      e.dataTransfer.setData('text/plain', 'extensis-filenames-type:' + this._musicVideo.filePath);
+      e.dataTransfer.setData('text/plain', 'extensis-filenames-type:' + this._soulSifterSettings.getString('mv.dir') + this._musicVideo.filePath);
     },
 
     editAction: function(e, detail, sender) {

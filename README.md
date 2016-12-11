@@ -19,7 +19,7 @@ Presteps:
   * locally with npm install: grunt plugins
 * install bower components
 * custom build of nwjs (for drag & drop & mp3 play support)
-* required libs (brew install): mysql-connector-c++, libtag, mad, boost
+* required libs (brew install): mysql-connector-c++, libtag, mad, boost, youtube-dl (for music videos)
 
 ```
 grunt all
