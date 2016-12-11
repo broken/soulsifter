@@ -97,12 +97,18 @@ namespace {
         return frameList.isEmpty() ? "" : frameList.front()->toString().to8Bit();
     }
 
-    void setId3v2Text(TagLib::ID3v2::Tag* id3v2, const char* name, const char* value) {
-        id3v2->removeFrames(name);
-        TagLib::ID3v2::TextIdentificationFrame *frame = new TagLib::ID3v2::TextIdentificationFrame(name, TagLib::String::Latin1);
-        frame->setText(TagLib::String(value, TagLib::String::UTF8));
-        id3v2->addFrame(frame);
+  void setId3v2Text(TagLib::ID3v2::Tag* id3v2, const char* name, const char* val) {
+    TagLib::ByteVector handle = name;
+    TagLib::String value = val;
+
+    if(!id3v2->frameList(handle).isEmpty()) {
+      id3v2->frameList(handle).front()->setText(value);
+    } else {
+      TagLib::ID3v2::TextIdentificationFrame *frame = new TagLib::ID3v2::TextIdentificationFrame(handle, TagLib::String::UTF8);
+      id3v2->addFrame(frame);
+      frame->setText(value);
     }
+  }
   
   // other formats: https://gist.github.com/guymac/1468279
   void setId3v2Picture(TagLib::ID3v2::Tag* id3v2, string path, bool replace) {
@@ -199,7 +205,7 @@ void MusicManager::readTagsFromSong(Song* song) {
 void MusicManager::writeTagsToSong(Song* song) {
     delete lastSongFixed;
     lastSongFixed = new Song(*song);
-  
+
   if (boost::algorithm::iends_with(song->getFilepath(), ".mp3") ||
       boost::algorithm::iends_with(song->getFilepath(), ".m4a") ||
       boost::algorithm::iends_with(song->getFilepath(), ".mp4") ||
@@ -262,6 +268,8 @@ void MusicManager::writeTagsToSong(Song* song) {
         bool result = f.save();
         if (!result) {
             cerr << "unable to save " << SoulSifterSettings::getInstance().get<string>("music.dir") << song->getFilepath() << endl;
+        } else {
+            cout << "successfully wrote id3v2 tag for " << song->getFilepath() << endl;
         }
     }
 }

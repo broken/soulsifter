@@ -32,7 +32,7 @@ public:
     
     // tags
     void readTagsFromSong(Song* song);
-    void writeTagsToSong(Song* song);  // takes ownership of song here
+    void writeTagsToSong(Song* song);
     
     // monitor changes
     void updateSongWithChanges(const Song& song, Song* updatedSong);
