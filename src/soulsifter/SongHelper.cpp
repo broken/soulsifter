@@ -42,6 +42,7 @@ namespace soulsifter {
     comments(song->getComments()),
     trashed(!song->getDisabled().compare("yes")),
     lowQuality(false),
+    googleSongId(),
     albumId(0),
     album(NULL),
     albumPartId(0),
@@ -121,5 +122,6 @@ namespace soulsifter {
         re->setDisabled(song.getTrashed() ? "yes" : "no");
         return re;
     }
-}
-}
+
+}  // namespace soulsifter
+}  // namespace dogatech

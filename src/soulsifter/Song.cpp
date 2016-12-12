@@ -53,6 +53,7 @@ namespace soulsifter {
     comments(),
     trashed(false),
     lowQuality(false),
+    googleSongId(),
     reSongId(0),
     reSong(NULL),
     albumId(0),
@@ -80,6 +81,7 @@ namespace soulsifter {
     comments(song.getComments()),
     trashed(song.getTrashed()),
     lowQuality(song.getLowQuality()),
+    googleSongId(song.getGoogleSongId()),
     reSongId(song.getRESongId()),
     reSong(NULL),
     albumId(song.getAlbumId()),
@@ -110,6 +112,7 @@ namespace soulsifter {
         comments = song.getComments();
         trashed = song.getTrashed();
         lowQuality = song.getLowQuality();
+        googleSongId = song.getGoogleSongId();
         reSongId = song.getRESongId();
         if (!song.getRESongId() && song.reSong) {
             if (!reSong) reSong = new RESong(*song.reSong);
@@ -165,6 +168,7 @@ namespace soulsifter {
         comments.clear();
         trashed = false;
         lowQuality = false;
+        googleSongId.clear();
         reSongId = 0;
         delete reSong;
         reSong = NULL;
@@ -196,6 +200,7 @@ namespace soulsifter {
         song->setComments(rs->getString("comments"));
         song->setTrashed(rs->getBoolean("trashed"));
         song->setLowQuality(rs->getBoolean("lowQuality"));
+        song->setGoogleSongId(rs->getString("googleSongId"));
         song->setRESongId(rs->getInt("reSongId"));
         song->setAlbumId(rs->getInt("albumId"));
         song->setAlbumPartId(rs->getInt("albumPartId"));
@@ -241,6 +246,30 @@ namespace soulsifter {
         try {
             sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select Songs.*, group_concat(styles.styleId) as styleIds from Songs left outer join SongStyles styles on Songs.id = styles.songId where Songs.filepath = ? group by Songs.id");
             ps->setString(1, filepath);
+            sql::ResultSet *rs = ps->executeQuery();
+            Song *song = NULL;
+            if (rs->next()) {
+                song = new Song();
+                populateFields(rs, song);
+            }
+            rs->close();
+            delete rs;
+
+            return song;
+        } catch (sql::SQLException &e) {
+            cerr << "ERROR: SQLException in " << __FILE__;
+            cerr << " (" << __func__<< ") on line " << __LINE__ << endl;
+            cerr << "ERROR: " << e.what();
+            cerr << " (MySQL error code: " << e.getErrorCode();
+            cerr << ", SQLState: " << e.getSQLState() << ")" << endl;
+            exit(1);
+        }
+    }
+
+    Song* Song::findByGoogleSongId(const string& googleSongId) {
+        try {
+            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select Songs.*, group_concat(styles.styleId) as styleIds from Songs left outer join SongStyles styles on Songs.id = styles.songId where Songs.googleSongId = ? group by Songs.id");
+            ps->setString(1, googleSongId);
             sql::ResultSet *rs = ps->executeQuery();
             Song *song = NULL;
             if (rs->next()) {
@@ -328,7 +357,7 @@ namespace soulsifter {
                 albumPartId = albumPart->getId();
             }
 
-            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("update Songs set artist=?, track=?, title=?, remixer=?, featuring=?, filepath=?, rating=?, dateAdded=?, bpm=?, tonicKeys=?, tonicKey=?, energy=?, comments=?, trashed=?, lowQuality=?, reSongId=?, albumId=?, albumPartId=? where id=?");
+            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("update Songs set artist=?, track=?, title=?, remixer=?, featuring=?, filepath=?, rating=?, dateAdded=?, bpm=?, tonicKeys=?, tonicKey=?, energy=?, comments=?, trashed=?, lowQuality=?, googleSongId=?, reSongId=?, albumId=?, albumPartId=? where id=?");
             if (!artist.empty()) ps->setString(1, artist);
             else ps->setNull(1, sql::DataType::VARCHAR);
             if (!track.empty()) ps->setString(2, track);
@@ -354,13 +383,15 @@ namespace soulsifter {
             else ps->setNull(13, sql::DataType::VARCHAR);
             ps->setBoolean(14, trashed);
             ps->setBoolean(15, lowQuality);
-            if (reSongId > 0) ps->setInt(16, reSongId);
-            else ps->setNull(16, sql::DataType::INTEGER);
-            if (albumId > 0) ps->setInt(17, albumId);
+            if (!googleSongId.empty()) ps->setString(16, googleSongId);
+            else ps->setNull(16, sql::DataType::VARCHAR);
+            if (reSongId > 0) ps->setInt(17, reSongId);
             else ps->setNull(17, sql::DataType::INTEGER);
-            if (albumPartId > 0) ps->setInt(18, albumPartId);
+            if (albumId > 0) ps->setInt(18, albumId);
             else ps->setNull(18, sql::DataType::INTEGER);
-            ps->setInt(19, id);
+            if (albumPartId > 0) ps->setInt(19, albumPartId);
+            else ps->setNull(19, sql::DataType::INTEGER);
+            ps->setInt(20, id);
             int result = ps->executeUpdate();
             if (!styleIds.empty()) {
                 stringstream ss("insert ignore into SongStyles (songId, styleId) values (?, ?)", ios_base::app | ios_base::out | ios_base::ate);
@@ -434,7 +465,7 @@ namespace soulsifter {
                 albumPartId = albumPart->getId();
             }
 
-            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("insert into Songs (artist, track, title, remixer, featuring, filepath, rating, dateAdded, bpm, tonicKeys, tonicKey, energy, comments, trashed, lowQuality, reSongId, albumId, albumPartId) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("insert into Songs (artist, track, title, remixer, featuring, filepath, rating, dateAdded, bpm, tonicKeys, tonicKey, energy, comments, trashed, lowQuality, googleSongId, reSongId, albumId, albumPartId) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
             if (!artist.empty()) ps->setString(1, artist);
             else ps->setNull(1, sql::DataType::VARCHAR);
             if (!track.empty()) ps->setString(2, track);
@@ -460,12 +491,14 @@ namespace soulsifter {
             else ps->setNull(13, sql::DataType::VARCHAR);
             ps->setBoolean(14, trashed);
             ps->setBoolean(15, lowQuality);
-            if (reSongId > 0) ps->setInt(16, reSongId);
-            else ps->setNull(16, sql::DataType::INTEGER);
-            if (albumId > 0) ps->setInt(17, albumId);
+            if (!googleSongId.empty()) ps->setString(16, googleSongId);
+            else ps->setNull(16, sql::DataType::VARCHAR);
+            if (reSongId > 0) ps->setInt(17, reSongId);
             else ps->setNull(17, sql::DataType::INTEGER);
-            if (albumPartId > 0) ps->setInt(18, albumPartId);
+            if (albumId > 0) ps->setInt(18, albumId);
             else ps->setNull(18, sql::DataType::INTEGER);
+            if (albumPartId > 0) ps->setInt(19, albumPartId);
+            else ps->setNull(19, sql::DataType::INTEGER);
             int saved = ps->executeUpdate();
             if (!saved) {
                 cerr << "Not able to save song" << endl;
@@ -653,6 +686,14 @@ namespace soulsifter {
                 lowQuality = song->getLowQuality();
             }
         }
+        if (googleSongId.compare(song->getGoogleSongId())  && (!boost::regex_match(googleSongId, match1, decimal) || !boost::regex_match(song->getGoogleSongId(), match2, decimal) || match1[1].str().compare(match2[1].str()))) {
+            if (!googleSongId.empty()) {
+                cout << "updating song " << id << " googleSongId from " << song->getGoogleSongId() << " to " << googleSongId << endl;
+                needsUpdate = true;
+            } else {
+                googleSongId = song->getGoogleSongId();
+            }
+        }
         if (reSongId != song->getRESongId()) {
             if (reSongId) {
                 cout << "updating song " << id << " reSongId from " << song->getRESongId() << " to " << reSongId << endl;
@@ -750,6 +791,9 @@ namespace soulsifter {
 
     const bool Song::getLowQuality() const { return lowQuality; }
     void Song::setLowQuality(const bool lowQuality) { this->lowQuality = lowQuality; }
+
+    const string& Song::getGoogleSongId() const { return googleSongId; }
+    void Song::setGoogleSongId(const string& googleSongId) { this->googleSongId = googleSongId; }
 
     const int Song::getRESongId() const { 
         return (!reSongId && reSong) ? reSong->getId() : reSongId;

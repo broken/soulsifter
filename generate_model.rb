@@ -859,6 +859,7 @@ songFields = [
   [:string, "comments", 0],
   [:bool, "trashed", 0],
   [:bool, "lowQuality", 0],
+  [:string, "googleSongId", Attrib::FIND],
   [:int, "reSongId", Attrib::KEY2 | Attrib::ID],
   ["RESong", "reSong", Attrib::PTR],
   [:int, "albumId", Attrib::ID],
