@@ -52,6 +52,7 @@
     <ss-options-menu>
       <ss-options-menu-item on-click="updateSongAttributesFromTags">Update Song Attributes From Tags</ss-options-menu-item>
       <ss-options-menu-item on-click="analyzeBpms">Analyze BPMs</ss-options-menu-item>
+      <ss-options-menu-item on-click="showDevTools">View Developer Tools</ss-options-menu-item>
     </ss-options-menu>
     <paper-dialog id="searchInfoDialog" entry-animation="fade-in-animation" exit-animation="fade-out-animation">
       <search-info></search-info>
@@ -91,6 +92,11 @@
         type: Boolean,
         notify: true
       },
+      _nwGui: {
+        type: Object,
+        value: function() { return require('nw.gui'); },
+        readOnly: true
+      },
     },
 
     attached: function() {
@@ -128,6 +134,10 @@
 
     updateSongAttributesFromTags: function(e, detail, sender) {
       ss.TagService.updateSongAttributesFromTags();
+    },
+
+    showDevTools: function(e, detail, sender) {
+      this._nwGui.Window.get().showDevTools();
     },
 
     _toggleSearchInfoDialog: function(e, detail, sender) {
