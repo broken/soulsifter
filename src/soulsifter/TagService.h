@@ -9,6 +9,7 @@ class Song;
 class TagService {
 public:
   static void readId3v2Tag(Song* song);
+  static void writeId3v2Tag(Song* song);
   static void updateSongAttributesFromTags();
 };
     

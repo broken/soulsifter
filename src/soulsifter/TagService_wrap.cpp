@@ -38,6 +38,7 @@ void TagService::Init(v8::Local<v8::Object> exports) {
 
   // Prototype
   Nan::SetMethod(tpl, "readId3v2Tag", readId3v2Tag);
+  Nan::SetMethod(tpl, "writeId3v2Tag", writeId3v2Tag);
   Nan::SetMethod(tpl, "updateSongAttributesFromTags", updateSongAttributesFromTags);
 
   constructor.Reset(tpl->GetFunction());
@@ -48,6 +49,14 @@ void TagService::readId3v2Tag(const Nan::FunctionCallbackInfo<v8::Value>& info) 
   dogatech::soulsifter::Song* a0(Nan::ObjectWrap::Unwrap<Song>(info[0]->ToObject())->getNwcpValue());
 
       dogatech::soulsifter::TagService::readId3v2Tag(a0);
+
+  info.GetReturnValue().SetUndefined();
+}
+
+void TagService::writeId3v2Tag(const Nan::FunctionCallbackInfo<v8::Value>& info) {
+  dogatech::soulsifter::Song* a0(Nan::ObjectWrap::Unwrap<Song>(info[0]->ToObject())->getNwcpValue());
+
+      dogatech::soulsifter::TagService::writeId3v2Tag(a0);
 
   info.GetReturnValue().SetUndefined();
 }

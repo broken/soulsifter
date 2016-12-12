@@ -57,84 +57,14 @@ namespace soulsifter {
 # pragma mark private helpers
 
 namespace {
-  
-  class ImageFile : public TagLib::File {
-  public:
-    ImageFile(const char *file) : TagLib::File(file) { }
-    
-    TagLib::String mimeType() const {
-      string filename = name();
-      
-      if (boost::algorithm::iends_with(filename, "jpg") ||
-          boost::algorithm::iends_with(filename, "jpeg")) {
-        return "image/jpeg";
-      } else if (boost::algorithm::iends_with(filename, "gif")) {
-        return "image/gif";
-      } else if (boost::algorithm::iends_with(filename, "png")) {
-        return "image/png";
-      } else {
-        cerr << "Unknown image type for file " << filename << endl;
-        return TagLib::String::null;
-      }
-    }
-    
-    TagLib::ByteVector data() {
-      return readBlock(length());
-    }
-    
-    bool isValid() const {
-      return isOpen() && !mimeType().isNull();
-    }
-    
-  private:
-    virtual TagLib::Tag *tag() const { return NULL; }
-    virtual TagLib::AudioProperties *audioProperties() const { return NULL; }
-    virtual bool save() { return false; }
-  };
-    
-    const string getId3v2Text(TagLib::ID3v2::Tag* id3v2, const char* name) {
-        TagLib::ID3v2::FrameList frameList = id3v2->frameListMap()[name];
-        return frameList.isEmpty() ? "" : frameList.front()->toString().to8Bit();
-    }
 
-  void setId3v2Text(TagLib::ID3v2::Tag* id3v2, const char* name, const char* val) {
-    TagLib::ByteVector handle = name;
-    TagLib::String value = val;
-
-    if(!id3v2->frameList(handle).isEmpty()) {
-      id3v2->frameList(handle).front()->setText(value);
-    } else {
-      TagLib::ID3v2::TextIdentificationFrame *frame = new TagLib::ID3v2::TextIdentificationFrame(handle, TagLib::String::UTF8);
-      id3v2->addFrame(frame);
-      frame->setText(value);
-    }
-  }
-  
-  // other formats: https://gist.github.com/guymac/1468279
-  void setId3v2Picture(TagLib::ID3v2::Tag* id3v2, string path, bool replace) {
-    TagLib::ID3v2::FrameList frames = id3v2->frameListMap()["APIC"];  // get pictures
-    if (!frames.isEmpty() && !replace) {
-      cout << "Picture exists: not replacing." << endl;
-      return;
-    } else if (!frames.isEmpty() && replace) {
-      id3v2->removeFrames("APIC");
-    }
-    ImageFile image(path.c_str());
-    if (!image.isValid()) {
-      return;
-    }
-    TagLib::ID3v2::AttachedPictureFrame *frame = new TagLib::ID3v2::AttachedPictureFrame;
-    frame->setMimeType(image.mimeType());
-    frame->setPicture(image.data());
-    id3v2->addFrame(frame);
-  }
-  
   string* cleanDirName(string* name) {
     std::replace(name->begin(), name->end(), '/', '-');
     std::replace(name->begin(), name->end(), ':', ' ');
     return name;
   }
-}
+
+}  // namespace
 
 # pragma mark initialization
 
@@ -203,75 +133,10 @@ void MusicManager::readTagsFromSong(Song* song) {
 }
 
 void MusicManager::writeTagsToSong(Song* song) {
-    delete lastSongFixed;
-    lastSongFixed = new Song(*song);
+  delete lastSongFixed;
+  lastSongFixed = new Song(*song);
 
-  if (boost::algorithm::iends_with(song->getFilepath(), ".mp3") ||
-      boost::algorithm::iends_with(song->getFilepath(), ".m4a") ||
-      boost::algorithm::iends_with(song->getFilepath(), ".mp4") ||
-      boost::algorithm::iends_with(song->getFilepath(), ".aac") ||
-      boost::algorithm::iends_with(song->getFilepath(), ".alac")) {
-        TagLib::MPEG::File f((SoulSifterSettings::getInstance().get<string>("music.dir") + song->getFilepath()).c_str());
-        TagLib::ID3v2::Tag* id3v2 = f.ID3v2Tag(true);
-        f.strip(TagLib::MPEG::File::ID3v1);
-        id3v2->setArtist(song->getArtist());
-        setId3v2Text(id3v2, "TRCK", song->getTrack().c_str());
-        id3v2->setTitle(song->getTitle());
-        setId3v2Text(id3v2, "TPE4", song->getRemixer().c_str());
-        id3v2->setComment(song->getComments());
-        setId3v2Text(id3v2, "TPE2", song->getAlbum()->getArtist().c_str());
-        id3v2->setAlbum(song->getAlbum()->getName());
-        setId3v2Text(id3v2, "TPUB", song->getAlbum()->getLabel().c_str());
-        setId3v2Text(id3v2, "TCID", song->getAlbum()->getCatalogId().c_str());
-        id3v2->setYear(song->getAlbum()->getReleaseDateYear());
-        // set genre
-        for (long i = song->getStyles().size(); i > 0; --i) {
-            const char* style = song->getStyles().back()->getName().c_str();
-            if (style[0] != '=' && style[0] != '_' && style[0] != '.') {
-                setId3v2Text(id3v2, "TCON", style);
-                break;
-            }
-        }
-        // set rating
-        {
-            id3v2->removeFrames("POPM");
-            TagLib::ID3v2::PopularimeterFrame *frame = new TagLib::ID3v2::PopularimeterFrame();
-            frame->setRating(song->getRating());
-            id3v2->addFrame(frame);
-        }
-        // part of set
-        if (song->getAlbumPart()) {
-            setId3v2Text(id3v2, "TPOS", song->getAlbumPart()->getPos().c_str());
-        } else {
-            id3v2->removeFrames("TPOS");
-        }
-        // set release day & month
-        if (song->getAlbum()->getReleaseDateMonth() > 0) {
-            ostringstream daymonth;
-            if (song->getAlbum()->getReleaseDateDay() == 0) {
-                daymonth << "00";
-            } else if (song->getAlbum()->getReleaseDateDay() < 10) {
-                daymonth << "0" << song->getAlbum()->getReleaseDateDay();
-            } else {
-                daymonth << song->getAlbum()->getReleaseDateDay();
-            }
-            if (song->getAlbum()->getReleaseDateMonth() < 10) {
-                daymonth << "0" << song->getAlbum()->getReleaseDateMonth();
-            } else {
-                daymonth << song->getAlbum()->getReleaseDateMonth();
-            }
-            setId3v2Text(id3v2, "TDAT", daymonth.str().c_str());
-        }
-        // picture
-        setId3v2Picture(id3v2, SoulSifterSettings::getInstance().get<string>("music.dir") + song->getAlbum()->getCoverFilepath(), false);
-        // save
-        bool result = f.save();
-        if (!result) {
-            cerr << "unable to save " << SoulSifterSettings::getInstance().get<string>("music.dir") << song->getFilepath() << endl;
-        } else {
-            cout << "successfully wrote id3v2 tag for " << song->getFilepath() << endl;
-        }
-    }
+  TagService::writeId3v2Tag(song);
 }
     
 # pragma mark monitor changes

@@ -21,6 +21,7 @@ class TagService : public Nan::ObjectWrap {
   static void New(const Nan::FunctionCallbackInfo<v8::Value>& info);
 
   static void readId3v2Tag(const Nan::FunctionCallbackInfo<v8::Value>& info);
+  static void writeId3v2Tag(const Nan::FunctionCallbackInfo<v8::Value>& info);
   static void updateSongAttributesFromTags(const Nan::FunctionCallbackInfo<v8::Value>& info);
 
   static Nan::Persistent<v8::Function> constructor;
