@@ -85,10 +85,14 @@ module.exports = function(grunt) {
     },
     spawn: {
       run: {
-        command: './build/soulsifter/osx64/soulsifter.app/Contents/MacOS/nwjs build/soulsifter/osx64/soulsifter.app/Contents/Resources/app.nw',
+        command: './build/soulsifter/osx64/soulsifter.app/Contents/MacOS/nwjs',
+        commandArgs: ['build/soulsifter/osx/soulsifter.app/Contents/Resources/app.nw'],
+        directory: '.',
       },
       ulimit: {
-        command: 'ulimit -n 10240',
+        command: 'ulimit',
+        commandArgs: ['-n', '10240'],
+        directory: '.',
       },
     },
     bump: {
@@ -133,8 +137,9 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-spawn');
   grunt.loadNpmTasks('grunt-text-replace');
 
+  grunt.registerTask('run', ['spawn:run']);
   grunt.registerTask('css-hack', ['less:development', 'replace:less']);
-  grunt.registerTask('default', ['nwjs', 'css-hack', 'copy:ffmpeg', 'buildnumber']);
+  grunt.registerTask('default', ['nwjs', 'css-hack', 'copy:ffmpeg', 'buildnumber', 'run']);
   grunt.registerTask('nw-gyp', ['shell:nwgypclean', 'shell:nwgypconfigure', 'replace:rtti', 'shell:nwgypbuild']);
   grunt.registerTask('up', ['shell:updateviews', 'shell:updatecomponents', 'css-hack', 'buildnumber']);
   grunt.registerTask('all', ['nw-gyp', 'default']);
