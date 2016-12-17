@@ -52,6 +52,7 @@
     <ss-options-menu>
       <ss-options-menu-item on-click="updateSongAttributesFromTags">Update Song Attributes From Tags</ss-options-menu-item>
       <ss-options-menu-item on-click="analyzeBpms">Analyze BPMs</ss-options-menu-item>
+      <ss-options-menu-item on-click="syncGoogleMusic">Sync Google Music</ss-options-menu-item>
       <ss-options-menu-item on-click="showDevTools">View Developer Tools</ss-options-menu-item>
     </ss-options-menu>
     <paper-dialog id="searchInfoDialog" entry-animation="fade-in-animation" exit-animation="fade-out-animation">
@@ -138,6 +139,12 @@
 
     showDevTools: function(e, detail, sender) {
       this._nwGui.Window.get().showDevTools();
+    },
+
+    syncGoogleMusic: function(e, detail, sender) {
+      this.gmm = new ss.GoogleMusicManager();
+      var loggedIn = this.gmm.login();
+      window.console.log('Login to Google Play Music was a ' + (loggedIn ? 'success' : 'failure'));
     },
 
     _toggleSearchInfoDialog: function(e, detail, sender) {

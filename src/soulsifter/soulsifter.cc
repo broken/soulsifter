@@ -4,6 +4,7 @@
 #include "AlbumPart_wrap.h"
 #include "AudioAnalyzer_wrap.h"
 #include "BasicGenre_wrap.h"
+#include "GoogleMusicManager_wrap.h"
 #include "Mix_wrap.h"
 #include "MusicVideo_wrap.h"
 #include "MusicVideoService_wrap.h"
@@ -30,6 +31,7 @@ void InitAll(v8::Handle<v8::Object> exports) {
 
   // services
   AudioAnalyzer::Init(exports);
+  GoogleMusicManager::Init(exports);
   MusicVideoService::Init(exports);
   NewSongManager::Init(exports);
   SearchUtil::Init(exports);

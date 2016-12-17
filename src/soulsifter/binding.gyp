@@ -41,6 +41,8 @@
           "MiniBpm.cpp",
           # organization
           "FilesToAdd.cpp",
+          "GoogleMusicManager.cpp",
+          "GoogleMusicManager_wrap.cpp",
           "MusicManager.cpp",
           "MusicVideoService.cpp",
           "MusicVideoService_wrap.cpp",
@@ -64,11 +66,30 @@
           '-fno-exceptions',
           '-std=c++11',
           '-stdlib=libc++',
+          # from python-config --cflags
+          '-fno-strict-aliasing',
+          '-fno-common',
+          '-fwrapv',
+          '-dynamic',
+          '-Wall',
+          '-Wstrict-prototypes',
+          # optimize later
+          #'-DNDEBUG',
+          #'-O3',
       ],
       'cflags_cc!': [
           '-fno-exceptions',
           '-std=c++11',
           '-stdlib=libc++',
+          # from python-config --ccflags
+          '-fno-strict-aliasing',
+          '-fno-common',
+          '-fwrapv',
+          '-dynamic',
+          '-Wall',
+          # optimize later
+          #'-DNDEBUG',
+          #'-O3',
       ],
       "link_settings": {
         "libraries": [
@@ -81,6 +102,7 @@
           "/usr/local/lib/libmysqlclient.20.dylib",
           "/usr/local/lib/libmysqlcppconn.7.dylib",
           "/usr/local/lib/libtag.1.17.0.dylib",
+          "/usr/local/Frameworks/Python.framework/Versions/2.7/lib/libpython2.7.dylib",
         ],
       },
       'conditions': [
@@ -97,6 +119,7 @@
       "include_dirs" : [
         "<!(node -e \"require('nan')\")",
         "/usr/local/include",
+        "/usr/local/Cellar/python/2.7.12_2/Frameworks/Python.framework/Versions/2.7/include/python2.7",
       ],
     }
   ]
