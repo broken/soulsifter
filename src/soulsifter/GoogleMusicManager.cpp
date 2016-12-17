@@ -25,6 +25,7 @@ GoogleMusicManager::GoogleMusicManager() {
 }
 
 GoogleMusicManager::~GoogleMusicManager() {
+  if (isLoggedIn) logout();
   Py_DECREF(mobileclient);
   Py_DECREF(mobileclientClass);
   Py_DECREF(gmusicapiModule);
@@ -44,11 +45,49 @@ bool GoogleMusicManager::login() {
   Py_DECREF(argsObjectList);
   assert(result != NULL);
   assert(PyBool_Check(result));
-  int isSuccess = PyObject_IsTrue(result);
+  isLoggedIn = PyObject_IsTrue(result) > 0;
   Py_DECREF(result);
 
   Py_DECREF(func);
-  return isSuccess;
+  return isLoggedIn;
+}
+
+bool GoogleMusicManager::logout() {
+  if (isLoggedIn) return false;
+
+  PyObject* func = PyObject_GetAttrString(mobileclient, "logout");
+  assert(PyCallable_Check(func));
+
+  PyObject* argsObjectList = PyTuple_New(0);
+
+  PyObject* result = PyObject_CallObject(func, argsObjectList);
+  Py_DECREF(argsObjectList);
+  assert(result != NULL);
+  assert(PyBool_Check(result));
+  bool loggedOut = PyObject_IsTrue(result) > 0;
+  Py_DECREF(result);
+
+  if (loggedOut) isLoggedIn = false;
+
+  Py_DECREF(func);
+  return loggedOut;
+}
+
+bool GoogleMusicManager::isAuthenticated() {
+  PyObject* func = PyObject_GetAttrString(mobileclient, "is_authenticated");
+  assert(PyCallable_Check(func));
+
+  PyObject* argsObjectList = PyTuple_New(0);
+
+  PyObject* result = PyObject_CallObject(func, argsObjectList);
+  Py_DECREF(argsObjectList);
+  assert(result != NULL);
+  assert(PyBool_Check(result));
+  int isAuth = PyObject_IsTrue(result);
+  Py_DECREF(result);
+
+  Py_DECREF(func);
+  return isAuth;
 }
 
 }  // namespace soulsifter
