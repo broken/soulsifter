@@ -22,7 +22,6 @@ class GoogleMusicManager : public Nan::ObjectWrap {
 
   static void login(const Nan::FunctionCallbackInfo<v8::Value>& info);
   static void logout(const Nan::FunctionCallbackInfo<v8::Value>& info);
-  static void isAuthenticated(const Nan::FunctionCallbackInfo<v8::Value>& info);
 
   static Nan::Persistent<v8::Function> constructor;
   dogatech::soulsifter::GoogleMusicManager* googlemusicmanager;

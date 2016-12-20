@@ -61,10 +61,35 @@
           # util
           "DTVectorUtil.h",
           "DTQueueUtil.h",
+          # GMusicApi-cpp
+          "PythonHelper/ClassBase.cpp",
+          "PythonHelper/Initializer.cpp",
+          "PythonHelper/ModuleBase.cpp",
+          "gmusicapi/ClientBase.cpp",
+          "gmusicapi/Clients.cpp",
+          "gmusicapi/Mobileclient.cpp",
+          "gmusicapi/Module.cpp",
+          "gmusicapi/Musicmanager.cpp",
+          "gmusicapi/Source.cpp",
+          "gmusicapi/Webclient.cpp",
+          "/Users/dogatech/dev/open.src/gmusicapi-cpp/pybind11/include/attr.h",
+          "/Users/dogatech/dev/open.src/gmusicapi-cpp/pybind11/include/cast.h",
+          "/Users/dogatech/dev/open.src/gmusicapi-cpp/pybind11/include/common.h",
+          "/Users/dogatech/dev/open.src/gmusicapi-cpp/pybind11/include/complex.h",
+          "/Users/dogatech/dev/open.src/gmusicapi-cpp/pybind11/include/descr.h",
+          "/Users/dogatech/dev/open.src/gmusicapi-cpp/pybind11/include/eigen.h",
+          "/Users/dogatech/dev/open.src/gmusicapi-cpp/pybind11/include/functional.h",
+          "/Users/dogatech/dev/open.src/gmusicapi-cpp/pybind11/include/numpy.h",
+          "/Users/dogatech/dev/open.src/gmusicapi-cpp/pybind11/include/operators.h",
+          "/Users/dogatech/dev/open.src/gmusicapi-cpp/pybind11/include/pybind11.h",
+          "/Users/dogatech/dev/open.src/gmusicapi-cpp/pybind11/include/pytypes.h",
+          "/Users/dogatech/dev/open.src/gmusicapi-cpp/pybind11/include/stl.h",
+          "/Users/dogatech/dev/open.src/gmusicapi-cpp/pybind11/include/stl_bind.h",
+          "/Users/dogatech/dev/open.src/gmusicapi-cpp/pybind11/include/typeid.h", 
       ],
       'cflags!': [
           '-fno-exceptions',
-          '-std=c++11',
+          '-std=c++14',
           '-stdlib=libc++',
           # from python-config --cflags
           '-fno-strict-aliasing',
@@ -79,7 +104,7 @@
       ],
       'cflags_cc!': [
           '-fno-exceptions',
-          '-std=c++11',
+          '-std=c++14',
           '-stdlib=libc++',
           # from python-config --ccflags
           '-fno-strict-aliasing',
@@ -110,7 +135,7 @@
           'xcode_settings': {
             'GCC_ENABLE_CPP_EXCEPTIONS': 'YES',
             'OTHER_CFLAGS': [ '-stdlib=libc++', ],
-            'OTHER_CPLUSPLUSFLAGS' : [ '-stdlib=libc++', '-std=c++11' ],
+            'OTHER_CPLUSPLUSFLAGS' : [ '-stdlib=libc++', '-std=c++14' ],
             'OTHER_LDFLAGS': [ '-stdlib=libc++', ],
             'MACOSX_DEPLOYMENT_TARGET': '10.12',
           }
@@ -120,6 +145,8 @@
         "<!(node -e \"require('nan')\")",
         "/usr/local/include",
         "/usr/local/Cellar/python/2.7.12_2/Frameworks/Python.framework/Versions/2.7/include/python2.7",
+        "/Users/dogatech/dev/open.src/gmusicapi-cpp/include",
+        "/Users/dogatech/dev/open.src/gmusicapi-cpp/pybind11/include",
       ],
     }
   ]

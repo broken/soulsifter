@@ -1,7 +1,9 @@
 #ifndef soul_sifter_GoogleMusicManager_h
 #define soul_sifter_GoogleMusicManager_h
 
-#include <Python.h>
+namespace GMusicApi {
+class Mobileclient;
+}
 
 namespace dogatech {
 namespace soulsifter {
@@ -13,12 +15,8 @@ public:
 
   bool login();
   bool logout();
-  bool isAuthenticated();
 private:
-  PyObject* gmusicapiModule;
-  PyObject* mobileclientClass;
-  PyObject* mobileclient;
-  bool isLoggedIn;
+  GMusicApi::Mobileclient* mc;
 
   // cannot be copied
   GoogleMusicManager(GoogleMusicManager const&);

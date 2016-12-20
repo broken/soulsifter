@@ -37,7 +37,6 @@ void GoogleMusicManager::Init(v8::Local<v8::Object> exports) {
   // Prototype
   Nan::SetPrototypeMethod(tpl, "login", login);
   Nan::SetPrototypeMethod(tpl, "logout", logout);
-  Nan::SetPrototypeMethod(tpl, "isAuthenticated", isAuthenticated);
 
   constructor.Reset(tpl->GetFunction());
   exports->Set(Nan::New<v8::String>("GoogleMusicManager").ToLocalChecked(), tpl->GetFunction());
@@ -53,13 +52,6 @@ void GoogleMusicManager::login(const Nan::FunctionCallbackInfo<v8::Value>& info)
 void GoogleMusicManager::logout(const Nan::FunctionCallbackInfo<v8::Value>& info) {
   GoogleMusicManager* obj = Nan::ObjectWrap::Unwrap<GoogleMusicManager>(info.Holder());
   bool result =  obj->googlemusicmanager->logout();
-
-  info.GetReturnValue().Set(Nan::New<v8::Boolean>(result));
-}
-
-void GoogleMusicManager::isAuthenticated(const Nan::FunctionCallbackInfo<v8::Value>& info) {
-  GoogleMusicManager* obj = Nan::ObjectWrap::Unwrap<GoogleMusicManager>(info.Holder());
-  bool result =  obj->googlemusicmanager->isAuthenticated();
 
   info.GetReturnValue().Set(Nan::New<v8::Boolean>(result));
 }
