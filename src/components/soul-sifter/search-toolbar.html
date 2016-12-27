@@ -142,10 +142,9 @@
     },
 
     syncGoogleMusic: function(e, detail, sender) {
-      this.gmm = new ss.GoogleMusicManager();
-      var loggedIn = this.gmm.login();
-      window.console.log('Login to Google Play Music was a ' + (loggedIn ? 'success' : 'failure'));
-      window.console.log('Logout of Google Play Music was a ' + (this.gmm.logout() ? 'success' : 'failure'));
+      var child_process = require('child_process');
+      var path = require('path');
+      var downloadProcess = child_process.fork(path.join(nw.__dirname, 'workers', 'syncgooglemusic.js'), [], {cwd: nw.__dirname});
     },
 
     _toggleSearchInfoDialog: function(e, detail, sender) {

@@ -13,7 +13,7 @@
     "frame": true,
     "toolbar": true
   },
-  "chromium-args": "--child-clean-exit",
+  "chromium-args": "--child-clean-exit --enable-node-worker",
   "private": true,
   "gypfile": true
 }

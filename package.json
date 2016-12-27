@@ -20,6 +20,6 @@
   },
   "dependencies": {
     "async": "^0.9.0",
-    "playmusic": "^1.1.1"
+    "playmusic": "^2.2.0"
   }
 }

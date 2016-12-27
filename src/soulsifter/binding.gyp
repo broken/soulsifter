@@ -41,8 +41,6 @@
           "MiniBpm.cpp",
           # organization
           "FilesToAdd.cpp",
-          "GoogleMusicManager.cpp",
-          "GoogleMusicManager_wrap.cpp",
           "MusicManager.cpp",
           "MusicVideoService.cpp",
           "MusicVideoService_wrap.cpp",
@@ -61,31 +59,6 @@
           # util
           "DTVectorUtil.h",
           "DTQueueUtil.h",
-          # GMusicApi-cpp
-          "PythonHelper/ClassBase.cpp",
-          "PythonHelper/Initializer.cpp",
-          "PythonHelper/ModuleBase.cpp",
-          "gmusicapi/ClientBase.cpp",
-          "gmusicapi/Clients.cpp",
-          "gmusicapi/Mobileclient.cpp",
-          "gmusicapi/Module.cpp",
-          "gmusicapi/Musicmanager.cpp",
-          "gmusicapi/Source.cpp",
-          "gmusicapi/Webclient.cpp",
-          "/Users/dogatech/dev/open.src/gmusicapi-cpp/pybind11/include/attr.h",
-          "/Users/dogatech/dev/open.src/gmusicapi-cpp/pybind11/include/cast.h",
-          "/Users/dogatech/dev/open.src/gmusicapi-cpp/pybind11/include/common.h",
-          "/Users/dogatech/dev/open.src/gmusicapi-cpp/pybind11/include/complex.h",
-          "/Users/dogatech/dev/open.src/gmusicapi-cpp/pybind11/include/descr.h",
-          "/Users/dogatech/dev/open.src/gmusicapi-cpp/pybind11/include/eigen.h",
-          "/Users/dogatech/dev/open.src/gmusicapi-cpp/pybind11/include/functional.h",
-          "/Users/dogatech/dev/open.src/gmusicapi-cpp/pybind11/include/numpy.h",
-          "/Users/dogatech/dev/open.src/gmusicapi-cpp/pybind11/include/operators.h",
-          "/Users/dogatech/dev/open.src/gmusicapi-cpp/pybind11/include/pybind11.h",
-          "/Users/dogatech/dev/open.src/gmusicapi-cpp/pybind11/include/pytypes.h",
-          "/Users/dogatech/dev/open.src/gmusicapi-cpp/pybind11/include/stl.h",
-          "/Users/dogatech/dev/open.src/gmusicapi-cpp/pybind11/include/stl_bind.h",
-          "/Users/dogatech/dev/open.src/gmusicapi-cpp/pybind11/include/typeid.h", 
       ],
       'cflags!': [
           '-fno-exceptions',
@@ -127,7 +100,6 @@
           "/usr/local/lib/libmysqlclient.20.dylib",
           "/usr/local/lib/libmysqlcppconn.7.dylib",
           "/usr/local/lib/libtag.1.17.0.dylib",
-          "/usr/local/Frameworks/Python.framework/Versions/2.7/lib/libpython2.7.dylib",
         ],
       },
       'conditions': [
@@ -144,9 +116,6 @@
       "include_dirs" : [
         "<!(node -e \"require('nan')\")",
         "/usr/local/include",
-        "/usr/local/Cellar/python/2.7.12_2/Frameworks/Python.framework/Versions/2.7/include/python2.7",
-        "/Users/dogatech/dev/open.src/gmusicapi-cpp/include",
-        "/Users/dogatech/dev/open.src/gmusicapi-cpp/pybind11/include",
       ],
     }
   ]
