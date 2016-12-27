@@ -193,35 +193,28 @@
       // audio source; use local, otherwise contact google api
       var that = this;
       this.fs.access(this._soulSifterSettings.getString('music.dir') + this.song.filepath, this.fs.F_OK | this.fs.R_OK, function(err) {
-          if (!err) {
-            that.$.audio.src = "file://" + that._soulSifterSettings.getString('music.dir') + that.song.filepath;
-            that._setCoverImage(that._soulSifterSettings.getString('music.dir') + that.song.album.coverFilepath);
-            that._setMusicVideo(ss.MusicVideo.findBySongId(that.song.id));
+        if (!err) {
+          that.$.audio.src = "file://" + that._soulSifterSettings.getString('music.dir') + that.song.filepath;
+          that._setCoverImage(that._soulSifterSettings.getString('music.dir') + that.song.album.coverFilepath);
+          that._setMusicVideo(ss.MusicVideo.findBySongId(that.song.id));
+        } else {
+          if (!that.song.googleSongId) {
+            console.warn('Unable to play song ' + that.song.id + ' because it does not have a Google song ID associated with it.');
           } else {
-            that.$.gpm.findSong(that.song,
-                function(s) {
-                  window.console.log(s);
-                  that.$.gpm.findStreamUrl(s.track.nid,
-                      function(url) {
-                        that.$.audio.src = url;
-                      },
-                      function(msg, body, err, resp) { console.warn(msg); that.$.audio.src = ''; });
-                  if (s.track.albumArtRef && s.track.albumArtRef.length) {
-                    that._setCoverImage(s.track.albumArtRef[0].url);
-                  } else {
-                    that._setCoverImage();
-                  }
-                  that._setMusicVideo();
-                },
-                function(msg, body, err, resp) {
-                  console.warn(msg);
-                  that.$.audio.src = '';
-                  that._setCoverImage();
-                  that._setMusicVideo();
-                }
-              );
+            that.$.gpm.getStreamUrl(that.song.googleSongId, function(err, url) {
+              if (err) {
+                console.error('Unable to get stream URL for song ' + that.song.id);
+                console.error(err);
+              } else {
+                that.$.audio.src = url;
+                // todo set cover by looking up s.track.albumArtRef as I once did?
+              }
+            });
           }
-        });
+          that._setCoverImage();
+          that._setMusicVideo();
+        }
+      });
     },
 
     dragSong: function(e) {

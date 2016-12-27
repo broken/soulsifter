@@ -92,18 +92,6 @@
       failure);
     },
 
-    /**
-     * Success callback takes a stream url
-     * Failure callback takes message, body, err, httpResonse
-     */
-    findStreamUrl: function(nid, success, failure) {
-      if (!this.connected) {
-        return;
-      }
-      var playmusic = this.playmusic;
-      playmusic.getStreamUrl(nid, success, failure);
-    },
-
     findPlaylist: function(name, success, failure) {
       if (!this.connected) {
         return;
@@ -141,16 +129,25 @@
             console.info('Successfully created playlist ' + playlist.name);
             playlist.gmusicId = mutationStatus.mutate_response[0].id;
             playlist.update();
+            // todo add songs
           }
         });
       }
     },
 
     /**
-     *
+     * Callback returns err, streamUrl
      */
-    savePlaylist: function(playlist, success, failure) {
-      var that = this;
+    getStreamUrl: function(gmid, callback) {
+      this.global.playmusic.getStreamUrl(gmid, callback);
+    },
+
+    updatePlaylist: function(playlist) {
+      if (!playlist.gmusicId) {
+        console.warn('Unable to update playlist ' + playlist.id + '; it is not synced with Google Music.');
+        return;
+      }
+
       this.playmusic.addPlayList(playlist.name,
           function(data, response) {
             console.log('Successfully added playlist ' + playlist.name);
