@@ -12,34 +12,27 @@
     ],
 
     properties: {
-      connected: {
-        type: Boolean,
-        value: false
-      }
     },
 
     attached: function() {
       if (!this.global.playmusic) {
         var PlayMusic = require('playmusic');
-        this.playmusic = new PlayMusic();
+        var playmusic = new PlayMusic();
         var settings = new ss.SoulSifterSettings();
         var email = settings.getString('google.email');
         var appKey = settings.getString('google.appKey');
         if (!email) {
           return;
         }
-        this.playmusic.init({email: email, password: appKey},
-            function() {
-              this.connected = true;
-              console.log('Succesfully connected to Google Music.');
-            }.bind(this),
-            function(message, data, err, res) {
-              console.warn('Login to Google Music failed: ' + message);
-              console.warn('Data: ' + data);
-              console.warn('Err: ' +  err);
-              console.warn('Response: ' + res);
-            });
-        this.global.playmusic = this.playmusic;
+        playmusic.init({email: email, password: appKey}, function(err) {
+          if(err) {
+            console.error('Login to Google Music failed.');
+            console.error(err);
+          } else {
+            console.info('Succesfully connected to Google Music.');
+          }
+        }.bind(this));
+        this.global.playmusic = playmusic;
       }
     },
 
@@ -135,10 +128,28 @@
       );
     },
 
-    savePlaylist: function(playlist, success, failure) {
-      if (!this.connected) {
-        return;
+    /**
+     * Add a new playlist, save the playlist id, and add the songs.
+     */
+    createPlaylist: function(playlist) {
+      if (!playlist.gmusicId) {
+        this.global.playmusic.addPlayList(playlist.name, function(err, mutationStatus) {
+          if (err) {
+            console.error('Unable to create playlist ' + playlist.name);
+            console.error(err);
+          } else {
+            console.info('Successfully created playlist ' + playlist.name);
+            playlist.gmusicId = mutationStatus.mutate_response[0].id;
+            playlist.update();
+          }
+        });
       }
+    },
+
+    /**
+     *
+     */
+    savePlaylist: function(playlist, success, failure) {
       var that = this;
       this.playmusic.addPlayList(playlist.name,
           function(data, response) {
