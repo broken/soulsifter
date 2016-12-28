@@ -49,6 +49,9 @@ module.exports = function(grunt) {
       updatecomponents: {
         command: 'cp -r src/components/soul-sifter build/soulsifter/osx64/soulsifter.app/Contents/Resources/app.nw/components/',
       },
+      updateworkers: {
+        command: 'cp -r src/workers/*.js build/soulsifter/osx64/soulsifter.app/Contents/Resources/app.nw/workers/',
+      },
     },
     replace: {
       rtti: {
@@ -141,6 +144,6 @@ module.exports = function(grunt) {
   grunt.registerTask('css-hack', ['less:development', 'replace:less']);
   grunt.registerTask('default', ['nwjs', 'css-hack', 'copy:ffmpeg', 'buildnumber', 'run']);
   grunt.registerTask('nw-gyp', ['shell:nwgypclean', 'shell:nwgypconfigure', 'replace:rtti', 'shell:nwgypbuild']);
-  grunt.registerTask('up', ['shell:updateviews', 'shell:updatecomponents', 'css-hack', 'buildnumber']);
+  grunt.registerTask('up', ['shell:updateviews', 'shell:updatecomponents', 'shell:updateworkers', 'css-hack', 'buildnumber']);
   grunt.registerTask('all', ['nw-gyp', 'default']);
 };
