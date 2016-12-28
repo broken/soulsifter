@@ -400,6 +400,7 @@ vector<Song*>* SearchUtil::searchSongs(const string& query, int bpm, const set<s
       song->setEnergy(rs->getInt("energy"));
       song->setComments(rs->getString("comments"));
       song->setTrashed(rs->getBoolean("trashed"));
+      song->setGoogleSongId(rs->getString("googleSongId"));
       song->setLowQuality(rs->getBoolean("lowQuality"));
       song->setRESongId(rs->getInt("reSongId"));
       song->setAlbumId(rs->getInt("albumId"));
