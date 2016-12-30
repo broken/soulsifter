@@ -39,6 +39,7 @@
     /**
      * Success callback takes a song.
      * Failure callback takes message, body, err, httpResonse
+     * WARNING: Nothing uses this, and before usage, should verify it still works.
      */
     findSong: function(song, success, failure) {
       if (!this.connected) {
@@ -46,7 +47,12 @@
       }
       var maxResults = 3;
       this.playmusic.search(song.artist + ' ' + song.title, maxResults,
-          function(data) {
+          function(err, data) {
+            if (err) {
+              console.error('Unable to search for song ' + song.artist + ' - ' + song.title);
+              console.error(err);
+              return;
+            }
             console.log(data);
             if (!data.entries) {
               failure('No results in Google Play Music for ' + song.artist + ' - ' + song.title, '', 1);
