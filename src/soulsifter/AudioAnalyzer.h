@@ -32,6 +32,9 @@ namespace dogatech {
       
       static const std::vector<double> analyzeBpm(Song* song);
       static void analyzeBpms();
+
+      static int analyzeDuration(Song* song);
+      static void analyzeDurations();
     };
     
   }

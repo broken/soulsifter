@@ -2,6 +2,8 @@
 #include <node.h>
 #include <nan.h>
 #include "AudioAnalyzer_wrap.h"
+#include "Song.h"
+#include "Song_wrap.h"
 
 Nan::Persistent<v8::Function> AudioAnalyzer::constructor;
 
@@ -38,6 +40,8 @@ void AudioAnalyzer::Init(v8::Local<v8::Object> exports) {
   // Unable to process analyzeKey
   // Unable to process analyzeBpm
   Nan::SetMethod(tpl, "analyzeBpms", analyzeBpms);
+  Nan::SetMethod(tpl, "analyzeDuration", analyzeDuration);
+  Nan::SetMethod(tpl, "analyzeDurations", analyzeDurations);
 
   constructor.Reset(tpl->GetFunction());
   exports->Set(Nan::New<v8::String>("AudioAnalyzer").ToLocalChecked(), tpl->GetFunction());
@@ -46,6 +50,21 @@ void AudioAnalyzer::Init(v8::Local<v8::Object> exports) {
 void AudioAnalyzer::analyzeBpms(const Nan::FunctionCallbackInfo<v8::Value>& info) {
 
       dogatech::soulsifter::AudioAnalyzer::analyzeBpms();
+
+  info.GetReturnValue().SetUndefined();
+}
+
+void AudioAnalyzer::analyzeDuration(const Nan::FunctionCallbackInfo<v8::Value>& info) {
+  dogatech::soulsifter::Song* a0(Nan::ObjectWrap::Unwrap<Song>(info[0]->ToObject())->getNwcpValue());
+  int result =
+      dogatech::soulsifter::AudioAnalyzer::analyzeDuration(a0);
+
+  info.GetReturnValue().Set(Nan::New<v8::Integer>(result));
+}
+
+void AudioAnalyzer::analyzeDurations(const Nan::FunctionCallbackInfo<v8::Value>& info) {
+
+      dogatech::soulsifter::AudioAnalyzer::analyzeDurations();
 
   info.GetReturnValue().SetUndefined();
 }

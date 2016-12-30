@@ -22,6 +22,7 @@
 #include <boost/algorithm/string/split.hpp>
 #include <boost/bind.hpp>
 #include <boost/ref.hpp>
+#include <taglib/mpegfile.h>
 
 #include "DTVectorUtil.h"
 #include "madlld.h"
@@ -54,6 +55,8 @@ namespace dogatech {
         return bpms;
       }
       
+      //TagLib::MPEG::File f((SoulSifterSettings::getInstance().get<string>("music.dir") + song->getFilepath()).c_str());
+      //int sampleRate = f.audioProperties()->sampleRate();
       breakfastquay::MiniBPM miniBpm(44100);
       
       if (boost::algorithm::iends_with(songFilepath, ".mp3")) {
@@ -82,7 +85,7 @@ namespace dogatech {
       for (Song* song : *songs) {
         maxId = song->getId();
       }
-    deleteVectorPointers(songs);
+      deleteVectorPointers(songs);
 
       int span = 100;
       for (int i = 0; i <= maxId; i += span) {
@@ -103,6 +106,56 @@ namespace dogatech {
       }
     }
     
+    int AudioAnalyzer::analyzeDuration(Song* song) {
+      cout << "analyze duration" << endl;
+
+      struct stat statBuffer;
+      string songFilepath;
+      if (stat(song->getFilepath().c_str(), &statBuffer) == 0) {
+        songFilepath = song->getFilepath();
+      } else if (stat((SoulSifterSettings::getInstance().get<string>("music.dir") + song->getFilepath()).c_str(), &statBuffer) == 0) {
+        songFilepath = SoulSifterSettings::getInstance().get<string>("music.dir") + song->getFilepath();
+      } else {
+        cerr << "File does not exist for song " << song->getId() << endl;
+        return 0;
+      }
+
+      TagLib::MPEG::File f((SoulSifterSettings::getInstance().get<string>("music.dir") + song->getFilepath()).c_str());
+      song->setDurationInMs(f.audioProperties()->lengthInMilliseconds());
+      return song->getDurationInMs();
+    }
+
+    void AudioAnalyzer::analyzeDurations() {
+      cout << "analyze durations" << endl;
+
+      vector<Style*> emptyStyles;
+      vector<Song*> emptySongs;
+      string query = "id:\"(select max(id) from songs)\"";
+      vector<Song*>* songs = SearchUtil::searchSongs(query, 0, set<string>(), emptyStyles, emptySongs, 1);
+      int maxId = 0;
+      for (Song* song : *songs) {
+        maxId = song->getId();
+      }
+      deleteVectorPointers(songs);
+
+      int span = 100;
+      for (int i = 0; i <= maxId; i += span) {
+        stringstream ss;
+        ss << "q:\"s.id >= " << i << "\" q:\"s.id < " << (i + span) << "\"";
+        ss << " trashed:0";  // todo time is null
+        query = ss.str();
+        songs = SearchUtil::searchSongs(query, 0, set<string>(), emptyStyles, emptySongs, span);
+        for (Song* song : *songs) {
+          int duration = song->getDurationInMs();
+          AudioAnalyzer::analyzeDuration(song);
+          if (duration != song->getDurationInMs()) {
+            song->update();
+          }
+        }
+        deleteVectorPointers(songs);
+      }
+    }
+
     const Keys* AudioAnalyzer::analyzeKey(Song *song) {
       cout << "analyze key" << endl;
       

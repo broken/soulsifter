@@ -52,6 +52,7 @@
     <ss-options-menu>
       <ss-options-menu-item on-click="updateSongAttributesFromTags">Update Song Attributes From Tags</ss-options-menu-item>
       <ss-options-menu-item on-click="analyzeBpms">Analyze BPMs</ss-options-menu-item>
+      <ss-options-menu-item on-click="analyzeDurations">Analyze Durations</ss-options-menu-item>
       <ss-options-menu-item on-click="syncGoogleMusic">Sync Google Music</ss-options-menu-item>
       <ss-options-menu-item on-click="syncGoogleMusicPlaylists">Sync Google Music Playlists</ss-options-menu-item>
       <ss-options-menu-item on-click="showDevTools">View Developer Tools</ss-options-menu-item>
@@ -132,6 +133,10 @@
 
     analyzeBpms: function(e, detail, sender) {
       ss.AudioAnalyzer.analyzeBpms();
+    },
+
+    analyzeDurations: function(e, detail, sender) {
+      ss.AudioAnalyzer.analyzeDurations();
     },
 
     updateSongAttributesFromTags: function(e, detail, sender) {

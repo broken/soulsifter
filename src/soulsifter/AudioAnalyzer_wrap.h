@@ -23,6 +23,8 @@ class AudioAnalyzer : public Nan::ObjectWrap {
   // Unable to process analyzeKey
   // Unable to process analyzeBpm
   static void analyzeBpms(const Nan::FunctionCallbackInfo<v8::Value>& info);
+  static void analyzeDuration(const Nan::FunctionCallbackInfo<v8::Value>& info);
+  static void analyzeDurations(const Nan::FunctionCallbackInfo<v8::Value>& info);
 
   static Nan::Persistent<v8::Function> constructor;
   dogatech::soulsifter::AudioAnalyzer* audioanalyzer;
