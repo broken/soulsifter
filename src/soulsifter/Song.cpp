@@ -54,6 +54,7 @@ namespace soulsifter {
     trashed(false),
     lowQuality(false),
     googleSongId(),
+    durationInMs(0),
     reSongId(0),
     reSong(NULL),
     albumId(0),
@@ -82,6 +83,7 @@ namespace soulsifter {
     trashed(song.getTrashed()),
     lowQuality(song.getLowQuality()),
     googleSongId(song.getGoogleSongId()),
+    durationInMs(song.getDurationInMs()),
     reSongId(song.getRESongId()),
     reSong(NULL),
     albumId(song.getAlbumId()),
@@ -113,6 +115,7 @@ namespace soulsifter {
         trashed = song.getTrashed();
         lowQuality = song.getLowQuality();
         googleSongId = song.getGoogleSongId();
+        durationInMs = song.getDurationInMs();
         reSongId = song.getRESongId();
         if (!song.getRESongId() && song.reSong) {
             if (!reSong) reSong = new RESong(*song.reSong);
@@ -169,6 +172,7 @@ namespace soulsifter {
         trashed = false;
         lowQuality = false;
         googleSongId.clear();
+        durationInMs = 0;
         reSongId = 0;
         delete reSong;
         reSong = NULL;
@@ -201,6 +205,7 @@ namespace soulsifter {
         song->setTrashed(rs->getBoolean("trashed"));
         song->setLowQuality(rs->getBoolean("lowQuality"));
         song->setGoogleSongId(rs->getString("googleSongId"));
+        song->setDurationInMs(rs->getInt("durationInMs"));
         song->setRESongId(rs->getInt("reSongId"));
         song->setAlbumId(rs->getInt("albumId"));
         song->setAlbumPartId(rs->getInt("albumPartId"));
@@ -357,7 +362,7 @@ namespace soulsifter {
                 albumPartId = albumPart->getId();
             }
 
-            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("update Songs set artist=?, track=?, title=?, remixer=?, featuring=?, filepath=?, rating=?, dateAdded=?, bpm=?, tonicKeys=?, tonicKey=?, energy=?, comments=?, trashed=?, lowQuality=?, googleSongId=?, reSongId=?, albumId=?, albumPartId=? where id=?");
+            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("update Songs set artist=?, track=?, title=?, remixer=?, featuring=?, filepath=?, rating=?, dateAdded=?, bpm=?, tonicKeys=?, tonicKey=?, energy=?, comments=?, trashed=?, lowQuality=?, googleSongId=?, durationInMs=?, reSongId=?, albumId=?, albumPartId=? where id=?");
             if (!artist.empty()) ps->setString(1, artist);
             else ps->setNull(1, sql::DataType::VARCHAR);
             if (!track.empty()) ps->setString(2, track);
@@ -385,13 +390,15 @@ namespace soulsifter {
             ps->setBoolean(15, lowQuality);
             if (!googleSongId.empty()) ps->setString(16, googleSongId);
             else ps->setNull(16, sql::DataType::VARCHAR);
-            if (reSongId > 0) ps->setInt(17, reSongId);
+            if (durationInMs > 0) ps->setInt(17, durationInMs);
             else ps->setNull(17, sql::DataType::INTEGER);
-            if (albumId > 0) ps->setInt(18, albumId);
+            if (reSongId > 0) ps->setInt(18, reSongId);
             else ps->setNull(18, sql::DataType::INTEGER);
-            if (albumPartId > 0) ps->setInt(19, albumPartId);
+            if (albumId > 0) ps->setInt(19, albumId);
             else ps->setNull(19, sql::DataType::INTEGER);
-            ps->setInt(20, id);
+            if (albumPartId > 0) ps->setInt(20, albumPartId);
+            else ps->setNull(20, sql::DataType::INTEGER);
+            ps->setInt(21, id);
             int result = ps->executeUpdate();
             if (!styleIds.empty()) {
                 stringstream ss("insert ignore into SongStyles (songId, styleId) values (?, ?)", ios_base::app | ios_base::out | ios_base::ate);
@@ -465,7 +472,7 @@ namespace soulsifter {
                 albumPartId = albumPart->getId();
             }
 
-            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("insert into Songs (artist, track, title, remixer, featuring, filepath, rating, dateAdded, bpm, tonicKeys, tonicKey, energy, comments, trashed, lowQuality, googleSongId, reSongId, albumId, albumPartId) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("insert into Songs (artist, track, title, remixer, featuring, filepath, rating, dateAdded, bpm, tonicKeys, tonicKey, energy, comments, trashed, lowQuality, googleSongId, durationInMs, reSongId, albumId, albumPartId) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
             if (!artist.empty()) ps->setString(1, artist);
             else ps->setNull(1, sql::DataType::VARCHAR);
             if (!track.empty()) ps->setString(2, track);
@@ -493,12 +500,14 @@ namespace soulsifter {
             ps->setBoolean(15, lowQuality);
             if (!googleSongId.empty()) ps->setString(16, googleSongId);
             else ps->setNull(16, sql::DataType::VARCHAR);
-            if (reSongId > 0) ps->setInt(17, reSongId);
+            if (durationInMs > 0) ps->setInt(17, durationInMs);
             else ps->setNull(17, sql::DataType::INTEGER);
-            if (albumId > 0) ps->setInt(18, albumId);
+            if (reSongId > 0) ps->setInt(18, reSongId);
             else ps->setNull(18, sql::DataType::INTEGER);
-            if (albumPartId > 0) ps->setInt(19, albumPartId);
+            if (albumId > 0) ps->setInt(19, albumId);
             else ps->setNull(19, sql::DataType::INTEGER);
+            if (albumPartId > 0) ps->setInt(20, albumPartId);
+            else ps->setNull(20, sql::DataType::INTEGER);
             int saved = ps->executeUpdate();
             if (!saved) {
                 cerr << "Not able to save song" << endl;
@@ -694,6 +703,14 @@ namespace soulsifter {
                 googleSongId = song->getGoogleSongId();
             }
         }
+        if (durationInMs != song->getDurationInMs()) {
+            if (durationInMs) {
+                cout << "updating song " << id << " durationInMs from " << song->getDurationInMs() << " to " << durationInMs << endl;
+                needsUpdate = true;
+            } else {
+                durationInMs = song->getDurationInMs();
+            }
+        }
         if (reSongId != song->getRESongId()) {
             if (reSongId) {
                 cout << "updating song " << id << " reSongId from " << song->getRESongId() << " to " << reSongId << endl;
@@ -794,6 +811,9 @@ namespace soulsifter {
 
     const string& Song::getGoogleSongId() const { return googleSongId; }
     void Song::setGoogleSongId(const string& googleSongId) { this->googleSongId = googleSongId; }
+
+    const int Song::getDurationInMs() const { return durationInMs; }
+    void Song::setDurationInMs(const int durationInMs) { this->durationInMs = durationInMs; }
 
     const int Song::getRESongId() const { 
         return (!reSongId && reSong) ? reSong->getId() : reSongId;

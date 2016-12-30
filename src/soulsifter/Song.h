@@ -92,6 +92,8 @@ namespace soulsifter {
         void setLowQuality(bool lowQuality);
         const string& getGoogleSongId() const;
         void setGoogleSongId(const string& googleSongId);
+        const int getDurationInMs() const;
+        void setDurationInMs(int durationInMs);
         const int getRESongId() const;
         void setRESongId(int reSongId);
         RESong* getRESong();
@@ -135,6 +137,7 @@ namespace soulsifter {
         bool trashed;
         bool lowQuality;
         string googleSongId;
+        int durationInMs;
         int reSongId;
         RESong* reSong;
         int albumId;

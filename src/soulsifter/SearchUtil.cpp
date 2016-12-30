@@ -403,6 +403,7 @@ vector<Song*>* SearchUtil::searchSongs(const string& query, int bpm, const set<s
       song->setGoogleSongId(rs->getString("googleSongId"));
       song->setLowQuality(rs->getBoolean("lowQuality"));
       song->setRESongId(rs->getInt("reSongId"));
+      song->setDurationInMs(rs->getInt("durationInMs"));
       song->setAlbumId(rs->getInt("albumId"));
       if (rs->isNull("albumPartId")) song->setAlbumPartId(0);
       else song->setAlbumPartId(rs->getInt("albumPartId"));

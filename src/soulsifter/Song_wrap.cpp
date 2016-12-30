@@ -85,6 +85,7 @@ void Song::Init(v8::Local<v8::Object> exports) {
   Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("trashed").ToLocalChecked(), getTrashed, setTrashed);
   Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("lowQuality").ToLocalChecked(), getLowQuality, setLowQuality);
   Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("googleSongId").ToLocalChecked(), getGoogleSongId, setGoogleSongId);
+  Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("durationInMs").ToLocalChecked(), getDurationInMs, setDurationInMs);
   Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("rESongId").ToLocalChecked(), getRESongId, setRESongId);
   // Unable to process getRESong
   // Unable to process getRESongOnce
@@ -511,6 +512,21 @@ NAN_SETTER(Song::setGoogleSongId) {
   Song* obj = Nan::ObjectWrap::Unwrap<Song>(info.Holder());
   string a0(*v8::String::Utf8Value(value->ToString()));
   obj->song->setGoogleSongId(a0);
+
+  info.GetReturnValue().SetUndefined();
+}
+
+NAN_GETTER(Song::getDurationInMs) {
+  Song* obj = Nan::ObjectWrap::Unwrap<Song>(info.Holder());
+  const int result =  obj->song->getDurationInMs();
+
+  info.GetReturnValue().Set(Nan::New<v8::Integer>(result));
+}
+
+NAN_SETTER(Song::setDurationInMs) {
+  Song* obj = Nan::ObjectWrap::Unwrap<Song>(info.Holder());
+  int a0(value->IntegerValue());
+  obj->song->setDurationInMs(a0);
 
   info.GetReturnValue().SetUndefined();
 }
