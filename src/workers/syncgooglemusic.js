@@ -49,7 +49,7 @@ var processResults = function(err, library) {
   } else {
     console.info('processed ' + total + ' songs');
   }
-}
+};
 
 playmusic.init({email: email,  password: appKey}, function(err) {
   if (err) {

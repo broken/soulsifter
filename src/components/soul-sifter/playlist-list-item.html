@@ -73,7 +73,6 @@
           <ss-options-menu>
             <ss-options-menu-item on-click="_editAction">Edit playlist</ss-options-menu-item>
             <ss-options-menu-item on-click="_deleteAction">Delete playlist</ss-options-menu-item>
-            <ss-options-menu-item on-click="_exportAction">Export to Google Play Music</ss-options-menu-item>
           </ss-options-menu>
         </div>
       </paper-material>
@@ -112,11 +111,6 @@
       e.preventDefault();
       // this.playlist.erase();
       // this.fire('iron-signal', {name: 'playlists-changed'});
-    },
-
-    _exportAction: function(e, detail, sender) {
-      e.preventDefault();
-      // this.$.gpm.savePlaylist(this.playlist, function() {}, function() {});
     },
 
     _isSmart: function(playlist) {

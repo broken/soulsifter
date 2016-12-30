@@ -53,6 +53,7 @@
       <ss-options-menu-item on-click="updateSongAttributesFromTags">Update Song Attributes From Tags</ss-options-menu-item>
       <ss-options-menu-item on-click="analyzeBpms">Analyze BPMs</ss-options-menu-item>
       <ss-options-menu-item on-click="syncGoogleMusic">Sync Google Music</ss-options-menu-item>
+      <ss-options-menu-item on-click="syncGoogleMusicPlaylists">Sync Google Music Playlists</ss-options-menu-item>
       <ss-options-menu-item on-click="showDevTools">View Developer Tools</ss-options-menu-item>
     </ss-options-menu>
     <paper-dialog id="searchInfoDialog" entry-animation="fade-in-animation" exit-animation="fade-out-animation">
@@ -145,6 +146,12 @@
       var child_process = require('child_process');
       var path = require('path');
       var downloadProcess = child_process.fork(path.join(nw.__dirname, 'workers', 'syncgooglemusic.js'), [], {cwd: nw.__dirname});
+    },
+
+    syncGoogleMusicPlaylists: function(e, detail, sender) {
+      var child_process = require('child_process');
+      var path = require('path');
+      var downloadProcess = child_process.fork(path.join(nw.__dirname, 'workers', 'syncgooglemusicplaylists.js'), [], {cwd: nw.__dirname});
     },
 
     _toggleSearchInfoDialog: function(e, detail, sender) {
