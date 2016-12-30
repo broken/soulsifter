@@ -120,7 +120,7 @@ namespace dogatech {
         return 0;
       }
 
-      TagLib::MPEG::File f((SoulSifterSettings::getInstance().get<string>("music.dir") + song->getFilepath()).c_str());
+      TagLib::MPEG::File f(songFilepath.c_str());
       song->setDurationInMs(f.audioProperties()->lengthInMilliseconds());
       return song->getDurationInMs();
     }
