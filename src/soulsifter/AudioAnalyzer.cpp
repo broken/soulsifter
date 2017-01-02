@@ -55,9 +55,12 @@ namespace dogatech {
         return bpms;
       }
       
-      //TagLib::MPEG::File f((SoulSifterSettings::getInstance().get<string>("music.dir") + song->getFilepath()).c_str());
-      //int sampleRate = f.audioProperties()->sampleRate();
-      breakfastquay::MiniBPM miniBpm(44100);
+      TagLib::MPEG::File f(songFilepath.c_str());
+      int sampleRate = f.audioProperties()->sampleRate();
+      if (sampleRate != 44100) {
+        cout << "Sample rate discovered to be " << sampleRate << " instead of 44100." << endl;
+      }
+      breakfastquay::MiniBPM miniBpm(sampleRate);
       
       if (boost::algorithm::iends_with(songFilepath, ".mp3")) {
         detectBpm(songFilepath.c_str(), boost::bind(&breakfastquay::MiniBPM::process, boost::ref(miniBpm), _1, _2));
