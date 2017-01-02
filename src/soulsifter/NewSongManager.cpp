@@ -123,6 +123,12 @@ bool NewSongManager::nextSong(Song* updatedSong, Song* originalSong) {
       }
       originalSong->setBpm(ss.str());
     }
+
+    // TODO thread this as well?
+    if (!originalSong->getDurationInMs()) {
+      int duration = AudioAnalyzer::analyzeDuration(updatedSong);
+      originalSong->setDurationInMs(duration);
+    }
     
     /*const Keys *keys = AudioAnalyzer::analyzeKey(updatedSong);
     if (updatedSong->getTonicKeys().empty()) [key setStringValue:[NSString stringWithFormat:@"%s",keys->candidate[0].first.c_str()]];
