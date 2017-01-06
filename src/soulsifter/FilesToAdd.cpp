@@ -56,6 +56,7 @@ namespace dogatech {
           boost::algorithm::iends_with(path, ".jpeg") ||
           boost::algorithm::iends_with(path, ".gif") ||
           boost::algorithm::iends_with(path, ".png") ||
+          boost::algorithm::iends_with(path, ".webp") ||
           boost::algorithm::iends_with(path, ".bmp")) {
         string* image = new string(path);
         images.push_back(image);
