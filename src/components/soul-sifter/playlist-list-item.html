@@ -7,6 +7,7 @@
 <link href="../paper-ripple/paper-ripple.html" rel="import">
 <link href="../paper-material/paper-material.html" rel="import">
 
+<link href="ss-global-behavior.html" rel="import">
 <link href="ss-googleplaymusic.html" rel="import">
 <link href="ss-options-menu.html" rel="import">
 <link href="ss-options-menu-item.html" rel="import">
@@ -62,7 +63,7 @@
   <template>
     <ss-googleplaymusic id="gpm"></ss-googleplaymusic>
 
-    <div id="itemContainer">
+    <div id="itemContainer" on-drop="_handleDrop">
       <paper-material animated id="material" elevation="[[_computeElevation(selected)]]">
         <div id="item" on-click="_onClick">
           <paper-ripple fit></paper-ripple>
@@ -87,6 +88,10 @@
    */
   Polymer({
     is: 'playlist-list-item',
+
+    behaviors: [
+      GlobalBehavior
+    ],
 
     properties: {
       playlist: Object,
@@ -114,12 +119,31 @@
     },
 
     _isSmart: function(playlist) {
-      return playlist.query ? "smart" : "";
+      return !!playlist.query ? "smart" : "";
     },
 
     _computeElevation: function(selected) {
       return selected ? "3" : "0";
-    }
+    },
+
+    _handleDrop: function(e) {
+      // only makes sense to drag & drop songs for non-smart playlists
+      if (!this.playlist.query) {
+        // this must be in multiple steps for it to save correctly
+        let entries = this.playlist.playlistEntries;
+        let entry = new ss.PlaylistEntry();
+        entry.playlist = this.playlist;
+        entry.song = this.global.draggedobj;
+        for (let i = 0; i < entries.length; ++i) {
+          if (entries[i].position >= entry.position) {
+            entry.position = entries[i].position + 1;
+          }
+        }
+        entry.save();
+        entries.push(entry);
+        this.playlist.playlistEntries = entries;
+      }
+    },
 
   });
 </script>

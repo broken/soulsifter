@@ -193,6 +193,7 @@
     _dragSong: function(e) {
       e.dataTransfer.effectAllowed = 'move';
       e.dataTransfer.setData('text/plain', 'extensis-filenames-type:' + this._soulSifterSettings.getString('music.dir') + this.song.filepath);
+      this.set('global.draggedobj', this.song);
     },
 
     _openEditSongPage: function(e, detail, sender) {
