@@ -3,17 +3,15 @@
 <link href="../iron-flex-layout/iron-flex-layout.html" rel="import">
 <link href="../iron-signals/iron-signals.html" rel="import">
 <link href="../paper-scroll-header-panel/paper-scroll-header-panel.html" rel="import">
-<link href="../paper-dropdown/paper-dropdown.html" rel="import">
 <link href="../paper-icon-button/paper-icon-button.html" rel="import">
-<link href="../paper-item/paper-item.html" rel="import">
-<link href="../paper-menu/paper-menu.html" rel="import">
-<link href="../paper-menu-button/paper-menu-button.html" rel="import">
 <link href="../paper-toolbar/paper-toolbar.html" rel="import">
 
 <link href="pitch-slider.html" rel="import">
 <link href="ss-audio.html" rel="import">
 <link href="ss-global-behavior.html" rel="import">
 <link href="ss-googleplaymusic.html" rel="import">
+<link href="ss-options-menu.html" rel="import">
+<link href="ss-options-menu-item.html" rel="import">
 <link href="ss-star-rating.html" rel="import">
 
 
@@ -110,14 +108,9 @@
           <paper-icon-button icon="av:movie" on-click="_associateVideo"></paper-icon-button>
         </div>
         <div id="musicVideoThumbnail" draggable="true" on-dragstart="_dragMusicVideo"></div>
-        <paper-menu-button on-click="stopPropagation">
-          <paper-icon-button icon="more-vert"></paper-icon-button>
-          <paper-dropdown class="dropdown" transition="cascade" halign="right" valign="bottom">
-            <paper-menu>
-              <paper-item on-click="editAction">Edit info</paper-item>
-            </paper-menu>
-          </paper-dropdown>
-        </paper-menu-button>
+        <ss-options-menu class="self-end">
+          <ss-options-menu-item on-click="_openEditSongPage">Edit song</ss-options-menu-item>
+        </ss-options-menu>
       </div>
     </paper-scroll-header-panel>
   </template>
@@ -279,9 +272,9 @@
       e.dataTransfer.setData('text/plain', 'extensis-filenames-type:' + this._soulSifterSettings.getString('mv.dir') + this._musicVideo.filePath);
     },
 
-    editAction: function(e, detail, sender) {
-      e.stopPropagation();
+    _openEditSongPage: function(e, detail, sender) {
       this.fire('page-song-edit', {song: this.song});
+      e.stopPropagation();
     },
 
     stopPropagation: function(e, detail, sender) {
