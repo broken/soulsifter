@@ -144,6 +144,7 @@ bool readId3v2TagAttributes(Song* song, TagLib::ID3v2::Tag* id3v2) {
         else oldKey[0] = oldKey[0] + 1;
         oldKey[1] = 'b';
       }
+      if (oldKey.empty() && keys.size() > 0) oldKey = *(keys.begin());
       song->setTonicKey(oldKey);
       song->setTonicKeys(keys);
       updated = true;
@@ -271,6 +272,8 @@ void TagService::writeId3v2Tag(Song* song) {
     setId3v2Text(id3v2, "TPUB", song->getAlbum()->getLabel().c_str());
     setId3v2Text(id3v2, "TCID", song->getAlbum()->getCatalogId().c_str());
     id3v2->setYear(song->getAlbum()->getReleaseDateYear());
+    // set key (currently we will ignore if we have multiple. TODO fix?)
+    if (!song->getTonicKey().empty()) setId3v2Text(id3v2, "TKEY", song->getTonicKey().c_str());
     // set genre
     for (long i = song->getStyles().size(); i > 0; --i) {
       const char* style = song->getStyles().back()->getName().c_str();
