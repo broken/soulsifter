@@ -143,6 +143,7 @@
       </ss-options-menu>
       <div>[[_computeBpmShift(song, global.bpm)]]</div>
       <div class$="energy-[[song.energy]]">[[song.energy]]</div>
+      <div>[[_computeDuration(song)]]</div>
       <ss-star-rating value="[[song.rating]]" class$="[[_trashedClass(song.trashed)]]" read-only></ss-star-rating>
       <time class="added">[[_computeLocaleDateString(song)]]</time>
     </div>
@@ -207,6 +208,19 @@
 
     _selectSong: function(e) {
       this.set('global.song', this.song);
+    },
+
+    _computeDuration: function(song) {
+      let duration = Math.round(song.durationInMs / 1000);
+      let secs = duration % 60;
+      let mins = ((duration - secs) / 60) % 60;
+      let hours = (duration - secs - mins * 60) / 60 / 60;
+      if (secs < 10 && mins) secs = '0' + secs;
+      let result = secs;
+      if (mins < 10 && hours) mins = '0' + mins;
+      if (mins) result = '' + mins + ':' + result;
+      if (hours) result = '' + hours + ':' + result;
+      return result;
     },
   });
 </script>
