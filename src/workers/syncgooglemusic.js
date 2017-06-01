@@ -31,7 +31,7 @@ var processResults = function(err, library) {
       query += " t:\"" + matches[1] + "\"";
       title = title.replace(remixRegex, '');
     }
-    query += " t:\"" + title + "\"";
+    query += " t:\"" + title + "\" q:\"" + song.durationMillis + " between durationInMs-5000 and durationInMs+5000\"";
     let songs = ss.SearchUtil.searchSongs(query, 0, [], [], [], 2);
     if (songs.length == 1) {
       if (songs[0].googleSongId && songs[0].googleSongId != song.id) {
