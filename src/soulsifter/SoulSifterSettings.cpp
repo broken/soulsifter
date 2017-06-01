@@ -30,6 +30,7 @@ namespace soulsifter {
     } else {
       // defaults
       //ptree.put("music.dir", "");
+      //ptree.put("staging.dir", "");
       //ptree.put("mv.dir", "");
       ptree.put("db.url", "localhost");
       ptree.put("db.user", "ss");

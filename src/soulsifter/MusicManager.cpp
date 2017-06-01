@@ -273,13 +273,13 @@ void MusicManager::writeTagsToSong(Song* song) {
 # pragma mark paths
  
 string MusicManager::getCopyToPath() {
-    filesystem::path dir(SoulSifterSettings::getInstance().getMusicPath());
+    filesystem::path dir(SoulSifterSettings::getInstance().get<string>("music.dir"));
     if (filesystem::exists(dir) && filesystem::is_directory(dir)) {
-        return SoulSifterSettings::getInstance().getMusicPath();
+        return SoulSifterSettings::getInstance().get<string>("music.dir");
     }
-    filesystem::path staging(SoulSifterSettings::getInstance().getStagingPath());
+    filesystem::path staging(SoulSifterSettings::getInstance().get<string>("staging.dir"));
     if (filesystem::exists(staging) && filesystem::is_directory(staging)) {
-        return SoulSifterSettings::getInstance().getStagingPath();
+        return SoulSifterSettings::getInstance().get<string>("staging.dir");
     }
     return "";
 }
@@ -397,7 +397,7 @@ bool MusicManager::moveSong(Song* song) {
                 cerr << "music path does not exist or is not a directory: " << musicPath.string() << endl;
                 return;
             }
-            filesystem::path stagingPath(SoulSifterSettings::getInstance().getStagingPath());
+            filesystem::path stagingPath(SoulSifterSettings::getInstance().get<string>("staging.dir"));
             if (!filesystem::exists(stagingPath) || !filesystem::is_directory(stagingPath)) {
                 cerr << "staging path does not exist or is not a directory: " << stagingPath.string() << endl;
                 return;

@@ -33,10 +33,6 @@ namespace soulsifter {
         template <typename T>
         void put(const std::string& label, const T& value);
         
-        /* deprecated */
-        const std::string& getMusicPath() const { return musicPath; }
-        const std::string& getStagingPath() const { return stagingPath; }
-        
     private:
         // singleton
         SoulSifterSettings();
@@ -46,10 +42,6 @@ namespace soulsifter {
         boost::property_tree::ptree ptree;
 
         std::string filename;
-        
-        /* deprecated */
-        std::string musicPath;
-        std::string stagingPath;
     };
     
 }
