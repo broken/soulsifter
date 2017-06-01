@@ -210,12 +210,12 @@
         this.$.coverFileDialog.addEventListener("change", function(e) {
           that.$.cover.style.backgroundImage = 'url("file://' + this.value + '")';
           // TODO should move cover file in place
-          that._editedSong.album.coverFilepath = this._editedSong.id ? this.value.replace(this._soulSifterSettings.getString('music.dir'), '') : this.value;
+          that._editedSong.album.coverFilepath = that._editedSong.id ? this.value.replace(that._soulSifterSettings.getString('music.dir'), '') : this.value;
           that._changedAlbumCover = true;
         }, false);
         this.$.songFileDialog.addEventListener("change", function(e) {
           // TODO move song in place if out of place
-          that._editedSong.filepath = this._editedSong.id ? this.value.replace(this._soulSifterSettings.getString('music.dir'), '') : this.value;
+          that._editedSong.filepath = that._editedSong.id ? this.value.replace(that._soulSifterSettings.getString('music.dir'), '') : this.value;
           that.notifyPath('_editedSong.filepath', that._editedSong.filepath);
         }, false);
       }.bind(this));
