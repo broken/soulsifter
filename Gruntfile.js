@@ -1,9 +1,11 @@
 module.exports = function(grunt) {
 
   grunt.initConfig({
+    pkg: grunt.file.readJSON('package.json'),
+    builtAppDir: 'build/<%= pkg.name %> - v<%= pkg.version %>/osx64/<%= pkg.name %>.app',
     nwjs: {
       options: {
-        version: '0.19.0-rc1', // Version of node-webkit
+        version: '0.21.6', // Version of node-webkit (http://dl.nwjs.io)
         buildDir: './build', // Where the build version of my node-webkit app is saved
         credits: './src/credits.html', // Mac credits
         macIcns: './DVDRipper.icns', // Path to the Mac icon file
@@ -44,13 +46,13 @@ module.exports = function(grunt) {
         },
       },
       updateviews: {
-        command: 'cp src/views/*.html build/soulsifter/osx64/soulsifter.app/Contents/Resources/app.nw/views/',
+        command: 'cp src/views/*.html <%= builtAppDir %>/Contents/Resources/app.nw/views/',
       },
       updatecomponents: {
-        command: 'cp -r src/components/soul-sifter build/soulsifter/osx64/soulsifter.app/Contents/Resources/app.nw/components/',
+        command: 'cp -r src/components/soul-sifter <%= builtAppDir %>/Contents/Resources/app.nw/components/',
       },
       updateworkers: {
-        command: 'cp -r src/workers/*.js build/soulsifter/osx64/soulsifter.app/Contents/Resources/app.nw/workers/',
+        command: 'cp -r src/workers/*.js <%= builtAppDir %>/Contents/Resources/app.nw/workers/',
       },
     },
     replace: {
@@ -63,7 +65,7 @@ module.exports = function(grunt) {
         }]
       },
       less: {
-        src: 'build/soulsifter/osx64/soulsifter.app/Contents/Resources/app.nw/components/soul-sifter/theme.html',
+        src: '<%= builtAppDir %>/Contents/Resources/app.nw/components/soul-sifter/theme.html',
         overwrite: true,
         replacements: [{
           from: /\/\*</g,
@@ -80,7 +82,7 @@ module.exports = function(grunt) {
         files: [
           {
             src: 'cache/libffmpeg.dylib',
-            dest: 'build/soulsifter/osx64/soulsifter.app/Contents/Versions/55.0.2883.65/nwjs Framework.framework/libffmpeg.dylib',
+            dest: '<%= builtAppDir %>/Contents/Versions/55.0.2883.65/nwjs Framework.framework/libffmpeg.dylib',
             flatten: true
           },
         ]
@@ -88,8 +90,8 @@ module.exports = function(grunt) {
     },
     spawn: {
       run: {
-        command: './build/soulsifter/osx64/soulsifter.app/Contents/MacOS/nwjs',
-        commandArgs: ['build/soulsifter/osx/soulsifter.app/Contents/Resources/app.nw'],
+        command: './<%= builtAppDir %>/Contents/MacOS/nwjs',
+        commandArgs: ['<%= builtAppDir %>/Contents/Resources/app.nw'],
         directory: '.',
       },
       ulimit: {
@@ -98,7 +100,7 @@ module.exports = function(grunt) {
         directory: '.',
       },
     },
-    bump: {
+    bump: {  // grunt bump:patch/minor/major
       options: {
         files: ['version.json', 'package.json', 'src/package.json', 'bower.json'],
         updateConfigs: [],
@@ -125,7 +127,7 @@ module.exports = function(grunt) {
           ieCompat: false,
         },
         files: {
-          'build/soulsifter/osx64/soulsifter.app/Contents/Resources/app.nw/components/soul-sifter/theme.html': 'src/components/soul-sifter/theme-scratchlive.html',
+          '<%= builtAppDir %>/Contents/Resources/app.nw/components/soul-sifter/theme.html': 'src/components/soul-sifter/theme-scratchlive.html',
         },
       },
     },
