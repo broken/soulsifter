@@ -40,7 +40,6 @@ namespace soulsifter {
       //ptree.put("google.email", "");
       ptree.put("songList.limit", 128);
     }
-    stagingPath = "/Users/dogatech/Music/mp3";
   }
   
   void SoulSifterSettings::save() {
