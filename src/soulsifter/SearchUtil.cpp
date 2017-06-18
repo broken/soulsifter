@@ -106,6 +106,7 @@ struct Atom {
     S_REMIXER,
     S_RATING,
     S_COMMENT,
+    S_CURATOR,
     S_TRASHED,
     S_LOW_QUALITY,
     A_ID,
@@ -142,7 +143,7 @@ void splitString(const string& query, vector<string>* atoms) {
 
 bool parse(const string& queryFragment, Atom* atom) {
   atom->clear();
-  boost::regex regex("^(-)?((id|a|artist|t|title|remixer|r|rating|comment|trashed|lowq|aid|n|album|m|mixed|l|label|y|year|q|query|limit):)?(.+)$");
+  boost::regex regex("^(-)?((id|a|artist|t|title|remixer|r|rating|comment|c|curator|trashed|lowq|aid|n|album|m|mixed|l|label|y|year|q|query|limit):)?(.+)$");
   boost::smatch match;
   if (!boost::regex_match(queryFragment, match, regex)) {
     return false;
@@ -163,6 +164,8 @@ bool parse(const string& queryFragment, Atom* atom) {
       atom->type = Atom::S_RATING;
     } else if (!match[3].compare("comment")) {
       atom->type = Atom::S_COMMENT;
+    } else if (!match[3].compare("c") || !match[3].compare("curator")) {
+      atom->type = Atom::S_CURATOR;
     } else if (!match[3].compare("trashed")) {
       atom->type = Atom::S_TRASHED;
     } else if (!match[3].compare("lowq")) {
@@ -199,7 +202,7 @@ string buildQueryPredicate(const vector<Atom>& atoms) {
       ss << "not ";
     }
     if (atom.type == Atom::ANY) {
-      ss << "(ifnull(s.artist,'') like '%" << atom.value << "%' or ifnull(s.title,'') like '%" << atom.value << "%' or ifnull(s.remixer,'') like '%" << atom.value << "%' or ifnull(s.comments,'') like '%" << atom.value << "%' or ifnull(a.name,'') like '%" << atom.value << "%')";
+      ss << "(ifnull(s.artist,'') like '%" << atom.value << "%' or ifnull(s.title,'') like '%" << atom.value << "%' or ifnull(s.remixer,'') like '%" << atom.value << "%' or ifnull(s.comments,'') like '%" << atom.value << "%' or ifnull(s.curator,'') like '%" << atom.value << "%' or ifnull(a.name,'') like '%" << atom.value << "%')";
     } else if (atom.type == Atom::S_ID) {
       ss << "s.id = " << atom.value;
     } else if (atom.type == Atom::S_ARTIST) {
@@ -212,6 +215,8 @@ string buildQueryPredicate(const vector<Atom>& atoms) {
       ss << "s.rating >= " << atom.value;
     } else if (atom.type == Atom::S_COMMENT) {
       ss << "ifnull(s.comment,'') like '%" << atom.value << "%'";
+    } else if (atom.type == Atom::S_CURATOR) {
+      ss << "ifnull(s.curator,'') like '%" << atom.value << "%'";
     } else if (atom.type == Atom::S_TRASHED) {
       ss << "s.trashed = " << atom.value;
     } else if (atom.type == Atom::S_LOW_QUALITY) {
