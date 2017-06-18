@@ -71,6 +71,8 @@ class Song : public Nan::ObjectWrap {
   static void setGoogleSongId(v8::Local<v8::String> property, v8::Local<v8::Value> value, const Nan::PropertyCallbackInfo<void>& info);
   static void getDurationInMs(v8::Local<v8::String> property, const Nan::PropertyCallbackInfo<v8::Value>& info);
   static void setDurationInMs(v8::Local<v8::String> property, v8::Local<v8::Value> value, const Nan::PropertyCallbackInfo<void>& info);
+  static void getCurator(v8::Local<v8::String> property, const Nan::PropertyCallbackInfo<v8::Value>& info);
+  static void setCurator(v8::Local<v8::String> property, v8::Local<v8::Value> value, const Nan::PropertyCallbackInfo<void>& info);
   static void getRESongId(v8::Local<v8::String> property, const Nan::PropertyCallbackInfo<v8::Value>& info);
   static void setRESongId(v8::Local<v8::String> property, v8::Local<v8::Value> value, const Nan::PropertyCallbackInfo<void>& info);
   // Unable to process getRESong

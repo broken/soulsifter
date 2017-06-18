@@ -861,6 +861,7 @@ songFields = [
   [:bool, "lowQuality", 0],
   [:string, "googleSongId", Attrib::FIND],
   [:int, "durationInMs", 0],
+  [:string, "curator", 0],
   [:int, "reSongId", Attrib::KEY2 | Attrib::ID],
   ["RESong", "reSong", Attrib::PTR],
   [:int, "albumId", Attrib::ID],
