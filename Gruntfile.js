@@ -46,13 +46,13 @@ module.exports = function(grunt) {
         },
       },
       updateviews: {
-        command: 'cp src/views/*.html <%= builtAppDir %>/Contents/Resources/app.nw/views/',
+        command: 'cp src/views/*.html "<%= builtAppDir %>/Contents/Resources/app.nw/views/"',
       },
       updatecomponents: {
-        command: 'cp -r src/components/soul-sifter <%= builtAppDir %>/Contents/Resources/app.nw/components/',
+        command: 'cp -r src/components/soul-sifter "<%= builtAppDir %>/Contents/Resources/app.nw/components/"',
       },
       updateworkers: {
-        command: 'cp -r src/workers/*.js <%= builtAppDir %>/Contents/Resources/app.nw/workers/',
+        command: 'cp -r src/workers/*.js "<%= builtAppDir %>/Contents/Resources/app.nw/workers/"',
       },
     },
     replace: {
