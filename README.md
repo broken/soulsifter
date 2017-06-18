@@ -19,7 +19,7 @@ Presteps:
   * locally with npm install: grunt plugins
 * install bower components
 * custom build of nwjs (for drag & drop & mp3 play support)
-* required libs (brew install): mysql-connector-c++, libtag, mad, boost, youtube-dl (for music videos)
+* required libs (brew install): mysql-connector-c++, libtag, mad, boost, youtube-dl (for music videos), ffmpeg (for youtube audio)
 
 ```
 grunt all
@@ -97,7 +97,7 @@ unset GYP_CHROMIUM_NO_ACTION
 vim src/content/browser/web_contents/web_drag_source_mac.mm
 # edit extensis lines for osx drag&drop
 # https://github.com/broken/node-webkit-dragout/blob/master/src/content/browser/web_contents/web_drag_source_mac.mm
-# Building nwjs will take multiple hours and a large amount of resources
+# Building nwjs will take all f*@#ing day and all the cpu
 ninja -C src/out/nw nwjs
 ninja -C src/out/Release node
 ninja -C src/out/nw copy_node
