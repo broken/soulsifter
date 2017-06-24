@@ -167,16 +167,8 @@ bool NewSongManager::nextSong(Song* updatedSong, Song* originalSong) {
   return false;
 }
 
+// basic genre & album name must exist for moving the file. blank album artist moves file into _compilations_ directory.
 bool NewSongManager::processSong(Song* song) {
-  // TODO this validation should be in fe
-  // TODO unable to move file if any of these are blank
-  /*if ([genreComboBox stringValue] == nil || [[genreComboBox stringValue] length] <= 0 ||
-      [artist stringValue] == nil || [[artist stringValue] length] <= 0 ||
-      [album stringValue] == nil || [[album stringValue] length] <= 0) {
-    NSBeep();
-    return false;
-  }*/
-  
   // move file
   MusicManager::getInstance().moveSong(song);
   hasMovedFile = true;
