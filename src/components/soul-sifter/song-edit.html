@@ -238,6 +238,10 @@
       // indicates a NULL value upon save.
       if (!this._editedSong.albumPart.pos && !this._editedSong.albumPart.name) {
         this._editedSong.albumPartId = 0;
+      } else {
+        // make sure this albumPart's album matches this edited album
+        if (!!this._editedSong.album.id) this._editedSong.albumPart.albumId = this._editedSong.album.id;
+        else this._editedSong.albumPart.album = this._editedSong.album;
       }
       // Since basicGenre objects should not be shared between objects, we will be
       // creating another basicGenre here regardless if we selected an object in the dropdown.
