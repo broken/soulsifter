@@ -363,6 +363,13 @@ end
 
 def cSyncFunction(name, fields, secondaryKeys)
   str = "    bool #{cap(name)}::sync() {\n        #{cap(name)}* #{name} = findById(id);\n"
+  if (!fields.select{|f| f[$attrib] & Attrib::PTR > 0}.empty?)
+    str << "        if (!#{name}) {\n"
+    fields.select{|f| f[$attrib] & Attrib::PTR > 0}.each do |f|
+      str << "            if (!#{f[$name]}Id && #{f[$name]}) {\n                #{f[$name]}->sync();\n                #{f[$name]}Id = #{f[$name]}->getId();\n            }\n"
+    end
+    str << "        }\n"
+  end
   if (!secondaryKeys.empty?)
     str << "        if (!#{name}) #{name} = findBy"
     secondaryKeys.each_with_index do |f,idx|
@@ -380,11 +387,7 @@ def cSyncFunction(name, fields, secondaryKeys)
     end
     str << ");\n"
   end
-  str << "        if (!#{name}) {\n"
-  fields.select{|f| f[$attrib] & Attrib::PTR > 0}.each do |f|
-    str << "            if (!#{f[$name]}Id && #{f[$name]}) {\n                #{f[$name]}->sync();\n                #{f[$name]}Id = #{f[$name]}->getId();\n            }\n"
-  end
-  str << "            return true;\n        }\n\n"
+  str << "        if (!#{name}) return true;\n\n"
   str << "        // check fields\n        bool needsUpdate = false;\n"
   str << "        boost::regex decimal(\"(-?\\\\d+)\\\\.?\\\\d*\");\n        boost::smatch match1;\n        boost::smatch match2;\n"
   fields.each do |f|

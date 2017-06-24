@@ -309,14 +309,14 @@ namespace soulsifter {
 
     bool Album::sync() {
         Album* album = findById(id);
-        if (!album) album = findByNameAndArtist(getName(), getArtist());
         if (!album) {
             if (!basicGenreId && basicGenre) {
                 basicGenre->sync();
                 basicGenreId = basicGenre->getId();
             }
-            return true;
         }
+        if (!album) album = findByNameAndArtist(getName(), getArtist());
+        if (!album) return true;
 
         // check fields
         bool needsUpdate = false;

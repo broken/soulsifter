@@ -555,7 +555,6 @@ namespace soulsifter {
 
     bool Song::sync() {
         Song* song = findById(id);
-        if (!song) song = findByRESongId(getRESongId());
         if (!song) {
             if (!reSongId && reSong) {
                 reSong->sync();
@@ -569,8 +568,9 @@ namespace soulsifter {
                 albumPart->sync();
                 albumPartId = albumPart->getId();
             }
-            return true;
         }
+        if (!song) song = findByRESongId(getRESongId());
+        if (!song) return true;
 
         // check fields
         bool needsUpdate = false;

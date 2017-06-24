@@ -283,7 +283,6 @@ namespace soulsifter {
 
     bool Mix::sync() {
         Mix* mix = findById(id);
-        if (!mix) mix = findByOutSongIdAndInSongId(getOutSongId(), getInSongId());
         if (!mix) {
             if (!outSongId && outSong) {
                 outSong->sync();
@@ -293,8 +292,9 @@ namespace soulsifter {
                 inSong->sync();
                 inSongId = inSong->getId();
             }
-            return true;
         }
+        if (!mix) mix = findByOutSongIdAndInSongId(getOutSongId(), getInSongId());
+        if (!mix) return true;
 
         // check fields
         bool needsUpdate = false;

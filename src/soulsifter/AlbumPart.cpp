@@ -224,14 +224,14 @@ namespace soulsifter {
 
     bool AlbumPart::sync() {
         AlbumPart* albumPart = findById(id);
-        if (!albumPart) albumPart = findByPosAndAlbumId(getPos(), getAlbumId());
         if (!albumPart) {
             if (!albumId && album) {
                 album->sync();
                 albumId = album->getId();
             }
-            return true;
         }
+        if (!albumPart) albumPart = findByPosAndAlbumId(getPos(), getAlbumId());
+        if (!albumPart) return true;
 
         // check fields
         bool needsUpdate = false;

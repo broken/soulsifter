@@ -226,8 +226,8 @@ namespace soulsifter {
                 song->sync();
                 songId = song->getId();
             }
-            return true;
         }
+        if (!musicVideo) return true;
 
         // check fields
         bool needsUpdate = false;

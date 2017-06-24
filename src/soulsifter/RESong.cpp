@@ -447,9 +447,7 @@ namespace soulsifter {
 
     bool RESong::sync() {
         RESong* reSong = findById(id);
-        if (!reSong) {
-            return true;
-        }
+        if (!reSong) return true;
 
         // check fields
         bool needsUpdate = false;

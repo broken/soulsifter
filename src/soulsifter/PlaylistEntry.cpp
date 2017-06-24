@@ -268,7 +268,6 @@ namespace soulsifter {
 
     bool PlaylistEntry::sync() {
         PlaylistEntry* playlistEntry = findById(id);
-        if (!playlistEntry) playlistEntry = findByPlaylistIdAndSongId(getPlaylistId(), getSongId());
         if (!playlistEntry) {
             if (!playlistId && playlist) {
                 playlist->sync();
@@ -278,8 +277,9 @@ namespace soulsifter {
                 song->sync();
                 songId = song->getId();
             }
-            return true;
         }
+        if (!playlistEntry) playlistEntry = findByPlaylistIdAndSongId(getPlaylistId(), getSongId());
+        if (!playlistEntry) return true;
 
         // check fields
         bool needsUpdate = false;

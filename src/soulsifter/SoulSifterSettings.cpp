@@ -32,10 +32,11 @@ namespace soulsifter {
       //ptree.put("music.dir", "");
       //ptree.put("staging.dir", "");
       //ptree.put("mv.dir", "");
+      ptree.put("dir.tmp", "/tmp");
       ptree.put("db.url", "localhost");
       ptree.put("db.user", "ss");
       ptree.put("db.name", "music");
-      //ptree.put("db.password", "");
+      ptree.put("db.password", "pw");
       //ptree.put("google.appKey", "");
       //ptree.put("google.email", "");
       ptree.put("songList.limit", 128);

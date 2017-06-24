@@ -306,9 +306,7 @@ namespace soulsifter {
 
     bool Playlist::sync() {
         Playlist* playlist = findById(id);
-        if (!playlist) {
-            return true;
-        }
+        if (!playlist) return true;
 
         // check fields
         bool needsUpdate = false;
