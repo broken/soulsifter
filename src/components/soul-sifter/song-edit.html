@@ -194,6 +194,10 @@
         value: function() { return new ss.SoulSifterSettings(); },
         readOnly: true
       },
+      _albumArtistCompilation: {
+        type: Boolean,
+        value: false
+      },
     },
 
     observers: [
@@ -252,9 +256,11 @@
         // TODO update song with changes
       } else {
         this._newSongManager.processSong(this._editedSong);
+        this._albumArtistCompilation = !this._editedSong.album.albumArtist;
         if (this._hasMoreSongs()) {
           return;  // stay on this page
         }
+        this._albumArtistCompilation = false;
       }
 
       // Currently you cannot edit the cover of newly added songs. The
@@ -277,6 +283,7 @@
       if (this._hasMoreSongs()) {
         return;  // stay on this page
       }
+      this._albumArtistCompilation = false;
       this.$.abstractActionPage.exit();
     },
 
@@ -351,7 +358,7 @@
     },
 
     _artistChanged: function(artist) {
-      if (!!artist && !this._editedSong.album.artist) {
+      if (!!artist && !this._editedSong.album.artist && !this._albumArtistCompilation && !this._editedSong.album.id) {
         this.debounce('setAlbumArtist', function() {
           this._editedSong.album.artist = artist;
           this.notifyPath('_editedSong.album.artist', artist);
