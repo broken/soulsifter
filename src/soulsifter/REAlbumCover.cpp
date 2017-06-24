@@ -93,7 +93,7 @@ namespace soulsifter {
 
     REAlbumCover* REAlbumCover::findByREId(const string& reId) {
         try {
-            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select REAlbumCovers.* from REAlbumCovers where reId = ?");
+            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select REAlbumCovers.* from REAlbumCovers where ifnull(reId,'') = ifnull(?,'')");
             if (!reId.empty()) ps->setString(1, reId);
             else ps->setNull(1, sql::DataType::VARCHAR);
             sql::ResultSet *rs = ps->executeQuery();

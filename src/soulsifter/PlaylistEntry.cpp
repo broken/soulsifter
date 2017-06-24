@@ -133,7 +133,7 @@ namespace soulsifter {
 
     PlaylistEntry* PlaylistEntry::findByPlaylistIdAndSongId(int playlistId, int songId) {
         try {
-            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select PlaylistEntries.* from PlaylistEntries where playlistId = ? and songId = ?");
+            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select PlaylistEntries.* from PlaylistEntries where ifnull(playlistId,0) = ifnull(?,0) and ifnull(songId,0) = ifnull(?,0)");
             if (playlistId > 0) ps->setInt(1, playlistId);
             else ps->setNull(1, sql::DataType::INTEGER);
             if (songId > 0) ps->setInt(2, songId);

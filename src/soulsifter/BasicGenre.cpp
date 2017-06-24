@@ -88,7 +88,7 @@ namespace soulsifter {
 
     BasicGenre* BasicGenre::findByName(const string& name) {
         try {
-            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select BasicGenres.* from BasicGenres where name = ?");
+            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select BasicGenres.* from BasicGenres where ifnull(name,'') = ifnull(?,'')");
             if (!name.empty()) ps->setString(1, name);
             else ps->setNull(1, sql::DataType::VARCHAR);
             sql::ResultSet *rs = ps->executeQuery();

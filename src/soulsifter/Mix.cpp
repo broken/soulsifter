@@ -142,7 +142,7 @@ namespace soulsifter {
 
     Mix* Mix::findByOutSongIdAndInSongId(int outSongId, int inSongId) {
         try {
-            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select Mixes.* from Mixes where outSongId = ? and inSongId = ?");
+            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select Mixes.* from Mixes where ifnull(outSongId,0) = ifnull(?,0) and ifnull(inSongId,0) = ifnull(?,0)");
             if (outSongId > 0) ps->setInt(1, outSongId);
             else ps->setNull(1, sql::DataType::INTEGER);
             if (inSongId > 0) ps->setInt(2, inSongId);

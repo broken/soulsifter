@@ -93,7 +93,7 @@ namespace soulsifter {
 
     RESetting* RESetting::findByName(const string& name) {
         try {
-            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select RESettings.* from RESettings where name = ?");
+            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select RESettings.* from RESettings where ifnull(name,'') = ifnull(?,'')");
             if (!name.empty()) ps->setString(1, name);
             else ps->setNull(1, sql::DataType::VARCHAR);
             sql::ResultSet *rs = ps->executeQuery();

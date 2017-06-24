@@ -113,7 +113,7 @@ namespace soulsifter {
 
     AlbumPart* AlbumPart::findByPosAndAlbumId(const string& pos, int albumId) {
         try {
-            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select AlbumParts.* from AlbumParts where pos = ? and albumId = ?");
+            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select AlbumParts.* from AlbumParts where ifnull(pos,'') = ifnull(?,'') and ifnull(albumId,0) = ifnull(?,0)");
             if (!pos.empty()) ps->setString(1, pos);
             else ps->setNull(1, sql::DataType::VARCHAR);
             if (albumId > 0) ps->setInt(2, albumId);

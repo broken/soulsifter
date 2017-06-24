@@ -145,6 +145,20 @@ def setField(f, i, indent)
   return str
 end
 
+def defaultNullValue(f)
+  if (f[$type] == :bool)
+    return "false"
+  elsif (f[$type] == :time_t)
+    return "0"
+  elsif (isSet(f[$type]))
+    return "''"
+  elsif (f[$type] == :int)
+    return "0"
+  else
+    return "''"
+  end
+end
+
 ######################### h & cc outputs
 
 def sqlCatchBlock()
@@ -338,7 +352,7 @@ def cSecondaryKeysFindFunction(name, secondaryKeys, fields)
     if (idx > 0)
       str << " and "
     end
-    str << "#{f[$name]} = ?"
+    str << "ifnull(#{f[$name]}," << defaultNullValue(f) << ") = ifnull(?," << defaultNullValue(f) << ")"
   end
   str << "#{groupBy(name,fields)}\");\n"
   secondaryKeys.each_with_index do |f,idx|
