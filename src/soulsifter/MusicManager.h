@@ -50,6 +50,11 @@ public:
     void updateDatabaseBasicGenres();
     const BasicGenre* findBasicGenreForArtist(const string& artist);
 
+    // metadata
+    bool splitArtistAndTitle(const string& songString, Song* updatedSong);
+    bool moveFeaturing(Song* updatedSong);
+    bool copyRemixer(Song* updatedSong);
+
 private:
     // tags
     Song *lastParsedSong;

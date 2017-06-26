@@ -58,6 +58,8 @@ namespace soulsifter {
 
 namespace {
 
+  const string FEATURING_REGEX = " [(]?[Ff](eaturing|t[.]?|eat[.]?) (.*?)[)]?$";
+
   string* cleanDirName(string* name) {
     std::replace(name->begin(), name->end(), '/', '-');
     std::replace(name->begin(), name->end(), ':', ' ');
@@ -163,7 +165,7 @@ void MusicManager::writeTagsToSong(Song* song) {
           }
         }
       }
-      // TODO I created these 'Once' methods for a reason, but what was it? Still needed?
+      // I created these 'Once' methods so you can retrieve model without saving the pointer and method remains const
       Album* songAlbum = song.getAlbumOnce();
       AlbumPart* songAlbumPart = song.getAlbumPartOnce();
       // we shouldn't auto set track title b/c it changes so much
@@ -217,24 +219,13 @@ void MusicManager::writeTagsToSong(Song* song) {
     }
     
     // strip featuring from the title and add it to the artist.
-    boost::regex featRegex(" [(]?[Ff](eaturing|t[.]?|eat[.]?) (.*?)[)]?$");
-    boost::smatch featMatch;
-    if (boost::regex_search(song.getTitle(), featMatch, featRegex, boost::match_extra)) {
-      updatedSong->setArtist(updatedSong->getArtist() + " (ft. " + featMatch[2] + ")");
-      updatedSong->setTitle(boost::regex_replace(updatedSong->getTitle(), featRegex, ""));
-    }
+    moveFeaturing(updatedSong);
     // copy remixer
-    boost::regex rmxrRegex("[(](.+) ([Rr]emix|[Rr]mx|[Mm]ix|[Rr]efix|[Dd]ub)[)]$");
-    boost::smatch rmxrMatch;
-    if (boost::regex_search(song.getTitle(), rmxrMatch, rmxrRegex, boost::match_extra) &&
-        updatedSong->getRemixer().length() == 0) {
-      string remixer(rmxrMatch[1]);
-      if (!!remixer.compare("original") && !!remixer.compare("Original")) {
-        updatedSong->setRemixer(remixer);
-      }
-    }
+    copyRemixer(updatedSong);
     // add an album artist if one does not exist
     if (updatedSong->getAlbum()->getArtist().empty()) {
+      boost::regex featRegex(FEATURING_REGEX);
+      boost::smatch featMatch;
       if (boost::regex_search(updatedSong->getArtist(), featMatch, featRegex, boost::match_extra)) {
         updatedSong->getAlbum()->setArtist(featMatch[1]);
       }
@@ -291,8 +282,7 @@ bool MusicManager::moveSong(Song* song) {
         string albumPath;
         {
             ostringstream ssdirpath;
-            string artistpart = song->getAlbum()->getArtist().length() > 0 ? song->getAlbum()->getArtist() : "_compilations_";
-            string albumartist = song->getAlbum()->getArtist();
+            string albumartist = song->getAlbum()->getArtist().length() > 0 ? song->getAlbum()->getArtist() : "_compilations_";
             string albumname = song->getAlbum()->getName();
             ssdirpath << song->getAlbum()->getBasicGenre()->getName() << "/" << *cleanDirName(&albumartist) << "/" << *cleanDirName(&albumname);
             albumSubPathForImage = ssdirpath.str();
@@ -482,6 +472,43 @@ void MusicManager::updateDatabaseBasicGenres() {
    
 const BasicGenre* MusicManager::findBasicGenreForArtist(const string& artist) {
     return artistToGenre[artist];
+}
+
+bool MusicManager::splitArtistAndTitle(const string& songString, Song* updatedSong) {
+  if (updatedSong->getArtist().length() > 0 || updatedSong->getTitle().length() > 0) return false;
+  boost::regex splitRegex("^(.+) - (.+)$");
+  boost::smatch match;
+  if (boost::regex_search(songString, match, splitRegex, boost::match_extra)) {
+    updatedSong->setArtist(match[1]);
+    updatedSong->setTitle(match[2]);
+    return true;
+  }
+  return false;
+}
+
+bool MusicManager::moveFeaturing(Song* updatedSong) {
+  boost::regex featRegex(FEATURING_REGEX);
+  boost::smatch featMatch;
+  if (boost::regex_search(updatedSong->getTitle(), featMatch, featRegex, boost::match_extra)) {
+    updatedSong->setArtist(updatedSong->getArtist() + " (ft. " + featMatch[2] + ")");
+    updatedSong->setTitle(boost::regex_replace(updatedSong->getTitle(), featRegex, ""));
+    return true;
+  }
+  return false;
+}
+
+bool MusicManager::copyRemixer(Song* updatedSong) {
+  boost::regex rmxrRegex("[(](.+) ([Rr]emix|[Rr]mx|[Mm]ix|[Rr]efix|[Dd]ub)[)]$");
+  boost::smatch rmxrMatch;
+  if (boost::regex_search(updatedSong->getTitle(), rmxrMatch, rmxrRegex, boost::match_extra) &&
+      updatedSong->getRemixer().length() == 0) {
+    string remixer(rmxrMatch[1]);
+    if (!!remixer.compare("original") && !!remixer.compare("Original")) {
+      updatedSong->setRemixer(remixer);
+      return true;
+    }
+  }
+  return false;
 }
                 
  /*

@@ -259,7 +259,16 @@ void TagService::writeId3v2Tag(Song* song) {
       boost::algorithm::iends_with(song->getFilepath(), ".mp4") ||
       boost::algorithm::iends_with(song->getFilepath(), ".aac") ||
       boost::algorithm::iends_with(song->getFilepath(), ".alac")) {
-    TagLib::MPEG::File f((SoulSifterSettings::getInstance().get<string>("music.dir") + song->getFilepath()).c_str());
+    string songFilepath = SoulSifterSettings::getInstance().get<string>("music.dir") + song->getFilepath();
+    if (!boost::filesystem::exists(songFilepath)) {
+      songFilepath = song->getFilepath();
+      if (!boost::filesystem::exists(songFilepath)) {
+        cerr << "Unable to save id3v2 tag. File does not exist: " << song->getFilepath() << endl;
+        return;
+      }
+    }
+
+    TagLib::MPEG::File f(songFilepath.c_str());
     TagLib::ID3v2::Tag* id3v2 = f.ID3v2Tag(true);
     f.strip(TagLib::MPEG::File::ID3v1);
     id3v2->setArtist(song->getArtist());
@@ -317,7 +326,7 @@ void TagService::writeId3v2Tag(Song* song) {
     // save
     bool result = f.save();
     if (!result) {
-      cerr << "unable to save " << song->getFilepath() << endl;
+      cerr << "unable to save id3v2 tag for " << song->getFilepath() << endl;
     } else {
       cout << "successfully wrote id3v2 tag for " << song->getFilepath() << endl;
     }

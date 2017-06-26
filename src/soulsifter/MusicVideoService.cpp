@@ -10,6 +10,8 @@
 #include <boost/algorithm/string/replace.hpp>
 #include <boost/algorithm/string/split.hpp>
 #include <boost/filesystem.hpp>
+#include <boost/property_tree/ptree.hpp>
+#include <boost/property_tree/json_parser.hpp>
 #include <boost/range/algorithm_ext/erase.hpp>
 #include <boost/regex.hpp>
 
@@ -17,7 +19,9 @@
 #include "BasicGenre.h"
 #include "Song.h"
 #include "MusicVideo.h"
+#include "MusicManager.h"
 #include "SoulSifterSettings.h"
+#include "TagService.h"
 
 using namespace std;
 
@@ -43,6 +47,78 @@ string removeSpecialCharsFromPath(string filepath) {
 }
 
 }  // namespace
+
+vector<string> MusicVideoService::downloadYouTubeAudio(const string& id) {
+  cout << "downloadYouTubeAudio YouTube video " << id << endl;
+  vector<string> filepaths;
+
+  boost::filesystem::path tmpPath(SoulSifterSettings::getInstance().get<string>("dir.tmp"));  // todo: use os.tmpdir()
+  if (!boost::filesystem::exists(tmpPath)) {
+    if (!boost::filesystem::create_directories(tmpPath)) {
+      cerr << "Unable to create temporary directory " << tmpPath << endl;
+      return filepaths;
+    }
+  } else if (!boost::filesystem::is_directory(tmpPath)) {
+    cerr << "Temporary directory is not a directory " << tmpPath << endl;
+    return filepaths;
+  }
+
+  FILE *fpipe;
+  stringstream command;
+  command << "cd " << tmpPath << "; youtube-dl --print-json --write-all-thumbnails --restrict-filenames --extract-audio --audio-format mp3 --audio-quality 0 --quiet www.youtube.com/watch?v=" << id;
+  if (!(fpipe = (FILE*)popen(command.str().c_str(), "r"))) {
+    cerr << "Problem with youtube-dl pipe." << endl;
+    return filepaths;
+  }
+
+  char buffer[1024];
+  stringstream ss;
+  cout << "Running command '" << command.str() << "'" << endl;
+  while (fgets(buffer, sizeof buffer, fpipe)) {
+    ss << buffer;
+  }
+
+  pclose(fpipe);
+
+  // read output
+  string json;
+  while (std::getline(ss, json, '\n')) {
+    if (json.at(0) == '{') {
+      boost::property_tree::ptree ptree;
+      std::stringstream tmp(json);
+      read_json(tmp, ptree);
+
+      Song* song = new Song();
+      Album* album = new Album();
+      song->setAlbum(album);
+
+      string baseFileName = ptree.get<string>("_filename").substr(0, ptree.get<string>("_filename").size() - ptree.get<string>("ext").size());
+      song->setFilepath(SoulSifterSettings::getInstance().get<string>("dir.tmp") + '/' + baseFileName + "mp3");
+      album->setCoverFilepath(SoulSifterSettings::getInstance().get<string>("dir.tmp") + '/' + baseFileName + "jpg");
+      string title = ptree.get<string>("title");
+      if (!MusicManager::getInstance().splitArtistAndTitle(title, song)) {
+        song->setArtist(title);
+        song->setTitle(title);
+      }
+      MusicManager::getInstance().moveFeaturing(song);
+      MusicManager::getInstance().copyRemixer(song);
+      song->setLowQuality(true);
+      song->setCurator(ptree.get<string>("uploader"));
+      string date = ptree.get<string>("upload_date", "00000000");
+      album->setReleaseDateYear(std::stoi(date.substr(0, 4)));
+      album->setReleaseDateMonth(std::stoi(date.substr(4, 2)));
+      album->setReleaseDateDay(std::stoi(date.substr(6, 4)));
+      album->setName(song->getTitle());
+
+      TagService::writeId3v2Tag(song);
+      filepaths.push_back(song->getFilepath());
+      filepaths.push_back(album->getCoverFilepath());
+      delete song;
+      return filepaths;
+    }
+  }
+  return filepaths;
+}
 
 MusicVideo* MusicVideoService::associateYouTubeVideo(Song* const song, const string& id) {
   cout << "Associate YouTube video " << id << " with song " << song->getId() << endl;
