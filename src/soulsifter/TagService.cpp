@@ -37,6 +37,10 @@ namespace soulsifter {
 
 namespace {
 
+// custom tag descriptions
+const char* const CURATOR = "CURATOR";
+const char* const LOW_QUALITY = "LQ";
+
 class ImageFile : public TagLib::File {
 public:
   ImageFile(const char *file) : TagLib::File(file) { }
@@ -85,6 +89,11 @@ int canonicalizeBpm(const string& bpm) {
 const string getId3v2Text(TagLib::ID3v2::Tag* id3v2, const char* name) {
   TagLib::ID3v2::FrameList frameList = id3v2->frameListMap()[name];
   return frameList.isEmpty() ? "" : frameList.front()->toString().to8Bit();
+}
+
+const string getId3v2UserText(TagLib::ID3v2::Tag* id3v2, const char* description) {
+  TagLib::ID3v2::UserTextIdentificationFrame* frame = TagLib::ID3v2::UserTextIdentificationFrame::find(id3v2, description);
+  return !frame ? "" : frame->fieldList()[1].to8Bit();  // the desciption is copied into the first element of the field list
 }
 
 bool readId3v2TagAttributes(Song* song, TagLib::ID3v2::Tag* id3v2) {
@@ -173,6 +182,18 @@ void setId3v2Text(TagLib::ID3v2::Tag* id3v2, const char* name, const char* val) 
   }
 }
 
+void setId3v2UserText(TagLib::ID3v2::Tag* id3v2, const char* description, const char* val) {
+  TagLib::StringList values(val);
+
+  TagLib::ID3v2::UserTextIdentificationFrame* frame = TagLib::ID3v2::UserTextIdentificationFrame::find(id3v2, description);
+  if(frame) {
+    frame->setText(values);
+  } else {
+    frame = new TagLib::ID3v2::UserTextIdentificationFrame(description, values, TagLib::String::UTF8);
+    id3v2->addFrame(frame);
+  }
+}
+
 // other formats: https://gist.github.com/guymac/1468279
 void setId3v2Picture(TagLib::ID3v2::Tag* id3v2, string path, bool replace) {
   TagLib::ID3v2::FrameList frames = id3v2->frameListMap()["APIC"];  // get pictures
@@ -250,6 +271,12 @@ void TagService::readId3v2Tag(Song* song) {
     song->getAlbum()->setReleaseDateMonth(atoi(tmp));
     delete [] tmp;
 
+  // custom tags
+  string lq(getId3v2UserText(id3v2, LOW_QUALITY));
+  song->setLowQuality(lq.length() > 0 && lq.compare("0") && lq.compare("false"));
+  song->setCurator(getId3v2UserText(id3v2, CURATOR));
+
+  // attributes (bpm, key, energy)
   readId3v2TagAttributes(song, id3v2);
 }
 
@@ -320,6 +347,19 @@ void TagService::writeId3v2Tag(Song* song) {
         daymonth << song->getAlbum()->getReleaseDateMonth();
       }
       setId3v2Text(id3v2, "TDAT", daymonth.str().c_str());
+    }
+    // custom tags
+    if (song->getLowQuality()) {
+      setId3v2UserText(id3v2, LOW_QUALITY, "1");
+    } else {
+      TagLib::ID3v2::UserTextIdentificationFrame* frame = TagLib::ID3v2::UserTextIdentificationFrame::find(id3v2, LOW_QUALITY);
+      if (frame) id3v2->removeFrames(frame->frameID());
+    }
+    if (song->getCurator().length() > 0) {
+      setId3v2UserText(id3v2, CURATOR, song->getCurator().c_str());
+    } else {
+      TagLib::ID3v2::UserTextIdentificationFrame* frame = TagLib::ID3v2::UserTextIdentificationFrame::find(id3v2, CURATOR);
+      if (frame) id3v2->removeFrames(frame->frameID());
     }
     // picture
     setId3v2Picture(id3v2, SoulSifterSettings::getInstance().get<string>("music.dir") + song->getAlbum()->getCoverFilepath(), false);
