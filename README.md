@@ -14,6 +14,10 @@ OSX Build Instructions
 Presteps:
 * create mysql db
   * SELECT @@GLOBAL.sql_mode; SET GLOBAL sql_mode=(SELECT REPLACE(@@sql_mode,'ONLY_FULL_GROUP_BY',''));
+  * update /etc/mysql/my.cnf to with the new sql-mode= under [mysqld]
+    * example: [mysqld]
+      secure_file_priv=/Users/dogatech/Music/db
+      sql-mode="STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION"
 * install npm modules
   * global: grunt-cli, nw-gyp, bower
   * locally with npm install: grunt plugins
