@@ -185,6 +185,10 @@
         type: Boolean,
         value: false
       },
+      _changedSongFile: {
+        type: Boolean,
+        value: false
+      },
       _basicGenreList: {
         type: Array,
         value: function() { return ss.BasicGenre.findAll(); },
@@ -223,6 +227,7 @@
           // TODO move song in place if out of place
           that._editedSong.filepath = that._editedSong.id ? this.value.replace(that._soulSifterSettings.getString('music.dir'), '') : this.value;
           that.notifyPath('_editedSong.filepath', that._editedSong.filepath);
+          if (!!that._editedSong.id) that._changedSongFile = true;
         }, false);
       }.bind(this));
     },
@@ -251,6 +256,23 @@
       // Since basicGenre objects should not be shared between objects, we will be
       // creating another basicGenre here regardless if we selected an object in the dropdown.
       this._editedSong.album.basicGenre = ss.BasicGenre.findByName(this.basicgenreName);
+
+      // Moves files after song change
+      if (this._changedSongFile && !!this._editedSong.id) {
+        // TODO the file moving should be done externally
+        // remove current song (copied to /var/tmp)
+        var currentSongFilepath = this._soulSifterSettings.getString('music.dir') + this.song.filepath;
+        var albumFilepath = this.path.dirname(this.song.filepath);
+        var rmToTmpFilename = '/var/tmp/' + this.path.basename(this.song.filepath);
+        this.fs.rename(currentSongFilepath, rmToTmpFilename);
+        window.console.log('Renamed ' + currentSongFilepath + ' to ' + rmToTmpFilename);
+        // copy new file to current album location
+        var basename = this.path.basename(this._editedSong.filepath);
+        var newpath = this._soulSifterSettings.getString('music.dir') + albumFilepath + '/' + basename;
+        this.fs.rename(this._editedSong.filepath, newpath);
+        window.console.log('Renamed ' + this._editedSong.filepath + ' to ' + newpath);
+        this._editedSong.filepath = albumFilepath + '/' + basename;
+      }
 
       if (this._editedSong.id) {
         this._editedSong.update();
@@ -311,6 +333,7 @@
       else this.basicgenreName = '';
       this.$.cover.style.backgroundImage = 'url("file://' + this._soulSifterSettings.getString('music.dir') + this._editedSong.album.coverFilepath + '")';
       this._changedAlbumCover = false;
+      this._changedSongFile = false;
       // this does not seem to play well when working straight on the array object
       this._styles = this._editedSong.styles;
     },
