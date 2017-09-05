@@ -97,7 +97,7 @@ vector<string> MusicVideoService::downloadAudio(const string& url) {
       album->setCoverFilepath(SoulSifterSettings::getInstance().get<string>("dir.tmp") + '/' + baseFileName + "jpg");
       string title = ptree.get<string>("title");
       if (!MusicManager::getInstance().splitArtistAndTitle(title, song)) {
-        song->setArtist(title);
+        song->setArtist(ptree.get<string>("uploader"));
         song->setTitle(title);
       }
       MusicManager::getInstance().moveFeaturing(song);
