@@ -110,6 +110,7 @@ vector<string> MusicVideoService::downloadYouTubeAudio(const string& id) {
         album->setReleaseDateMonth(std::stoi(date.substr(4, 2)));
         album->setReleaseDateDay(std::stoi(date.substr(6, 4)));
       }
+      album->setArtist(song->getArtist());
       album->setName(song->getTitle());
 
       TagService::writeId3v2Tag(song);
