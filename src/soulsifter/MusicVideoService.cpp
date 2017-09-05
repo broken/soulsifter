@@ -48,8 +48,8 @@ string removeSpecialCharsFromPath(string filepath) {
 
 }  // namespace
 
-vector<string> MusicVideoService::downloadYouTubeAudio(const string& id) {
-  cout << "downloadYouTubeAudio YouTube video " << id << endl;
+vector<string> MusicVideoService::downloadAudio(const string& url) {
+  cout << "downloadYouTubeAudio with url " << url << endl;
   vector<string> filepaths;
 
   boost::filesystem::path tmpPath(SoulSifterSettings::getInstance().get<string>("dir.tmp"));  // todo: use os.tmpdir()
@@ -65,7 +65,7 @@ vector<string> MusicVideoService::downloadYouTubeAudio(const string& id) {
 
   FILE *fpipe;
   stringstream command;
-  command << "cd " << tmpPath << "; youtube-dl --print-json --write-all-thumbnails --restrict-filenames --extract-audio --audio-format mp3 --audio-quality 0 --quiet www.youtube.com/watch?v=" << id;
+  command << "cd " << tmpPath << "; youtube-dl --print-json --write-all-thumbnails --restrict-filenames --extract-audio --audio-format mp3 --audio-quality 0 --quiet " << url;
   if (!(fpipe = (FILE*)popen(command.str().c_str(), "r"))) {
     cerr << "Problem with youtube-dl pipe." << endl;
     return filepaths;

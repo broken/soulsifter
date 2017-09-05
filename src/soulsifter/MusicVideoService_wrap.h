@@ -21,7 +21,7 @@ class MusicVideoService : public Nan::ObjectWrap {
   static void New(const Nan::FunctionCallbackInfo<v8::Value>& info);
 
   static void associateYouTubeVideo(const Nan::FunctionCallbackInfo<v8::Value>& info);
-  static void downloadYouTubeAudio(const Nan::FunctionCallbackInfo<v8::Value>& info);
+  static void downloadAudio(const Nan::FunctionCallbackInfo<v8::Value>& info);
 
   static Nan::Persistent<v8::Function> constructor;
   dogatech::soulsifter::MusicVideoService* musicvideoservice;

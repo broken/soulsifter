@@ -40,7 +40,7 @@ void MusicVideoService::Init(v8::Local<v8::Object> exports) {
 
   // Prototype
   Nan::SetMethod(tpl, "associateYouTubeVideo", associateYouTubeVideo);
-  Nan::SetMethod(tpl, "downloadYouTubeAudio", downloadYouTubeAudio);
+  Nan::SetMethod(tpl, "downloadAudio", downloadAudio);
 
   constructor.Reset(tpl->GetFunction());
   exports->Set(Nan::New<v8::String>("MusicVideoService").ToLocalChecked(), tpl->GetFunction());
@@ -63,10 +63,10 @@ void MusicVideoService::associateYouTubeVideo(const Nan::FunctionCallbackInfo<v8
   }
 }
 
-void MusicVideoService::downloadYouTubeAudio(const Nan::FunctionCallbackInfo<v8::Value>& info) {
+void MusicVideoService::downloadAudio(const Nan::FunctionCallbackInfo<v8::Value>& info) {
   string a0(*v8::String::Utf8Value(info[0]->ToString()));
   std::vector<string> result =
-      dogatech::soulsifter::MusicVideoService::downloadYouTubeAudio(a0);
+      dogatech::soulsifter::MusicVideoService::downloadAudio(a0);
 
   v8::Local<v8::Array> a = Nan::New<v8::Array>((int) result.size());
   for (int i = 0; i < (int) result.size(); i++) {

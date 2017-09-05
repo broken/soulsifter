@@ -50,7 +50,7 @@
     <paper-icon-button icon="add-circle" on-click="_openCreateSongPage" id="createSongButton"></paper-icon-button>
     <paper-icon-button icon="settings" on-click="_openSettingsPage"></paper-icon-button>
     <ss-options-menu>
-      <ss-options-menu-item on-click="addSongFromYouTube">Add Song From YouTube</ss-options-menu-item>
+      <ss-options-menu-item on-click="addSongFromUrl">Add Song From URL</ss-options-menu-item>
       <ss-options-menu-item on-click="updateSongAttributesFromTags">Update Song Attributes From Tags</ss-options-menu-item>
       <ss-options-menu-item on-click="analyzeBpms">Analyze BPMs</ss-options-menu-item>
       <ss-options-menu-item on-click="analyzeDurations">Analyze Durations</ss-options-menu-item>
@@ -160,21 +160,15 @@
       var downloadProcess = child_process.fork(path.join(nw.__dirname, 'workers', 'syncgooglemusicplaylists.js'), [], {cwd: nw.__dirname});
     },
 
-    addSongFromYouTube: function(e, detail, sender) {
-      var id = nw.Clipboard.get().get('text');
-      var re = /[?&]v=([^&]+)/;
-      if (m = re.exec(id)) id = m[1];
-      if (!/[a-zA-Z0-9_-]{11}/.test(id)) {
-        window.console.log(id + ' is not a valid YouTube ID. Aborting download.');
-        return;
-      }
-      window.console.log('YouTube Audio ID = ' + id);
+    addSongFromUrl: function(e, detail, sender) {
+      var url = nw.Clipboard.get().get('text');
+      window.console.log('Audio url = ' + url);
 
-      var filepaths = ss.MusicVideoService.downloadYouTubeAudio(id);
+      var filepaths = ss.MusicVideoService.downloadAudio(url);
       if (filepaths.length > 0) {
         this.fire('page-song-edit', {filepaths: filepaths});
       } else {
-        window.console.log('Failed to download audio from YouTube ' + id);
+        window.console.log('Failed to download audio from url ' + url);
       }
     },
 
