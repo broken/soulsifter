@@ -105,9 +105,11 @@ vector<string> MusicVideoService::downloadYouTubeAudio(const string& id) {
       song->setLowQuality(true);
       song->setCurator(ptree.get<string>("uploader"));
       string date = ptree.get<string>("upload_date", "00000000");
-      album->setReleaseDateYear(std::stoi(date.substr(0, 4)));
-      album->setReleaseDateMonth(std::stoi(date.substr(4, 2)));
-      album->setReleaseDateDay(std::stoi(date.substr(6, 4)));
+      if (!date.empty() && !!date.compare("null")) {
+        album->setReleaseDateYear(std::stoi(date.substr(0, 4)));
+        album->setReleaseDateMonth(std::stoi(date.substr(4, 2)));
+        album->setReleaseDateDay(std::stoi(date.substr(6, 4)));
+      }
       album->setName(song->getTitle());
 
       TagService::writeId3v2Tag(song);
