@@ -6,6 +6,9 @@
 <link href="../paper-material/paper-material.html" rel="import">
 <link href="../paper-ripple/paper-ripple.html" rel="import">
 
+<link href="ss-options-menu.html" rel="import">
+<link href="ss-options-menu-item.html" rel="import">
+
 
 <dom-module id="genre-list-item">
   <style is="custom-style">
@@ -38,6 +41,17 @@
     .selected {
       background-color: var(--ss-genre-list-item-select-color);
     }
+
+    ss-options-menu {
+      --iron-icon-height: 16px;
+      --iron-icon-width: 16px;
+    }
+    #item ss-options-menu::shadow #btn {
+      display: none;
+    }
+    #item:hover ss-options-menu::shadow #btn {
+      display: block;
+    }
   </style>
   <template>
     <div id="itemContainer">
@@ -45,6 +59,9 @@
         <paper-ripple></paper-ripple>
         <paper-icon-button icon="[[icon]]" on-tap="_toggleExpansion"></paper-icon-button>
         <div class="flex">[[genre.name]]</div>
+        <ss-options-menu>
+          <ss-options-menu-item on-click="_editAction">Edit genre</ss-options-menu-item>
+        </ss-options-menu>
       </paper-material>
     </div>
     <iron-collapse id="collapse" opened="{{opened}}">
@@ -166,6 +183,11 @@
 
     _compareGenres: function(a, b) {
       return a.name.localeCompare(b.name);
+    },
+
+    _editAction: function(e, detail, sender) {
+      e.preventDefault();
+      this.fire('page-genre-edit', {genre: this.genre});
     },
   });
 </script>
