@@ -59,7 +59,7 @@
         <paper-ripple></paper-ripple>
         <paper-icon-button icon="[[icon]]" on-tap="_toggleExpansion"></paper-icon-button>
         <div class="flex">[[genre.name]]</div>
-        <ss-options-menu>
+        <ss-options-menu hidden$="[[!main]]">
           <ss-options-menu-item on-click="_editAction">Edit genre</ss-options-menu-item>
         </ss-options-menu>
       </paper-material>
@@ -91,6 +91,10 @@
         value: false
       },
       singleSelect: {
+        type: Boolean,
+        value: false,
+      },
+      main: {
         type: Boolean,
         value: false,
       },

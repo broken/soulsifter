@@ -13,9 +13,9 @@
   </style>
   <template>
     <template is="dom-repeat" items="[[genreParents]]">
-      <genre-list-item genre="[[item]]" on-genre-select="_selectGenre" single-select="[[singleSelect]]"></genre-list-item>
+      <genre-list-item genre="[[item]]" on-genre-select="_selectGenre" single-select="[[singleSelect]]" main="[[main]]"></genre-list-item>
     </template>
-    <paper-fab mini icon="add" on-click="_createGenre"></paper-fab>
+    <paper-fab mini icon="add" on-click="_createGenre" hidden$="[[!main]]"></paper-fab>
   </template>
 </dom-module>
 
@@ -35,6 +35,10 @@
         observer: '_selectionChanged'
       },
       singleSelect: {
+        type: Boolean,
+        value: false,
+      },
+      main: {
         type: Boolean,
         value: false,
       },

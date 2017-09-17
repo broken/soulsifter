@@ -107,7 +107,7 @@
             </paper-tabs>
             <neon-animated-pages selected="{{selectedTab}}" entry-animation="slide-from-right-animation" exit-animation="slide-left-animation">
               <neon-animatable><song-section id="songSection" song-trail="{{songTrail}}"></song-section></neon-animatable>
-              <neon-animatable><genre-list selection="{{genres}}"></genre-list></neon-animatable>
+              <neon-animatable><genre-list selection="{{genres}}" main></genre-list></neon-animatable>
               <neon-animatable><playlist-list on-query-change="changeQuery" on-genre-change="updateGenres"></playlist-list></neon-animatable>
             </neon-animated-pages>
           </section>
