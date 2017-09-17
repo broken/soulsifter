@@ -11,6 +11,7 @@
 <link href="../paper-toast/paper-toast.html" rel="import">
 <link href="../paper-icon-button/paper-icon-button.html" rel="import">
 
+<link href="genre-edit.html" rel="import">
 <link href="genre-list.html" rel="import">
 <link href="playlist-edit.html" rel="import">
 <link href="playlist-list.html" rel="import">
@@ -119,6 +120,9 @@
         </paper-drawer-panel>
       </neon-animatable>
       <neon-animatable>
+        <genre-edit genre="{{genre}}"></genre-edit>
+      </neon-animatable>
+      <neon-animatable>
         <playlist-edit playlist="{{playlist}}"></playlist-edit>
       </neon-animatable>
       <neon-animatable>
@@ -174,23 +178,29 @@
         that.pageExitAnimation = subExit;
         that.selectedPage = 0;
       });
-      this.addEventListener('page-playlist-edit', function(e) {
+      this.addEventListener('page-genre-edit', function(e) {
         that.pageEntryAnimation = subEntry;
         that.pageExitAnimation = mainExit;
         that.selectedPage = 1;
+        that.genre = e.detail.genre;
+      });
+      this.addEventListener('page-playlist-edit', function(e) {
+        that.pageEntryAnimation = subEntry;
+        that.pageExitAnimation = mainExit;
+        that.selectedPage = 2;
         that.playlist = e.detail.playlist;
       });
       this.addEventListener('page-song-edit', function(e) {
         that.pageEntryAnimation = subEntry;
         that.pageExitAnimation = mainExit;
-        that.selectedPage = 2;
+        that.selectedPage = 3;
         if (e.detail.song) that.song = e.detail.song;
         if (e.detail.filepaths) that.newSongFilepaths = e.detail.filepaths;
       });
       this.addEventListener('page-settings', function(e) {
         that.pageEntryAnimation = subEntry;
         that.pageExitAnimation = mainExit;
-        that.selectedPage = 3;
+        that.selectedPage = 4;
       });
       this.addEventListener('error-alert', function(e) {
         console.log(e.detail.msg);

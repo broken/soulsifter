@@ -1,0 +1,50 @@
+<link href="../polymer/polymer.html" rel="import">
+
+<link href="../paper-input/paper-input.html" rel="import">
+
+<link href="abstract-action-page.html" rel="import">
+<link href="genre-list.html" rel="import">
+
+
+<dom-module id="genre-edit">
+  <style is="custom-style">
+  </style>
+  <template>
+    <abstract-action-page id="abstractActionPage">
+      <div class="fields">
+        <paper-input floatingLabel label="Name" value="{{genre.name}}"></paper-input>
+      </div>
+      <div class="genres">
+        <genre-list id="genreList" selection="{{genre.parents}}"></genre-list>
+      </div>
+    </abstract-action-page>
+  </template>
+</dom-module>
+
+<script>
+  Polymer({
+    is: 'genre-edit',
+
+    properties: {
+      genre: {
+        type: Object,
+      },
+    },
+
+    attached: function() {
+      // https://www.polymer-project.org/1.0/docs/migration.html#domready
+      this.async(function() {
+        this.$.abstractActionPage.setAcceptAction(this.save);
+      }.bind(this));
+    },
+
+    save: function(e, detail, sender) {
+      if (this.genre.id) {
+        this.genre.update();
+      } else {
+        this.genre.save();
+      }
+      this.fire('iron-signal', {name: 'genres-changed'});
+    },
+  });
+</script>

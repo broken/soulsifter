@@ -5,11 +5,17 @@
 
 <dom-module id="genre-list">
   <style is="custom-style">
+    paper-fab {
+      bottom: 15px;
+      position: relative;
+      left: 182px;
+    }
   </style>
   <template>
     <template is="dom-repeat" items="[[genreParents]]">
       <genre-list-item genre="[[item]]" on-genre-select="_selectGenre" single-select="[[singleSelect]]"></genre-list-item>
     </template>
+    <paper-fab mini icon="add" on-click="_createGenre"></paper-fab>
   </template>
 </dom-module>
 
@@ -50,6 +56,11 @@
       }
       var g = new ss.Style(detail.genre);
       this.push('selection', g);
+    },
+
+    _createGenre: function(e, detail, sender) {
+      var genre = new ss.Style();
+      this.fire('page-genre-edit', {genre: genre});
     },
     
     _compareGenres: function(a, b) {
