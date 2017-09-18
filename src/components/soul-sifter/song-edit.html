@@ -73,7 +73,6 @@
       flex-direction: column;
     }
     #cover {
-      align-self: flex-end;
       background-position: center center;
       background-size: cover;
       height: 108px;
@@ -266,7 +265,7 @@
         var rmToTmpFilename = '/var/tmp/' + this.path.basename(this.song.filepath);
         this.fs.rename(currentSongFilepath, rmToTmpFilename);
         window.console.log('Renamed ' + currentSongFilepath + ' to ' + rmToTmpFilename);
-        // copy new file to current album location
+        // copy new file to current albumFilepaths location
         var basename = this.path.basename(this._editedSong.filepath);
         var newpath = this._soulSifterSettings.getString('music.dir') + albumFilepath + '/' + basename;
         this.fs.rename(this._editedSong.filepath, newpath);
