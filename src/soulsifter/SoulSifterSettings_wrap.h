@@ -28,6 +28,8 @@ class SoulSifterSettings : public Nan::ObjectWrap {
   static void putString(const Nan::FunctionCallbackInfo<v8::Value>& info);
   static void getInt(const Nan::FunctionCallbackInfo<v8::Value>& info);
   static void putInt(const Nan::FunctionCallbackInfo<v8::Value>& info);
+  static void getBool(const Nan::FunctionCallbackInfo<v8::Value>& info);
+  static void putBool(const Nan::FunctionCallbackInfo<v8::Value>& info);
 
   static Nan::Persistent<v8::Function> constructor;
   dogatech::soulsifter::SoulSifterSettings* soulsiftersettings;

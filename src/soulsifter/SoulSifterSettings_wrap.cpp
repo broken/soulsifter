@@ -44,6 +44,8 @@ void SoulSifterSettings::Init(v8::Local<v8::Object> exports) {
   Nan::SetPrototypeMethod(tpl, "putString", putString);
   Nan::SetPrototypeMethod(tpl, "getInt", getInt);
   Nan::SetPrototypeMethod(tpl, "putInt", putInt);
+  Nan::SetPrototypeMethod(tpl, "getBool", getBool);
+  Nan::SetPrototypeMethod(tpl, "putBool", putBool);
 
   constructor.Reset(tpl->GetFunction());
   exports->Set(Nan::New<v8::String>("SoulSifterSettings").ToLocalChecked(), tpl->GetFunction());
@@ -58,7 +60,7 @@ void SoulSifterSettings::save(const Nan::FunctionCallbackInfo<v8::Value>& info) 
 
 void SoulSifterSettings::getString(const Nan::FunctionCallbackInfo<v8::Value>& info) {
   SoulSifterSettings* obj = Nan::ObjectWrap::Unwrap<SoulSifterSettings>(info.Holder());
-  std::string a0(*v8::String::Utf8Value(info[0]->ToString()));
+  const std::string a0(*v8::String::Utf8Value(info[0]->ToString()));
   const std::string result = obj->soulsiftersettings->get<std::string>(a0);
 
   info.GetReturnValue().Set(Nan::New<v8::String>(result).ToLocalChecked());
@@ -66,8 +68,8 @@ void SoulSifterSettings::getString(const Nan::FunctionCallbackInfo<v8::Value>& i
 
 void SoulSifterSettings::putString(const Nan::FunctionCallbackInfo<v8::Value>& info) {
   SoulSifterSettings* obj = Nan::ObjectWrap::Unwrap<SoulSifterSettings>(info.Holder());
-  std::string a0(*v8::String::Utf8Value(info[0]->ToString()));
-  std::string a1(*v8::String::Utf8Value(info[1]->ToString()));
+  const std::string a0(*v8::String::Utf8Value(info[0]->ToString()));
+  const std::string a1(*v8::String::Utf8Value(info[1]->ToString()));
   obj->soulsiftersettings->put<std::string>(a0, a1);
 
   info.GetReturnValue().SetUndefined();
@@ -75,7 +77,7 @@ void SoulSifterSettings::putString(const Nan::FunctionCallbackInfo<v8::Value>& i
 
 void SoulSifterSettings::getInt(const Nan::FunctionCallbackInfo<v8::Value>& info) {
   SoulSifterSettings* obj = Nan::ObjectWrap::Unwrap<SoulSifterSettings>(info.Holder());
-  std::string a0(*v8::String::Utf8Value(info[0]->ToString()));
+  const std::string a0(*v8::String::Utf8Value(info[0]->ToString()));
   const int result = obj->soulsiftersettings->get<int>(a0);
 
   info.GetReturnValue().Set(Nan::New<v8::Integer>(result));
@@ -83,9 +85,26 @@ void SoulSifterSettings::getInt(const Nan::FunctionCallbackInfo<v8::Value>& info
 
 void SoulSifterSettings::putInt(const Nan::FunctionCallbackInfo<v8::Value>& info) {
   SoulSifterSettings* obj = Nan::ObjectWrap::Unwrap<SoulSifterSettings>(info.Holder());
-  std::string a0(*v8::String::Utf8Value(info[0]->ToString()));
-  int a1(info[1]->IntegerValue());
+  const std::string a0(*v8::String::Utf8Value(info[0]->ToString()));
+  const int a1(info[1]->IntegerValue());
   obj->soulsiftersettings->put<int>(a0, a1);
+
+  info.GetReturnValue().SetUndefined();
+}
+
+void SoulSifterSettings::getBool(const Nan::FunctionCallbackInfo<v8::Value>& info) {
+  SoulSifterSettings* obj = Nan::ObjectWrap::Unwrap<SoulSifterSettings>(info.Holder());
+  const std::string a0(*v8::String::Utf8Value(info[0]->ToString()));
+  const bool result = obj->soulsiftersettings->get<bool>(a0);
+
+  info.GetReturnValue().Set(Nan::New<v8::Boolean>(result));
+}
+
+void SoulSifterSettings::putBool(const Nan::FunctionCallbackInfo<v8::Value>& info) {
+  SoulSifterSettings* obj = Nan::ObjectWrap::Unwrap<SoulSifterSettings>(info.Holder());
+  const std::string a0(*v8::String::Utf8Value(info[0]->ToString()));
+  const bool a1(info[1]->BooleanValue());
+  obj->soulsiftersettings->put<bool>(a0, a1);
 
   info.GetReturnValue().SetUndefined();
 }

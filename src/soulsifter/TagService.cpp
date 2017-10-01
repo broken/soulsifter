@@ -99,12 +99,13 @@ const string getId3v2UserText(TagLib::ID3v2::Tag* id3v2, const char* description
 bool readId3v2TagAttributes(Song* song, TagLib::ID3v2::Tag* id3v2) {
   std::cout << "reading tags for song " << song->getId() << std::endl;
   bool updated = false;
+  bool overwrite = SoulSifterSettings::getInstance().get<bool>("tag.readOverwrite");  // TODO: make option instead of setting
   if (!id3v2 || !song) {
     return updated;
   }
   // bpm
   const string bpm = getId3v2Text(id3v2, "TBPM");
-  if (canonicalizeBpm(bpm) != canonicalizeBpm(song->getBpm())) {
+  if (canonicalizeBpm(bpm) != canonicalizeBpm(song->getBpm()) && (overwrite || !canonicalizeBpm(song->getBpm()))) {
     std::cout << "updating song " << song->getId()
          << " bpm from " << song->getBpm()
          << " to " << bpm << std::endl;
@@ -128,7 +129,7 @@ bool readId3v2TagAttributes(Song* song, TagLib::ID3v2::Tag* id3v2) {
               << " found energy " << energystr
               << " and key " << oldKey << std::endl;
     int energy = std::atoi(energystr.c_str());
-    if (energy != song->getEnergy()) {
+    if (energy != song->getEnergy() && (overwrite || !song->getEnergy())) {
       std::cout << "updating song " << song->getId()
                 << " energy from " << song->getEnergy()
                 << " to " << energy << std::endl;
@@ -142,7 +143,7 @@ bool readId3v2TagAttributes(Song* song, TagLib::ID3v2::Tag* id3v2) {
   const string keylist = getId3v2Text(id3v2, "TKEY");
   std::set<std::string> keys;
   boost::split(keys, keylist, boost::is_any_of("\\"));
-  if (keys != song->getTonicKeys()) {
+  if (keys != song->getTonicKeys() && (overwrite || !song->getTonicKeys().size())) {
     std::cout << "updating song " << song->getId()
          << " keys from " << boost::algorithm::join(song->getTonicKeys(), ",") << " or " << oldKey
          << " to " << boost::algorithm::join(keys, ",") << std::endl;

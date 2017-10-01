@@ -40,6 +40,7 @@ namespace soulsifter {
       //ptree.put("google.appKey", "");
       //ptree.put("google.email", "");
       ptree.put("songList.limit", 128);
+      //ptree.put("tag.readOverwrite", "");
     }
   }
   
@@ -57,6 +58,9 @@ namespace soulsifter {
   template<> const string SoulSifterSettings::get<string>(const std::string& label) const {
     return ptree.get(label, "");
   }
+  template<> const bool SoulSifterSettings::get<bool>(const std::string& label) const {
+    return ptree.get(label, false);
+  }
 
   template <typename T>
   void SoulSifterSettings::put(const string& label, const T& value) {
@@ -64,6 +68,7 @@ namespace soulsifter {
   }
   template void SoulSifterSettings::put<int>(const string& label, const int& value);
   template void SoulSifterSettings::put<string>(const string& label, const string& value);
+  template void SoulSifterSettings::put<bool>(const string& label, const bool& value);
 
 }  // namespace soulsifter
 }  // namespace dogatech

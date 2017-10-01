@@ -1,6 +1,7 @@
 <link href="../polymer/polymer.html" rel="import">
 
 <link href="../iron-flex-layout/iron-flex-layout.html" rel="import">
+<link href="../paper-checkbox/paper-checkbox.html" rel="import">
 <link href="../paper-input/paper-input.html" rel="import">
 
 <link href="abstract-action-page.html" rel="import">
@@ -19,6 +20,7 @@
         <paper-input label="Google Music App Key" value="{{googleAppKey}}"></paper-input>
         <br>
         <paper-input label="Default song list limit" value="{{songListLimit}}" allowedPattern="[0-9]*" preventInvalidInput></paper-input>
+        <paper-checkbox checked="{{overwriteSongFromTag}}">Overwrite values when reading ID3 tags</paper-checkbox>
       </div>
       <div class="fields">
         <paper-input label="Database Name" value="{{dbName}}"></paper-input>
@@ -46,6 +48,8 @@
       this.dbPassword = this.settings.getString('db.password');
       this.dbUrl = this.settings.getString('db.url');
       this.songListLimit = this.settings.getInt('songList.limit');
+      this.overwriteSongFromTag = this.settings.getBool('tag.readOverwrite');
+      this.overwriteSongFromTagOriginalValue = this.overwriteSongFromTag;
     },
 
     attached: function() {
@@ -65,6 +69,7 @@
       this.puts('db.password', this.dbPassword);
       this.puts('db.url', this.dbUrl);
       this.puti('songList.limit', this.songListLimit);
+      this.putb('tag.readOverwrite', this.overwriteSongFromTag, this.overwriteSongFromTagOriginalValue);
       this.settings.save();
     },
 
@@ -77,6 +82,12 @@
     puti: function(key, value) {
       if (!!key && (!!value || value === 0)) {
         this.settings.putInt(key, value);
+      }
+    },
+
+    putb: function(key, value, originalValue) {
+      if (!!key && value !== originalValue) {
+        this.settings.putBool(key, value);
       }
     },
   });
