@@ -9,8 +9,10 @@
 #ifndef __soul_sifter__MysqlAccess__
 #define __soul_sifter__MysqlAccess__
 
+#include <chrono>
 #include <map>
 #include <string>
+#include <thread>
 
 #include <boost/thread/tss.hpp>
 #include <cppconn/connection.h>
@@ -39,6 +41,23 @@ public:
         instance.reset(new MysqlAccess());
       }
       return *instance;
+    }
+
+    template<typename F>
+    static void* execute(F f) {
+        for (int i = 0; i < 3; ++i) {
+            try {
+                return f();
+            } catch (sql::SQLException &e) {
+                std::cout << "ERROR: SQLException in " << __FILE__;
+                std::cout << " (" << __func__<< ") on line " << __LINE__ << std::endl;
+                std::cout << "ERROR: " << e.what();
+                std::cout << " (MySQL error code: " << e.getErrorCode();
+                std::cout << ", SQLState: " << e.getSQLState() << ")" << std::endl;
+                std::this_thread::sleep_for(std::chrono::milliseconds(500));
+            }
+        }
+        return 0;
     }
 
     sql::Connection *getConnection() {

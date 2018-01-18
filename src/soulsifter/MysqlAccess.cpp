@@ -157,5 +157,5 @@ const int MysqlAccess::getLastInsertId() {
     }
 }
     
-}
-}
+}  // dogatech
+}  // soulsifter

@@ -87,7 +87,7 @@ namespace soulsifter {
     }
 
     BasicGenre* BasicGenre::findByName(const string& name) {
-        try {
+        auto exe = [&] () {
             sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select BasicGenres.* from BasicGenres where ifnull(name,'') = ifnull(?,'')");
             if (!name.empty()) ps->setString(1, name);
             else ps->setNull(1, sql::DataType::VARCHAR);
@@ -101,14 +101,12 @@ namespace soulsifter {
             delete rs;
 
             return basicGenre;
-        } catch (sql::SQLException &e) {
-            cerr << "ERROR: SQLException in " << __FILE__;
-            cerr << " (" << __func__<< ") on line " << __LINE__ << endl;
-            cerr << "ERROR: " << e.what();
-            cerr << " (MySQL error code: " << e.getErrorCode();
-            cerr << ", SQLState: " << e.getSQLState() << ")" << endl;
+        };
+        void* result = MysqlAccess::execute(exe);
+        if (result == 0) {
             exit(1);
         }
+        return (BasicGenre *) result;
     }
 
     ResultSetIterator<BasicGenre>* BasicGenre::findAll() {
