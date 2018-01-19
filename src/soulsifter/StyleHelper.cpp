@@ -60,10 +60,23 @@ namespace soulsifter {
     }
 
     ResultSetIterator<Style>* Style::findAllParents() {
-        sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select *, group_concat(children.childId) as childIds, group_concat(parents.parentId) as parentIds from Styles left outer join StyleChildren children on Styles.id = children.parentId left outer join StyleChildren parents on Styles.id = parents.childId group by Styles.id having parentIds is null");
-        sql::ResultSet *rs = ps->executeQuery();
-        ResultSetIterator<Style> *dtrs = new ResultSetIterator<Style>(rs);
-        return dtrs;
+        for (int i = 0; i < 3; ++i) {
+            try {
+                sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select *, group_concat(children.childId) as childIds, group_concat(parents.parentId) as parentIds from Styles left outer join StyleChildren children on Styles.id = children.parentId left outer join StyleChildren parents on Styles.id = parents.childId group by Styles.id having parentIds is null");
+                sql::ResultSet *rs = ps->executeQuery();
+                ResultSetIterator<Style> *dtrs = new ResultSetIterator<Style>(rs);
+                return dtrs;
+            } catch (sql::SQLException &e) {
+                cerr << "ERRO: SQLExceptionR in " << __FILE__;
+                cerr << " (" << __func__<< ") on line " << __LINE__ << endl;
+                cerr << "ERROR: " << e.what();
+                cerr << " (MySQL error code: " << e.getErrorCode();
+                cerr << ", SQLState: " << e.getSQLState() << ")" << endl;
+                bool reconnected = MysqlAccess::getInstance().reconnect();
+                std::cout << (reconnected ? "Successful" : "Failed") << " mysql reconnection" << std::endl;
+            }
+        }
+        exit(1);
     }
 
 }  // namespace soulsifter
