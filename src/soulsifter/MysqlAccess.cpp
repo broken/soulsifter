@@ -70,6 +70,9 @@ preparedStatements() {
 
 MysqlAccess::~MysqlAccess() {
     disconnect();
+    for (const std::pair<std::string, sql::PreparedStatement*>& entry : preparedStatements) {
+        delete entry.second;
+    }
 }
 
 # pragma mark connecting
@@ -103,7 +106,28 @@ bool MysqlAccess::connect() {
 bool MysqlAccess::disconnect() {
     try {
         connection->close();
-        delete connection;
+        delete connection;  // this deletes the driver as well
+        connection = nullptr;
+        driver = nullptr;
+    } catch (sql::SQLException &e) {
+        std::cout << "ERROR: SQLException in " << __FILE__;
+        std::cout << " (" << __func__<< ") on line " << __LINE__ << std::endl;
+        std::cout << "ERROR: " << e.what();
+        std::cout << " (MySQL error code: " << e.getErrorCode();
+        std::cout << ", SQLState: " << e.getSQLState() << ")" << std::endl;
+        return false;
+    }
+    return true;
+}
+    
+bool MysqlAccess::reconnect() {
+    try {
+        std::cout << "Reconnecing a" << (connection->isValid() ? " valid" : "n invalid") << " connection." << std::endl;
+        connection->reconnect();
+        for (const std::pair<std::string, sql::PreparedStatement*>& entry : preparedStatements) {
+            delete entry.second;
+        }
+        preparedStatements.clear();
     } catch (sql::SQLException &e) {
         std::cout << "ERROR: SQLException in " << __FILE__;
         std::cout << " (" << __func__<< ") on line " << __LINE__ << std::endl;
@@ -136,7 +160,7 @@ sql::PreparedStatement* MysqlAccess::getPreparedStatement(std::string query) {
     }
 }
 
-const int MysqlAccess::getLastInsertId() {
+int MysqlAccess::getLastInsertId() {
     try {
         sql::PreparedStatement *ps = getPreparedStatement("select LAST_INSERT_ID()");
         sql::ResultSet *rs = ps->executeQuery();

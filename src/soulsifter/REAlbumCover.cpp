@@ -68,52 +68,60 @@ namespace soulsifter {
     }
 
     REAlbumCover* REAlbumCover::findById(int id) {
-        try {
-            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select REAlbumCovers.* from REAlbumCovers where REAlbumCovers.id = ?");
-            ps->setInt(1, id);
-            sql::ResultSet *rs = ps->executeQuery();
-            REAlbumCover *reAlbumCover = NULL;
-            if (rs->next()) {
-                reAlbumCover = new REAlbumCover();
-                populateFields(rs, reAlbumCover);
-            }
-            rs->close();
-            delete rs;
+        for (int i = 0; i < 3; ++i) {
+            try {
+                sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select REAlbumCovers.* from REAlbumCovers where REAlbumCovers.id = ?");
+                ps->setInt(1, id);
+                sql::ResultSet *rs = ps->executeQuery();
+                REAlbumCover *reAlbumCover = NULL;
+                if (rs->next()) {
+                    reAlbumCover = new REAlbumCover();
+                    populateFields(rs, reAlbumCover);
+                }
+                rs->close();
+                delete rs;
 
-            return reAlbumCover;
-        } catch (sql::SQLException &e) {
-            cerr << "ERROR: SQLException in " << __FILE__;
-            cerr << " (" << __func__<< ") on line " << __LINE__ << endl;
-            cerr << "ERROR: " << e.what();
-            cerr << " (MySQL error code: " << e.getErrorCode();
-            cerr << ", SQLState: " << e.getSQLState() << ")" << endl;
-            exit(1);
+                return reAlbumCover;
+            } catch (sql::SQLException &e) {
+                cerr << "ERROR: SQLException in " << __FILE__;
+                cerr << " (" << __func__<< ") on line " << __LINE__ << endl;
+                cerr << "ERROR: " << e.what();
+                cerr << " (MySQL error code: " << e.getErrorCode();
+                cerr << ", SQLState: " << e.getSQLState() << ")" << endl;
+                bool reconnected = MysqlAccess::getInstance().reconnect();
+                std::cout << (reconnected ? "Successful" : "Failed") << " mysql reconnection" << std::endl;
+            }
         }
+        exit(1);
     }
 
     REAlbumCover* REAlbumCover::findByREId(const string& reId) {
-        try {
-            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select REAlbumCovers.* from REAlbumCovers where ifnull(reId,'') = ifnull(?,'')");
-            if (!reId.empty()) ps->setString(1, reId);
-            else ps->setNull(1, sql::DataType::VARCHAR);
-            sql::ResultSet *rs = ps->executeQuery();
-            REAlbumCover *reAlbumCover = NULL;
-            if (rs->next()) {
-                reAlbumCover = new REAlbumCover();
-                populateFields(rs, reAlbumCover);
-            }
-            rs->close();
-            delete rs;
+        for (int i = 0; i < 3; ++i) {
+            try {
+                sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select REAlbumCovers.* from REAlbumCovers where ifnull(reId,'') = ifnull(?,'')");
+                if (!reId.empty()) ps->setString(1, reId);
+                else ps->setNull(1, sql::DataType::VARCHAR);
+                sql::ResultSet *rs = ps->executeQuery();
+                REAlbumCover *reAlbumCover = NULL;
+                if (rs->next()) {
+                    reAlbumCover = new REAlbumCover();
+                    populateFields(rs, reAlbumCover);
+                }
+                rs->close();
+                delete rs;
 
-            return reAlbumCover;
-        } catch (sql::SQLException &e) {
-            cerr << "ERROR: SQLException in " << __FILE__;
-            cerr << " (" << __func__<< ") on line " << __LINE__ << endl;
-            cerr << "ERROR: " << e.what();
-            cerr << " (MySQL error code: " << e.getErrorCode();
-            cerr << ", SQLState: " << e.getSQLState() << ")" << endl;
-            exit(1);
+                return reAlbumCover;
+            } catch (sql::SQLException &e) {
+                cerr << "ERROR: SQLException in " << __FILE__;
+                cerr << " (" << __func__<< ") on line " << __LINE__ << endl;
+                cerr << "ERROR: " << e.what();
+                cerr << " (MySQL error code: " << e.getErrorCode();
+                cerr << ", SQLState: " << e.getSQLState() << ")" << endl;
+                bool reconnected = MysqlAccess::getInstance().reconnect();
+                std::cout << (reconnected ? "Successful" : "Failed") << " mysql reconnection" << std::endl;
+            }
         }
+        exit(1);
     }
 
     ResultSetIterator<REAlbumCover>* REAlbumCover::findAll() {
@@ -126,54 +134,62 @@ namespace soulsifter {
 # pragma mark persistence
 
     int REAlbumCover::update() {
-        try {
+        for (int i = 0; i < 3; ++i) {
+            try {
 
-            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("update REAlbumCovers set reId=?, thumbnail=? where id=?");
-            if (!reId.empty()) ps->setString(1, reId);
-            else ps->setNull(1, sql::DataType::VARCHAR);
-            if (!thumbnail.empty()) ps->setString(2, thumbnail);
-            else ps->setNull(2, sql::DataType::VARCHAR);
-            ps->setInt(3, id);
-            int result = ps->executeUpdate();
-            return result;
-        } catch (sql::SQLException &e) {
-            cerr << "ERROR: SQLException in " << __FILE__;
-            cerr << " (" << __func__<< ") on line " << __LINE__ << endl;
-            cerr << "ERROR: " << e.what();
-            cerr << " (MySQL error code: " << e.getErrorCode();
-            cerr << ", SQLState: " << e.getSQLState() << ")" << endl;
-            exit(1);
+                sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("update REAlbumCovers set reId=?, thumbnail=? where id=?");
+                if (!reId.empty()) ps->setString(1, reId);
+                else ps->setNull(1, sql::DataType::VARCHAR);
+                if (!thumbnail.empty()) ps->setString(2, thumbnail);
+                else ps->setNull(2, sql::DataType::VARCHAR);
+                ps->setInt(3, id);
+                int result = ps->executeUpdate();
+                return result;
+            } catch (sql::SQLException &e) {
+                cerr << "ERROR: SQLException in " << __FILE__;
+                cerr << " (" << __func__<< ") on line " << __LINE__ << endl;
+                cerr << "ERROR: " << e.what();
+                cerr << " (MySQL error code: " << e.getErrorCode();
+                cerr << ", SQLState: " << e.getSQLState() << ")" << endl;
+                bool reconnected = MysqlAccess::getInstance().reconnect();
+                std::cout << (reconnected ? "Successful" : "Failed") << " mysql reconnection" << std::endl;
+            }
         }
+        exit(1);
     }
 
     int REAlbumCover::save() {
-        try {
+        for (int i = 0; i < 3; ++i) {
+            try {
 
-            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("insert into REAlbumCovers (reId, thumbnail) values (?, ?)");
-            if (!reId.empty()) ps->setString(1, reId);
-            else ps->setNull(1, sql::DataType::VARCHAR);
-            if (!thumbnail.empty()) ps->setString(2, thumbnail);
-            else ps->setNull(2, sql::DataType::VARCHAR);
-            int saved = ps->executeUpdate();
-            if (!saved) {
-                cerr << "Not able to save reAlbumCover" << endl;
-                return saved;
-            } else {
-                id = MysqlAccess::getInstance().getLastInsertId();
-                if (id == 0) {
-                    cerr << "Inserted reAlbumCover, but unable to retreive inserted ID." << endl;
+                sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("insert into REAlbumCovers (reId, thumbnail) values (?, ?)");
+                if (!reId.empty()) ps->setString(1, reId);
+                else ps->setNull(1, sql::DataType::VARCHAR);
+                if (!thumbnail.empty()) ps->setString(2, thumbnail);
+                else ps->setNull(2, sql::DataType::VARCHAR);
+                int saved = ps->executeUpdate();
+                if (!saved) {
+                    cerr << "Not able to save reAlbumCover" << endl;
+                    return saved;
+                } else {
+                    id = MysqlAccess::getInstance().getLastInsertId();
+                    if (id == 0) {
+                        cerr << "Inserted reAlbumCover, but unable to retreive inserted ID." << endl;
+                        return saved;
+                    }
                     return saved;
                 }
-                return saved;
+            } catch (sql::SQLException &e) {
+                cerr << "ERROR: SQLException in " << __FILE__;
+                cerr << " (" << __func__<< ") on line " << __LINE__ << endl;
+                cerr << "ERROR: " << e.what();
+                cerr << " (MySQL error code: " << e.getErrorCode();
+                cerr << ", SQLState: " << e.getSQLState() << ")" << endl;
+                bool reconnected = MysqlAccess::getInstance().reconnect();
+                std::cout << (reconnected ? "Successful" : "Failed") << " mysql reconnection" << std::endl;
             }
-        } catch (sql::SQLException &e) {
-            cerr << "ERROR: SQLException in " << __FILE__;
-            cerr << " (" << __func__<< ") on line " << __LINE__ << endl;
-            cerr << "ERROR: " << e.what();
-            cerr << " (MySQL error code: " << e.getErrorCode();
-            cerr << ", SQLState: " << e.getSQLState() << ")" << endl;
-            exit(1);
         }
+        exit(1);
     }
 
     bool REAlbumCover::sync() {

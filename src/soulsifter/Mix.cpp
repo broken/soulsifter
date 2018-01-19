@@ -117,54 +117,62 @@ namespace soulsifter {
     }
 
     Mix* Mix::findById(int id) {
-        try {
-            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select Mixes.* from Mixes where Mixes.id = ?");
-            ps->setInt(1, id);
-            sql::ResultSet *rs = ps->executeQuery();
-            Mix *mix = NULL;
-            if (rs->next()) {
-                mix = new Mix();
-                populateFields(rs, mix);
-            }
-            rs->close();
-            delete rs;
+        for (int i = 0; i < 3; ++i) {
+            try {
+                sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select Mixes.* from Mixes where Mixes.id = ?");
+                ps->setInt(1, id);
+                sql::ResultSet *rs = ps->executeQuery();
+                Mix *mix = NULL;
+                if (rs->next()) {
+                    mix = new Mix();
+                    populateFields(rs, mix);
+                }
+                rs->close();
+                delete rs;
 
-            return mix;
-        } catch (sql::SQLException &e) {
-            cerr << "ERROR: SQLException in " << __FILE__;
-            cerr << " (" << __func__<< ") on line " << __LINE__ << endl;
-            cerr << "ERROR: " << e.what();
-            cerr << " (MySQL error code: " << e.getErrorCode();
-            cerr << ", SQLState: " << e.getSQLState() << ")" << endl;
-            exit(1);
+                return mix;
+            } catch (sql::SQLException &e) {
+                cerr << "ERROR: SQLException in " << __FILE__;
+                cerr << " (" << __func__<< ") on line " << __LINE__ << endl;
+                cerr << "ERROR: " << e.what();
+                cerr << " (MySQL error code: " << e.getErrorCode();
+                cerr << ", SQLState: " << e.getSQLState() << ")" << endl;
+                bool reconnected = MysqlAccess::getInstance().reconnect();
+                std::cout << (reconnected ? "Successful" : "Failed") << " mysql reconnection" << std::endl;
+            }
         }
+        exit(1);
     }
 
     Mix* Mix::findByOutSongIdAndInSongId(int outSongId, int inSongId) {
-        try {
-            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select Mixes.* from Mixes where ifnull(outSongId,0) = ifnull(?,0) and ifnull(inSongId,0) = ifnull(?,0)");
-            if (outSongId > 0) ps->setInt(1, outSongId);
-            else ps->setNull(1, sql::DataType::INTEGER);
-            if (inSongId > 0) ps->setInt(2, inSongId);
-            else ps->setNull(2, sql::DataType::INTEGER);
-            sql::ResultSet *rs = ps->executeQuery();
-            Mix *mix = NULL;
-            if (rs->next()) {
-                mix = new Mix();
-                populateFields(rs, mix);
-            }
-            rs->close();
-            delete rs;
+        for (int i = 0; i < 3; ++i) {
+            try {
+                sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select Mixes.* from Mixes where ifnull(outSongId,0) = ifnull(?,0) and ifnull(inSongId,0) = ifnull(?,0)");
+                if (outSongId > 0) ps->setInt(1, outSongId);
+                else ps->setNull(1, sql::DataType::INTEGER);
+                if (inSongId > 0) ps->setInt(2, inSongId);
+                else ps->setNull(2, sql::DataType::INTEGER);
+                sql::ResultSet *rs = ps->executeQuery();
+                Mix *mix = NULL;
+                if (rs->next()) {
+                    mix = new Mix();
+                    populateFields(rs, mix);
+                }
+                rs->close();
+                delete rs;
 
-            return mix;
-        } catch (sql::SQLException &e) {
-            cerr << "ERROR: SQLException in " << __FILE__;
-            cerr << " (" << __func__<< ") on line " << __LINE__ << endl;
-            cerr << "ERROR: " << e.what();
-            cerr << " (MySQL error code: " << e.getErrorCode();
-            cerr << ", SQLState: " << e.getSQLState() << ")" << endl;
-            exit(1);
+                return mix;
+            } catch (sql::SQLException &e) {
+                cerr << "ERROR: SQLException in " << __FILE__;
+                cerr << " (" << __func__<< ") on line " << __LINE__ << endl;
+                cerr << "ERROR: " << e.what();
+                cerr << " (MySQL error code: " << e.getErrorCode();
+                cerr << ", SQLState: " << e.getSQLState() << ")" << endl;
+                bool reconnected = MysqlAccess::getInstance().reconnect();
+                std::cout << (reconnected ? "Successful" : "Failed") << " mysql reconnection" << std::endl;
+            }
         }
+        exit(1);
     }
 
     ResultSetIterator<Mix>* Mix::findAll() {
@@ -177,108 +185,116 @@ namespace soulsifter {
 # pragma mark persistence
 
     int Mix::update() {
-        try {
-            if (outSong && outSong->sync()) {
-                if (outSong->getId()) {
-                    outSong->update();
-                } else {
-                    outSong->save();
+        for (int i = 0; i < 3; ++i) {
+            try {
+                if (outSong && outSong->sync()) {
+                    if (outSong->getId()) {
+                        outSong->update();
+                    } else {
+                        outSong->save();
+                    }
+                    outSongId = outSong->getId();
+                } else if (!outSongId && outSong) {
+                    outSongId = outSong->getId();
                 }
-                outSongId = outSong->getId();
-            } else if (!outSongId && outSong) {
-                outSongId = outSong->getId();
-            }
-            if (inSong && inSong->sync()) {
-                if (inSong->getId()) {
-                    inSong->update();
-                } else {
-                    inSong->save();
+                if (inSong && inSong->sync()) {
+                    if (inSong->getId()) {
+                        inSong->update();
+                    } else {
+                        inSong->save();
+                    }
+                    inSongId = inSong->getId();
+                } else if (!inSongId && inSong) {
+                    inSongId = inSong->getId();
                 }
-                inSongId = inSong->getId();
-            } else if (!inSongId && inSong) {
-                inSongId = inSong->getId();
-            }
 
-            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("update Mixes set outSongId=?, inSongId=?, bpmDiff=?, rank=?, comments=?, addon=? where id=?");
-            if (outSongId > 0) ps->setInt(1, outSongId);
-            else ps->setNull(1, sql::DataType::INTEGER);
-            if (inSongId > 0) ps->setInt(2, inSongId);
-            else ps->setNull(2, sql::DataType::INTEGER);
-            if (!bpmDiff.empty()) ps->setString(3, bpmDiff);
-            else ps->setNull(3, sql::DataType::VARCHAR);
-            if (rank > 0) ps->setInt(4, rank);
-            else ps->setNull(4, sql::DataType::INTEGER);
-            if (!comments.empty()) ps->setString(5, comments);
-            else ps->setNull(5, sql::DataType::VARCHAR);
-            ps->setBoolean(6, addon);
-            ps->setInt(7, id);
-            int result = ps->executeUpdate();
-            return result;
-        } catch (sql::SQLException &e) {
-            cerr << "ERROR: SQLException in " << __FILE__;
-            cerr << " (" << __func__<< ") on line " << __LINE__ << endl;
-            cerr << "ERROR: " << e.what();
-            cerr << " (MySQL error code: " << e.getErrorCode();
-            cerr << ", SQLState: " << e.getSQLState() << ")" << endl;
-            exit(1);
+                sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("update Mixes set outSongId=?, inSongId=?, bpmDiff=?, rank=?, comments=?, addon=? where id=?");
+                if (outSongId > 0) ps->setInt(1, outSongId);
+                else ps->setNull(1, sql::DataType::INTEGER);
+                if (inSongId > 0) ps->setInt(2, inSongId);
+                else ps->setNull(2, sql::DataType::INTEGER);
+                if (!bpmDiff.empty()) ps->setString(3, bpmDiff);
+                else ps->setNull(3, sql::DataType::VARCHAR);
+                if (rank > 0) ps->setInt(4, rank);
+                else ps->setNull(4, sql::DataType::INTEGER);
+                if (!comments.empty()) ps->setString(5, comments);
+                else ps->setNull(5, sql::DataType::VARCHAR);
+                ps->setBoolean(6, addon);
+                ps->setInt(7, id);
+                int result = ps->executeUpdate();
+                return result;
+            } catch (sql::SQLException &e) {
+                cerr << "ERROR: SQLException in " << __FILE__;
+                cerr << " (" << __func__<< ") on line " << __LINE__ << endl;
+                cerr << "ERROR: " << e.what();
+                cerr << " (MySQL error code: " << e.getErrorCode();
+                cerr << ", SQLState: " << e.getSQLState() << ")" << endl;
+                bool reconnected = MysqlAccess::getInstance().reconnect();
+                std::cout << (reconnected ? "Successful" : "Failed") << " mysql reconnection" << std::endl;
+            }
         }
+        exit(1);
     }
 
     int Mix::save() {
-        try {
-            if (outSong && outSong->sync()) {
-                if (outSong->getId()) {
-                    outSong->update();
-                } else {
-                    outSong->save();
+        for (int i = 0; i < 3; ++i) {
+            try {
+                if (outSong && outSong->sync()) {
+                    if (outSong->getId()) {
+                        outSong->update();
+                    } else {
+                        outSong->save();
+                    }
+                    outSongId = outSong->getId();
+                } else if (!outSongId && outSong) {
+                    outSongId = outSong->getId();
                 }
-                outSongId = outSong->getId();
-            } else if (!outSongId && outSong) {
-                outSongId = outSong->getId();
-            }
-            if (inSong && inSong->sync()) {
-                if (inSong->getId()) {
-                    inSong->update();
-                } else {
-                    inSong->save();
+                if (inSong && inSong->sync()) {
+                    if (inSong->getId()) {
+                        inSong->update();
+                    } else {
+                        inSong->save();
+                    }
+                    inSongId = inSong->getId();
+                } else if (!inSongId && inSong) {
+                    inSongId = inSong->getId();
                 }
-                inSongId = inSong->getId();
-            } else if (!inSongId && inSong) {
-                inSongId = inSong->getId();
-            }
 
-            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("insert into Mixes (outSongId, inSongId, bpmDiff, rank, comments, addon) values (?, ?, ?, ?, ?, ?)");
-            if (outSongId > 0) ps->setInt(1, outSongId);
-            else ps->setNull(1, sql::DataType::INTEGER);
-            if (inSongId > 0) ps->setInt(2, inSongId);
-            else ps->setNull(2, sql::DataType::INTEGER);
-            if (!bpmDiff.empty()) ps->setString(3, bpmDiff);
-            else ps->setNull(3, sql::DataType::VARCHAR);
-            if (rank > 0) ps->setInt(4, rank);
-            else ps->setNull(4, sql::DataType::INTEGER);
-            if (!comments.empty()) ps->setString(5, comments);
-            else ps->setNull(5, sql::DataType::VARCHAR);
-            ps->setBoolean(6, addon);
-            int saved = ps->executeUpdate();
-            if (!saved) {
-                cerr << "Not able to save mix" << endl;
-                return saved;
-            } else {
-                id = MysqlAccess::getInstance().getLastInsertId();
-                if (id == 0) {
-                    cerr << "Inserted mix, but unable to retreive inserted ID." << endl;
+                sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("insert into Mixes (outSongId, inSongId, bpmDiff, rank, comments, addon) values (?, ?, ?, ?, ?, ?)");
+                if (outSongId > 0) ps->setInt(1, outSongId);
+                else ps->setNull(1, sql::DataType::INTEGER);
+                if (inSongId > 0) ps->setInt(2, inSongId);
+                else ps->setNull(2, sql::DataType::INTEGER);
+                if (!bpmDiff.empty()) ps->setString(3, bpmDiff);
+                else ps->setNull(3, sql::DataType::VARCHAR);
+                if (rank > 0) ps->setInt(4, rank);
+                else ps->setNull(4, sql::DataType::INTEGER);
+                if (!comments.empty()) ps->setString(5, comments);
+                else ps->setNull(5, sql::DataType::VARCHAR);
+                ps->setBoolean(6, addon);
+                int saved = ps->executeUpdate();
+                if (!saved) {
+                    cerr << "Not able to save mix" << endl;
+                    return saved;
+                } else {
+                    id = MysqlAccess::getInstance().getLastInsertId();
+                    if (id == 0) {
+                        cerr << "Inserted mix, but unable to retreive inserted ID." << endl;
+                        return saved;
+                    }
                     return saved;
                 }
-                return saved;
+            } catch (sql::SQLException &e) {
+                cerr << "ERROR: SQLException in " << __FILE__;
+                cerr << " (" << __func__<< ") on line " << __LINE__ << endl;
+                cerr << "ERROR: " << e.what();
+                cerr << " (MySQL error code: " << e.getErrorCode();
+                cerr << ", SQLState: " << e.getSQLState() << ")" << endl;
+                bool reconnected = MysqlAccess::getInstance().reconnect();
+                std::cout << (reconnected ? "Successful" : "Failed") << " mysql reconnection" << std::endl;
             }
-        } catch (sql::SQLException &e) {
-            cerr << "ERROR: SQLException in " << __FILE__;
-            cerr << " (" << __func__<< ") on line " << __LINE__ << endl;
-            cerr << "ERROR: " << e.what();
-            cerr << " (MySQL error code: " << e.getErrorCode();
-            cerr << ", SQLState: " << e.getSQLState() << ")" << endl;
-            exit(1);
         }
+        exit(1);
     }
 
     bool Mix::sync() {

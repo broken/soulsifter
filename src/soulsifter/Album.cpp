@@ -123,78 +123,90 @@ namespace soulsifter {
     }
 
     Album* Album::findById(int id) {
-        try {
-            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select Albums.* from Albums where Albums.id = ?");
-            ps->setInt(1, id);
-            sql::ResultSet *rs = ps->executeQuery();
-            Album *album = NULL;
-            if (rs->next()) {
-                album = new Album();
-                populateFields(rs, album);
-            }
-            rs->close();
-            delete rs;
+        for (int i = 0; i < 3; ++i) {
+            try {
+                sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select Albums.* from Albums where Albums.id = ?");
+                ps->setInt(1, id);
+                sql::ResultSet *rs = ps->executeQuery();
+                Album *album = NULL;
+                if (rs->next()) {
+                    album = new Album();
+                    populateFields(rs, album);
+                }
+                rs->close();
+                delete rs;
 
-            return album;
-        } catch (sql::SQLException &e) {
-            cerr << "ERROR: SQLException in " << __FILE__;
-            cerr << " (" << __func__<< ") on line " << __LINE__ << endl;
-            cerr << "ERROR: " << e.what();
-            cerr << " (MySQL error code: " << e.getErrorCode();
-            cerr << ", SQLState: " << e.getSQLState() << ")" << endl;
-            exit(1);
+                return album;
+            } catch (sql::SQLException &e) {
+                cerr << "ERROR: SQLException in " << __FILE__;
+                cerr << " (" << __func__<< ") on line " << __LINE__ << endl;
+                cerr << "ERROR: " << e.what();
+                cerr << " (MySQL error code: " << e.getErrorCode();
+                cerr << ", SQLState: " << e.getSQLState() << ")" << endl;
+                bool reconnected = MysqlAccess::getInstance().reconnect();
+                std::cout << (reconnected ? "Successful" : "Failed") << " mysql reconnection" << std::endl;
+            }
         }
+        exit(1);
     }
 
     Album* Album::findByCoverFilepath(const string& coverFilepath) {
-        try {
-            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select Albums.* from Albums where Albums.coverFilepath = ?");
-            ps->setString(1, coverFilepath);
-            sql::ResultSet *rs = ps->executeQuery();
-            Album *album = NULL;
-            if (rs->next()) {
-                album = new Album();
-                populateFields(rs, album);
-            }
-            rs->close();
-            delete rs;
+        for (int i = 0; i < 3; ++i) {
+            try {
+                sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select Albums.* from Albums where Albums.coverFilepath = ?");
+                ps->setString(1, coverFilepath);
+                sql::ResultSet *rs = ps->executeQuery();
+                Album *album = NULL;
+                if (rs->next()) {
+                    album = new Album();
+                    populateFields(rs, album);
+                }
+                rs->close();
+                delete rs;
 
-            return album;
-        } catch (sql::SQLException &e) {
-            cerr << "ERROR: SQLException in " << __FILE__;
-            cerr << " (" << __func__<< ") on line " << __LINE__ << endl;
-            cerr << "ERROR: " << e.what();
-            cerr << " (MySQL error code: " << e.getErrorCode();
-            cerr << ", SQLState: " << e.getSQLState() << ")" << endl;
-            exit(1);
+                return album;
+            } catch (sql::SQLException &e) {
+                cerr << "ERROR: SQLException in " << __FILE__;
+                cerr << " (" << __func__<< ") on line " << __LINE__ << endl;
+                cerr << "ERROR: " << e.what();
+                cerr << " (MySQL error code: " << e.getErrorCode();
+                cerr << ", SQLState: " << e.getSQLState() << ")" << endl;
+                bool reconnected = MysqlAccess::getInstance().reconnect();
+                std::cout << (reconnected ? "Successful" : "Failed") << " mysql reconnection" << std::endl;
+            }
         }
+        exit(1);
     }
 
     Album* Album::findByNameAndArtist(const string& name, const string& artist) {
-        try {
-            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select Albums.* from Albums where ifnull(name,'') = ifnull(?,'') and ifnull(artist,'') = ifnull(?,'')");
-            if (!name.empty()) ps->setString(1, name);
-            else ps->setNull(1, sql::DataType::VARCHAR);
-            if (!artist.empty()) ps->setString(2, artist);
-            else ps->setNull(2, sql::DataType::VARCHAR);
-            sql::ResultSet *rs = ps->executeQuery();
-            Album *album = NULL;
-            if (rs->next()) {
-                album = new Album();
-                populateFields(rs, album);
-            }
-            rs->close();
-            delete rs;
+        for (int i = 0; i < 3; ++i) {
+            try {
+                sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select Albums.* from Albums where ifnull(name,'') = ifnull(?,'') and ifnull(artist,'') = ifnull(?,'')");
+                if (!name.empty()) ps->setString(1, name);
+                else ps->setNull(1, sql::DataType::VARCHAR);
+                if (!artist.empty()) ps->setString(2, artist);
+                else ps->setNull(2, sql::DataType::VARCHAR);
+                sql::ResultSet *rs = ps->executeQuery();
+                Album *album = NULL;
+                if (rs->next()) {
+                    album = new Album();
+                    populateFields(rs, album);
+                }
+                rs->close();
+                delete rs;
 
-            return album;
-        } catch (sql::SQLException &e) {
-            cerr << "ERROR: SQLException in " << __FILE__;
-            cerr << " (" << __func__<< ") on line " << __LINE__ << endl;
-            cerr << "ERROR: " << e.what();
-            cerr << " (MySQL error code: " << e.getErrorCode();
-            cerr << ", SQLState: " << e.getSQLState() << ")" << endl;
-            exit(1);
+                return album;
+            } catch (sql::SQLException &e) {
+                cerr << "ERROR: SQLException in " << __FILE__;
+                cerr << " (" << __func__<< ") on line " << __LINE__ << endl;
+                cerr << "ERROR: " << e.what();
+                cerr << " (MySQL error code: " << e.getErrorCode();
+                cerr << ", SQLState: " << e.getSQLState() << ")" << endl;
+                bool reconnected = MysqlAccess::getInstance().reconnect();
+                std::cout << (reconnected ? "Successful" : "Failed") << " mysql reconnection" << std::endl;
+            }
         }
+        exit(1);
     }
 
     ResultSetIterator<Album>* Album::findAll() {
@@ -207,104 +219,112 @@ namespace soulsifter {
 # pragma mark persistence
 
     int Album::update() {
-        try {
-            if (basicGenre && basicGenre->sync()) {
-                if (basicGenre->getId()) {
-                    basicGenre->update();
-                } else {
-                    basicGenre->save();
+        for (int i = 0; i < 3; ++i) {
+            try {
+                if (basicGenre && basicGenre->sync()) {
+                    if (basicGenre->getId()) {
+                        basicGenre->update();
+                    } else {
+                        basicGenre->save();
+                    }
+                    basicGenreId = basicGenre->getId();
+                } else if (!basicGenreId && basicGenre) {
+                    basicGenreId = basicGenre->getId();
                 }
-                basicGenreId = basicGenre->getId();
-            } else if (!basicGenreId && basicGenre) {
-                basicGenreId = basicGenre->getId();
-            }
 
-            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("update Albums set name=?, artist=?, coverFilepath=?, mixed=?, label=?, catalogId=?, releaseDateYear=?, releaseDateMonth=?, releaseDateDay=?, basicGenreId=? where id=?");
-            if (!name.empty()) ps->setString(1, name);
-            else ps->setNull(1, sql::DataType::VARCHAR);
-            if (!artist.empty()) ps->setString(2, artist);
-            else ps->setNull(2, sql::DataType::VARCHAR);
-            if (!coverFilepath.empty()) ps->setString(3, coverFilepath);
-            else ps->setNull(3, sql::DataType::VARCHAR);
-            ps->setBoolean(4, mixed);
-            if (!label.empty()) ps->setString(5, label);
-            else ps->setNull(5, sql::DataType::VARCHAR);
-            if (!catalogId.empty()) ps->setString(6, catalogId);
-            else ps->setNull(6, sql::DataType::VARCHAR);
-            if (releaseDateYear > 0) ps->setInt(7, releaseDateYear);
-            else ps->setNull(7, sql::DataType::INTEGER);
-            if (releaseDateMonth > 0) ps->setInt(8, releaseDateMonth);
-            else ps->setNull(8, sql::DataType::INTEGER);
-            if (releaseDateDay > 0) ps->setInt(9, releaseDateDay);
-            else ps->setNull(9, sql::DataType::INTEGER);
-            if (basicGenreId > 0) ps->setInt(10, basicGenreId);
-            else ps->setNull(10, sql::DataType::INTEGER);
-            ps->setInt(11, id);
-            int result = ps->executeUpdate();
-            return result;
-        } catch (sql::SQLException &e) {
-            cerr << "ERROR: SQLException in " << __FILE__;
-            cerr << " (" << __func__<< ") on line " << __LINE__ << endl;
-            cerr << "ERROR: " << e.what();
-            cerr << " (MySQL error code: " << e.getErrorCode();
-            cerr << ", SQLState: " << e.getSQLState() << ")" << endl;
-            exit(1);
+                sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("update Albums set name=?, artist=?, coverFilepath=?, mixed=?, label=?, catalogId=?, releaseDateYear=?, releaseDateMonth=?, releaseDateDay=?, basicGenreId=? where id=?");
+                if (!name.empty()) ps->setString(1, name);
+                else ps->setNull(1, sql::DataType::VARCHAR);
+                if (!artist.empty()) ps->setString(2, artist);
+                else ps->setNull(2, sql::DataType::VARCHAR);
+                if (!coverFilepath.empty()) ps->setString(3, coverFilepath);
+                else ps->setNull(3, sql::DataType::VARCHAR);
+                ps->setBoolean(4, mixed);
+                if (!label.empty()) ps->setString(5, label);
+                else ps->setNull(5, sql::DataType::VARCHAR);
+                if (!catalogId.empty()) ps->setString(6, catalogId);
+                else ps->setNull(6, sql::DataType::VARCHAR);
+                if (releaseDateYear > 0) ps->setInt(7, releaseDateYear);
+                else ps->setNull(7, sql::DataType::INTEGER);
+                if (releaseDateMonth > 0) ps->setInt(8, releaseDateMonth);
+                else ps->setNull(8, sql::DataType::INTEGER);
+                if (releaseDateDay > 0) ps->setInt(9, releaseDateDay);
+                else ps->setNull(9, sql::DataType::INTEGER);
+                if (basicGenreId > 0) ps->setInt(10, basicGenreId);
+                else ps->setNull(10, sql::DataType::INTEGER);
+                ps->setInt(11, id);
+                int result = ps->executeUpdate();
+                return result;
+            } catch (sql::SQLException &e) {
+                cerr << "ERROR: SQLException in " << __FILE__;
+                cerr << " (" << __func__<< ") on line " << __LINE__ << endl;
+                cerr << "ERROR: " << e.what();
+                cerr << " (MySQL error code: " << e.getErrorCode();
+                cerr << ", SQLState: " << e.getSQLState() << ")" << endl;
+                bool reconnected = MysqlAccess::getInstance().reconnect();
+                std::cout << (reconnected ? "Successful" : "Failed") << " mysql reconnection" << std::endl;
+            }
         }
+        exit(1);
     }
 
     int Album::save() {
-        try {
-            if (basicGenre && basicGenre->sync()) {
-                if (basicGenre->getId()) {
-                    basicGenre->update();
-                } else {
-                    basicGenre->save();
+        for (int i = 0; i < 3; ++i) {
+            try {
+                if (basicGenre && basicGenre->sync()) {
+                    if (basicGenre->getId()) {
+                        basicGenre->update();
+                    } else {
+                        basicGenre->save();
+                    }
+                    basicGenreId = basicGenre->getId();
+                } else if (!basicGenreId && basicGenre) {
+                    basicGenreId = basicGenre->getId();
                 }
-                basicGenreId = basicGenre->getId();
-            } else if (!basicGenreId && basicGenre) {
-                basicGenreId = basicGenre->getId();
-            }
 
-            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("insert into Albums (name, artist, coverFilepath, mixed, label, catalogId, releaseDateYear, releaseDateMonth, releaseDateDay, basicGenreId) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-            if (!name.empty()) ps->setString(1, name);
-            else ps->setNull(1, sql::DataType::VARCHAR);
-            if (!artist.empty()) ps->setString(2, artist);
-            else ps->setNull(2, sql::DataType::VARCHAR);
-            if (!coverFilepath.empty()) ps->setString(3, coverFilepath);
-            else ps->setNull(3, sql::DataType::VARCHAR);
-            ps->setBoolean(4, mixed);
-            if (!label.empty()) ps->setString(5, label);
-            else ps->setNull(5, sql::DataType::VARCHAR);
-            if (!catalogId.empty()) ps->setString(6, catalogId);
-            else ps->setNull(6, sql::DataType::VARCHAR);
-            if (releaseDateYear > 0) ps->setInt(7, releaseDateYear);
-            else ps->setNull(7, sql::DataType::INTEGER);
-            if (releaseDateMonth > 0) ps->setInt(8, releaseDateMonth);
-            else ps->setNull(8, sql::DataType::INTEGER);
-            if (releaseDateDay > 0) ps->setInt(9, releaseDateDay);
-            else ps->setNull(9, sql::DataType::INTEGER);
-            if (basicGenreId > 0) ps->setInt(10, basicGenreId);
-            else ps->setNull(10, sql::DataType::INTEGER);
-            int saved = ps->executeUpdate();
-            if (!saved) {
-                cerr << "Not able to save album" << endl;
-                return saved;
-            } else {
-                id = MysqlAccess::getInstance().getLastInsertId();
-                if (id == 0) {
-                    cerr << "Inserted album, but unable to retreive inserted ID." << endl;
+                sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("insert into Albums (name, artist, coverFilepath, mixed, label, catalogId, releaseDateYear, releaseDateMonth, releaseDateDay, basicGenreId) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                if (!name.empty()) ps->setString(1, name);
+                else ps->setNull(1, sql::DataType::VARCHAR);
+                if (!artist.empty()) ps->setString(2, artist);
+                else ps->setNull(2, sql::DataType::VARCHAR);
+                if (!coverFilepath.empty()) ps->setString(3, coverFilepath);
+                else ps->setNull(3, sql::DataType::VARCHAR);
+                ps->setBoolean(4, mixed);
+                if (!label.empty()) ps->setString(5, label);
+                else ps->setNull(5, sql::DataType::VARCHAR);
+                if (!catalogId.empty()) ps->setString(6, catalogId);
+                else ps->setNull(6, sql::DataType::VARCHAR);
+                if (releaseDateYear > 0) ps->setInt(7, releaseDateYear);
+                else ps->setNull(7, sql::DataType::INTEGER);
+                if (releaseDateMonth > 0) ps->setInt(8, releaseDateMonth);
+                else ps->setNull(8, sql::DataType::INTEGER);
+                if (releaseDateDay > 0) ps->setInt(9, releaseDateDay);
+                else ps->setNull(9, sql::DataType::INTEGER);
+                if (basicGenreId > 0) ps->setInt(10, basicGenreId);
+                else ps->setNull(10, sql::DataType::INTEGER);
+                int saved = ps->executeUpdate();
+                if (!saved) {
+                    cerr << "Not able to save album" << endl;
+                    return saved;
+                } else {
+                    id = MysqlAccess::getInstance().getLastInsertId();
+                    if (id == 0) {
+                        cerr << "Inserted album, but unable to retreive inserted ID." << endl;
+                        return saved;
+                    }
                     return saved;
                 }
-                return saved;
+            } catch (sql::SQLException &e) {
+                cerr << "ERROR: SQLException in " << __FILE__;
+                cerr << " (" << __func__<< ") on line " << __LINE__ << endl;
+                cerr << "ERROR: " << e.what();
+                cerr << " (MySQL error code: " << e.getErrorCode();
+                cerr << ", SQLState: " << e.getSQLState() << ")" << endl;
+                bool reconnected = MysqlAccess::getInstance().reconnect();
+                std::cout << (reconnected ? "Successful" : "Failed") << " mysql reconnection" << std::endl;
             }
-        } catch (sql::SQLException &e) {
-            cerr << "ERROR: SQLException in " << __FILE__;
-            cerr << " (" << __func__<< ") on line " << __LINE__ << endl;
-            cerr << "ERROR: " << e.what();
-            cerr << " (MySQL error code: " << e.getErrorCode();
-            cerr << ", SQLState: " << e.getSQLState() << ")" << endl;
-            exit(1);
         }
+        exit(1);
     }
 
     bool Album::sync() {

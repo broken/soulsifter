@@ -88,54 +88,62 @@ namespace soulsifter {
     }
 
     AlbumPart* AlbumPart::findById(int id) {
-        try {
-            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select AlbumParts.* from AlbumParts where AlbumParts.id = ?");
-            ps->setInt(1, id);
-            sql::ResultSet *rs = ps->executeQuery();
-            AlbumPart *albumPart = NULL;
-            if (rs->next()) {
-                albumPart = new AlbumPart();
-                populateFields(rs, albumPart);
-            }
-            rs->close();
-            delete rs;
+        for (int i = 0; i < 3; ++i) {
+            try {
+                sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select AlbumParts.* from AlbumParts where AlbumParts.id = ?");
+                ps->setInt(1, id);
+                sql::ResultSet *rs = ps->executeQuery();
+                AlbumPart *albumPart = NULL;
+                if (rs->next()) {
+                    albumPart = new AlbumPart();
+                    populateFields(rs, albumPart);
+                }
+                rs->close();
+                delete rs;
 
-            return albumPart;
-        } catch (sql::SQLException &e) {
-            cerr << "ERROR: SQLException in " << __FILE__;
-            cerr << " (" << __func__<< ") on line " << __LINE__ << endl;
-            cerr << "ERROR: " << e.what();
-            cerr << " (MySQL error code: " << e.getErrorCode();
-            cerr << ", SQLState: " << e.getSQLState() << ")" << endl;
-            exit(1);
+                return albumPart;
+            } catch (sql::SQLException &e) {
+                cerr << "ERROR: SQLException in " << __FILE__;
+                cerr << " (" << __func__<< ") on line " << __LINE__ << endl;
+                cerr << "ERROR: " << e.what();
+                cerr << " (MySQL error code: " << e.getErrorCode();
+                cerr << ", SQLState: " << e.getSQLState() << ")" << endl;
+                bool reconnected = MysqlAccess::getInstance().reconnect();
+                std::cout << (reconnected ? "Successful" : "Failed") << " mysql reconnection" << std::endl;
+            }
         }
+        exit(1);
     }
 
     AlbumPart* AlbumPart::findByPosAndAlbumId(const string& pos, int albumId) {
-        try {
-            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select AlbumParts.* from AlbumParts where ifnull(pos,'') = ifnull(?,'') and ifnull(albumId,0) = ifnull(?,0)");
-            if (!pos.empty()) ps->setString(1, pos);
-            else ps->setNull(1, sql::DataType::VARCHAR);
-            if (albumId > 0) ps->setInt(2, albumId);
-            else ps->setNull(2, sql::DataType::INTEGER);
-            sql::ResultSet *rs = ps->executeQuery();
-            AlbumPart *albumPart = NULL;
-            if (rs->next()) {
-                albumPart = new AlbumPart();
-                populateFields(rs, albumPart);
-            }
-            rs->close();
-            delete rs;
+        for (int i = 0; i < 3; ++i) {
+            try {
+                sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select AlbumParts.* from AlbumParts where ifnull(pos,'') = ifnull(?,'') and ifnull(albumId,0) = ifnull(?,0)");
+                if (!pos.empty()) ps->setString(1, pos);
+                else ps->setNull(1, sql::DataType::VARCHAR);
+                if (albumId > 0) ps->setInt(2, albumId);
+                else ps->setNull(2, sql::DataType::INTEGER);
+                sql::ResultSet *rs = ps->executeQuery();
+                AlbumPart *albumPart = NULL;
+                if (rs->next()) {
+                    albumPart = new AlbumPart();
+                    populateFields(rs, albumPart);
+                }
+                rs->close();
+                delete rs;
 
-            return albumPart;
-        } catch (sql::SQLException &e) {
-            cerr << "ERROR: SQLException in " << __FILE__;
-            cerr << " (" << __func__<< ") on line " << __LINE__ << endl;
-            cerr << "ERROR: " << e.what();
-            cerr << " (MySQL error code: " << e.getErrorCode();
-            cerr << ", SQLState: " << e.getSQLState() << ")" << endl;
-            exit(1);
+                return albumPart;
+            } catch (sql::SQLException &e) {
+                cerr << "ERROR: SQLException in " << __FILE__;
+                cerr << " (" << __func__<< ") on line " << __LINE__ << endl;
+                cerr << "ERROR: " << e.what();
+                cerr << " (MySQL error code: " << e.getErrorCode();
+                cerr << ", SQLState: " << e.getSQLState() << ")" << endl;
+                bool reconnected = MysqlAccess::getInstance().reconnect();
+                std::cout << (reconnected ? "Successful" : "Failed") << " mysql reconnection" << std::endl;
+            }
         }
+        exit(1);
     }
 
     ResultSetIterator<AlbumPart>* AlbumPart::findAll() {
@@ -148,78 +156,86 @@ namespace soulsifter {
 # pragma mark persistence
 
     int AlbumPart::update() {
-        try {
-            if (album && album->sync()) {
-                if (album->getId()) {
-                    album->update();
-                } else {
-                    album->save();
+        for (int i = 0; i < 3; ++i) {
+            try {
+                if (album && album->sync()) {
+                    if (album->getId()) {
+                        album->update();
+                    } else {
+                        album->save();
+                    }
+                    albumId = album->getId();
+                } else if (!albumId && album) {
+                    albumId = album->getId();
                 }
-                albumId = album->getId();
-            } else if (!albumId && album) {
-                albumId = album->getId();
-            }
 
-            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("update AlbumParts set pos=?, name=?, albumId=? where id=?");
-            if (!pos.empty()) ps->setString(1, pos);
-            else ps->setNull(1, sql::DataType::VARCHAR);
-            if (!name.empty()) ps->setString(2, name);
-            else ps->setNull(2, sql::DataType::VARCHAR);
-            if (albumId > 0) ps->setInt(3, albumId);
-            else ps->setNull(3, sql::DataType::INTEGER);
-            ps->setInt(4, id);
-            int result = ps->executeUpdate();
-            return result;
-        } catch (sql::SQLException &e) {
-            cerr << "ERROR: SQLException in " << __FILE__;
-            cerr << " (" << __func__<< ") on line " << __LINE__ << endl;
-            cerr << "ERROR: " << e.what();
-            cerr << " (MySQL error code: " << e.getErrorCode();
-            cerr << ", SQLState: " << e.getSQLState() << ")" << endl;
-            exit(1);
+                sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("update AlbumParts set pos=?, name=?, albumId=? where id=?");
+                if (!pos.empty()) ps->setString(1, pos);
+                else ps->setNull(1, sql::DataType::VARCHAR);
+                if (!name.empty()) ps->setString(2, name);
+                else ps->setNull(2, sql::DataType::VARCHAR);
+                if (albumId > 0) ps->setInt(3, albumId);
+                else ps->setNull(3, sql::DataType::INTEGER);
+                ps->setInt(4, id);
+                int result = ps->executeUpdate();
+                return result;
+            } catch (sql::SQLException &e) {
+                cerr << "ERROR: SQLException in " << __FILE__;
+                cerr << " (" << __func__<< ") on line " << __LINE__ << endl;
+                cerr << "ERROR: " << e.what();
+                cerr << " (MySQL error code: " << e.getErrorCode();
+                cerr << ", SQLState: " << e.getSQLState() << ")" << endl;
+                bool reconnected = MysqlAccess::getInstance().reconnect();
+                std::cout << (reconnected ? "Successful" : "Failed") << " mysql reconnection" << std::endl;
+            }
         }
+        exit(1);
     }
 
     int AlbumPart::save() {
-        try {
-            if (album && album->sync()) {
-                if (album->getId()) {
-                    album->update();
-                } else {
-                    album->save();
+        for (int i = 0; i < 3; ++i) {
+            try {
+                if (album && album->sync()) {
+                    if (album->getId()) {
+                        album->update();
+                    } else {
+                        album->save();
+                    }
+                    albumId = album->getId();
+                } else if (!albumId && album) {
+                    albumId = album->getId();
                 }
-                albumId = album->getId();
-            } else if (!albumId && album) {
-                albumId = album->getId();
-            }
 
-            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("insert into AlbumParts (pos, name, albumId) values (?, ?, ?)");
-            if (!pos.empty()) ps->setString(1, pos);
-            else ps->setNull(1, sql::DataType::VARCHAR);
-            if (!name.empty()) ps->setString(2, name);
-            else ps->setNull(2, sql::DataType::VARCHAR);
-            if (albumId > 0) ps->setInt(3, albumId);
-            else ps->setNull(3, sql::DataType::INTEGER);
-            int saved = ps->executeUpdate();
-            if (!saved) {
-                cerr << "Not able to save albumPart" << endl;
-                return saved;
-            } else {
-                id = MysqlAccess::getInstance().getLastInsertId();
-                if (id == 0) {
-                    cerr << "Inserted albumPart, but unable to retreive inserted ID." << endl;
+                sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("insert into AlbumParts (pos, name, albumId) values (?, ?, ?)");
+                if (!pos.empty()) ps->setString(1, pos);
+                else ps->setNull(1, sql::DataType::VARCHAR);
+                if (!name.empty()) ps->setString(2, name);
+                else ps->setNull(2, sql::DataType::VARCHAR);
+                if (albumId > 0) ps->setInt(3, albumId);
+                else ps->setNull(3, sql::DataType::INTEGER);
+                int saved = ps->executeUpdate();
+                if (!saved) {
+                    cerr << "Not able to save albumPart" << endl;
+                    return saved;
+                } else {
+                    id = MysqlAccess::getInstance().getLastInsertId();
+                    if (id == 0) {
+                        cerr << "Inserted albumPart, but unable to retreive inserted ID." << endl;
+                        return saved;
+                    }
                     return saved;
                 }
-                return saved;
+            } catch (sql::SQLException &e) {
+                cerr << "ERROR: SQLException in " << __FILE__;
+                cerr << " (" << __func__<< ") on line " << __LINE__ << endl;
+                cerr << "ERROR: " << e.what();
+                cerr << " (MySQL error code: " << e.getErrorCode();
+                cerr << ", SQLState: " << e.getSQLState() << ")" << endl;
+                bool reconnected = MysqlAccess::getInstance().reconnect();
+                std::cout << (reconnected ? "Successful" : "Failed") << " mysql reconnection" << std::endl;
             }
-        } catch (sql::SQLException &e) {
-            cerr << "ERROR: SQLException in " << __FILE__;
-            cerr << " (" << __func__<< ") on line " << __LINE__ << endl;
-            cerr << "ERROR: " << e.what();
-            cerr << " (MySQL error code: " << e.getErrorCode();
-            cerr << ", SQLState: " << e.getSQLState() << ")" << endl;
-            exit(1);
         }
+        exit(1);
     }
 
     bool AlbumPart::sync() {

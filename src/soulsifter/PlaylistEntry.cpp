@@ -108,54 +108,62 @@ namespace soulsifter {
     }
 
     PlaylistEntry* PlaylistEntry::findById(int id) {
-        try {
-            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select PlaylistEntries.* from PlaylistEntries where PlaylistEntries.id = ?");
-            ps->setInt(1, id);
-            sql::ResultSet *rs = ps->executeQuery();
-            PlaylistEntry *playlistEntry = NULL;
-            if (rs->next()) {
-                playlistEntry = new PlaylistEntry();
-                populateFields(rs, playlistEntry);
-            }
-            rs->close();
-            delete rs;
+        for (int i = 0; i < 3; ++i) {
+            try {
+                sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select PlaylistEntries.* from PlaylistEntries where PlaylistEntries.id = ?");
+                ps->setInt(1, id);
+                sql::ResultSet *rs = ps->executeQuery();
+                PlaylistEntry *playlistEntry = NULL;
+                if (rs->next()) {
+                    playlistEntry = new PlaylistEntry();
+                    populateFields(rs, playlistEntry);
+                }
+                rs->close();
+                delete rs;
 
-            return playlistEntry;
-        } catch (sql::SQLException &e) {
-            cerr << "ERROR: SQLException in " << __FILE__;
-            cerr << " (" << __func__<< ") on line " << __LINE__ << endl;
-            cerr << "ERROR: " << e.what();
-            cerr << " (MySQL error code: " << e.getErrorCode();
-            cerr << ", SQLState: " << e.getSQLState() << ")" << endl;
-            exit(1);
+                return playlistEntry;
+            } catch (sql::SQLException &e) {
+                cerr << "ERROR: SQLException in " << __FILE__;
+                cerr << " (" << __func__<< ") on line " << __LINE__ << endl;
+                cerr << "ERROR: " << e.what();
+                cerr << " (MySQL error code: " << e.getErrorCode();
+                cerr << ", SQLState: " << e.getSQLState() << ")" << endl;
+                bool reconnected = MysqlAccess::getInstance().reconnect();
+                std::cout << (reconnected ? "Successful" : "Failed") << " mysql reconnection" << std::endl;
+            }
         }
+        exit(1);
     }
 
     PlaylistEntry* PlaylistEntry::findByPlaylistIdAndSongId(int playlistId, int songId) {
-        try {
-            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select PlaylistEntries.* from PlaylistEntries where ifnull(playlistId,0) = ifnull(?,0) and ifnull(songId,0) = ifnull(?,0)");
-            if (playlistId > 0) ps->setInt(1, playlistId);
-            else ps->setNull(1, sql::DataType::INTEGER);
-            if (songId > 0) ps->setInt(2, songId);
-            else ps->setNull(2, sql::DataType::INTEGER);
-            sql::ResultSet *rs = ps->executeQuery();
-            PlaylistEntry *playlistEntry = NULL;
-            if (rs->next()) {
-                playlistEntry = new PlaylistEntry();
-                populateFields(rs, playlistEntry);
-            }
-            rs->close();
-            delete rs;
+        for (int i = 0; i < 3; ++i) {
+            try {
+                sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select PlaylistEntries.* from PlaylistEntries where ifnull(playlistId,0) = ifnull(?,0) and ifnull(songId,0) = ifnull(?,0)");
+                if (playlistId > 0) ps->setInt(1, playlistId);
+                else ps->setNull(1, sql::DataType::INTEGER);
+                if (songId > 0) ps->setInt(2, songId);
+                else ps->setNull(2, sql::DataType::INTEGER);
+                sql::ResultSet *rs = ps->executeQuery();
+                PlaylistEntry *playlistEntry = NULL;
+                if (rs->next()) {
+                    playlistEntry = new PlaylistEntry();
+                    populateFields(rs, playlistEntry);
+                }
+                rs->close();
+                delete rs;
 
-            return playlistEntry;
-        } catch (sql::SQLException &e) {
-            cerr << "ERROR: SQLException in " << __FILE__;
-            cerr << " (" << __func__<< ") on line " << __LINE__ << endl;
-            cerr << "ERROR: " << e.what();
-            cerr << " (MySQL error code: " << e.getErrorCode();
-            cerr << ", SQLState: " << e.getSQLState() << ")" << endl;
-            exit(1);
+                return playlistEntry;
+            } catch (sql::SQLException &e) {
+                cerr << "ERROR: SQLException in " << __FILE__;
+                cerr << " (" << __func__<< ") on line " << __LINE__ << endl;
+                cerr << "ERROR: " << e.what();
+                cerr << " (MySQL error code: " << e.getErrorCode();
+                cerr << ", SQLState: " << e.getSQLState() << ")" << endl;
+                bool reconnected = MysqlAccess::getInstance().reconnect();
+                std::cout << (reconnected ? "Successful" : "Failed") << " mysql reconnection" << std::endl;
+            }
         }
+        exit(1);
     }
 
     ResultSetIterator<PlaylistEntry>* PlaylistEntry::findAll() {
@@ -168,102 +176,110 @@ namespace soulsifter {
 # pragma mark persistence
 
     int PlaylistEntry::update() {
-        try {
-            if (playlist && playlist->sync()) {
-                if (playlist->getId()) {
-                    playlist->update();
-                } else {
-                    playlist->save();
+        for (int i = 0; i < 3; ++i) {
+            try {
+                if (playlist && playlist->sync()) {
+                    if (playlist->getId()) {
+                        playlist->update();
+                    } else {
+                        playlist->save();
+                    }
+                    playlistId = playlist->getId();
+                } else if (!playlistId && playlist) {
+                    playlistId = playlist->getId();
                 }
-                playlistId = playlist->getId();
-            } else if (!playlistId && playlist) {
-                playlistId = playlist->getId();
-            }
-            if (song && song->sync()) {
-                if (song->getId()) {
-                    song->update();
-                } else {
-                    song->save();
+                if (song && song->sync()) {
+                    if (song->getId()) {
+                        song->update();
+                    } else {
+                        song->save();
+                    }
+                    songId = song->getId();
+                } else if (!songId && song) {
+                    songId = song->getId();
                 }
-                songId = song->getId();
-            } else if (!songId && song) {
-                songId = song->getId();
-            }
 
-            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("update PlaylistEntries set playlistId=?, songId=?, position=?, time=? where id=?");
-            if (playlistId > 0) ps->setInt(1, playlistId);
-            else ps->setNull(1, sql::DataType::INTEGER);
-            if (songId > 0) ps->setInt(2, songId);
-            else ps->setNull(2, sql::DataType::INTEGER);
-            if (position > 0) ps->setInt(3, position);
-            else ps->setNull(3, sql::DataType::INTEGER);
-            if (!time.empty()) ps->setString(4, time);
-            else ps->setNull(4, sql::DataType::VARCHAR);
-            ps->setInt(5, id);
-            int result = ps->executeUpdate();
-            return result;
-        } catch (sql::SQLException &e) {
-            cerr << "ERROR: SQLException in " << __FILE__;
-            cerr << " (" << __func__<< ") on line " << __LINE__ << endl;
-            cerr << "ERROR: " << e.what();
-            cerr << " (MySQL error code: " << e.getErrorCode();
-            cerr << ", SQLState: " << e.getSQLState() << ")" << endl;
-            exit(1);
+                sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("update PlaylistEntries set playlistId=?, songId=?, position=?, time=? where id=?");
+                if (playlistId > 0) ps->setInt(1, playlistId);
+                else ps->setNull(1, sql::DataType::INTEGER);
+                if (songId > 0) ps->setInt(2, songId);
+                else ps->setNull(2, sql::DataType::INTEGER);
+                if (position > 0) ps->setInt(3, position);
+                else ps->setNull(3, sql::DataType::INTEGER);
+                if (!time.empty()) ps->setString(4, time);
+                else ps->setNull(4, sql::DataType::VARCHAR);
+                ps->setInt(5, id);
+                int result = ps->executeUpdate();
+                return result;
+            } catch (sql::SQLException &e) {
+                cerr << "ERROR: SQLException in " << __FILE__;
+                cerr << " (" << __func__<< ") on line " << __LINE__ << endl;
+                cerr << "ERROR: " << e.what();
+                cerr << " (MySQL error code: " << e.getErrorCode();
+                cerr << ", SQLState: " << e.getSQLState() << ")" << endl;
+                bool reconnected = MysqlAccess::getInstance().reconnect();
+                std::cout << (reconnected ? "Successful" : "Failed") << " mysql reconnection" << std::endl;
+            }
         }
+        exit(1);
     }
 
     int PlaylistEntry::save() {
-        try {
-            if (playlist && playlist->sync()) {
-                if (playlist->getId()) {
-                    playlist->update();
-                } else {
-                    playlist->save();
+        for (int i = 0; i < 3; ++i) {
+            try {
+                if (playlist && playlist->sync()) {
+                    if (playlist->getId()) {
+                        playlist->update();
+                    } else {
+                        playlist->save();
+                    }
+                    playlistId = playlist->getId();
+                } else if (!playlistId && playlist) {
+                    playlistId = playlist->getId();
                 }
-                playlistId = playlist->getId();
-            } else if (!playlistId && playlist) {
-                playlistId = playlist->getId();
-            }
-            if (song && song->sync()) {
-                if (song->getId()) {
-                    song->update();
-                } else {
-                    song->save();
+                if (song && song->sync()) {
+                    if (song->getId()) {
+                        song->update();
+                    } else {
+                        song->save();
+                    }
+                    songId = song->getId();
+                } else if (!songId && song) {
+                    songId = song->getId();
                 }
-                songId = song->getId();
-            } else if (!songId && song) {
-                songId = song->getId();
-            }
 
-            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("insert into PlaylistEntries (playlistId, songId, position, time) values (?, ?, ?, ?)");
-            if (playlistId > 0) ps->setInt(1, playlistId);
-            else ps->setNull(1, sql::DataType::INTEGER);
-            if (songId > 0) ps->setInt(2, songId);
-            else ps->setNull(2, sql::DataType::INTEGER);
-            if (position > 0) ps->setInt(3, position);
-            else ps->setNull(3, sql::DataType::INTEGER);
-            if (!time.empty()) ps->setString(4, time);
-            else ps->setNull(4, sql::DataType::VARCHAR);
-            int saved = ps->executeUpdate();
-            if (!saved) {
-                cerr << "Not able to save playlistEntry" << endl;
-                return saved;
-            } else {
-                id = MysqlAccess::getInstance().getLastInsertId();
-                if (id == 0) {
-                    cerr << "Inserted playlistEntry, but unable to retreive inserted ID." << endl;
+                sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("insert into PlaylistEntries (playlistId, songId, position, time) values (?, ?, ?, ?)");
+                if (playlistId > 0) ps->setInt(1, playlistId);
+                else ps->setNull(1, sql::DataType::INTEGER);
+                if (songId > 0) ps->setInt(2, songId);
+                else ps->setNull(2, sql::DataType::INTEGER);
+                if (position > 0) ps->setInt(3, position);
+                else ps->setNull(3, sql::DataType::INTEGER);
+                if (!time.empty()) ps->setString(4, time);
+                else ps->setNull(4, sql::DataType::VARCHAR);
+                int saved = ps->executeUpdate();
+                if (!saved) {
+                    cerr << "Not able to save playlistEntry" << endl;
+                    return saved;
+                } else {
+                    id = MysqlAccess::getInstance().getLastInsertId();
+                    if (id == 0) {
+                        cerr << "Inserted playlistEntry, but unable to retreive inserted ID." << endl;
+                        return saved;
+                    }
                     return saved;
                 }
-                return saved;
+            } catch (sql::SQLException &e) {
+                cerr << "ERROR: SQLException in " << __FILE__;
+                cerr << " (" << __func__<< ") on line " << __LINE__ << endl;
+                cerr << "ERROR: " << e.what();
+                cerr << " (MySQL error code: " << e.getErrorCode();
+                cerr << ", SQLState: " << e.getSQLState() << ")" << endl;
+                bool reconnected = MysqlAccess::getInstance().reconnect();
+                std::cout << (reconnected ? "Successful" : "Failed") << " mysql reconnection" << std::endl;
             }
-        } catch (sql::SQLException &e) {
-            cerr << "ERROR: SQLException in " << __FILE__;
-            cerr << " (" << __func__<< ") on line " << __LINE__ << endl;
-            cerr << "ERROR: " << e.what();
-            cerr << " (MySQL error code: " << e.getErrorCode();
-            cerr << ", SQLState: " << e.getSQLState() << ")" << endl;
-            exit(1);
         }
+        exit(1);
     }
 
     bool PlaylistEntry::sync() {
@@ -332,22 +348,26 @@ namespace soulsifter {
     }
 
     int PlaylistEntry::erase() {
-        try {
-            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("delete from PlaylistEntries where id=?");
-            ps->setInt(1, id);
-            int erased = ps->executeUpdate();
-            if (!erased) {
-                cerr << "Not able to erase playlistEntry" << endl;
+        for (int i = 0; i < 3; ++i) {
+            try {
+                sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("delete from PlaylistEntries where id=?");
+                ps->setInt(1, id);
+                int erased = ps->executeUpdate();
+                if (!erased) {
+                    cerr << "Not able to erase playlistEntry" << endl;
+                }
+                return erased;
+            } catch (sql::SQLException &e) {
+                cerr << "ERROR: SQLException in " << __FILE__;
+                cerr << " (" << __func__<< ") on line " << __LINE__ << endl;
+                cerr << "ERROR: " << e.what();
+                cerr << " (MySQL error code: " << e.getErrorCode();
+                cerr << ", SQLState: " << e.getSQLState() << ")" << endl;
+                bool reconnected = MysqlAccess::getInstance().reconnect();
+                std::cout << (reconnected ? "Successful" : "Failed") << " mysql reconnection" << std::endl;
             }
-            return erased;
-        } catch (sql::SQLException &e) {
-            cerr << "ERROR: SQLException in " << __FILE__;
-            cerr << " (" << __func__<< ") on line " << __LINE__ << endl;
-            cerr << "ERROR: " << e.what();
-            cerr << " (MySQL error code: " << e.getErrorCode();
-            cerr << ", SQLState: " << e.getSQLState() << ")" << endl;
-            exit(1);
         }
+        exit(1);
     }
 
 

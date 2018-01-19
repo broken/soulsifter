@@ -217,51 +217,59 @@ namespace soulsifter {
     }
 
     RESong* RESong::findById(int id) {
-        try {
-            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select RESongs.* from RESongs where RESongs.id = ?");
-            ps->setInt(1, id);
-            sql::ResultSet *rs = ps->executeQuery();
-            RESong *reSong = NULL;
-            if (rs->next()) {
-                reSong = new RESong();
-                populateFields(rs, reSong);
-            }
-            rs->close();
-            delete rs;
+        for (int i = 0; i < 3; ++i) {
+            try {
+                sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select RESongs.* from RESongs where RESongs.id = ?");
+                ps->setInt(1, id);
+                sql::ResultSet *rs = ps->executeQuery();
+                RESong *reSong = NULL;
+                if (rs->next()) {
+                    reSong = new RESong();
+                    populateFields(rs, reSong);
+                }
+                rs->close();
+                delete rs;
 
-            return reSong;
-        } catch (sql::SQLException &e) {
-            cerr << "ERROR: SQLException in " << __FILE__;
-            cerr << " (" << __func__<< ") on line " << __LINE__ << endl;
-            cerr << "ERROR: " << e.what();
-            cerr << " (MySQL error code: " << e.getErrorCode();
-            cerr << ", SQLState: " << e.getSQLState() << ")" << endl;
-            exit(1);
+                return reSong;
+            } catch (sql::SQLException &e) {
+                cerr << "ERROR: SQLException in " << __FILE__;
+                cerr << " (" << __func__<< ") on line " << __LINE__ << endl;
+                cerr << "ERROR: " << e.what();
+                cerr << " (MySQL error code: " << e.getErrorCode();
+                cerr << ", SQLState: " << e.getSQLState() << ")" << endl;
+                bool reconnected = MysqlAccess::getInstance().reconnect();
+                std::cout << (reconnected ? "Successful" : "Failed") << " mysql reconnection" << std::endl;
+            }
         }
+        exit(1);
     }
 
     RESong* RESong::findBySongid(const string& songid) {
-        try {
-            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select RESongs.* from RESongs where RESongs.songid = ?");
-            ps->setString(1, songid);
-            sql::ResultSet *rs = ps->executeQuery();
-            RESong *reSong = NULL;
-            if (rs->next()) {
-                reSong = new RESong();
-                populateFields(rs, reSong);
-            }
-            rs->close();
-            delete rs;
+        for (int i = 0; i < 3; ++i) {
+            try {
+                sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select RESongs.* from RESongs where RESongs.songid = ?");
+                ps->setString(1, songid);
+                sql::ResultSet *rs = ps->executeQuery();
+                RESong *reSong = NULL;
+                if (rs->next()) {
+                    reSong = new RESong();
+                    populateFields(rs, reSong);
+                }
+                rs->close();
+                delete rs;
 
-            return reSong;
-        } catch (sql::SQLException &e) {
-            cerr << "ERROR: SQLException in " << __FILE__;
-            cerr << " (" << __func__<< ") on line " << __LINE__ << endl;
-            cerr << "ERROR: " << e.what();
-            cerr << " (MySQL error code: " << e.getErrorCode();
-            cerr << ", SQLState: " << e.getSQLState() << ")" << endl;
-            exit(1);
+                return reSong;
+            } catch (sql::SQLException &e) {
+                cerr << "ERROR: SQLException in " << __FILE__;
+                cerr << " (" << __func__<< ") on line " << __LINE__ << endl;
+                cerr << "ERROR: " << e.what();
+                cerr << " (MySQL error code: " << e.getErrorCode();
+                cerr << ", SQLState: " << e.getSQLState() << ")" << endl;
+                bool reconnected = MysqlAccess::getInstance().reconnect();
+                std::cout << (reconnected ? "Successful" : "Failed") << " mysql reconnection" << std::endl;
+            }
         }
+        exit(1);
     }
 
     ResultSetIterator<RESong>* RESong::findAll() {
@@ -274,175 +282,183 @@ namespace soulsifter {
 # pragma mark persistence
 
     int RESong::update() {
-        try {
+        for (int i = 0; i < 3; ++i) {
+            try {
 
-            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("update RESongs set songidWinfo=?, songid=?, shortid=?, shortidWinfo=?, artist=?, album=?, track=?, title=?, time=?, timeSignature=?, filename=?, digitalOnly=?, compilation=?, keyStart=?, keyAccuracy=?, bpmStart=?, bpmAccuracy=?, rating=?, dateAdded=?, catalogId=?, label=?, remix=?, numPlays=?, comments=?, releaseDate=?, featuring=?, keyEnd=?, disabled=?, bpmEnd=?, beatIntensity=?, replayGain=? where id=?");
-            if (!songidWinfo.empty()) ps->setString(1, songidWinfo);
-            else ps->setNull(1, sql::DataType::VARCHAR);
-            if (!songid.empty()) ps->setString(2, songid);
-            else ps->setNull(2, sql::DataType::VARCHAR);
-            if (!shortid.empty()) ps->setString(3, shortid);
-            else ps->setNull(3, sql::DataType::VARCHAR);
-            if (!shortidWinfo.empty()) ps->setString(4, shortidWinfo);
-            else ps->setNull(4, sql::DataType::VARCHAR);
-            if (!artist.empty()) ps->setString(5, artist);
-            else ps->setNull(5, sql::DataType::VARCHAR);
-            if (!album.empty()) ps->setString(6, album);
-            else ps->setNull(6, sql::DataType::VARCHAR);
-            if (!track.empty()) ps->setString(7, track);
-            else ps->setNull(7, sql::DataType::VARCHAR);
-            if (!title.empty()) ps->setString(8, title);
-            else ps->setNull(8, sql::DataType::VARCHAR);
-            if (!time.empty()) ps->setString(9, time);
-            else ps->setNull(9, sql::DataType::VARCHAR);
-            if (!timeSignature.empty()) ps->setString(10, timeSignature);
-            else ps->setNull(10, sql::DataType::VARCHAR);
-            if (!filename.empty()) ps->setString(11, filename);
-            else ps->setNull(11, sql::DataType::VARCHAR);
-            if (!digitalOnly.empty()) ps->setString(12, digitalOnly);
-            else ps->setNull(12, sql::DataType::VARCHAR);
-            if (!compilation.empty()) ps->setString(13, compilation);
-            else ps->setNull(13, sql::DataType::VARCHAR);
-            if (!keyStart.empty()) ps->setString(14, keyStart);
-            else ps->setNull(14, sql::DataType::VARCHAR);
-            if (keyAccuracy > 0) ps->setInt(15, keyAccuracy);
-            else ps->setNull(15, sql::DataType::INTEGER);
-            if (!bpmStart.empty()) ps->setString(16, bpmStart);
-            else ps->setNull(16, sql::DataType::VARCHAR);
-            if (bpmAccuracy > 0) ps->setInt(17, bpmAccuracy);
-            else ps->setNull(17, sql::DataType::INTEGER);
-            if (rating > 0) ps->setInt(18, rating);
-            else ps->setNull(18, sql::DataType::INTEGER);
-            if (!dateAdded.empty()) ps->setString(19, dateAdded);
-            else ps->setNull(19, sql::DataType::VARCHAR);
-            if (!catalogId.empty()) ps->setString(20, catalogId);
-            else ps->setNull(20, sql::DataType::VARCHAR);
-            if (!label.empty()) ps->setString(21, label);
-            else ps->setNull(21, sql::DataType::VARCHAR);
-            if (!remix.empty()) ps->setString(22, remix);
-            else ps->setNull(22, sql::DataType::VARCHAR);
-            if (numPlays > 0) ps->setInt(23, numPlays);
-            else ps->setNull(23, sql::DataType::INTEGER);
-            if (!comments.empty()) ps->setString(24, comments);
-            else ps->setNull(24, sql::DataType::VARCHAR);
-            if (!releaseDate.empty()) ps->setString(25, releaseDate);
-            else ps->setNull(25, sql::DataType::VARCHAR);
-            if (!featuring.empty()) ps->setString(26, featuring);
-            else ps->setNull(26, sql::DataType::VARCHAR);
-            if (!keyEnd.empty()) ps->setString(27, keyEnd);
-            else ps->setNull(27, sql::DataType::VARCHAR);
-            if (!disabled.empty()) ps->setString(28, disabled);
-            else ps->setNull(28, sql::DataType::VARCHAR);
-            if (!bpmEnd.empty()) ps->setString(29, bpmEnd);
-            else ps->setNull(29, sql::DataType::VARCHAR);
-            if (beatIntensity > 0) ps->setInt(30, beatIntensity);
-            else ps->setNull(30, sql::DataType::INTEGER);
-            if (!replayGain.empty()) ps->setString(31, replayGain);
-            else ps->setNull(31, sql::DataType::VARCHAR);
-            ps->setInt(32, id);
-            int result = ps->executeUpdate();
-            return result;
-        } catch (sql::SQLException &e) {
-            cerr << "ERROR: SQLException in " << __FILE__;
-            cerr << " (" << __func__<< ") on line " << __LINE__ << endl;
-            cerr << "ERROR: " << e.what();
-            cerr << " (MySQL error code: " << e.getErrorCode();
-            cerr << ", SQLState: " << e.getSQLState() << ")" << endl;
-            exit(1);
+                sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("update RESongs set songidWinfo=?, songid=?, shortid=?, shortidWinfo=?, artist=?, album=?, track=?, title=?, time=?, timeSignature=?, filename=?, digitalOnly=?, compilation=?, keyStart=?, keyAccuracy=?, bpmStart=?, bpmAccuracy=?, rating=?, dateAdded=?, catalogId=?, label=?, remix=?, numPlays=?, comments=?, releaseDate=?, featuring=?, keyEnd=?, disabled=?, bpmEnd=?, beatIntensity=?, replayGain=? where id=?");
+                if (!songidWinfo.empty()) ps->setString(1, songidWinfo);
+                else ps->setNull(1, sql::DataType::VARCHAR);
+                if (!songid.empty()) ps->setString(2, songid);
+                else ps->setNull(2, sql::DataType::VARCHAR);
+                if (!shortid.empty()) ps->setString(3, shortid);
+                else ps->setNull(3, sql::DataType::VARCHAR);
+                if (!shortidWinfo.empty()) ps->setString(4, shortidWinfo);
+                else ps->setNull(4, sql::DataType::VARCHAR);
+                if (!artist.empty()) ps->setString(5, artist);
+                else ps->setNull(5, sql::DataType::VARCHAR);
+                if (!album.empty()) ps->setString(6, album);
+                else ps->setNull(6, sql::DataType::VARCHAR);
+                if (!track.empty()) ps->setString(7, track);
+                else ps->setNull(7, sql::DataType::VARCHAR);
+                if (!title.empty()) ps->setString(8, title);
+                else ps->setNull(8, sql::DataType::VARCHAR);
+                if (!time.empty()) ps->setString(9, time);
+                else ps->setNull(9, sql::DataType::VARCHAR);
+                if (!timeSignature.empty()) ps->setString(10, timeSignature);
+                else ps->setNull(10, sql::DataType::VARCHAR);
+                if (!filename.empty()) ps->setString(11, filename);
+                else ps->setNull(11, sql::DataType::VARCHAR);
+                if (!digitalOnly.empty()) ps->setString(12, digitalOnly);
+                else ps->setNull(12, sql::DataType::VARCHAR);
+                if (!compilation.empty()) ps->setString(13, compilation);
+                else ps->setNull(13, sql::DataType::VARCHAR);
+                if (!keyStart.empty()) ps->setString(14, keyStart);
+                else ps->setNull(14, sql::DataType::VARCHAR);
+                if (keyAccuracy > 0) ps->setInt(15, keyAccuracy);
+                else ps->setNull(15, sql::DataType::INTEGER);
+                if (!bpmStart.empty()) ps->setString(16, bpmStart);
+                else ps->setNull(16, sql::DataType::VARCHAR);
+                if (bpmAccuracy > 0) ps->setInt(17, bpmAccuracy);
+                else ps->setNull(17, sql::DataType::INTEGER);
+                if (rating > 0) ps->setInt(18, rating);
+                else ps->setNull(18, sql::DataType::INTEGER);
+                if (!dateAdded.empty()) ps->setString(19, dateAdded);
+                else ps->setNull(19, sql::DataType::VARCHAR);
+                if (!catalogId.empty()) ps->setString(20, catalogId);
+                else ps->setNull(20, sql::DataType::VARCHAR);
+                if (!label.empty()) ps->setString(21, label);
+                else ps->setNull(21, sql::DataType::VARCHAR);
+                if (!remix.empty()) ps->setString(22, remix);
+                else ps->setNull(22, sql::DataType::VARCHAR);
+                if (numPlays > 0) ps->setInt(23, numPlays);
+                else ps->setNull(23, sql::DataType::INTEGER);
+                if (!comments.empty()) ps->setString(24, comments);
+                else ps->setNull(24, sql::DataType::VARCHAR);
+                if (!releaseDate.empty()) ps->setString(25, releaseDate);
+                else ps->setNull(25, sql::DataType::VARCHAR);
+                if (!featuring.empty()) ps->setString(26, featuring);
+                else ps->setNull(26, sql::DataType::VARCHAR);
+                if (!keyEnd.empty()) ps->setString(27, keyEnd);
+                else ps->setNull(27, sql::DataType::VARCHAR);
+                if (!disabled.empty()) ps->setString(28, disabled);
+                else ps->setNull(28, sql::DataType::VARCHAR);
+                if (!bpmEnd.empty()) ps->setString(29, bpmEnd);
+                else ps->setNull(29, sql::DataType::VARCHAR);
+                if (beatIntensity > 0) ps->setInt(30, beatIntensity);
+                else ps->setNull(30, sql::DataType::INTEGER);
+                if (!replayGain.empty()) ps->setString(31, replayGain);
+                else ps->setNull(31, sql::DataType::VARCHAR);
+                ps->setInt(32, id);
+                int result = ps->executeUpdate();
+                return result;
+            } catch (sql::SQLException &e) {
+                cerr << "ERROR: SQLException in " << __FILE__;
+                cerr << " (" << __func__<< ") on line " << __LINE__ << endl;
+                cerr << "ERROR: " << e.what();
+                cerr << " (MySQL error code: " << e.getErrorCode();
+                cerr << ", SQLState: " << e.getSQLState() << ")" << endl;
+                bool reconnected = MysqlAccess::getInstance().reconnect();
+                std::cout << (reconnected ? "Successful" : "Failed") << " mysql reconnection" << std::endl;
+            }
         }
+        exit(1);
     }
 
     int RESong::save() {
-        try {
-            if (id == 0) {
-                sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select max(id) from RESongs");
-                sql::ResultSet *rs = ps->executeQuery();
-                rs->next();
-                id = rs->getInt(1) + 1;
-                rs->close();
-                delete rs;
-            }
+        for (int i = 0; i < 3; ++i) {
+            try {
+                if (id == 0) {
+                    sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select max(id) from RESongs");
+                    sql::ResultSet *rs = ps->executeQuery();
+                    rs->next();
+                    id = rs->getInt(1) + 1;
+                    rs->close();
+                    delete rs;
+                }
 
-            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("insert into RESongs (id, songidWinfo, songid, shortid, shortidWinfo, artist, album, track, title, time, timeSignature, filename, digitalOnly, compilation, keyStart, keyAccuracy, bpmStart, bpmAccuracy, rating, dateAdded, catalogId, label, remix, numPlays, comments, releaseDate, featuring, keyEnd, disabled, bpmEnd, beatIntensity, replayGain) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-            if (id > 0) ps->setInt(1, id);
-            else ps->setNull(1, sql::DataType::INTEGER);
-            if (!songidWinfo.empty()) ps->setString(2, songidWinfo);
-            else ps->setNull(2, sql::DataType::VARCHAR);
-            if (!songid.empty()) ps->setString(3, songid);
-            else ps->setNull(3, sql::DataType::VARCHAR);
-            if (!shortid.empty()) ps->setString(4, shortid);
-            else ps->setNull(4, sql::DataType::VARCHAR);
-            if (!shortidWinfo.empty()) ps->setString(5, shortidWinfo);
-            else ps->setNull(5, sql::DataType::VARCHAR);
-            if (!artist.empty()) ps->setString(6, artist);
-            else ps->setNull(6, sql::DataType::VARCHAR);
-            if (!album.empty()) ps->setString(7, album);
-            else ps->setNull(7, sql::DataType::VARCHAR);
-            if (!track.empty()) ps->setString(8, track);
-            else ps->setNull(8, sql::DataType::VARCHAR);
-            if (!title.empty()) ps->setString(9, title);
-            else ps->setNull(9, sql::DataType::VARCHAR);
-            if (!time.empty()) ps->setString(10, time);
-            else ps->setNull(10, sql::DataType::VARCHAR);
-            if (!timeSignature.empty()) ps->setString(11, timeSignature);
-            else ps->setNull(11, sql::DataType::VARCHAR);
-            if (!filename.empty()) ps->setString(12, filename);
-            else ps->setNull(12, sql::DataType::VARCHAR);
-            if (!digitalOnly.empty()) ps->setString(13, digitalOnly);
-            else ps->setNull(13, sql::DataType::VARCHAR);
-            if (!compilation.empty()) ps->setString(14, compilation);
-            else ps->setNull(14, sql::DataType::VARCHAR);
-            if (!keyStart.empty()) ps->setString(15, keyStart);
-            else ps->setNull(15, sql::DataType::VARCHAR);
-            if (keyAccuracy > 0) ps->setInt(16, keyAccuracy);
-            else ps->setNull(16, sql::DataType::INTEGER);
-            if (!bpmStart.empty()) ps->setString(17, bpmStart);
-            else ps->setNull(17, sql::DataType::VARCHAR);
-            if (bpmAccuracy > 0) ps->setInt(18, bpmAccuracy);
-            else ps->setNull(18, sql::DataType::INTEGER);
-            if (rating > 0) ps->setInt(19, rating);
-            else ps->setNull(19, sql::DataType::INTEGER);
-            if (!dateAdded.empty()) ps->setString(20, dateAdded);
-            else ps->setNull(20, sql::DataType::VARCHAR);
-            if (!catalogId.empty()) ps->setString(21, catalogId);
-            else ps->setNull(21, sql::DataType::VARCHAR);
-            if (!label.empty()) ps->setString(22, label);
-            else ps->setNull(22, sql::DataType::VARCHAR);
-            if (!remix.empty()) ps->setString(23, remix);
-            else ps->setNull(23, sql::DataType::VARCHAR);
-            if (numPlays > 0) ps->setInt(24, numPlays);
-            else ps->setNull(24, sql::DataType::INTEGER);
-            if (!comments.empty()) ps->setString(25, comments);
-            else ps->setNull(25, sql::DataType::VARCHAR);
-            if (!releaseDate.empty()) ps->setString(26, releaseDate);
-            else ps->setNull(26, sql::DataType::VARCHAR);
-            if (!featuring.empty()) ps->setString(27, featuring);
-            else ps->setNull(27, sql::DataType::VARCHAR);
-            if (!keyEnd.empty()) ps->setString(28, keyEnd);
-            else ps->setNull(28, sql::DataType::VARCHAR);
-            if (!disabled.empty()) ps->setString(29, disabled);
-            else ps->setNull(29, sql::DataType::VARCHAR);
-            if (!bpmEnd.empty()) ps->setString(30, bpmEnd);
-            else ps->setNull(30, sql::DataType::VARCHAR);
-            if (beatIntensity > 0) ps->setInt(31, beatIntensity);
-            else ps->setNull(31, sql::DataType::INTEGER);
-            if (!replayGain.empty()) ps->setString(32, replayGain);
-            else ps->setNull(32, sql::DataType::VARCHAR);
-            int saved = ps->executeUpdate();
-            if (!saved) {
-                cerr << "Not able to save reSong" << endl;
-                return saved;
-            } else {
-                return saved;
+                sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("insert into RESongs (id, songidWinfo, songid, shortid, shortidWinfo, artist, album, track, title, time, timeSignature, filename, digitalOnly, compilation, keyStart, keyAccuracy, bpmStart, bpmAccuracy, rating, dateAdded, catalogId, label, remix, numPlays, comments, releaseDate, featuring, keyEnd, disabled, bpmEnd, beatIntensity, replayGain) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                if (id > 0) ps->setInt(1, id);
+                else ps->setNull(1, sql::DataType::INTEGER);
+                if (!songidWinfo.empty()) ps->setString(2, songidWinfo);
+                else ps->setNull(2, sql::DataType::VARCHAR);
+                if (!songid.empty()) ps->setString(3, songid);
+                else ps->setNull(3, sql::DataType::VARCHAR);
+                if (!shortid.empty()) ps->setString(4, shortid);
+                else ps->setNull(4, sql::DataType::VARCHAR);
+                if (!shortidWinfo.empty()) ps->setString(5, shortidWinfo);
+                else ps->setNull(5, sql::DataType::VARCHAR);
+                if (!artist.empty()) ps->setString(6, artist);
+                else ps->setNull(6, sql::DataType::VARCHAR);
+                if (!album.empty()) ps->setString(7, album);
+                else ps->setNull(7, sql::DataType::VARCHAR);
+                if (!track.empty()) ps->setString(8, track);
+                else ps->setNull(8, sql::DataType::VARCHAR);
+                if (!title.empty()) ps->setString(9, title);
+                else ps->setNull(9, sql::DataType::VARCHAR);
+                if (!time.empty()) ps->setString(10, time);
+                else ps->setNull(10, sql::DataType::VARCHAR);
+                if (!timeSignature.empty()) ps->setString(11, timeSignature);
+                else ps->setNull(11, sql::DataType::VARCHAR);
+                if (!filename.empty()) ps->setString(12, filename);
+                else ps->setNull(12, sql::DataType::VARCHAR);
+                if (!digitalOnly.empty()) ps->setString(13, digitalOnly);
+                else ps->setNull(13, sql::DataType::VARCHAR);
+                if (!compilation.empty()) ps->setString(14, compilation);
+                else ps->setNull(14, sql::DataType::VARCHAR);
+                if (!keyStart.empty()) ps->setString(15, keyStart);
+                else ps->setNull(15, sql::DataType::VARCHAR);
+                if (keyAccuracy > 0) ps->setInt(16, keyAccuracy);
+                else ps->setNull(16, sql::DataType::INTEGER);
+                if (!bpmStart.empty()) ps->setString(17, bpmStart);
+                else ps->setNull(17, sql::DataType::VARCHAR);
+                if (bpmAccuracy > 0) ps->setInt(18, bpmAccuracy);
+                else ps->setNull(18, sql::DataType::INTEGER);
+                if (rating > 0) ps->setInt(19, rating);
+                else ps->setNull(19, sql::DataType::INTEGER);
+                if (!dateAdded.empty()) ps->setString(20, dateAdded);
+                else ps->setNull(20, sql::DataType::VARCHAR);
+                if (!catalogId.empty()) ps->setString(21, catalogId);
+                else ps->setNull(21, sql::DataType::VARCHAR);
+                if (!label.empty()) ps->setString(22, label);
+                else ps->setNull(22, sql::DataType::VARCHAR);
+                if (!remix.empty()) ps->setString(23, remix);
+                else ps->setNull(23, sql::DataType::VARCHAR);
+                if (numPlays > 0) ps->setInt(24, numPlays);
+                else ps->setNull(24, sql::DataType::INTEGER);
+                if (!comments.empty()) ps->setString(25, comments);
+                else ps->setNull(25, sql::DataType::VARCHAR);
+                if (!releaseDate.empty()) ps->setString(26, releaseDate);
+                else ps->setNull(26, sql::DataType::VARCHAR);
+                if (!featuring.empty()) ps->setString(27, featuring);
+                else ps->setNull(27, sql::DataType::VARCHAR);
+                if (!keyEnd.empty()) ps->setString(28, keyEnd);
+                else ps->setNull(28, sql::DataType::VARCHAR);
+                if (!disabled.empty()) ps->setString(29, disabled);
+                else ps->setNull(29, sql::DataType::VARCHAR);
+                if (!bpmEnd.empty()) ps->setString(30, bpmEnd);
+                else ps->setNull(30, sql::DataType::VARCHAR);
+                if (beatIntensity > 0) ps->setInt(31, beatIntensity);
+                else ps->setNull(31, sql::DataType::INTEGER);
+                if (!replayGain.empty()) ps->setString(32, replayGain);
+                else ps->setNull(32, sql::DataType::VARCHAR);
+                int saved = ps->executeUpdate();
+                if (!saved) {
+                    cerr << "Not able to save reSong" << endl;
+                    return saved;
+                } else {
+                    return saved;
+                }
+            } catch (sql::SQLException &e) {
+                cerr << "ERROR: SQLException in " << __FILE__;
+                cerr << " (" << __func__<< ") on line " << __LINE__ << endl;
+                cerr << "ERROR: " << e.what();
+                cerr << " (MySQL error code: " << e.getErrorCode();
+                cerr << ", SQLState: " << e.getSQLState() << ")" << endl;
+                bool reconnected = MysqlAccess::getInstance().reconnect();
+                std::cout << (reconnected ? "Successful" : "Failed") << " mysql reconnection" << std::endl;
             }
-        } catch (sql::SQLException &e) {
-            cerr << "ERROR: SQLException in " << __FILE__;
-            cerr << " (" << __func__<< ") on line " << __LINE__ << endl;
-            cerr << "ERROR: " << e.what();
-            cerr << " (MySQL error code: " << e.getErrorCode();
-            cerr << ", SQLState: " << e.getSQLState() << ")" << endl;
-            exit(1);
         }
+        exit(1);
     }
 
     bool RESong::sync() {

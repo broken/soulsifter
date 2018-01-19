@@ -63,50 +63,60 @@ namespace soulsifter {
     }
 
     BasicGenre* BasicGenre::findById(int id) {
-        try {
-            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select BasicGenres.* from BasicGenres where BasicGenres.id = ?");
-            ps->setInt(1, id);
-            sql::ResultSet *rs = ps->executeQuery();
-            BasicGenre *basicGenre = NULL;
-            if (rs->next()) {
-                basicGenre = new BasicGenre();
-                populateFields(rs, basicGenre);
-            }
-            rs->close();
-            delete rs;
+        for (int i = 0; i < 3; ++i) {
+            try {
+                sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select BasicGenres.* from BasicGenres where BasicGenres.id = ?");
+                ps->setInt(1, id);
+                sql::ResultSet *rs = ps->executeQuery();
+                BasicGenre *basicGenre = NULL;
+                if (rs->next()) {
+                    basicGenre = new BasicGenre();
+                    populateFields(rs, basicGenre);
+                }
+                rs->close();
+                delete rs;
 
-            return basicGenre;
-        } catch (sql::SQLException &e) {
-            cerr << "ERROR: SQLException in " << __FILE__;
-            cerr << " (" << __func__<< ") on line " << __LINE__ << endl;
-            cerr << "ERROR: " << e.what();
-            cerr << " (MySQL error code: " << e.getErrorCode();
-            cerr << ", SQLState: " << e.getSQLState() << ")" << endl;
-            exit(1);
+                return basicGenre;
+            } catch (sql::SQLException &e) {
+                cerr << "ERROR: SQLException in " << __FILE__;
+                cerr << " (" << __func__<< ") on line " << __LINE__ << endl;
+                cerr << "ERROR: " << e.what();
+                cerr << " (MySQL error code: " << e.getErrorCode();
+                cerr << ", SQLState: " << e.getSQLState() << ")" << endl;
+                bool reconnected = MysqlAccess::getInstance().reconnect();
+                std::cout << (reconnected ? "Successful" : "Failed") << " mysql reconnection" << std::endl;
+            }
         }
+        exit(1);
     }
 
     BasicGenre* BasicGenre::findByName(const string& name) {
-        auto exe = [&] () {
-            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select BasicGenres.* from BasicGenres where ifnull(name,'') = ifnull(?,'')");
-            if (!name.empty()) ps->setString(1, name);
-            else ps->setNull(1, sql::DataType::VARCHAR);
-            sql::ResultSet *rs = ps->executeQuery();
-            BasicGenre *basicGenre = NULL;
-            if (rs->next()) {
-                basicGenre = new BasicGenre();
-                populateFields(rs, basicGenre);
-            }
-            rs->close();
-            delete rs;
+        for (int i = 0; i < 3; ++i) {
+            try {
+                sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select BasicGenres.* from BasicGenres where ifnull(name,'') = ifnull(?,'')");
+                if (!name.empty()) ps->setString(1, name);
+                else ps->setNull(1, sql::DataType::VARCHAR);
+                sql::ResultSet *rs = ps->executeQuery();
+                BasicGenre *basicGenre = NULL;
+                if (rs->next()) {
+                    basicGenre = new BasicGenre();
+                    populateFields(rs, basicGenre);
+                }
+                rs->close();
+                delete rs;
 
-            return basicGenre;
-        };
-        void* result = MysqlAccess::execute(exe);
-        if (result == 0) {
-            exit(1);
+                return basicGenre;
+            } catch (sql::SQLException &e) {
+                cerr << "ERROR: SQLException in " << __FILE__;
+                cerr << " (" << __func__<< ") on line " << __LINE__ << endl;
+                cerr << "ERROR: " << e.what();
+                cerr << " (MySQL error code: " << e.getErrorCode();
+                cerr << ", SQLState: " << e.getSQLState() << ")" << endl;
+                bool reconnected = MysqlAccess::getInstance().reconnect();
+                std::cout << (reconnected ? "Successful" : "Failed") << " mysql reconnection" << std::endl;
+            }
         }
-        return (BasicGenre *) result;
+        exit(1);
     }
 
     ResultSetIterator<BasicGenre>* BasicGenre::findAll() {
@@ -119,50 +129,58 @@ namespace soulsifter {
 # pragma mark persistence
 
     int BasicGenre::update() {
-        try {
+        for (int i = 0; i < 3; ++i) {
+            try {
 
-            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("update BasicGenres set name=? where id=?");
-            if (!name.empty()) ps->setString(1, name);
-            else ps->setNull(1, sql::DataType::VARCHAR);
-            ps->setInt(2, id);
-            int result = ps->executeUpdate();
-            return result;
-        } catch (sql::SQLException &e) {
-            cerr << "ERROR: SQLException in " << __FILE__;
-            cerr << " (" << __func__<< ") on line " << __LINE__ << endl;
-            cerr << "ERROR: " << e.what();
-            cerr << " (MySQL error code: " << e.getErrorCode();
-            cerr << ", SQLState: " << e.getSQLState() << ")" << endl;
-            exit(1);
+                sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("update BasicGenres set name=? where id=?");
+                if (!name.empty()) ps->setString(1, name);
+                else ps->setNull(1, sql::DataType::VARCHAR);
+                ps->setInt(2, id);
+                int result = ps->executeUpdate();
+                return result;
+            } catch (sql::SQLException &e) {
+                cerr << "ERROR: SQLException in " << __FILE__;
+                cerr << " (" << __func__<< ") on line " << __LINE__ << endl;
+                cerr << "ERROR: " << e.what();
+                cerr << " (MySQL error code: " << e.getErrorCode();
+                cerr << ", SQLState: " << e.getSQLState() << ")" << endl;
+                bool reconnected = MysqlAccess::getInstance().reconnect();
+                std::cout << (reconnected ? "Successful" : "Failed") << " mysql reconnection" << std::endl;
+            }
         }
+        exit(1);
     }
 
     int BasicGenre::save() {
-        try {
+        for (int i = 0; i < 3; ++i) {
+            try {
 
-            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("insert into BasicGenres (name) values (?)");
-            if (!name.empty()) ps->setString(1, name);
-            else ps->setNull(1, sql::DataType::VARCHAR);
-            int saved = ps->executeUpdate();
-            if (!saved) {
-                cerr << "Not able to save basicGenre" << endl;
-                return saved;
-            } else {
-                id = MysqlAccess::getInstance().getLastInsertId();
-                if (id == 0) {
-                    cerr << "Inserted basicGenre, but unable to retreive inserted ID." << endl;
+                sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("insert into BasicGenres (name) values (?)");
+                if (!name.empty()) ps->setString(1, name);
+                else ps->setNull(1, sql::DataType::VARCHAR);
+                int saved = ps->executeUpdate();
+                if (!saved) {
+                    cerr << "Not able to save basicGenre" << endl;
+                    return saved;
+                } else {
+                    id = MysqlAccess::getInstance().getLastInsertId();
+                    if (id == 0) {
+                        cerr << "Inserted basicGenre, but unable to retreive inserted ID." << endl;
+                        return saved;
+                    }
                     return saved;
                 }
-                return saved;
+            } catch (sql::SQLException &e) {
+                cerr << "ERROR: SQLException in " << __FILE__;
+                cerr << " (" << __func__<< ") on line " << __LINE__ << endl;
+                cerr << "ERROR: " << e.what();
+                cerr << " (MySQL error code: " << e.getErrorCode();
+                cerr << ", SQLState: " << e.getSQLState() << ")" << endl;
+                bool reconnected = MysqlAccess::getInstance().reconnect();
+                std::cout << (reconnected ? "Successful" : "Failed") << " mysql reconnection" << std::endl;
             }
-        } catch (sql::SQLException &e) {
-            cerr << "ERROR: SQLException in " << __FILE__;
-            cerr << " (" << __func__<< ") on line " << __LINE__ << endl;
-            cerr << "ERROR: " << e.what();
-            cerr << " (MySQL error code: " << e.getErrorCode();
-            cerr << ", SQLState: " << e.getSQLState() << ")" << endl;
-            exit(1);
         }
+        exit(1);
     }
 
     bool BasicGenre::sync() {

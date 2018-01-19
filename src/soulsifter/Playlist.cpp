@@ -109,51 +109,59 @@ namespace soulsifter {
     }
 
     Playlist* Playlist::findById(int id) {
-        try {
-            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select Playlists.*, group_concat(playlistEntries.id) as playlistEntryIds, group_concat(styles.styleId) as styleIds from Playlists left outer join PlaylistEntries playlistEntries on Playlists.id = playlistEntries.playlistId left outer join PlaylistStyles styles on Playlists.id = styles.playlistId where Playlists.id = ? group by Playlists.id");
-            ps->setInt(1, id);
-            sql::ResultSet *rs = ps->executeQuery();
-            Playlist *playlist = NULL;
-            if (rs->next()) {
-                playlist = new Playlist();
-                populateFields(rs, playlist);
-            }
-            rs->close();
-            delete rs;
+        for (int i = 0; i < 3; ++i) {
+            try {
+                sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select Playlists.*, group_concat(playlistEntries.id) as playlistEntryIds, group_concat(styles.styleId) as styleIds from Playlists left outer join PlaylistEntries playlistEntries on Playlists.id = playlistEntries.playlistId left outer join PlaylistStyles styles on Playlists.id = styles.playlistId where Playlists.id = ? group by Playlists.id");
+                ps->setInt(1, id);
+                sql::ResultSet *rs = ps->executeQuery();
+                Playlist *playlist = NULL;
+                if (rs->next()) {
+                    playlist = new Playlist();
+                    populateFields(rs, playlist);
+                }
+                rs->close();
+                delete rs;
 
-            return playlist;
-        } catch (sql::SQLException &e) {
-            cerr << "ERROR: SQLException in " << __FILE__;
-            cerr << " (" << __func__<< ") on line " << __LINE__ << endl;
-            cerr << "ERROR: " << e.what();
-            cerr << " (MySQL error code: " << e.getErrorCode();
-            cerr << ", SQLState: " << e.getSQLState() << ")" << endl;
-            exit(1);
+                return playlist;
+            } catch (sql::SQLException &e) {
+                cerr << "ERROR: SQLException in " << __FILE__;
+                cerr << " (" << __func__<< ") on line " << __LINE__ << endl;
+                cerr << "ERROR: " << e.what();
+                cerr << " (MySQL error code: " << e.getErrorCode();
+                cerr << ", SQLState: " << e.getSQLState() << ")" << endl;
+                bool reconnected = MysqlAccess::getInstance().reconnect();
+                std::cout << (reconnected ? "Successful" : "Failed") << " mysql reconnection" << std::endl;
+            }
         }
+        exit(1);
     }
 
     Playlist* Playlist::findByName(const string& name) {
-        try {
-            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select Playlists.*, group_concat(playlistEntries.id) as playlistEntryIds, group_concat(styles.styleId) as styleIds from Playlists left outer join PlaylistEntries playlistEntries on Playlists.id = playlistEntries.playlistId left outer join PlaylistStyles styles on Playlists.id = styles.playlistId where Playlists.name = ? group by Playlists.id");
-            ps->setString(1, name);
-            sql::ResultSet *rs = ps->executeQuery();
-            Playlist *playlist = NULL;
-            if (rs->next()) {
-                playlist = new Playlist();
-                populateFields(rs, playlist);
-            }
-            rs->close();
-            delete rs;
+        for (int i = 0; i < 3; ++i) {
+            try {
+                sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select Playlists.*, group_concat(playlistEntries.id) as playlistEntryIds, group_concat(styles.styleId) as styleIds from Playlists left outer join PlaylistEntries playlistEntries on Playlists.id = playlistEntries.playlistId left outer join PlaylistStyles styles on Playlists.id = styles.playlistId where Playlists.name = ? group by Playlists.id");
+                ps->setString(1, name);
+                sql::ResultSet *rs = ps->executeQuery();
+                Playlist *playlist = NULL;
+                if (rs->next()) {
+                    playlist = new Playlist();
+                    populateFields(rs, playlist);
+                }
+                rs->close();
+                delete rs;
 
-            return playlist;
-        } catch (sql::SQLException &e) {
-            cerr << "ERROR: SQLException in " << __FILE__;
-            cerr << " (" << __func__<< ") on line " << __LINE__ << endl;
-            cerr << "ERROR: " << e.what();
-            cerr << " (MySQL error code: " << e.getErrorCode();
-            cerr << ", SQLState: " << e.getSQLState() << ")" << endl;
-            exit(1);
+                return playlist;
+            } catch (sql::SQLException &e) {
+                cerr << "ERROR: SQLException in " << __FILE__;
+                cerr << " (" << __func__<< ") on line " << __LINE__ << endl;
+                cerr << "ERROR: " << e.what();
+                cerr << " (MySQL error code: " << e.getErrorCode();
+                cerr << ", SQLState: " << e.getSQLState() << ")" << endl;
+                bool reconnected = MysqlAccess::getInstance().reconnect();
+                std::cout << (reconnected ? "Successful" : "Failed") << " mysql reconnection" << std::endl;
+            }
         }
+        exit(1);
     }
 
     ResultSetIterator<Playlist>* Playlist::findAll() {
@@ -166,104 +174,18 @@ namespace soulsifter {
 # pragma mark persistence
 
     int Playlist::update() {
-        try {
+        for (int i = 0; i < 3; ++i) {
+            try {
 
-            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("update Playlists set name=?, query=?, gmusicId=? where id=?");
-            if (!name.empty()) ps->setString(1, name);
-            else ps->setNull(1, sql::DataType::VARCHAR);
-            if (!query.empty()) ps->setString(2, query);
-            else ps->setNull(2, sql::DataType::VARCHAR);
-            if (!gmusicId.empty()) ps->setString(3, gmusicId);
-            else ps->setNull(3, sql::DataType::VARCHAR);
-            ps->setInt(4, id);
-            int result = ps->executeUpdate();
-            if (!playlistEntryIds.empty()) {
-                stringstream ss("insert ignore into PlaylistEntries (playlistId, playlistEntryId) values (?, ?)", ios_base::app | ios_base::out | ios_base::ate);
-                for (int i = 1; i < playlistEntryIds.size(); ++i) {
-                    ss << ", (?, ?)";
-                }
-                ps = MysqlAccess::getInstance().getPreparedStatement(ss.str());
-                for (int i = 0; i < playlistEntryIds.size(); ++i) {
-                    ps->setInt(i * 2 + 1, id);
-                    ps->setInt(i * 2 + 2, playlistEntryIds[i]);
-                }
-                ps->executeUpdate();
-                ss.str(std::string());
-                ss << "delete ignore from PlaylistEntries where playlistId = ? and playlistEntryId not in (?";
-                for (int i = 1; i < playlistEntryIds.size(); ++i) {
-                    ss << ", ?";
-                }
-                ss << ")";
-                ps = MysqlAccess::getInstance().getPreparedStatement(ss.str());
-                ps->setInt(1, id);
-                for (int i = 0; i < playlistEntryIds.size(); ++i) {
-                    ps->setInt(i + 2, playlistEntryIds[i]);
-                }
-                ps->executeUpdate();
-            } else {
-                ps = MysqlAccess::getInstance().getPreparedStatement("delete ignore from PlaylistEntries where playlistId = ?");
-                ps->setInt(1, id);
-                ps->executeUpdate();
-            }
-            if (!styleIds.empty()) {
-                stringstream ss("insert ignore into PlaylistStyles (playlistId, styleId) values (?, ?)", ios_base::app | ios_base::out | ios_base::ate);
-                for (int i = 1; i < styleIds.size(); ++i) {
-                    ss << ", (?, ?)";
-                }
-                ps = MysqlAccess::getInstance().getPreparedStatement(ss.str());
-                for (int i = 0; i < styleIds.size(); ++i) {
-                    ps->setInt(i * 2 + 1, id);
-                    ps->setInt(i * 2 + 2, styleIds[i]);
-                }
-                ps->executeUpdate();
-                ss.str(std::string());
-                ss << "delete ignore from PlaylistStyles where playlistId = ? and styleId not in (?";
-                for (int i = 1; i < styleIds.size(); ++i) {
-                    ss << ", ?";
-                }
-                ss << ")";
-                ps = MysqlAccess::getInstance().getPreparedStatement(ss.str());
-                ps->setInt(1, id);
-                for (int i = 0; i < styleIds.size(); ++i) {
-                    ps->setInt(i + 2, styleIds[i]);
-                }
-                ps->executeUpdate();
-            } else {
-                ps = MysqlAccess::getInstance().getPreparedStatement("delete ignore from PlaylistStyles where playlistId = ?");
-                ps->setInt(1, id);
-                ps->executeUpdate();
-            }
-            return result;
-        } catch (sql::SQLException &e) {
-            cerr << "ERROR: SQLException in " << __FILE__;
-            cerr << " (" << __func__<< ") on line " << __LINE__ << endl;
-            cerr << "ERROR: " << e.what();
-            cerr << " (MySQL error code: " << e.getErrorCode();
-            cerr << ", SQLState: " << e.getSQLState() << ")" << endl;
-            exit(1);
-        }
-    }
-
-    int Playlist::save() {
-        try {
-
-            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("insert into Playlists (name, query, gmusicId) values (?, ?, ?)");
-            if (!name.empty()) ps->setString(1, name);
-            else ps->setNull(1, sql::DataType::VARCHAR);
-            if (!query.empty()) ps->setString(2, query);
-            else ps->setNull(2, sql::DataType::VARCHAR);
-            if (!gmusicId.empty()) ps->setString(3, gmusicId);
-            else ps->setNull(3, sql::DataType::VARCHAR);
-            int saved = ps->executeUpdate();
-            if (!saved) {
-                cerr << "Not able to save playlist" << endl;
-                return saved;
-            } else {
-                id = MysqlAccess::getInstance().getLastInsertId();
-                if (id == 0) {
-                    cerr << "Inserted playlist, but unable to retreive inserted ID." << endl;
-                    return saved;
-                }
+                sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("update Playlists set name=?, query=?, gmusicId=? where id=?");
+                if (!name.empty()) ps->setString(1, name);
+                else ps->setNull(1, sql::DataType::VARCHAR);
+                if (!query.empty()) ps->setString(2, query);
+                else ps->setNull(2, sql::DataType::VARCHAR);
+                if (!gmusicId.empty()) ps->setString(3, gmusicId);
+                else ps->setNull(3, sql::DataType::VARCHAR);
+                ps->setInt(4, id);
+                int result = ps->executeUpdate();
                 if (!playlistEntryIds.empty()) {
                     stringstream ss("insert ignore into PlaylistEntries (playlistId, playlistEntryId) values (?, ?)", ios_base::app | ios_base::out | ios_base::ate);
                     for (int i = 1; i < playlistEntryIds.size(); ++i) {
@@ -274,9 +196,23 @@ namespace soulsifter {
                         ps->setInt(i * 2 + 1, id);
                         ps->setInt(i * 2 + 2, playlistEntryIds[i]);
                     }
-                    if (!ps->executeUpdate()) {
-                        cerr << "Did not save playlistEntry for playlist " << id << endl;
+                    ps->executeUpdate();
+                    ss.str(std::string());
+                    ss << "delete ignore from PlaylistEntries where playlistId = ? and playlistEntryId not in (?";
+                    for (int i = 1; i < playlistEntryIds.size(); ++i) {
+                        ss << ", ?";
                     }
+                    ss << ")";
+                    ps = MysqlAccess::getInstance().getPreparedStatement(ss.str());
+                    ps->setInt(1, id);
+                    for (int i = 0; i < playlistEntryIds.size(); ++i) {
+                        ps->setInt(i + 2, playlistEntryIds[i]);
+                    }
+                    ps->executeUpdate();
+                } else {
+                    ps = MysqlAccess::getInstance().getPreparedStatement("delete ignore from PlaylistEntries where playlistId = ?");
+                    ps->setInt(1, id);
+                    ps->executeUpdate();
                 }
                 if (!styleIds.empty()) {
                     stringstream ss("insert ignore into PlaylistStyles (playlistId, styleId) values (?, ?)", ios_base::app | ios_base::out | ios_base::ate);
@@ -288,20 +224,100 @@ namespace soulsifter {
                         ps->setInt(i * 2 + 1, id);
                         ps->setInt(i * 2 + 2, styleIds[i]);
                     }
-                    if (!ps->executeUpdate()) {
-                        cerr << "Did not save style for playlist " << id << endl;
+                    ps->executeUpdate();
+                    ss.str(std::string());
+                    ss << "delete ignore from PlaylistStyles where playlistId = ? and styleId not in (?";
+                    for (int i = 1; i < styleIds.size(); ++i) {
+                        ss << ", ?";
                     }
+                    ss << ")";
+                    ps = MysqlAccess::getInstance().getPreparedStatement(ss.str());
+                    ps->setInt(1, id);
+                    for (int i = 0; i < styleIds.size(); ++i) {
+                        ps->setInt(i + 2, styleIds[i]);
+                    }
+                    ps->executeUpdate();
+                } else {
+                    ps = MysqlAccess::getInstance().getPreparedStatement("delete ignore from PlaylistStyles where playlistId = ?");
+                    ps->setInt(1, id);
+                    ps->executeUpdate();
                 }
-                return saved;
+                return result;
+            } catch (sql::SQLException &e) {
+                cerr << "ERROR: SQLException in " << __FILE__;
+                cerr << " (" << __func__<< ") on line " << __LINE__ << endl;
+                cerr << "ERROR: " << e.what();
+                cerr << " (MySQL error code: " << e.getErrorCode();
+                cerr << ", SQLState: " << e.getSQLState() << ")" << endl;
+                bool reconnected = MysqlAccess::getInstance().reconnect();
+                std::cout << (reconnected ? "Successful" : "Failed") << " mysql reconnection" << std::endl;
             }
-        } catch (sql::SQLException &e) {
-            cerr << "ERROR: SQLException in " << __FILE__;
-            cerr << " (" << __func__<< ") on line " << __LINE__ << endl;
-            cerr << "ERROR: " << e.what();
-            cerr << " (MySQL error code: " << e.getErrorCode();
-            cerr << ", SQLState: " << e.getSQLState() << ")" << endl;
-            exit(1);
         }
+        exit(1);
+    }
+
+    int Playlist::save() {
+        for (int i = 0; i < 3; ++i) {
+            try {
+
+                sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("insert into Playlists (name, query, gmusicId) values (?, ?, ?)");
+                if (!name.empty()) ps->setString(1, name);
+                else ps->setNull(1, sql::DataType::VARCHAR);
+                if (!query.empty()) ps->setString(2, query);
+                else ps->setNull(2, sql::DataType::VARCHAR);
+                if (!gmusicId.empty()) ps->setString(3, gmusicId);
+                else ps->setNull(3, sql::DataType::VARCHAR);
+                int saved = ps->executeUpdate();
+                if (!saved) {
+                    cerr << "Not able to save playlist" << endl;
+                    return saved;
+                } else {
+                    id = MysqlAccess::getInstance().getLastInsertId();
+                    if (id == 0) {
+                        cerr << "Inserted playlist, but unable to retreive inserted ID." << endl;
+                        return saved;
+                    }
+                    if (!playlistEntryIds.empty()) {
+                        stringstream ss("insert ignore into PlaylistEntries (playlistId, playlistEntryId) values (?, ?)", ios_base::app | ios_base::out | ios_base::ate);
+                        for (int i = 1; i < playlistEntryIds.size(); ++i) {
+                            ss << ", (?, ?)";
+                        }
+                        ps = MysqlAccess::getInstance().getPreparedStatement(ss.str());
+                        for (int i = 0; i < playlistEntryIds.size(); ++i) {
+                            ps->setInt(i * 2 + 1, id);
+                            ps->setInt(i * 2 + 2, playlistEntryIds[i]);
+                        }
+                        if (!ps->executeUpdate()) {
+                            cerr << "Did not save playlistEntry for playlist " << id << endl;
+                        }
+                    }
+                    if (!styleIds.empty()) {
+                        stringstream ss("insert ignore into PlaylistStyles (playlistId, styleId) values (?, ?)", ios_base::app | ios_base::out | ios_base::ate);
+                        for (int i = 1; i < styleIds.size(); ++i) {
+                            ss << ", (?, ?)";
+                        }
+                        ps = MysqlAccess::getInstance().getPreparedStatement(ss.str());
+                        for (int i = 0; i < styleIds.size(); ++i) {
+                            ps->setInt(i * 2 + 1, id);
+                            ps->setInt(i * 2 + 2, styleIds[i]);
+                        }
+                        if (!ps->executeUpdate()) {
+                            cerr << "Did not save style for playlist " << id << endl;
+                        }
+                    }
+                    return saved;
+                }
+            } catch (sql::SQLException &e) {
+                cerr << "ERROR: SQLException in " << __FILE__;
+                cerr << " (" << __func__<< ") on line " << __LINE__ << endl;
+                cerr << "ERROR: " << e.what();
+                cerr << " (MySQL error code: " << e.getErrorCode();
+                cerr << ", SQLState: " << e.getSQLState() << ")" << endl;
+                bool reconnected = MysqlAccess::getInstance().reconnect();
+                std::cout << (reconnected ? "Successful" : "Failed") << " mysql reconnection" << std::endl;
+            }
+        }
+        exit(1);
     }
 
     bool Playlist::sync() {
@@ -363,30 +379,34 @@ namespace soulsifter {
     }
 
     int Playlist::erase() {
-        try {
-            {
-                const vector<PlaylistEntry*>& playlistEntries = getPlaylistEntries();
-                for (vector<PlaylistEntry*>::const_iterator it = playlistEntries.begin(); it != playlistEntries.end(); ++it) {
-                    (*it)->erase();
+        for (int i = 0; i < 3; ++i) {
+            try {
+                {
+                    const vector<PlaylistEntry*>& playlistEntries = getPlaylistEntries();
+                    for (vector<PlaylistEntry*>::const_iterator it = playlistEntries.begin(); it != playlistEntries.end(); ++it) {
+                        (*it)->erase();
+                    }
+                    vector<PlaylistEntry*> tmp;
+                    setPlaylistEntries(tmp);
                 }
-                vector<PlaylistEntry*> tmp;
-                setPlaylistEntries(tmp);
+                sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("delete from Playlists where id=?");
+                ps->setInt(1, id);
+                int erased = ps->executeUpdate();
+                if (!erased) {
+                    cerr << "Not able to erase playlist" << endl;
+                }
+                return erased;
+            } catch (sql::SQLException &e) {
+                cerr << "ERROR: SQLException in " << __FILE__;
+                cerr << " (" << __func__<< ") on line " << __LINE__ << endl;
+                cerr << "ERROR: " << e.what();
+                cerr << " (MySQL error code: " << e.getErrorCode();
+                cerr << ", SQLState: " << e.getSQLState() << ")" << endl;
+                bool reconnected = MysqlAccess::getInstance().reconnect();
+                std::cout << (reconnected ? "Successful" : "Failed") << " mysql reconnection" << std::endl;
             }
-            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("delete from Playlists where id=?");
-            ps->setInt(1, id);
-            int erased = ps->executeUpdate();
-            if (!erased) {
-                cerr << "Not able to erase playlist" << endl;
-            }
-            return erased;
-        } catch (sql::SQLException &e) {
-            cerr << "ERROR: SQLException in " << __FILE__;
-            cerr << " (" << __func__<< ") on line " << __LINE__ << endl;
-            cerr << "ERROR: " << e.what();
-            cerr << " (MySQL error code: " << e.getErrorCode();
-            cerr << ", SQLState: " << e.getSQLState() << ")" << endl;
-            exit(1);
         }
+        exit(1);
     }
 
 

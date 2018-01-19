@@ -108,52 +108,60 @@ namespace soulsifter {
     }
 
     Style* Style::findById(int id) {
-        try {
-            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select Styles.*, group_concat(children.childId) as childIds, group_concat(parents.parentId) as parentIds from Styles left outer join StyleChildren children on Styles.id = children.parentId left outer join StyleChildren parents on Styles.id = parents.childId where Styles.id = ? group by Styles.id");
-            ps->setInt(1, id);
-            sql::ResultSet *rs = ps->executeQuery();
-            Style *style = NULL;
-            if (rs->next()) {
-                style = new Style();
-                populateFields(rs, style);
-            }
-            rs->close();
-            delete rs;
+        for (int i = 0; i < 3; ++i) {
+            try {
+                sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select Styles.*, group_concat(children.childId) as childIds, group_concat(parents.parentId) as parentIds from Styles left outer join StyleChildren children on Styles.id = children.parentId left outer join StyleChildren parents on Styles.id = parents.childId where Styles.id = ? group by Styles.id");
+                ps->setInt(1, id);
+                sql::ResultSet *rs = ps->executeQuery();
+                Style *style = NULL;
+                if (rs->next()) {
+                    style = new Style();
+                    populateFields(rs, style);
+                }
+                rs->close();
+                delete rs;
 
-            return style;
-        } catch (sql::SQLException &e) {
-            cerr << "ERROR: SQLException in " << __FILE__;
-            cerr << " (" << __func__<< ") on line " << __LINE__ << endl;
-            cerr << "ERROR: " << e.what();
-            cerr << " (MySQL error code: " << e.getErrorCode();
-            cerr << ", SQLState: " << e.getSQLState() << ")" << endl;
-            exit(1);
+                return style;
+            } catch (sql::SQLException &e) {
+                cerr << "ERROR: SQLException in " << __FILE__;
+                cerr << " (" << __func__<< ") on line " << __LINE__ << endl;
+                cerr << "ERROR: " << e.what();
+                cerr << " (MySQL error code: " << e.getErrorCode();
+                cerr << ", SQLState: " << e.getSQLState() << ")" << endl;
+                bool reconnected = MysqlAccess::getInstance().reconnect();
+                std::cout << (reconnected ? "Successful" : "Failed") << " mysql reconnection" << std::endl;
+            }
         }
+        exit(1);
     }
 
     Style* Style::findByREId(int reId) {
-        try {
-            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select Styles.*, group_concat(children.childId) as childIds, group_concat(parents.parentId) as parentIds from Styles left outer join StyleChildren children on Styles.id = children.parentId left outer join StyleChildren parents on Styles.id = parents.childId where ifnull(reId,0) = ifnull(?,0) group by Styles.id");
-            if (reId > 0) ps->setInt(1, reId);
-            else ps->setNull(1, sql::DataType::INTEGER);
-            sql::ResultSet *rs = ps->executeQuery();
-            Style *style = NULL;
-            if (rs->next()) {
-                style = new Style();
-                populateFields(rs, style);
-            }
-            rs->close();
-            delete rs;
+        for (int i = 0; i < 3; ++i) {
+            try {
+                sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select Styles.*, group_concat(children.childId) as childIds, group_concat(parents.parentId) as parentIds from Styles left outer join StyleChildren children on Styles.id = children.parentId left outer join StyleChildren parents on Styles.id = parents.childId where ifnull(reId,0) = ifnull(?,0) group by Styles.id");
+                if (reId > 0) ps->setInt(1, reId);
+                else ps->setNull(1, sql::DataType::INTEGER);
+                sql::ResultSet *rs = ps->executeQuery();
+                Style *style = NULL;
+                if (rs->next()) {
+                    style = new Style();
+                    populateFields(rs, style);
+                }
+                rs->close();
+                delete rs;
 
-            return style;
-        } catch (sql::SQLException &e) {
-            cerr << "ERROR: SQLException in " << __FILE__;
-            cerr << " (" << __func__<< ") on line " << __LINE__ << endl;
-            cerr << "ERROR: " << e.what();
-            cerr << " (MySQL error code: " << e.getErrorCode();
-            cerr << ", SQLState: " << e.getSQLState() << ")" << endl;
-            exit(1);
+                return style;
+            } catch (sql::SQLException &e) {
+                cerr << "ERROR: SQLException in " << __FILE__;
+                cerr << " (" << __func__<< ") on line " << __LINE__ << endl;
+                cerr << "ERROR: " << e.what();
+                cerr << " (MySQL error code: " << e.getErrorCode();
+                cerr << ", SQLState: " << e.getSQLState() << ")" << endl;
+                bool reconnected = MysqlAccess::getInstance().reconnect();
+                std::cout << (reconnected ? "Successful" : "Failed") << " mysql reconnection" << std::endl;
+            }
         }
+        exit(1);
     }
 
     ResultSetIterator<Style>* Style::findAll() {
@@ -166,104 +174,18 @@ namespace soulsifter {
 # pragma mark persistence
 
     int Style::update() {
-        try {
+        for (int i = 0; i < 3; ++i) {
+            try {
 
-            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("update Styles set name=?, reId=?, reLabel=? where id=?");
-            if (!name.empty()) ps->setString(1, name);
-            else ps->setNull(1, sql::DataType::VARCHAR);
-            if (reId > 0) ps->setInt(2, reId);
-            else ps->setNull(2, sql::DataType::INTEGER);
-            if (!reLabel.empty()) ps->setString(3, reLabel);
-            else ps->setNull(3, sql::DataType::VARCHAR);
-            ps->setInt(4, id);
-            int result = ps->executeUpdate();
-            if (!childIds.empty()) {
-                stringstream ss("insert ignore into StyleChildren (parentId, childId) values (?, ?)", ios_base::app | ios_base::out | ios_base::ate);
-                for (int i = 1; i < childIds.size(); ++i) {
-                    ss << ", (?, ?)";
-                }
-                ps = MysqlAccess::getInstance().getPreparedStatement(ss.str());
-                for (int i = 0; i < childIds.size(); ++i) {
-                    ps->setInt(i * 2 + 1, id);
-                    ps->setInt(i * 2 + 2, childIds[i]);
-                }
-                ps->executeUpdate();
-                ss.str(std::string());
-                ss << "delete ignore from StyleChildren where parentId = ? and childId not in (?";
-                for (int i = 1; i < childIds.size(); ++i) {
-                    ss << ", ?";
-                }
-                ss << ")";
-                ps = MysqlAccess::getInstance().getPreparedStatement(ss.str());
-                ps->setInt(1, id);
-                for (int i = 0; i < childIds.size(); ++i) {
-                    ps->setInt(i + 2, childIds[i]);
-                }
-                ps->executeUpdate();
-            } else {
-                ps = MysqlAccess::getInstance().getPreparedStatement("delete ignore from StyleChildren where parentId = ?");
-                ps->setInt(1, id);
-                ps->executeUpdate();
-            }
-            if (!parentIds.empty()) {
-                stringstream ss("insert ignore into StyleChildren (childId, parentId) values (?, ?)", ios_base::app | ios_base::out | ios_base::ate);
-                for (int i = 1; i < parentIds.size(); ++i) {
-                    ss << ", (?, ?)";
-                }
-                ps = MysqlAccess::getInstance().getPreparedStatement(ss.str());
-                for (int i = 0; i < parentIds.size(); ++i) {
-                    ps->setInt(i * 2 + 1, id);
-                    ps->setInt(i * 2 + 2, parentIds[i]);
-                }
-                ps->executeUpdate();
-                ss.str(std::string());
-                ss << "delete ignore from StyleChildren where childId = ? and parentId not in (?";
-                for (int i = 1; i < parentIds.size(); ++i) {
-                    ss << ", ?";
-                }
-                ss << ")";
-                ps = MysqlAccess::getInstance().getPreparedStatement(ss.str());
-                ps->setInt(1, id);
-                for (int i = 0; i < parentIds.size(); ++i) {
-                    ps->setInt(i + 2, parentIds[i]);
-                }
-                ps->executeUpdate();
-            } else {
-                ps = MysqlAccess::getInstance().getPreparedStatement("delete ignore from StyleChildren where childId = ?");
-                ps->setInt(1, id);
-                ps->executeUpdate();
-            }
-            return result;
-        } catch (sql::SQLException &e) {
-            cerr << "ERROR: SQLException in " << __FILE__;
-            cerr << " (" << __func__<< ") on line " << __LINE__ << endl;
-            cerr << "ERROR: " << e.what();
-            cerr << " (MySQL error code: " << e.getErrorCode();
-            cerr << ", SQLState: " << e.getSQLState() << ")" << endl;
-            exit(1);
-        }
-    }
-
-    int Style::save() {
-        try {
-
-            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("insert into Styles (name, reId, reLabel) values (?, ?, ?)");
-            if (!name.empty()) ps->setString(1, name);
-            else ps->setNull(1, sql::DataType::VARCHAR);
-            if (reId > 0) ps->setInt(2, reId);
-            else ps->setNull(2, sql::DataType::INTEGER);
-            if (!reLabel.empty()) ps->setString(3, reLabel);
-            else ps->setNull(3, sql::DataType::VARCHAR);
-            int saved = ps->executeUpdate();
-            if (!saved) {
-                cerr << "Not able to save style" << endl;
-                return saved;
-            } else {
-                id = MysqlAccess::getInstance().getLastInsertId();
-                if (id == 0) {
-                    cerr << "Inserted style, but unable to retreive inserted ID." << endl;
-                    return saved;
-                }
+                sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("update Styles set name=?, reId=?, reLabel=? where id=?");
+                if (!name.empty()) ps->setString(1, name);
+                else ps->setNull(1, sql::DataType::VARCHAR);
+                if (reId > 0) ps->setInt(2, reId);
+                else ps->setNull(2, sql::DataType::INTEGER);
+                if (!reLabel.empty()) ps->setString(3, reLabel);
+                else ps->setNull(3, sql::DataType::VARCHAR);
+                ps->setInt(4, id);
+                int result = ps->executeUpdate();
                 if (!childIds.empty()) {
                     stringstream ss("insert ignore into StyleChildren (parentId, childId) values (?, ?)", ios_base::app | ios_base::out | ios_base::ate);
                     for (int i = 1; i < childIds.size(); ++i) {
@@ -274,9 +196,23 @@ namespace soulsifter {
                         ps->setInt(i * 2 + 1, id);
                         ps->setInt(i * 2 + 2, childIds[i]);
                     }
-                    if (!ps->executeUpdate()) {
-                        cerr << "Did not save child for style " << id << endl;
+                    ps->executeUpdate();
+                    ss.str(std::string());
+                    ss << "delete ignore from StyleChildren where parentId = ? and childId not in (?";
+                    for (int i = 1; i < childIds.size(); ++i) {
+                        ss << ", ?";
                     }
+                    ss << ")";
+                    ps = MysqlAccess::getInstance().getPreparedStatement(ss.str());
+                    ps->setInt(1, id);
+                    for (int i = 0; i < childIds.size(); ++i) {
+                        ps->setInt(i + 2, childIds[i]);
+                    }
+                    ps->executeUpdate();
+                } else {
+                    ps = MysqlAccess::getInstance().getPreparedStatement("delete ignore from StyleChildren where parentId = ?");
+                    ps->setInt(1, id);
+                    ps->executeUpdate();
                 }
                 if (!parentIds.empty()) {
                     stringstream ss("insert ignore into StyleChildren (childId, parentId) values (?, ?)", ios_base::app | ios_base::out | ios_base::ate);
@@ -288,20 +224,100 @@ namespace soulsifter {
                         ps->setInt(i * 2 + 1, id);
                         ps->setInt(i * 2 + 2, parentIds[i]);
                     }
-                    if (!ps->executeUpdate()) {
-                        cerr << "Did not save parent for style " << id << endl;
+                    ps->executeUpdate();
+                    ss.str(std::string());
+                    ss << "delete ignore from StyleChildren where childId = ? and parentId not in (?";
+                    for (int i = 1; i < parentIds.size(); ++i) {
+                        ss << ", ?";
                     }
+                    ss << ")";
+                    ps = MysqlAccess::getInstance().getPreparedStatement(ss.str());
+                    ps->setInt(1, id);
+                    for (int i = 0; i < parentIds.size(); ++i) {
+                        ps->setInt(i + 2, parentIds[i]);
+                    }
+                    ps->executeUpdate();
+                } else {
+                    ps = MysqlAccess::getInstance().getPreparedStatement("delete ignore from StyleChildren where childId = ?");
+                    ps->setInt(1, id);
+                    ps->executeUpdate();
                 }
-                return saved;
+                return result;
+            } catch (sql::SQLException &e) {
+                cerr << "ERROR: SQLException in " << __FILE__;
+                cerr << " (" << __func__<< ") on line " << __LINE__ << endl;
+                cerr << "ERROR: " << e.what();
+                cerr << " (MySQL error code: " << e.getErrorCode();
+                cerr << ", SQLState: " << e.getSQLState() << ")" << endl;
+                bool reconnected = MysqlAccess::getInstance().reconnect();
+                std::cout << (reconnected ? "Successful" : "Failed") << " mysql reconnection" << std::endl;
             }
-        } catch (sql::SQLException &e) {
-            cerr << "ERROR: SQLException in " << __FILE__;
-            cerr << " (" << __func__<< ") on line " << __LINE__ << endl;
-            cerr << "ERROR: " << e.what();
-            cerr << " (MySQL error code: " << e.getErrorCode();
-            cerr << ", SQLState: " << e.getSQLState() << ")" << endl;
-            exit(1);
         }
+        exit(1);
+    }
+
+    int Style::save() {
+        for (int i = 0; i < 3; ++i) {
+            try {
+
+                sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("insert into Styles (name, reId, reLabel) values (?, ?, ?)");
+                if (!name.empty()) ps->setString(1, name);
+                else ps->setNull(1, sql::DataType::VARCHAR);
+                if (reId > 0) ps->setInt(2, reId);
+                else ps->setNull(2, sql::DataType::INTEGER);
+                if (!reLabel.empty()) ps->setString(3, reLabel);
+                else ps->setNull(3, sql::DataType::VARCHAR);
+                int saved = ps->executeUpdate();
+                if (!saved) {
+                    cerr << "Not able to save style" << endl;
+                    return saved;
+                } else {
+                    id = MysqlAccess::getInstance().getLastInsertId();
+                    if (id == 0) {
+                        cerr << "Inserted style, but unable to retreive inserted ID." << endl;
+                        return saved;
+                    }
+                    if (!childIds.empty()) {
+                        stringstream ss("insert ignore into StyleChildren (parentId, childId) values (?, ?)", ios_base::app | ios_base::out | ios_base::ate);
+                        for (int i = 1; i < childIds.size(); ++i) {
+                            ss << ", (?, ?)";
+                        }
+                        ps = MysqlAccess::getInstance().getPreparedStatement(ss.str());
+                        for (int i = 0; i < childIds.size(); ++i) {
+                            ps->setInt(i * 2 + 1, id);
+                            ps->setInt(i * 2 + 2, childIds[i]);
+                        }
+                        if (!ps->executeUpdate()) {
+                            cerr << "Did not save child for style " << id << endl;
+                        }
+                    }
+                    if (!parentIds.empty()) {
+                        stringstream ss("insert ignore into StyleChildren (childId, parentId) values (?, ?)", ios_base::app | ios_base::out | ios_base::ate);
+                        for (int i = 1; i < parentIds.size(); ++i) {
+                            ss << ", (?, ?)";
+                        }
+                        ps = MysqlAccess::getInstance().getPreparedStatement(ss.str());
+                        for (int i = 0; i < parentIds.size(); ++i) {
+                            ps->setInt(i * 2 + 1, id);
+                            ps->setInt(i * 2 + 2, parentIds[i]);
+                        }
+                        if (!ps->executeUpdate()) {
+                            cerr << "Did not save parent for style " << id << endl;
+                        }
+                    }
+                    return saved;
+                }
+            } catch (sql::SQLException &e) {
+                cerr << "ERROR: SQLException in " << __FILE__;
+                cerr << " (" << __func__<< ") on line " << __LINE__ << endl;
+                cerr << "ERROR: " << e.what();
+                cerr << " (MySQL error code: " << e.getErrorCode();
+                cerr << ", SQLState: " << e.getSQLState() << ")" << endl;
+                bool reconnected = MysqlAccess::getInstance().reconnect();
+                std::cout << (reconnected ? "Successful" : "Failed") << " mysql reconnection" << std::endl;
+            }
+        }
+        exit(1);
     }
 
     bool Style::sync() {

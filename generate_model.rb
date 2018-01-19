@@ -162,11 +162,11 @@ end
 ######################### h & cc outputs
 
 def sqlCatchBlock()
-  return "        } catch (sql::SQLException &e) {\n            cerr << \"ERROR: SQLException in \" << __FILE__;\n            cerr << \" (\" << __func__<< \") on line \" << __LINE__ << endl;\n            cerr << \"ERROR: \" << e.what();\n            cerr << \" (MySQL error code: \" << e.getErrorCode();\n            cerr << \", SQLState: \" << e.getSQLState() << \")\" << endl;\n            exit(1);\n        }\n"
+  return "            } catch (sql::SQLException &e) {\n                cerr << \"ERROR: SQLException in \" << __FILE__;\n                cerr << \" (\" << __func__<< \") on line \" << __LINE__ << endl;\n                cerr << \"ERROR: \" << e.what();\n                cerr << \" (MySQL error code: \" << e.getErrorCode();\n                cerr << \", SQLState: \" << e.getSQLState() << \")\" << endl;\n                bool reconnected = MysqlAccess::getInstance().reconnect();\n                std::cout << (reconnected ? \"Successful\" : \"Failed\") << \" mysql reconnection\" << std::endl;\n            }\n        }\n        exit(1);\n"
 end
 
 def syncChildBlock(f)
-  return "            if (#{f[$name]} && #{f[$name]}->sync()) {\n                if (#{f[$name]}->getId()) {\n                    #{f[$name]}->update();\n                } else {\n                    #{f[$name]}->save();\n                }\n                #{f[$name]}Id = #{f[$name]}->getId();\n            } else if (!#{f[$name]}Id && #{f[$name]}) {\n                #{f[$name]}Id = #{f[$name]}->getId();\n            }\n"
+  return "                if (#{f[$name]} && #{f[$name]}->sync()) {\n                    if (#{f[$name]}->getId()) {\n                        #{f[$name]}->update();\n                    } else {\n                        #{f[$name]}->save();\n                    }\n                    #{f[$name]}Id = #{f[$name]}->getId();\n                } else if (!#{f[$name]}Id && #{f[$name]}) {\n                    #{f[$name]}Id = #{f[$name]}->getId();\n                }\n"
 end
 
 def hFieldDeclaration(f)
@@ -296,10 +296,10 @@ def cFindFunction(name, f, fields)
   else
     str << "    #{cap(name)}* #{cap(name)}::findBy#{cap(f[$name])}(const #{f[$type]}& #{f[$name]}) {\n"
   end
-  str << "        try {\n"
-  str << "            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement(\"select #{selectStar(name, fields)} from #{fromTable(name, fields)} where #{cap(plural(name))}.#{f[$name]} = ?#{groupBy(name,fields)}\");\n"
-  str << "            ps->set#{cap(f[$type].to_s)}(1, #{f[$name]});\n            sql::ResultSet *rs = ps->executeQuery();\n            #{cap(name)} *#{name} = NULL;\n            if (rs->next()) {\n                #{name} = new #{cap(name)}();\n                populateFields(rs, #{name});\n            }\n            rs->close();\n            delete rs;\n\n"
-  str << "            return #{name};\n"
+  str << "        for (int i = 0; i < 3; ++i) {\n            try {\n"
+  str << "                sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement(\"select #{selectStar(name, fields)} from #{fromTable(name, fields)} where #{cap(plural(name))}.#{f[$name]} = ?#{groupBy(name,fields)}\");\n"
+  str << "                ps->set#{cap(f[$type].to_s)}(1, #{f[$name]});\n                sql::ResultSet *rs = ps->executeQuery();\n                #{cap(name)} *#{name} = NULL;\n                if (rs->next()) {\n                    #{name} = new #{cap(name)}();\n                    populateFields(rs, #{name});\n                }\n                rs->close();\n                delete rs;\n\n"
+  str << "                return #{name};\n"
   str << sqlCatchBlock()
   str << "    }\n\n"
 end
@@ -346,8 +346,8 @@ def cSecondaryKeysFindFunction(name, secondaryKeys, fields)
     end
   end
   str << ") {\n"
-  str << "        try {\n"
-  str << "            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement(\"select #{selectStar(name, fields)} from #{fromTable(name, fields)} where "
+  str << "        for (int i = 0; i < 3; ++i) {\n            try {\n"
+  str << "                sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement(\"select #{selectStar(name, fields)} from #{fromTable(name, fields)} where "
   secondaryKeys.each_with_index do |f,idx|
     if (idx > 0)
       str << " and "
@@ -356,9 +356,9 @@ def cSecondaryKeysFindFunction(name, secondaryKeys, fields)
   end
   str << "#{groupBy(name,fields)}\");\n"
   secondaryKeys.each_with_index do |f,idx|
-    str << setField(f, idx+1, "            ")
+    str << setField(f, idx+1, "                ")
   end
-  str << "            sql::ResultSet *rs = ps->executeQuery();\n            #{cap(name)} *#{name} = NULL;\n            if (rs->next()) {\n                #{name} = new #{cap(name)}();\n                populateFields(rs, #{name});\n            }\n            rs->close();\n            delete rs;\n\n            return #{name};\n"
+  str << "                sql::ResultSet *rs = ps->executeQuery();\n                #{cap(name)} *#{name} = NULL;\n                if (rs->next()) {\n                    #{name} = new #{cap(name)}();\n                    populateFields(rs, #{name});\n                }\n                rs->close();\n                delete rs;\n\n                return #{name};\n"
   str << sqlCatchBlock()
   str << "    }\n\n"
 end
@@ -442,12 +442,12 @@ def hUpdateFunction()
 end
 
 def cUpdateFunction(name, fields)
-  str = "    int #{cap(name)}::update() {\n        try {\n"
+  str = "    int #{cap(name)}::update() {\n        for (int i = 0; i < 3; ++i) {\n            try {\n"
   fields.select{|f| f[$attrib] & Attrib::PTR > 0}.each do |f|
     str << syncChildBlock(f)
   end
   str << "\n"
-  str << "            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement(\"update #{cap(plural(name))} set "
+  str << "                sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement(\"update #{cap(plural(name))} set "
   fields.each do |f|
     next if (f[$name] == "id" || f[$attrib] & Attrib::PTR > 0 || isVector(f[$type]) || f[$attrib] & Attrib::TRANSIENT > 0)
     str << "#{f[$name]}=?, "
@@ -458,19 +458,19 @@ def cUpdateFunction(name, fields)
   fields.each do |f|
     next if (f[$name] == "id" || f[$attrib] & Attrib::PTR > 0 || isVector(f[$type]) || f[$attrib] & Attrib::TRANSIENT > 0)
     i += 1
-    str << setField(f, i, "            ")
+    str << setField(f, i, "                ")
   end
-  str << "            ps->setInt(#{i + 1}, id);\n            int result = ps->executeUpdate();\n"
+  str << "                ps->setInt(#{i + 1}, id);\n                int result = ps->executeUpdate();\n"
   fields.select{|f| isVector(f[$type]) && f[$attrib] & Attrib::ID == 0}.each do |f|
     t = vectorRelationTable(name, f)
-    str << "            if (!#{vectorIds(f)}.empty()) {\n"
-    str << "                stringstream ss(\"insert ignore into #{t[0]} (#{t[2]}, #{t[1]}) values (?, ?)\", ios_base::app | ios_base::out | ios_base::ate);\n                for (int i = 1; i < #{vectorIds(f)}.size(); ++i) {\n                    ss << \", (?, ?)\";\n                }\n                ps = MysqlAccess::getInstance().getPreparedStatement(ss.str());\n"
-    str << "                for (int i = 0; i < #{vectorIds(f)}.size(); ++i) {\n                    ps->setInt(i * 2 + 1, id);\n                    ps->setInt(i * 2 + 2, #{vectorIds(f)}[i]);\n                }\n                ps->executeUpdate();\n"
-    str << "                ss.str(std::string());\n                ss << \"delete ignore from #{t[0]} where #{t[2]} = ? and #{t[1]} not in (?\";\n                for (int i = 1; i < #{vectorIds(f)}.size(); ++i) {\n                    ss << \", ?\";\n                }\n                ss << \")\";\n"
-    str << "                ps = MysqlAccess::getInstance().getPreparedStatement(ss.str());\n                ps->setInt(1, id);\n                for (int i = 0; i < #{vectorIds(f)}.size(); ++i) {\n                    ps->setInt(i + 2, #{vectorIds(f)}[i]);\n                }\n                ps->executeUpdate();\n"
-    str << "            } else {\n                ps = MysqlAccess::getInstance().getPreparedStatement(\"delete ignore from #{t[0]} where #{t[2]} = ?\");\n                ps->setInt(1, id);\n                ps->executeUpdate();\n            }\n"
+    str << "                if (!#{vectorIds(f)}.empty()) {\n"
+    str << "                    stringstream ss(\"insert ignore into #{t[0]} (#{t[2]}, #{t[1]}) values (?, ?)\", ios_base::app | ios_base::out | ios_base::ate);\n                    for (int i = 1; i < #{vectorIds(f)}.size(); ++i) {\n                        ss << \", (?, ?)\";\n                    }\n                    ps = MysqlAccess::getInstance().getPreparedStatement(ss.str());\n"
+    str << "                    for (int i = 0; i < #{vectorIds(f)}.size(); ++i) {\n                        ps->setInt(i * 2 + 1, id);\n                        ps->setInt(i * 2 + 2, #{vectorIds(f)}[i]);\n                    }\n                    ps->executeUpdate();\n"
+    str << "                    ss.str(std::string());\n                    ss << \"delete ignore from #{t[0]} where #{t[2]} = ? and #{t[1]} not in (?\";\n                    for (int i = 1; i < #{vectorIds(f)}.size(); ++i) {\n                        ss << \", ?\";\n                    }\n                    ss << \")\";\n"
+    str << "                    ps = MysqlAccess::getInstance().getPreparedStatement(ss.str());\n                    ps->setInt(1, id);\n                    for (int i = 0; i < #{vectorIds(f)}.size(); ++i) {\n                        ps->setInt(i + 2, #{vectorIds(f)}[i]);\n                    }\n                    ps->executeUpdate();\n"
+    str << "                } else {\n                    ps = MysqlAccess::getInstance().getPreparedStatement(\"delete ignore from #{t[0]} where #{t[2]} = ?\");\n                    ps->setInt(1, id);\n                    ps->executeUpdate();\n                }\n"
   end
-  str << "            return result;\n"
+  str << "                return result;\n"
   str << sqlCatchBlock()
   str << "    }\n\n"
 end
@@ -480,15 +480,15 @@ def hSaveFunction()
 end
 
 def cSaveFunction(name, fields, attribs)
-  str = "    int #{cap(name)}::save() {\n        try {\n"
+  str = "    int #{cap(name)}::save() {\n        for (int i = 0; i < 3; ++i) {\n            try {\n"
   fields.select{|f| f[$attrib] & Attrib::PTR > 0}.each do |f|
     str << syncChildBlock(f)
   end
   if (attribs & Attrib::SAVEID > 0)
-    str << "            if (id == 0) {\n                sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement(\"select max(id) from #{cap(plural(name))}\");\n                sql::ResultSet *rs = ps->executeQuery();\n                rs->next();\n                id = rs->getInt(1) + 1;\n                rs->close();\n                delete rs;\n            }\n"
+    str << "                if (id == 0) {\n                    sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement(\"select max(id) from #{cap(plural(name))}\");\n                    sql::ResultSet *rs = ps->executeQuery();\n                    rs->next();\n                    id = rs->getInt(1) + 1;\n                    rs->close();\n                    delete rs;\n                }\n"
   end
   str << "\n"
-  str << "            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement(\"insert into #{cap(plural(name))} ("
+  str << "                sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement(\"insert into #{cap(plural(name))} ("
   i = 0
   fields.each do |f|
     next if ((f[$name] == "id" && attribs & Attrib::SAVEID == 0) || f[$attrib] & Attrib::PTR > 0 || isVector(f[$type]) || f[$attrib] & Attrib::TRANSIENT > 0)
@@ -505,23 +505,23 @@ def cSaveFunction(name, fields, attribs)
   fields.each do |f|
     next if ((f[$name] == "id" && attribs & Attrib::SAVEID == 0) || f[$attrib] & Attrib::PTR > 0 || isVector(f[$type]) || f[$attrib] & Attrib::TRANSIENT > 0)
     i += 1
-    str << setField(f, i, "            ")
+    str << setField(f, i, "                ")
   end
-  str << "            int saved = ps->executeUpdate();\n            if (!saved) {\n"
-  str << "                cerr << \"Not able to save #{name}\" << endl;\n                return saved;\n"
-  str << "            } else {\n"
+  str << "                int saved = ps->executeUpdate();\n                if (!saved) {\n"
+  str << "                    cerr << \"Not able to save #{name}\" << endl;\n                    return saved;\n"
+  str << "                } else {\n"
   if (attribs & Attrib::SAVEID == 0)
-    str << "                id = MysqlAccess::getInstance().getLastInsertId();\n                if (id == 0) {\n"
-    str << "                    cerr << \"Inserted #{name}, but unable to retreive inserted ID.\" << endl;\n                    return saved;\n                }\n"
+    str << "                    id = MysqlAccess::getInstance().getLastInsertId();\n                    if (id == 0) {\n"
+    str << "                        cerr << \"Inserted #{name}, but unable to retreive inserted ID.\" << endl;\n                        return saved;\n                    }\n"
   end
   fields.each do |f|
     if (isVector(f[$type]) && f[$attrib] & Attrib::ID == 0)
     t = vectorRelationTable(name, f)
-    str << "                if (!#{vectorIds(f)}.empty()) {\n                    stringstream ss(\"insert ignore into #{t[0]} (#{t[2]}, #{t[1]}) values (?, ?)\", ios_base::app | ios_base::out | ios_base::ate);\n                    for (int i = 1; i < #{vectorIds(f)}.size(); ++i) {\n                        ss << \", (?, ?)\";\n                    }\n                    ps = MysqlAccess::getInstance().getPreparedStatement(ss.str());\n"
-    str << "                    for (int i = 0; i < #{vectorIds(f)}.size(); ++i) {\n                        ps->setInt(i * 2 + 1, id);\n                        ps->setInt(i * 2 + 2, #{vectorIds(f)}[i]);\n                    }\n                    if (!ps->executeUpdate()) {\n                        cerr << \"Did not save #{single(f[$name])} for #{name} \" << id << endl;\n                    }\n                }\n"
+    str << "                    if (!#{vectorIds(f)}.empty()) {\n                        stringstream ss(\"insert ignore into #{t[0]} (#{t[2]}, #{t[1]}) values (?, ?)\", ios_base::app | ios_base::out | ios_base::ate);\n                        for (int i = 1; i < #{vectorIds(f)}.size(); ++i) {\n                            ss << \", (?, ?)\";\n                        }\n                        ps = MysqlAccess::getInstance().getPreparedStatement(ss.str());\n"
+    str << "                        for (int i = 0; i < #{vectorIds(f)}.size(); ++i) {\n                            ps->setInt(i * 2 + 1, id);\n                            ps->setInt(i * 2 + 2, #{vectorIds(f)}[i]);\n                        }\n                        if (!ps->executeUpdate()) {\n                            cerr << \"Did not save #{single(f[$name])} for #{name} \" << id << endl;\n                        }\n                    }\n"
     end
   end
-  str << "                return saved;\n            }\n"
+  str << "                    return saved;\n                }\n"
   str << sqlCatchBlock()
   str << "    }\n\n"
 end
@@ -531,17 +531,17 @@ def hEraseFunction()
 end
 
 def cEraseFunction(name, fields)
-  str = "    int #{cap(name)}::erase() {\n        try {\n"
+  str = "    int #{cap(name)}::erase() {\n        for (int i = 0; i < 3; ++i) {\n            try {\n"
   fields.each do |f|
     next unless (isVector(f[$type]) && !["int", "string"].include?(getVectorGeneric(f[$type])) && f[$attrib] & Attrib::JOINTABLE > 0)
-    str << "            {\n                const #{f[$type]}& #{f[$name]} = get#{cap(f[$name])}();\n                for (#{f[$type]}::const_iterator it = #{f[$name]}.begin(); it != #{f[$name]}.end(); ++it) {\n                    (*it)->erase();\n                }\n                #{f[$type]} tmp;\n                set#{cap(f[$name])}(tmp);\n            }\n"
+    str << "                {\n                    const #{f[$type]}& #{f[$name]} = get#{cap(f[$name])}();\n                    for (#{f[$type]}::const_iterator it = #{f[$name]}.begin(); it != #{f[$name]}.end(); ++it) {\n                        (*it)->erase();\n                    }\n                    #{f[$type]} tmp;\n                    set#{cap(f[$name])}(tmp);\n                }\n"
   end
-  str << "            sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement(\"delete from #{cap(plural(name))} where id=?\");\n"
-  str << "            ps->setInt(1, id);\n"
-  str << "            int erased = ps->executeUpdate();\n            if (!erased) {\n"
-  str << "                cerr << \"Not able to erase #{name}\" << endl;\n"
-  str << "            }\n"
-  str << "            return erased;\n"
+  str << "                sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement(\"delete from #{cap(plural(name))} where id=?\");\n"
+  str << "                ps->setInt(1, id);\n"
+  str << "                int erased = ps->executeUpdate();\n                if (!erased) {\n"
+  str << "                    cerr << \"Not able to erase #{name}\" << endl;\n"
+  str << "                }\n"
+  str << "                return erased;\n"
   str << sqlCatchBlock()
   str << "    }\n\n"
 end
