@@ -386,7 +386,7 @@ vector<Song*>* SearchUtil::searchSongs(const string& query, int bpm, const set<s
   
   vector<Song*>* songs = new vector<Song*>();
   try {
-    sql::Statement *stmt = MysqlAccess::getInstance().getConnection()->createStatement();
+    sql::Statement *stmt = MysqlAccess::getInstance().createStatement();
     sql::ResultSet *rs = stmt->executeQuery(ss.str());
     while (rs->next()) {
       Song* song = new Song();

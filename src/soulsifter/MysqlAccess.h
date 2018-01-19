@@ -40,13 +40,10 @@ public:
       }
       return *instance;
     }
-
-    sql::Connection *getConnection() {
-        return connection;
-    }
     
     bool reconnect();
     sql::PreparedStatement* getPreparedStatement(std::string query);
+    sql::Statement* createStatement() { return connection->createStatement(); }
     int getLastInsertId();
     
 private:
