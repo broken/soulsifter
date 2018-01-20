@@ -132,9 +132,9 @@
         <div class="prev">&nbsp;<span>[[_taggedSong.album.releaseDateYear]]</span></div>
         <paper-input label="Release Year" value="{{_editedSong.album.releaseDateYear}}" required="true" type="number" min="1600" max="2099" floatingLabel></paper-input>
         <div class="prev">&nbsp;<span>[[_taggedSong.album.releaseDateMonth]]</span></div>
-        <paper-input label="Release Month" value="{{_editedSong.album.releaseDateMonth}}" type="number" min="1" max="12" floatingLabel></paper-input>
+        <paper-input label="Release Month" value="{{_editedSong.album.releaseDateMonth}}" type="number" min="0" max="12" floatingLabel></paper-input>
         <div class="prev">&nbsp;<span>[[_taggedSong.album.releaseDateDay]]</span></div>
-        <paper-input label="Release Day" value="{{_editedSong.album.releaseDateDay}}" type="number" min="1" max="31" floatingLabel></paper-input>
+        <paper-input label="Release Day" value="{{_editedSong.album.releaseDateDay}}" type="number" min="0" max="31" floatingLabel></paper-input>
       </div>
       <div class="genres">
         <genre-list id="genreList" selection="{{_styles}}" single-select></genre-list>
