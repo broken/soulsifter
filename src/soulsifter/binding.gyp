@@ -59,6 +59,7 @@
           # util
           "DTVectorUtil.h",
           "DTQueueUtil.h",
+          "StdoutFileSink.h",
       ],
       'cflags!': [
           '-fno-exceptions',

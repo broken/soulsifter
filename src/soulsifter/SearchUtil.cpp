@@ -313,8 +313,7 @@ string buildOptionPredicate(int bpm, const set<string>& keys, const vector<Style
           ss << " or find_in_set('" << CamelotKeys::map.at("1A") << "', tonicKeys)>0 or find_in_set('" << CamelotKeys::map.at("1B") << "', tonicKeys)>0";
           if (++num == 3) break;
         default:
-          cout << "Error. Unable to find key." << endl;
-          LOG(INFO) << "Error. Unable to find key.";
+          LOG(WARNING) << "Error. Unable to find key.";
           return "";
       }
       ss << ")";
@@ -359,7 +358,6 @@ bool isLimit(const Atom& a) {
 }  // anon namespace
 
 vector<Song*>* SearchUtil::searchSongs(const string& query, int bpm, const set<string>& keys, const vector<Style*>& styles, const vector<Song*>& songsToOmit, int limit) {
-  cout << "q:" << query << ", bpm:" << bpm << ", keys:" << setToCsv(keys) << ", styles:" << ", limit:" << limit << endl;
   LOG(INFO) << "q:" << query << ", bpm:" << bpm << ", keys:" << setToCsv(keys) << ", styles:" << ", limit:" << limit;
 
   vector<string> fragments;
@@ -371,7 +369,7 @@ vector<Song*>* SearchUtil::searchSongs(const string& query, int bpm, const set<s
     if (parse(fragment, &atom)) {
       atoms.push_back(atom);
     } else {
-      cerr << "ERROR: Unable to parse query fragment '" << fragment << "'" << endl;
+      LOG(WARNING) << "ERROR: Unable to parse query fragment '" << fragment << "'";
     }
   }
 
@@ -386,8 +384,7 @@ vector<Song*>* SearchUtil::searchSongs(const string& query, int bpm, const set<s
   ss << buildQueryPredicate(atoms);
   ss << buildOptionPredicate(bpm, keys, styles, songsToOmit, limit);
   
-  cout << "Query:" << endl << ss.str() << endl;
-  LOG(INFO) << "Query:" << endl << ss.str();
+  LOG(DEBUG) << "Query:" << endl << ss.str();
   
   vector<Song*>* songs = new vector<Song*>();
   for (int i = 0; i < 3; ++i) {
@@ -458,17 +455,13 @@ vector<Song*>* SearchUtil::searchSongs(const string& query, int bpm, const set<s
 
       return songs;
     } catch (sql::SQLException &e) {
-      cerr << "ERROR: SQLException in " << __FILE__;
-      cerr << " (" << __func__<< ") on line " << __LINE__ << endl;
-      cerr << "ERROR: " << e.what();
-      cerr << " (MySQL error code: " << e.getErrorCode();
-      cerr << ", SQLState: " << e.getSQLState() << ")" << endl;
+      LOG(WARNING) << "ERROR: SQLException in " << __FILE__ << " (" << __func__<< ") on line " << __LINE__;
+      LOG(WARNING) << "ERROR: " << e.what() << " (MySQL error code: " << e.getErrorCode() << ", SQLState: " << e.getSQLState() << ")";
       bool reconnected = MysqlAccess::getInstance().reconnect();
-      std::cout << (reconnected ? "Successful" : "Failed") << " mysql reconnection" << std::endl;
       LOG(INFO) << (reconnected ? "Successful" : "Failed") << " mysql reconnection";
     }
   }
-  CHECKF(false) << "Failed searching songs";
+  LOG(FATAL) << "Failed searching songs";
 }
   
 }  // namespace soulsifter

@@ -16,6 +16,7 @@
 #include "SearchUtil_wrap.h"
 #include "Song_wrap.h"
 #include "SoulSifterSettings_wrap.h"
+#include "StdoutFileSink.h"
 #include "Style_wrap.h"
 #include "TagService_wrap.h"
 
@@ -23,7 +24,9 @@ void InitAll(v8::Handle<v8::Object> exports) {
   // first init the logging
   static std::unique_ptr<g3::LogWorker> logworker = g3::LogWorker::createLogWorker();
   std::string home = getenv("HOME");
-  logworker->addDefaultLogger("ss", home + "/Library/Application Support/Soul Sifter");
+  logworker->addSink(
+      std2::make_unique<dogatech::soulsifter::StdoutFileSink>("ss", home + "/Library/Application Support/Soul Sifter"),
+      &dogatech::soulsifter::StdoutFileSink::log);
   g3::initializeLogging(logworker.get());
 
   // model
