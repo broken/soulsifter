@@ -1,5 +1,8 @@
+#include <string>
 #include <node.h>
 #include <nan.h>
+#include <g3log/g3log.hpp>
+#include <g3log/logworker.hpp>
 #include "Album_wrap.h"
 #include "AlbumPart_wrap.h"
 #include "AudioAnalyzer_wrap.h"
@@ -17,6 +20,12 @@
 #include "TagService_wrap.h"
 
 void InitAll(v8::Handle<v8::Object> exports) {
+  // first init the logging
+  static std::unique_ptr<g3::LogWorker> logworker = g3::LogWorker::createLogWorker();
+  std::string home = getenv("HOME");
+  logworker->addDefaultLogger("ss", home + "/Library/Application Support/Soul Sifter");
+  g3::initializeLogging(logworker.get());
+
   // model
   Album::Init(exports);
   AlbumPart::Init(exports);
