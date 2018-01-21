@@ -75,6 +75,7 @@
     #cover {
       background-position: center center;
       background-size: cover;
+      background-color: #333;  /* TODO put into theme */
       height: 108px;
       width: 108px;
     }
@@ -106,7 +107,7 @@
             <paper-checkbox checked="{{_editedSong.trashed}}" disabled$="[[song.trashed]]">Trash</paper-checkbox>
           </div>
           <div id="cover" on-click="_changeCover"></div>
-          <input style="display:none;" id="coverFileDialog" type="file"/>
+          <input style="display:none;" id="coverFileDialog" type="file" nwworkingdir="[[_pathOfSong(_editedSong.filepath)]]"/>
         </div>
       </div>
       <div class="fields">
@@ -144,7 +145,7 @@
       <div>[[_editedSong.id]]</div>
       <div>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</div>
       <div on-click="_changeSong">[[_editedSong.filepath]]</div>
-      <input style="display:none;" id="songFileDialog" type="file"/>
+      <input style="display:none;" id="songFileDialog" type="file" nwworkingdir="[[_pathOfSong(_editedSong.filepath)]]"/>
     </div>
   </template>
 </dom-module>
@@ -395,6 +396,10 @@
 
     _changeSong: function() {
       this.$.songFileDialog.click();
+    },
+
+    _pathOfSong: function(filename) {
+      return this._soulSifterSettings.getString('music.dir') + this.path.dirname(filename);
     },
   });
 </script>
