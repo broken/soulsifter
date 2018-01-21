@@ -9,7 +9,6 @@
 <link href="pitch-slider.html" rel="import">
 <link href="ss-audio.html" rel="import">
 <link href="ss-global-behavior.html" rel="import">
-<link href="ss-googleplaymusic.html" rel="import">
 <link href="ss-options-menu.html" rel="import">
 <link href="ss-options-menu-item.html" rel="import">
 <link href="ss-star-rating.html" rel="import">
@@ -76,7 +75,6 @@
     }
   </style>
   <template>
-    <ss-googleplaymusic id="gpm"></ss-googleplaymusic>
     <iron-signals on-iron-signal-save-song-trail="saveSongTrail"></iron-signals>
 
     <paper-scroll-header-panel id="shp" condenses keepCondensedHeader condensedHeaderHeight="40" headerHeight="256">
@@ -101,7 +99,7 @@
           <pitch-slider></pitch-slider>
         </div>
         <div class="audio">
-          <ss-audio id="audio"></ss-audio>
+          <ss-audio id="audio" song="[[song]]"></ss-audio>
         </div>
         <div id="musicVideoInput">
           <paper-input label="video id" value="{{_videoId}}" class="flex" no-label-float></paper-input>
@@ -183,31 +181,8 @@
 
       this.localeDateTime = new Date(this.song.dateAdded).toLocaleString();
 
-      // audio source; use local, otherwise contact google api
-      var that = this;
-      this.fs.access(this._soulSifterSettings.getString('music.dir') + this.song.filepath, this.fs.F_OK | this.fs.R_OK, function(err) {
-        if (!err) {
-          that.$.audio.src = "file://" + that._soulSifterSettings.getString('music.dir') + that.song.filepath;
-          that._setCoverImage(that._soulSifterSettings.getString('music.dir') + that.song.album.coverFilepath);
-          that._setMusicVideo(ss.MusicVideo.findBySongId(that.song.id));
-        } else {
-          if (!that.song.googleSongId) {
-            console.warn('Unable to play song ' + that.song.id + ' because it does not have a Google song ID associated with it.');
-          } else {
-            that.$.gpm.getStreamUrl(that.song.googleSongId, function(err, url) {
-              if (err) {
-                console.error('Unable to get stream URL for song ' + that.song.id);
-                console.error(err);
-              } else {
-                that.$.audio.src = url;
-                // todo set cover by looking up s.track.albumArtRef as I once did?
-              }
-            });
-          }
-          that._setCoverImage();
-          that._setMusicVideo();
-        }
-      });
+      this._setCoverImage(this._soulSifterSettings.getString('music.dir') + this.song.album.coverFilepath);
+      this._setMusicVideo(ss.MusicVideo.findBySongId(this.song.id));
     },
 
     dragSong: function(e) {

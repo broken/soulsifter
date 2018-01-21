@@ -5,6 +5,8 @@
 <link href="../iron-icons/av-icons.html" rel="import">
 <link href="../paper-slider/paper-slider.html" rel="import">
 
+<link href="ss-googleplaymusic.html" rel="import">
+
 
 <dom-module id="ss-audio">
   <style is="custom-style">
@@ -44,10 +46,11 @@
     }
   </style>
   <template>
+    <ss-googleplaymusic id="gpm"></ss-googleplaymusic>
     <div class$="{{computeIsDisabled(disabled)}}">
       <iron-icon id="playPause" icon="av:play-arrow" on-click="playAction"></iron-icon>
       <div class="timebar">
-        <div id="time" self-end>{{currentTimeStr}}</div>
+        <div id="time" self-end>[[_currentTimeStr]]</div>
         <paper-slider id="slider" min="0" max="{{duration}}" value="{{currentTime}}" on-change="changeCurrentTime" disabled="{{disabled}}"></paper-slider>
       </div>
     </div>
@@ -60,21 +63,65 @@
     is: 'ss-audio',
 
     properties: {
+      song: {
+        type: Object,
+        observer: '_songChanged'
+      },
       src: {
         type: String,
-        observer: 'srcChanged'
-      }
+        observer: '_srcChanged'
+      },
+      _soulSifterSettings: {
+        type: Object,
+        value: function() { return new ss.SoulSifterSettings(); },
+        readOnly: true
+      },
+      _currentTimeStr: {
+        type: String,
+        value: 'Ø',
+      },
     },
 
     duration: 1,
 
     currentTime: 0,
 
-    currentTimeStr: '--',
-
     disabled: true,
 
-    srcChanged: function(newValue, oldValue) {
+    ready: function() {
+      this.fs = require('fs');
+    },
+
+    _songChanged: function(newValue, oldValue) {
+      if (!newValue) {
+        this.set('src', null);
+        return;
+      }
+
+      // audio source; use local, otherwise contact google api
+      var filepath = this.song.filepath.charAt(0) === '/' ? this.song.filepath : this._soulSifterSettings.getString('music.dir') + this.song.filepath;
+      this.fs.access(filepath, this.fs.F_OK | this.fs.R_OK, (err) => {
+        if (!err) {
+          this.set('src', 'file://' + filepath);
+        } else {
+          if (!this.song.googleSongId) {
+            console.warn('Unable to play song ' + this.song.id + ' because it does not have a Google song ID associated with it.');
+          } else {
+            this.$.gpm.getStreamUrl(this.song.googleSongId, (err, url) => {
+              if (err) {
+                console.error('Unable to get stream URL for song ' + this.song.id);
+                console.error(err);
+              } else {
+                this.set('src', url);
+              }
+            });
+          }
+        }
+      });
+
+    },
+
+    _srcChanged: function(newValue, oldValue) {
       this.currentTime = 0;
       if (!newValue) {
         this.disabled = true;
@@ -92,7 +139,7 @@
       });
       this.audio.addEventListener('error', function (mediaError) {
         window.console.log('Audio error: ' + mediaError.code);
-        that.currentTimeStr = '--',
+        that._currentTimeStr = 'Ø',
         that.disabled = true;
       });
       this.audio.addEventListener('timeupdate', function () {
@@ -108,7 +155,7 @@
         if (hours || mins) str += (mins < 10 && hours ? '0' : '') + mins + ':';
         var secs = time % 60;
         str += (secs < 10 && (hours || mins) ? '0' : '') + secs;
-        that.currentTimeStr = str;
+        that._currentTimeStr = str;
       });
     },
 
