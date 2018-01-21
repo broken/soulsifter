@@ -311,6 +311,7 @@
         this._editedSong.album.update();
       }
 
+      this.$.audio.pause();
       this.$.abstractActionPage.exit();
     },
 
@@ -319,6 +320,7 @@
         return;  // stay on this page
       }
       this._albumArtistCompilation = false;
+      this.$.audio.pause();
       this.$.abstractActionPage.exit();
     },
 
@@ -326,6 +328,7 @@
       this._newSongManager.import(this.filepaths);
       if (!this._hasMoreSongs()) {
         // for some reason there is no song after importing filepaths, so just exit.
+        this.$.audio.pause();
         this.$.abstractActionPage.exit();
       }
     },

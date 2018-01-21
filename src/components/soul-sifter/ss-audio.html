@@ -160,14 +160,23 @@
     },
 
     playAction: function() {
-      if (this.disabled) return;
       if (this.$.playPause.icon === 'av:play-arrow') {
-        this.audio.play();
-        this.$.playPause.icon = 'av:pause';
+        this.play();
       } else {
-        this.audio.pause();
-        this.$.playPause.icon = 'av:play-arrow';
+        this.pause();
       }
+    },
+
+    play: function() {
+      if (this.disabled) return;
+      this.audio.play();
+      this.$.playPause.icon = 'av:pause';
+    },
+
+    pause: function() {
+      if (this.disabled) return;
+      this.audio.pause();
+      this.$.playPause.icon = 'av:play-arrow';
     },
 
     changeCurrentTime: function(event, detail, sender) {
