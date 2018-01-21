@@ -93,6 +93,7 @@
     },
 
     _songChanged: function(newValue, oldValue) {
+      this.set('_currentTimeStr', 'Ø');
       if (!newValue) {
         this.set('src', null);
         return;

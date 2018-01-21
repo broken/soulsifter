@@ -293,6 +293,7 @@
         this._newSongManager.processSong(this._editedSong);
         this._albumArtistCompilation = !this._editedSong.album.albumArtist;
         if (this._hasMoreSongs()) {
+          this.$.audio.pause();
           return;  // stay on this page
         }
         this._albumArtistCompilation = false;
