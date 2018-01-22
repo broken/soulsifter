@@ -151,7 +151,7 @@ MusicVideo* MusicVideoService::associateYouTubeVideo(Song* const song, const str
       
   FILE *fpipe;
   stringstream command;
-  command << "cd " << mvArtistDir << "; youtube-dl --write-thumbnail --restrict-filenames --merge-output-format mp4 www.youtube.com/watch?v=" << id;
+  command << "cd \"" << mvArtistDir << "\"; youtube-dl --write-thumbnail --restrict-filenames --merge-output-format mp4 www.youtube.com/watch?v=" << id;
   if (!(fpipe = (FILE*)popen(command.str().c_str(), "r"))) {
     cerr << "Problem with youtube-dl pipe." << endl;
     return NULL;
