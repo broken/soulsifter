@@ -1,7 +1,6 @@
 #include "TagService.h"
 
 #include <cmath>
-#include <iostream>
 #include <sstream>
 #include <stdlib.h>
 #include <string>
@@ -10,6 +9,7 @@
 #include <boost/algorithm/string.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/regex.hpp>
+#include <g3log/g3log.hpp>
 #include <taglib/attachedpictureframe.h>
 #include <taglib/fileref.h>
 #include <taglib/id3v1tag.h>
@@ -56,7 +56,7 @@ public:
     } else if (boost::algorithm::iends_with(filename, "png")) {
       return "image/png";
     } else {
-      cerr << "Unknown image type for file " << filename << endl;
+      LOG(WARNING) << "Unknown image type for file " << filename;
       return TagLib::String::null;
     }
   }
@@ -97,7 +97,7 @@ const string getId3v2UserText(TagLib::ID3v2::Tag* id3v2, const char* description
 }
 
 bool readId3v2TagAttributes(Song* song, TagLib::ID3v2::Tag* id3v2) {
-  std::cout << "reading tags for song " << song->getId() << std::endl;
+  LOG(INFO) << "reading tags for song " << song->getId();
   bool updated = false;
   bool overwrite = SoulSifterSettings::getInstance().get<bool>("tag.readOverwrite");  // TODO: make option instead of setting
   if (!id3v2 || !song) {
@@ -106,11 +106,11 @@ bool readId3v2TagAttributes(Song* song, TagLib::ID3v2::Tag* id3v2) {
   // bpm
   const string bpm = getId3v2Text(id3v2, "TBPM");
   if (canonicalizeBpm(bpm) != canonicalizeBpm(song->getBpm()) && (overwrite || !canonicalizeBpm(song->getBpm()))) {
-    std::cout << "updating song " << song->getId()
+    LOG(INFO) << "updating song " << song->getId()
          << " bpm from " << song->getBpm()
-         << " to " << bpm << std::endl;
+         << " to " << bpm;
     if (abs(canonicalizeBpm(bpm) - canonicalizeBpm(song->getBpm())) > 3) {
-      std::cerr << "BPM for song " << song->getId() << " was WAY off!" << std::endl;
+      LOG(WARNING) << "BPM for song " << song->getId() << " was WAY off!";
     }
     if (canonicalizeBpm(bpm) > 0) {
       song->setBpm(bpm);
@@ -125,14 +125,14 @@ bool readId3v2TagAttributes(Song* song, TagLib::ID3v2::Tag* id3v2) {
   if (boost::regex_search(grpTag, grpMatch, grpRegex, boost::match_default)) {
     string energystr = grpMatch[1];
     oldKey = grpMatch[2];
-    std::cout << "song " << song->getId() << " from " << grpTag
+    LOG(INFO) << "song " << song->getId() << " from " << grpTag
               << " found energy " << energystr
-              << " and key " << oldKey << std::endl;
+              << " and key " << oldKey;
     int energy = std::atoi(energystr.c_str());
     if (energy != song->getEnergy() && (overwrite || !song->getEnergy())) {
-      std::cout << "updating song " << song->getId()
+      LOG(INFO) << "updating song " << song->getId()
                 << " energy from " << song->getEnergy()
-                << " to " << energy << std::endl;
+                << " to " << energy;
       if (energy > 0) {
         song->setEnergy(energy);
         updated = true;
@@ -144,9 +144,9 @@ bool readId3v2TagAttributes(Song* song, TagLib::ID3v2::Tag* id3v2) {
   std::set<std::string> keys;
   boost::split(keys, keylist, boost::is_any_of("\\"));
   if (keys != song->getTonicKeys() && (overwrite || !song->getTonicKeys().size())) {
-    std::cout << "updating song " << song->getId()
+    LOG(INFO) << "updating song " << song->getId()
          << " keys from " << boost::algorithm::join(song->getTonicKeys(), ",") << " or " << oldKey
-         << " to " << boost::algorithm::join(keys, ",") << std::endl;
+         << " to " << boost::algorithm::join(keys, ",");
     if (keys.size() > 0) {
       // convert old key from sharp to flat
       if (oldKey.length() >= 2 && oldKey[1] == '#') {
@@ -199,7 +199,7 @@ void setId3v2UserText(TagLib::ID3v2::Tag* id3v2, const char* description, const 
 void setId3v2Picture(TagLib::ID3v2::Tag* id3v2, string path, bool replace) {
   TagLib::ID3v2::FrameList frames = id3v2->frameListMap()["APIC"];  // get pictures
   if (!frames.isEmpty() && !replace) {
-    cout << "Picture exists: not replacing." << endl;
+    LOG(INFO) << "Picture exists: not replacing.";
     return;
   } else if (!frames.isEmpty() && replace) {
     id3v2->removeFrames("APIC");
@@ -221,7 +221,7 @@ void TagService::readId3v2Tag(Song* song) {
   if (!boost::filesystem::exists(songFilepath)) {
     songFilepath = SoulSifterSettings::getInstance().get<string>("music.dir") + song->getFilepath();
     if (!boost::filesystem::exists(songFilepath)) {
-      cerr << "unable to find song: " << song->getFilepath() << endl;
+      LOG(WARNING) << "unable to find song: " << song->getFilepath();
     }
   }
   TagLib::MPEG::File f(songFilepath.c_str());
@@ -291,7 +291,7 @@ void TagService::writeId3v2Tag(Song* song) {
     if (!boost::filesystem::exists(songFilepath)) {
       songFilepath = song->getFilepath();
       if (!boost::filesystem::exists(songFilepath)) {
-        cerr << "Unable to save id3v2 tag. File does not exist: " << song->getFilepath() << endl;
+        LOG(WARNING) << "Unable to save id3v2 tag. File does not exist: " << song->getFilepath();
         return;
       }
     }
@@ -367,15 +367,15 @@ void TagService::writeId3v2Tag(Song* song) {
     // save
     bool result = f.save();
     if (!result) {
-      cerr << "unable to save id3v2 tag for " << song->getFilepath() << endl;
+      LOG(WARNING) << "unable to save id3v2 tag for " << song->getFilepath();
     } else {
-      cout << "successfully wrote id3v2 tag for " << song->getFilepath() << endl;
+      LOG(INFO) << "successfully wrote id3v2 tag for " << song->getFilepath();
     }
   }
 }
 
 void TagService::updateSongAttributesFromTags() {
-  std::cout << "updating song attributes from tags" << std::endl;
+  LOG(INFO) << "updating song attributes from tags";
 
   // get max id
   vector<Style*> emptyStyles;
@@ -399,7 +399,7 @@ void TagService::updateSongAttributesFromTags() {
 
     for (Song* song : *songs) {
       if (readId3v2TagAttributes(song)) {
-        std::cout << "updating song " << song->getId() << "'s attributes" << std::endl;
+        LOG(INFO) << "updating song " << song->getId() << "'s attributes";
         song->update();
       }
     }

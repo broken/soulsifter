@@ -13,6 +13,7 @@
 #include <cppconn/connection.h>
 #include <cppconn/prepared_statement.h>
 #include <cppconn/resultset.h>
+#include <g3log/g3log.hpp>
 
 #include "MysqlAccess.h"
 #include "Style.h"
@@ -38,7 +39,7 @@ namespace soulsifter {
         if (rs->next()) {
             stylesCount = rs->getInt(1);
         } else {
-            cerr << "Unable to get total count of styles" << endl;
+            LOG(WARNING) << "Unable to get total count of styles";
             return;
         }
         rs->close();

@@ -6,6 +6,7 @@
 #include <boost/filesystem.hpp>
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/json_parser.hpp>
+#include <g3log/g3log.hpp>
 
 using namespace boost;
 using namespace std;
@@ -19,7 +20,7 @@ namespace soulsifter {
     filename.append("/Library/Application Support/Soul Sifter");
     if (!filesystem::exists(filename)) {
       if (!filesystem::create_directory(filename)) {
-        cerr << "Unable to create settings directory " << filename << endl;
+        LOG(WARNING) << "Unable to create settings directory " << filename;
       }
     }
     filename.append("/settings.json");

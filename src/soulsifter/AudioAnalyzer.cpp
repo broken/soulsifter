@@ -8,7 +8,6 @@
 
 #include "AudioAnalyzer.h"
 
-#include <iostream>
 #include <map>
 #include <sstream>
 #include <stdio.h>
@@ -22,6 +21,7 @@
 #include <boost/algorithm/string/split.hpp>
 #include <boost/bind.hpp>
 #include <boost/ref.hpp>
+#include <g3log/g3log.hpp>
 #include <taglib/mpegfile.h>
 
 #include "DTVectorUtil.h"
@@ -41,7 +41,7 @@ namespace dogatech {
     }
     
     const vector<double> AudioAnalyzer::analyzeBpm(Song *song) {
-      cout << "analyze bpm" << endl;
+      LOG(INFO) << "analyze bpm";
 
       struct stat statBuffer;
       string songFilepath;
@@ -50,7 +50,7 @@ namespace dogatech {
       } else if (stat((SoulSifterSettings::getInstance().get<string>("music.dir") + song->getFilepath()).c_str(), &statBuffer) == 0) {
         songFilepath = SoulSifterSettings::getInstance().get<string>("music.dir") + song->getFilepath();
       } else {
-        cerr << "File does not exist for song " << song->getId() << endl;
+        LOG(WARNING) << "File does not exist for song " << song->getId();
         vector<double> bpms;
         return bpms;
       }
@@ -58,14 +58,14 @@ namespace dogatech {
       TagLib::MPEG::File f(songFilepath.c_str());
       int sampleRate = f.audioProperties()->sampleRate();
       if (sampleRate != 44100) {
-        cout << "Sample rate discovered to be " << sampleRate << " instead of 44100." << endl;
+        LOG(INFO) << "Sample rate discovered to be " << sampleRate << " instead of 44100.";
       }
       breakfastquay::MiniBPM miniBpm(sampleRate);
       
       if (boost::algorithm::iends_with(songFilepath, ".mp3")) {
         detectBpm(songFilepath.c_str(), boost::bind(&breakfastquay::MiniBPM::process, boost::ref(miniBpm), _1, _2));
       } else {
-        cerr << "Unrecognizable file type when analyzing BPM for " << songFilepath << endl;
+        LOG(WARNING) << "Unrecognizable file type when analyzing BPM for " << songFilepath;
         vector<double> bpms;
         return bpms;
       }
@@ -78,7 +78,7 @@ namespace dogatech {
     }
 
     void AudioAnalyzer::analyzeBpms() {
-      cout << "analyze bpms" << endl;
+      LOG(INFO) << "analyze bpms";
 
       vector<Style*> emptyStyles;
       vector<Song*> emptySongs;
@@ -110,7 +110,7 @@ namespace dogatech {
     }
     
     int AudioAnalyzer::analyzeDuration(Song* song) {
-      cout << "analyze duration" << endl;
+      LOG(INFO) << "analyze duration";
 
       struct stat statBuffer;
       string songFilepath;
@@ -119,7 +119,7 @@ namespace dogatech {
       } else if (stat((SoulSifterSettings::getInstance().get<string>("music.dir") + song->getFilepath()).c_str(), &statBuffer) == 0) {
         songFilepath = SoulSifterSettings::getInstance().get<string>("music.dir") + song->getFilepath();
       } else {
-        cerr << "File does not exist for song " << song->getId() << endl;
+        LOG(WARNING) << "File does not exist for song " << song->getId();
         return 0;
       }
 
@@ -129,7 +129,7 @@ namespace dogatech {
     }
 
     void AudioAnalyzer::analyzeDurations() {
-      cout << "analyze durations" << endl;
+      LOG(INFO) << "analyze durations";
 
       vector<Style*> emptyStyles;
       vector<Song*> emptySongs;
@@ -160,7 +160,7 @@ namespace dogatech {
     }
 
     const Keys* AudioAnalyzer::analyzeKey(Song *song) {
-      cout << "analyze key" << endl;
+      LOG(INFO) << "analyze key";
       
       FILE *fpipe;
       stringstream command;
@@ -170,22 +170,21 @@ namespace dogatech {
       
       if (!(fpipe = (FILE*)popen(command.str().c_str(), "r")) ) {
         // If fpipe is NULL
-        cerr << "Problems with sonic annotator pipe." << endl;
+        LOG(WARNING) << "Problems with sonic annotator pipe.";
         return new Keys();
       }
       
       stringstream ss;
       while (fgets(buffer, sizeof buffer, fpipe)) {
-        cout << buffer;
         ss << buffer;
       }
-      cout << endl;
       
       pclose(fpipe);
       
       float lastTime(0);
       map<string, float> keys;
       string output(ss.str());
+      LOG(INFO) << output;
       vector<string> lines;
       boost::split(lines, output, boost::is_any_of("\n"));
       for (string line : lines) {

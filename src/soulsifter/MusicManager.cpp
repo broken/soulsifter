@@ -14,7 +14,6 @@
 #include "MusicManager.h"
 
 #include <algorithm>
-#include <iostream>
 #include <map>
 #include <regex.h>
 #include <stdlib.h>
@@ -25,6 +24,7 @@
 #include <boost/algorithm/string/predicate.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/regex.hpp>
+#include <g3log/g3log.hpp>
 #include <taglib/apetag.h>
 #include <taglib/attachedpictureframe.h>
 #include <taglib/fileref.h>
@@ -93,7 +93,7 @@ void MusicManager::readTagsFromSong(Song* song) {
     if (!boost::filesystem::exists(songFilepath)) {
       songFilepath = SoulSifterSettings::getInstance().get<string>("music.dir") + song->getFilepath();
       if (!boost::filesystem::exists(songFilepath)) {
-        cerr << "unable to find song: " << song->getFilepath() << endl;
+        LOG(WARNING) << "unable to find song: " << song->getFilepath();
       }
     }
   
@@ -299,11 +299,11 @@ bool MusicManager::moveSong(Song* song) {
         filesystem::path dir(fullAlbumPath);
         if (!filesystem::exists(dir)) {
             if (!filesystem::create_directories(dir)) {
-                cerr << "Error occurred while trying to create directory " << fullAlbumPath << endl;
+                LOG(WARNING) << "Error occurred while trying to create directory " << fullAlbumPath;
                 return false;
             }
         } else if (!filesystem::is_directory(dir)) {
-            cerr << "Cannot move file b/c destination is not a directory " << fullAlbumPath << endl;
+            LOG(WARNING) << "Cannot move file b/c destination is not a directory " << fullAlbumPath;
             return false;
         }
     
@@ -320,7 +320,7 @@ bool MusicManager::moveSong(Song* song) {
     
         return true;  //TODO better testing
     } catch (const filesystem::filesystem_error& ex) {
-        cerr << ex.what() << '\n';
+        LOG(WARNING) << ex.what() << '\n';
     }
     return false;
 }
@@ -337,7 +337,7 @@ bool MusicManager::moveSong(Song* song) {
             
             return true;
         } catch (const filesystem::filesystem_error& ex) {
-            cerr << ex.what() << '\n';
+            LOG(WARNING) << ex.what() << '\n';
         }
         return false;
     }
@@ -384,12 +384,12 @@ bool MusicManager::moveSong(Song* song) {
         try {
             filesystem::path musicPath(SoulSifterSettings::getInstance().get<string>("music.dir"));
             if (!filesystem::exists(musicPath) || !filesystem::is_directory(musicPath)) {
-                cerr << "music path does not exist or is not a directory: " << musicPath.string() << endl;
+                LOG(WARNING) << "music path does not exist or is not a directory: " << musicPath.string();
                 return;
             }
             filesystem::path stagingPath(SoulSifterSettings::getInstance().get<string>("staging.dir"));
             if (!filesystem::exists(stagingPath) || !filesystem::is_directory(stagingPath)) {
-                cerr << "staging path does not exist or is not a directory: " << stagingPath.string() << endl;
+                LOG(WARNING) << "staging path does not exist or is not a directory: " << stagingPath.string();
                 return;
             }
             
@@ -408,29 +408,29 @@ bool MusicManager::moveSong(Song* song) {
                     filesystem::path dir(musicPath.string() + subPath);
                     if (!filesystem::exists(dir)) {
                         if (!filesystem::create_directories(dir)) {
-                            cerr << "Error occurred while trying to create directory " << dir.string() << endl;
+                            LOG(WARNING) << "Error occurred while trying to create directory " << dir.string();
                             continue;
                         }
                     } else if (!filesystem::is_directory(dir)) {
-                        cerr << "Cannot move file b/c destination is not a directory " << dir.string() << endl;
+                        LOG(WARNING) << "Cannot move file b/c destination is not a directory " << dir.string();
                         continue;
                     }
                     // move file
                     stringstream destpath;
                     destpath << dir.string() << "/" << it->path().filename().string();
                     filesystem::path dest(destpath.str());
-                    cerr << "Moving " << it->path().string() << " to " << dest.string() << endl;
+                    LOG(INFO) << "Moving " << it->path().string() << " to " << dest.string();
                     filesystem::copy(it->path(), dest);
                     if (filesystem::exists(dest)) {
                         filesystem::path trash("/Users/rneale/.Trash/" + it->path().filename().string());
                         filesystem::rename(it->path(), trash);
                     }
                 } else {
-                    cerr << "wtf is this? " << it->path().string() << endl;
+                    LOG(WARNING) << "wtf is this? " << it->path().string();
                 }
             }
         } catch (const filesystem::filesystem_error& ex) {
-            cerr << ex.what() << '\n';
+            LOG(WARNING) << ex.what() << '\n';
         }
     }
 
@@ -441,10 +441,10 @@ void MusicManager::updateDatabaseBasicGenres() {
     try {
         filesystem::path path(getCopyToPath());
         if (!filesystem::exists(path)) {
-            cerr << "Cannot update db basic genres because path does not exist: " << getCopyToPath() << endl;
+            LOG(WARNING) << "Cannot update db basic genres because path does not exist: " << getCopyToPath();
             return;
         } else if (!filesystem::is_directory(path)) {
-            cerr << "Cannot update db basic genres because path is not a directory: " << getCopyToPath() << endl;
+            LOG(WARNING) << "Cannot update db basic genres because path is not a directory: " << getCopyToPath();
             return;
         }
         
@@ -466,7 +466,7 @@ void MusicManager::updateDatabaseBasicGenres() {
             }
         }
     } catch (const filesystem::filesystem_error& ex) {
-        cerr << ex.what() << '\n';
+        LOG(WARNING) << ex.what() << '\n';
     }
 }
    

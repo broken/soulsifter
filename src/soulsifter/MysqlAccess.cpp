@@ -8,13 +8,11 @@
 
 #include "MysqlAccess.h"
 
-#include <iostream>
 #include <map>
 #include <string>
 
 #include <boost/date_time.hpp>
 #include <boost/regex.hpp>
-/* MySQL Connector/C++ specific headers */
 #include <cppconn/connection.h>
 #include <cppconn/statement.h>
 #include <cppconn/prepared_statement.h>
@@ -23,6 +21,7 @@
 #include <cppconn/resultset_metadata.h>
 #include <cppconn/exception.h>
 #include <cppconn/warning.h>
+#include <g3log/g3log.hpp>
 #include <mysql_driver.h>
 
 #include "SoulSifterSettings.h"
@@ -93,11 +92,8 @@ bool MysqlAccess::connect() {
         connection->setAutoCommit(1);
         connection->setSchema(database);
     } catch (sql::SQLException &e) {
-        std::cout << "ERROR: SQLException in " << __FILE__;
-        std::cout << " (" << __func__<< ") on line " << __LINE__ << std::endl;
-        std::cout << "ERROR: " << e.what();
-        std::cout << " (MySQL error code: " << e.getErrorCode();
-        std::cout << ", SQLState: " << e.getSQLState() << ")" << std::endl;
+        LOG(WARNING) << "ERROR: SQLException in " << __FILE__ << " (" << __func__<< ") on line " << __LINE__;
+        LOG(WARNING) << "ERROR: " << e.what() << " (MySQL error code: " << e.getErrorCode() << ", SQLState: " << e.getSQLState() << ")";
         return false;
 	}
     return true;
@@ -110,11 +106,8 @@ bool MysqlAccess::disconnect() {
         connection = nullptr;
         driver = nullptr;
     } catch (sql::SQLException &e) {
-        std::cout << "ERROR: SQLException in " << __FILE__;
-        std::cout << " (" << __func__<< ") on line " << __LINE__ << std::endl;
-        std::cout << "ERROR: " << e.what();
-        std::cout << " (MySQL error code: " << e.getErrorCode();
-        std::cout << ", SQLState: " << e.getSQLState() << ")" << std::endl;
+        LOG(WARNING) << "ERROR: SQLException in " << __FILE__ << " (" << __func__<< ") on line " << __LINE__;
+        LOG(WARNING) << "ERROR: " << e.what() << " (MySQL error code: " << e.getErrorCode() << ", SQLState: " << e.getSQLState() << ")";
         return false;
     }
     return true;
@@ -122,18 +115,15 @@ bool MysqlAccess::disconnect() {
     
 bool MysqlAccess::reconnect() {
     try {
-        std::cout << "Reconnecing a" << (connection->isValid() ? " valid" : "n invalid") << " connection." << std::endl;
+        LOG(INFO) << "Reconnecing a" << (connection->isValid() ? " valid" : "n invalid") << " connection.";
         connection->reconnect();
         for (const std::pair<std::string, sql::PreparedStatement*>& entry : preparedStatements) {
             delete entry.second;
         }
         preparedStatements.clear();
     } catch (sql::SQLException &e) {
-        std::cout << "ERROR: SQLException in " << __FILE__;
-        std::cout << " (" << __func__<< ") on line " << __LINE__ << std::endl;
-        std::cout << "ERROR: " << e.what();
-        std::cout << " (MySQL error code: " << e.getErrorCode();
-        std::cout << ", SQLState: " << e.getSQLState() << ")" << std::endl;
+        LOG(WARNING) << "ERROR: SQLException in " << __FILE__ << " (" << __func__<< ") on line " << __LINE__;
+        LOG(WARNING) << "ERROR: " << e.what() << " (MySQL error code: " << e.getErrorCode() << ", SQLState: " << e.getSQLState() << ")";
         return false;
     }
     return true;
@@ -151,11 +141,8 @@ sql::PreparedStatement* MysqlAccess::getPreparedStatement(std::string query) {
         }
         return ps;
     } catch (sql::SQLException &e) {
-        std::cout << "ERROR: SQLException in " << __FILE__;
-        std::cout << " (" << __func__<< ") on line " << __LINE__ << std::endl;
-        std::cout << "ERROR: " << e.what();
-        std::cout << " (MySQL error code: " << e.getErrorCode();
-        std::cout << ", SQLState: " << e.getSQLState() << ")" << std::endl;
+        LOG(WARNING) << "ERROR: SQLException in " << __FILE__ << " (" << __func__<< ") on line " << __LINE__;
+        LOG(WARNING) << "ERROR: " << e.what() << " (MySQL error code: " << e.getErrorCode() << ", SQLState: " << e.getSQLState() << ")";
         throw e;
     }
 }
@@ -172,11 +159,8 @@ int MysqlAccess::getLastInsertId() {
         delete rs;
         return id;
     } catch (sql::SQLException &e) {
-        std::cout << "ERROR: SQLException in " << __FILE__;
-        std::cout << " (" << __func__<< ") on line " << __LINE__ << std::endl;
-        std::cout << "ERROR: " << e.what();
-        std::cout << " (MySQL error code: " << e.getErrorCode();
-        std::cout << ", SQLState: " << e.getSQLState() << ")" << std::endl;
+        LOG(WARNING) << "ERROR: SQLException in " << __FILE__ << " (" << __func__<< ") on line " << __LINE__;
+        LOG(WARNING) << "ERROR: " << e.what() << " (MySQL error code: " << e.getErrorCode() << ", SQLState: " << e.getSQLState() << ")";
         throw e;
     }
 }

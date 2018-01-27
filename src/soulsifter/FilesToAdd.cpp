@@ -8,9 +8,10 @@
 
 #include "FilesToAdd.h"
 
-#include <iostream>
+#include <string>
 
 #include <boost/algorithm/string/predicate.hpp>
+#include <g3log/g3log.hpp>
 
 #include "Album.h"
 #include "DTQueueUtil.h"
@@ -69,7 +70,7 @@ namespace dogatech {
           !boost::algorithm::iends_with(path, ".txt") &&
           !boost::algorithm::iends_with(path, ".sfv") &&
           !boost::algorithm::iends_with(path, ".m3u")) {
-        cout << "Unknown file type to be copied: " << path << endl;
+        LOG(WARNING) << "Unknown file type to be copied: " << path;
       }
       string* file = new string(path);
       misc.push(file);

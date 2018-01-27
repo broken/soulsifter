@@ -1,13 +1,13 @@
 #include "NewSongManager.h"
 
 #include <fstream>
-#include <iostream>
 #include <stdio.h>
 #include <string>
 #include <vector>
 
 #include <boost/filesystem.hpp>
 #include <boost/range/iterator_range.hpp>
+#include <g3log/g3log.hpp>
 
 #include "Album.h"
 #include "AlbumPart.h"
@@ -56,7 +56,7 @@ void NewSongManager::preprocessAllFiles(const vector<filesystem::path>& filepath
 
     // skip files starting with period
     if (filepath.filename().string().at(0) == '.') {
-      cout << "skipping " << filepath << endl;
+      LOG(INFO) << "skipping " << filepath;
       continue;
     }
     
@@ -200,7 +200,7 @@ void NewSongManager::trashMusicFile(Song* song) {
 
   // trash old file
   if (remove(oldPath.c_str()) != 0) {
-    cerr << "Unable to delete trashed song file at " << oldPath << endl;
+    LOG(WARNING) << "Unable to delete trashed song file at " << oldPath;
   }
     
   song->setTrashed(true);

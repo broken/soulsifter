@@ -384,7 +384,8 @@ vector<Song*>* SearchUtil::searchSongs(const string& query, int bpm, const set<s
   ss << buildQueryPredicate(atoms);
   ss << buildOptionPredicate(bpm, keys, styles, songsToOmit, limit);
   
-  LOG(DEBUG) << "Query:" << endl << ss.str();
+  LOG(DEBUG) << "Query:";
+  LOG(DEBUG) << ss.str();
   
   vector<Song*>* songs = new vector<Song*>();
   for (int i = 0; i < 3; ++i) {

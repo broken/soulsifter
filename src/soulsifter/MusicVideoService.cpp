@@ -1,6 +1,5 @@
 #include "MusicVideoService.h"
 
-#include <iostream>
 #include <sstream>
 #include <stdio.h>
 #include <string>
@@ -14,6 +13,7 @@
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/range/algorithm_ext/erase.hpp>
 #include <boost/regex.hpp>
+#include <g3log/g3log.hpp>
 
 #include "Album.h"
 #include "BasicGenre.h"
@@ -34,14 +34,14 @@ string removeSpecialCharsFromPath(string filepath) {
   string newPath = boost::remove_erase_if(filepath, boost::is_any_of("'\""));
   if (!newPath.compare(filepath)) return filepath;
 
-  cout << "Renaming '" << filepath << "'' to '" << newPath << "'" << endl;
+  LOG(INFO) << "Renaming '" << filepath << "'' to '" << newPath << "'";
   try {
       boost::filesystem::path src(filepath);
       boost::filesystem::path dest(newPath);
       boost::filesystem::rename(src, dest);
       return newPath;
   } catch (const boost::filesystem::filesystem_error& ex) {
-      cerr << "Unable to rename music video related file '" << filepath << "'\n" << ex.what() << endl;
+      LOG(WARNING) << "Unable to rename music video related file '" << filepath << "'\n" << ex.what();
       return filepath;
   }
 }
@@ -49,17 +49,17 @@ string removeSpecialCharsFromPath(string filepath) {
 }  // namespace
 
 vector<string> MusicVideoService::downloadAudio(const string& url) {
-  cout << "downloadYouTubeAudio with url " << url << endl;
+  LOG(INFO) << "downloadYouTubeAudio with url " << url;
   vector<string> filepaths;
 
   boost::filesystem::path tmpPath(SoulSifterSettings::getInstance().get<string>("dir.tmp"));  // todo: use os.tmpdir()
   if (!boost::filesystem::exists(tmpPath)) {
     if (!boost::filesystem::create_directories(tmpPath)) {
-      cerr << "Unable to create temporary directory " << tmpPath << endl;
+      LOG(WARNING) << "Unable to create temporary directory " << tmpPath;
       return filepaths;
     }
   } else if (!boost::filesystem::is_directory(tmpPath)) {
-    cerr << "Temporary directory is not a directory " << tmpPath << endl;
+    LOG(WARNING) << "Temporary directory is not a directory " << tmpPath;
     return filepaths;
   }
 
@@ -67,13 +67,13 @@ vector<string> MusicVideoService::downloadAudio(const string& url) {
   stringstream command;
   command << "cd " << tmpPath << "; youtube-dl --print-json --write-all-thumbnails --restrict-filenames --extract-audio --audio-format mp3 --audio-quality 0 --quiet " << url;
   if (!(fpipe = (FILE*)popen(command.str().c_str(), "r"))) {
-    cerr << "Problem with youtube-dl pipe." << endl;
+    LOG(WARNING) << "Problem with youtube-dl pipe.";
     return filepaths;
   }
 
   char buffer[1024];
   stringstream ss;
-  cout << "Running command '" << command.str() << "'" << endl;
+  LOG(INFO) << "Running command '" << command.str() << "'";
   while (fgets(buffer, sizeof buffer, fpipe)) {
     ss << buffer;
   }
@@ -124,11 +124,11 @@ vector<string> MusicVideoService::downloadAudio(const string& url) {
 }
 
 MusicVideo* MusicVideoService::associateYouTubeVideo(Song* const song, const string& id) {
-  cout << "Associate YouTube video " << id << " with song " << song->getId() << endl;
+  LOG(INFO) << "Associate YouTube video " << id << " with song " << song->getId();
 
   boost::filesystem::path mvBasePath(SoulSifterSettings::getInstance().get<string>("mv.dir"));
   if (!boost::filesystem::exists(mvBasePath) || !boost::filesystem::is_directory(mvBasePath)) {
-    cerr << "Music video base path does not exist. " << mvBasePath << endl;
+    LOG(WARNING) << "Music video base path does not exist. " << mvBasePath;
     return NULL;
   }
 
@@ -141,11 +141,11 @@ MusicVideo* MusicVideoService::associateYouTubeVideo(Song* const song, const str
   boost::filesystem::path mvArtistPath(mvArtistDir);
   if (!boost::filesystem::exists(mvArtistPath)) {
     if (!boost::filesystem::create_directories(mvArtistPath)) {
-      cerr << "Unable to create music video artist directory " << mvArtistDir << endl;
+      LOG(WARNING) << "Unable to create music video artist directory " << mvArtistDir;
       return NULL;
     }
   } else if (!boost::filesystem::is_directory(mvArtistPath)) {
-    cerr << "Music video artist directory is not a directory " << mvArtistDir << endl;
+    LOG(WARNING) << "Music video artist directory is not a directory " << mvArtistDir;
     return NULL;
   }
       
@@ -153,22 +153,21 @@ MusicVideo* MusicVideoService::associateYouTubeVideo(Song* const song, const str
   stringstream command;
   command << "cd \"" << mvArtistDir << "\"; youtube-dl --write-thumbnail --restrict-filenames --merge-output-format mp4 www.youtube.com/watch?v=" << id;
   if (!(fpipe = (FILE*)popen(command.str().c_str(), "r"))) {
-    cerr << "Problem with youtube-dl pipe." << endl;
+    LOG(WARNING) << "Problem with youtube-dl pipe.";
     return NULL;
   }
   
   char buffer[1024];
   stringstream ss;
-  cout << "Command output for '" << command.str() << "':" << endl;
+  LOG(INFO) << "Command output for '" << command.str() << "':";
   while (fgets(buffer, sizeof buffer, fpipe)) {
-    cout << buffer;
     ss << buffer;
   }
-  cout << endl;
   
   pclose(fpipe);
 
   string output(ss.str());
+  LOG(INFO) << output;
   boost::regex thumbnailRegex("Writing thumbnail to: (.*)$");
   boost::smatch thumbnailMatch;
   boost::regex videoRegex("Merging formats into \"(.*mp4)\"$");
@@ -189,7 +188,7 @@ MusicVideo* MusicVideoService::associateYouTubeVideo(Song* const song, const str
   }
   if (musicVideo->getFilePath().empty()) {
     delete musicVideo;
-    cerr << "Did not find music video file from youtube-dl output." <<endl;
+    LOG(WARNING) << "Did not find music video file from youtube-dl output.";
     return NULL;
   }
 

@@ -11,6 +11,7 @@
 #include <cppconn/connection.h>
 #include <cppconn/prepared_statement.h>
 #include <cppconn/resultset.h>
+#include <g3log/g3log.hpp>
 
 #include "MysqlAccess.h"
 
@@ -67,16 +68,13 @@ namespace soulsifter {
                 ResultSetIterator<Style> *dtrs = new ResultSetIterator<Style>(rs);
                 return dtrs;
             } catch (sql::SQLException &e) {
-                cerr << "ERRO: SQLExceptionR in " << __FILE__;
-                cerr << " (" << __func__<< ") on line " << __LINE__ << endl;
-                cerr << "ERROR: " << e.what();
-                cerr << " (MySQL error code: " << e.getErrorCode();
-                cerr << ", SQLState: " << e.getSQLState() << ")" << endl;
+                LOG(WARNING) << "ERROR: SQLException in " << __FILE__ << " (" << __func__<< ") on line " << __LINE__;
+                LOG(WARNING) << "ERROR: " << e.what() << " (MySQL error code: " << e.getErrorCode() << ", SQLState: " << e.getSQLState() << ")";
                 bool reconnected = MysqlAccess::getInstance().reconnect();
-                std::cout << (reconnected ? "Successful" : "Failed") << " mysql reconnection" << std::endl;
+                LOG(INFO) << (reconnected ? "Successful" : "Failed") << " mysql reconnection";
             }
         }
-        exit(1);
+        LOG(FATAL) << "Unable to complete model operation";
     }
 
 }  // namespace soulsifter

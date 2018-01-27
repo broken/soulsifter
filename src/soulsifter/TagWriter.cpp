@@ -8,6 +8,8 @@
 
 #include "TagWriter.h"
 
+#include <g3log/g3log.hpp>
+
 #include "RESong.h"
 #include "Song.h"
 
@@ -30,7 +32,7 @@ namespace soulsifter {
     }
     
     bool TagWriter::writeAll() {
-        cout << "TagWriter::writeAll" << endl;
+        LOG(INFO) << "TagWriter::writeAll";
         processing = true;
         offset = 0;
         computeSrcLength();
