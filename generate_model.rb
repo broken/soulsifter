@@ -102,7 +102,7 @@ end
 def selectStar(name, fields)
   str = "#{cap(plural(name))}.*";
   fields.select{|f| isVector(f[$type]) && f[$attrib] & Attrib::ID > 0}.each do |f|
-    str << ", group_concat(#{plural(f[$name][0..-4])}.#{f[$attrib] & Attrib::JOINTABLE > 0 ? 'id' : single(f[$name])}) as #{f[$name]}"
+    str << ", group_concat(distinct(#{plural(f[$name][0..-4])}.#{f[$attrib] & Attrib::JOINTABLE > 0 ? 'id' : single(f[$name])})) as #{f[$name]}"
   end
   return str
 end

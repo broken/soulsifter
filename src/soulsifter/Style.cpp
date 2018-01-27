@@ -110,7 +110,7 @@ namespace soulsifter {
     Style* Style::findById(int id) {
         for (int i = 0; i < 3; ++i) {
             try {
-                sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select Styles.*, group_concat(children.childId) as childIds, group_concat(parents.parentId) as parentIds from Styles left outer join StyleChildren children on Styles.id = children.parentId left outer join StyleChildren parents on Styles.id = parents.childId where Styles.id = ? group by Styles.id");
+                sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select Styles.*, group_concat(distinct(children.childId)) as childIds, group_concat(distinct(parents.parentId)) as parentIds from Styles left outer join StyleChildren children on Styles.id = children.parentId left outer join StyleChildren parents on Styles.id = parents.childId where Styles.id = ? group by Styles.id");
                 ps->setInt(1, id);
                 sql::ResultSet *rs = ps->executeQuery();
                 Style *style = NULL;
@@ -135,7 +135,7 @@ namespace soulsifter {
     Style* Style::findByREId(int reId) {
         for (int i = 0; i < 3; ++i) {
             try {
-                sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select Styles.*, group_concat(children.childId) as childIds, group_concat(parents.parentId) as parentIds from Styles left outer join StyleChildren children on Styles.id = children.parentId left outer join StyleChildren parents on Styles.id = parents.childId where ifnull(reId,0) = ifnull(?,0) group by Styles.id");
+                sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select Styles.*, group_concat(distinct(children.childId)) as childIds, group_concat(distinct(parents.parentId)) as parentIds from Styles left outer join StyleChildren children on Styles.id = children.parentId left outer join StyleChildren parents on Styles.id = parents.childId where ifnull(reId,0) = ifnull(?,0) group by Styles.id");
                 if (reId > 0) ps->setInt(1, reId);
                 else ps->setNull(1, sql::DataType::INTEGER);
                 sql::ResultSet *rs = ps->executeQuery();
@@ -159,7 +159,7 @@ namespace soulsifter {
     }
 
     ResultSetIterator<Style>* Style::findAll() {
-        sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select Styles.*, group_concat(children.childId) as childIds, group_concat(parents.parentId) as parentIds from Styles left outer join StyleChildren children on Styles.id = children.parentId left outer join StyleChildren parents on Styles.id = parents.childId group by Styles.id");
+        sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select Styles.*, group_concat(distinct(children.childId)) as childIds, group_concat(distinct(parents.parentId)) as parentIds from Styles left outer join StyleChildren children on Styles.id = children.parentId left outer join StyleChildren parents on Styles.id = parents.childId group by Styles.id");
         sql::ResultSet *rs = ps->executeQuery();
         ResultSetIterator<Style> *dtrs = new ResultSetIterator<Style>(rs);
         return dtrs;

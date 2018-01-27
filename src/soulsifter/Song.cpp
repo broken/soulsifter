@@ -231,7 +231,7 @@ namespace soulsifter {
     Song* Song::findById(int id) {
         for (int i = 0; i < 3; ++i) {
             try {
-                sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select Songs.*, group_concat(styles.styleId) as styleIds from Songs left outer join SongStyles styles on Songs.id = styles.songId where Songs.id = ? group by Songs.id");
+                sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select Songs.*, group_concat(distinct(styles.styleId)) as styleIds from Songs left outer join SongStyles styles on Songs.id = styles.songId where Songs.id = ? group by Songs.id");
                 ps->setInt(1, id);
                 sql::ResultSet *rs = ps->executeQuery();
                 Song *song = NULL;
@@ -256,7 +256,7 @@ namespace soulsifter {
     Song* Song::findByFilepath(const string& filepath) {
         for (int i = 0; i < 3; ++i) {
             try {
-                sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select Songs.*, group_concat(styles.styleId) as styleIds from Songs left outer join SongStyles styles on Songs.id = styles.songId where Songs.filepath = ? group by Songs.id");
+                sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select Songs.*, group_concat(distinct(styles.styleId)) as styleIds from Songs left outer join SongStyles styles on Songs.id = styles.songId where Songs.filepath = ? group by Songs.id");
                 ps->setString(1, filepath);
                 sql::ResultSet *rs = ps->executeQuery();
                 Song *song = NULL;
@@ -281,7 +281,7 @@ namespace soulsifter {
     Song* Song::findByGoogleSongId(const string& googleSongId) {
         for (int i = 0; i < 3; ++i) {
             try {
-                sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select Songs.*, group_concat(styles.styleId) as styleIds from Songs left outer join SongStyles styles on Songs.id = styles.songId where Songs.googleSongId = ? group by Songs.id");
+                sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select Songs.*, group_concat(distinct(styles.styleId)) as styleIds from Songs left outer join SongStyles styles on Songs.id = styles.songId where Songs.googleSongId = ? group by Songs.id");
                 ps->setString(1, googleSongId);
                 sql::ResultSet *rs = ps->executeQuery();
                 Song *song = NULL;
@@ -306,7 +306,7 @@ namespace soulsifter {
     Song* Song::findByRESongId(int reSongId) {
         for (int i = 0; i < 3; ++i) {
             try {
-                sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select Songs.*, group_concat(styles.styleId) as styleIds from Songs left outer join SongStyles styles on Songs.id = styles.songId where ifnull(reSongId,0) = ifnull(?,0) group by Songs.id");
+                sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select Songs.*, group_concat(distinct(styles.styleId)) as styleIds from Songs left outer join SongStyles styles on Songs.id = styles.songId where ifnull(reSongId,0) = ifnull(?,0) group by Songs.id");
                 if (reSongId > 0) ps->setInt(1, reSongId);
                 else ps->setNull(1, sql::DataType::INTEGER);
                 sql::ResultSet *rs = ps->executeQuery();
@@ -330,7 +330,7 @@ namespace soulsifter {
     }
 
     ResultSetIterator<Song>* Song::findAll() {
-        sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select Songs.*, group_concat(styles.styleId) as styleIds from Songs left outer join SongStyles styles on Songs.id = styles.songId group by Songs.id");
+        sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select Songs.*, group_concat(distinct(styles.styleId)) as styleIds from Songs left outer join SongStyles styles on Songs.id = styles.songId group by Songs.id");
         sql::ResultSet *rs = ps->executeQuery();
         ResultSetIterator<Song> *dtrs = new ResultSetIterator<Song>(rs);
         return dtrs;
