@@ -14,13 +14,13 @@
 
 #include <boost/regex.hpp>
 #include <boost/algorithm/string.hpp>
-
 #include <cppconn/connection.h>
 #include <cppconn/statement.h>
 #include <cppconn/prepared_statement.h>
 #include <cppconn/resultset.h>
 #include <cppconn/exception.h>
 #include <cppconn/warning.h>
+#include <g3log/g3log.hpp>
 
 #include "MysqlAccess.h"
 #include "DTVectorUtil.h"
@@ -138,16 +138,13 @@ namespace soulsifter {
 
                 return album;
             } catch (sql::SQLException &e) {
-                cerr << "ERROR: SQLException in " << __FILE__;
-                cerr << " (" << __func__<< ") on line " << __LINE__ << endl;
-                cerr << "ERROR: " << e.what();
-                cerr << " (MySQL error code: " << e.getErrorCode();
-                cerr << ", SQLState: " << e.getSQLState() << ")" << endl;
+                LOG(WARNING) << "ERROR: SQLException in " << __FILE__ << " (" << __func__<< ") on line " << __LINE__;
+                LOG(WARNING) << "ERROR: " << e.what() << " (MySQL error code: " << e.getErrorCode() << ", SQLState: " << e.getSQLState() << ")";
                 bool reconnected = MysqlAccess::getInstance().reconnect();
-                std::cout << (reconnected ? "Successful" : "Failed") << " mysql reconnection" << std::endl;
+                LOG(INFO) << (reconnected ? "Successful" : "Failed") << " mysql reconnection";
             }
         }
-        exit(1);
+        LOG(FATAL) << "Unable to complete model operation";
     }
 
     Album* Album::findByCoverFilepath(const string& coverFilepath) {
@@ -166,16 +163,13 @@ namespace soulsifter {
 
                 return album;
             } catch (sql::SQLException &e) {
-                cerr << "ERROR: SQLException in " << __FILE__;
-                cerr << " (" << __func__<< ") on line " << __LINE__ << endl;
-                cerr << "ERROR: " << e.what();
-                cerr << " (MySQL error code: " << e.getErrorCode();
-                cerr << ", SQLState: " << e.getSQLState() << ")" << endl;
+                LOG(WARNING) << "ERROR: SQLException in " << __FILE__ << " (" << __func__<< ") on line " << __LINE__;
+                LOG(WARNING) << "ERROR: " << e.what() << " (MySQL error code: " << e.getErrorCode() << ", SQLState: " << e.getSQLState() << ")";
                 bool reconnected = MysqlAccess::getInstance().reconnect();
-                std::cout << (reconnected ? "Successful" : "Failed") << " mysql reconnection" << std::endl;
+                LOG(INFO) << (reconnected ? "Successful" : "Failed") << " mysql reconnection";
             }
         }
-        exit(1);
+        LOG(FATAL) << "Unable to complete model operation";
     }
 
     Album* Album::findByNameAndArtist(const string& name, const string& artist) {
@@ -197,16 +191,13 @@ namespace soulsifter {
 
                 return album;
             } catch (sql::SQLException &e) {
-                cerr << "ERROR: SQLException in " << __FILE__;
-                cerr << " (" << __func__<< ") on line " << __LINE__ << endl;
-                cerr << "ERROR: " << e.what();
-                cerr << " (MySQL error code: " << e.getErrorCode();
-                cerr << ", SQLState: " << e.getSQLState() << ")" << endl;
+                LOG(WARNING) << "ERROR: SQLException in " << __FILE__ << " (" << __func__<< ") on line " << __LINE__;
+                LOG(WARNING) << "ERROR: " << e.what() << " (MySQL error code: " << e.getErrorCode() << ", SQLState: " << e.getSQLState() << ")";
                 bool reconnected = MysqlAccess::getInstance().reconnect();
-                std::cout << (reconnected ? "Successful" : "Failed") << " mysql reconnection" << std::endl;
+                LOG(INFO) << (reconnected ? "Successful" : "Failed") << " mysql reconnection";
             }
         }
-        exit(1);
+        LOG(FATAL) << "Unable to complete model operation";
     }
 
     ResultSetIterator<Album>* Album::findAll() {
@@ -256,16 +247,13 @@ namespace soulsifter {
                 int result = ps->executeUpdate();
                 return result;
             } catch (sql::SQLException &e) {
-                cerr << "ERROR: SQLException in " << __FILE__;
-                cerr << " (" << __func__<< ") on line " << __LINE__ << endl;
-                cerr << "ERROR: " << e.what();
-                cerr << " (MySQL error code: " << e.getErrorCode();
-                cerr << ", SQLState: " << e.getSQLState() << ")" << endl;
+                LOG(WARNING) << "ERROR: SQLException in " << __FILE__ << " (" << __func__<< ") on line " << __LINE__;
+                LOG(WARNING) << "ERROR: " << e.what() << " (MySQL error code: " << e.getErrorCode() << ", SQLState: " << e.getSQLState() << ")";
                 bool reconnected = MysqlAccess::getInstance().reconnect();
-                std::cout << (reconnected ? "Successful" : "Failed") << " mysql reconnection" << std::endl;
+                LOG(INFO) << (reconnected ? "Successful" : "Failed") << " mysql reconnection";
             }
         }
-        exit(1);
+        LOG(FATAL) << "Unable to complete model operation";
     }
 
     int Album::save() {
@@ -304,27 +292,24 @@ namespace soulsifter {
                 else ps->setNull(10, sql::DataType::INTEGER);
                 int saved = ps->executeUpdate();
                 if (!saved) {
-                    cerr << "Not able to save album" << endl;
+                    LOG(WARNING) << "Not able to save album";
                     return saved;
                 } else {
                     id = MysqlAccess::getInstance().getLastInsertId();
                     if (id == 0) {
-                        cerr << "Inserted album, but unable to retreive inserted ID." << endl;
+                        LOG(WARNING) << "Inserted album, but unable to retreive inserted ID.";
                         return saved;
                     }
                     return saved;
                 }
             } catch (sql::SQLException &e) {
-                cerr << "ERROR: SQLException in " << __FILE__;
-                cerr << " (" << __func__<< ") on line " << __LINE__ << endl;
-                cerr << "ERROR: " << e.what();
-                cerr << " (MySQL error code: " << e.getErrorCode();
-                cerr << ", SQLState: " << e.getSQLState() << ")" << endl;
+                LOG(WARNING) << "ERROR: SQLException in " << __FILE__ << " (" << __func__<< ") on line " << __LINE__;
+                LOG(WARNING) << "ERROR: " << e.what() << " (MySQL error code: " << e.getErrorCode() << ", SQLState: " << e.getSQLState() << ")";
                 bool reconnected = MysqlAccess::getInstance().reconnect();
-                std::cout << (reconnected ? "Successful" : "Failed") << " mysql reconnection" << std::endl;
+                LOG(INFO) << (reconnected ? "Successful" : "Failed") << " mysql reconnection";
             }
         }
-        exit(1);
+        LOG(FATAL) << "Unable to complete model operation";
     }
 
     bool Album::sync() {
@@ -345,7 +330,7 @@ namespace soulsifter {
         boost::smatch match2;
         if (id != album->getId()) {
             if (id) {
-                cout << "updating album " << id << " id from " << album->getId() << " to " << id << endl;
+                LOG(INFO) << "updating album " << id << " id from " << album->getId() << " to " << id;
                 needsUpdate = true;
             } else {
                 id = album->getId();
@@ -353,7 +338,7 @@ namespace soulsifter {
         }
         if (name.compare(album->getName())  && (!boost::regex_match(name, match1, decimal) || !boost::regex_match(album->getName(), match2, decimal) || match1[1].str().compare(match2[1].str()))) {
             if (!name.empty()) {
-                cout << "updating album " << id << " name from " << album->getName() << " to " << name << endl;
+                LOG(INFO) << "updating album " << id << " name from " << album->getName() << " to " << name;
                 needsUpdate = true;
             } else {
                 name = album->getName();
@@ -361,7 +346,7 @@ namespace soulsifter {
         }
         if (artist.compare(album->getArtist())  && (!boost::regex_match(artist, match1, decimal) || !boost::regex_match(album->getArtist(), match2, decimal) || match1[1].str().compare(match2[1].str()))) {
             if (!artist.empty()) {
-                cout << "updating album " << id << " artist from " << album->getArtist() << " to " << artist << endl;
+                LOG(INFO) << "updating album " << id << " artist from " << album->getArtist() << " to " << artist;
                 needsUpdate = true;
             } else {
                 artist = album->getArtist();
@@ -369,7 +354,7 @@ namespace soulsifter {
         }
         if (coverFilepath.compare(album->getCoverFilepath())  && (!boost::regex_match(coverFilepath, match1, decimal) || !boost::regex_match(album->getCoverFilepath(), match2, decimal) || match1[1].str().compare(match2[1].str()))) {
             if (!coverFilepath.empty()) {
-                cout << "updating album " << id << " coverFilepath from " << album->getCoverFilepath() << " to " << coverFilepath << endl;
+                LOG(INFO) << "updating album " << id << " coverFilepath from " << album->getCoverFilepath() << " to " << coverFilepath;
                 needsUpdate = true;
             } else {
                 coverFilepath = album->getCoverFilepath();
@@ -377,7 +362,7 @@ namespace soulsifter {
         }
         if (mixed != album->getMixed()) {
             if (mixed) {
-                cout << "updating album " << id << " mixed from " << album->getMixed() << " to " << mixed << endl;
+                LOG(INFO) << "updating album " << id << " mixed from " << album->getMixed() << " to " << mixed;
                 needsUpdate = true;
             } else {
                 mixed = album->getMixed();
@@ -385,7 +370,7 @@ namespace soulsifter {
         }
         if (label.compare(album->getLabel())  && (!boost::regex_match(label, match1, decimal) || !boost::regex_match(album->getLabel(), match2, decimal) || match1[1].str().compare(match2[1].str()))) {
             if (!label.empty()) {
-                cout << "updating album " << id << " label from " << album->getLabel() << " to " << label << endl;
+                LOG(INFO) << "updating album " << id << " label from " << album->getLabel() << " to " << label;
                 needsUpdate = true;
             } else {
                 label = album->getLabel();
@@ -393,7 +378,7 @@ namespace soulsifter {
         }
         if (catalogId.compare(album->getCatalogId())  && (!boost::regex_match(catalogId, match1, decimal) || !boost::regex_match(album->getCatalogId(), match2, decimal) || match1[1].str().compare(match2[1].str()))) {
             if (!catalogId.empty()) {
-                cout << "updating album " << id << " catalogId from " << album->getCatalogId() << " to " << catalogId << endl;
+                LOG(INFO) << "updating album " << id << " catalogId from " << album->getCatalogId() << " to " << catalogId;
                 needsUpdate = true;
             } else {
                 catalogId = album->getCatalogId();
@@ -401,7 +386,7 @@ namespace soulsifter {
         }
         if (releaseDateYear != album->getReleaseDateYear()) {
             if (releaseDateYear) {
-                cout << "updating album " << id << " releaseDateYear from " << album->getReleaseDateYear() << " to " << releaseDateYear << endl;
+                LOG(INFO) << "updating album " << id << " releaseDateYear from " << album->getReleaseDateYear() << " to " << releaseDateYear;
                 needsUpdate = true;
             } else {
                 releaseDateYear = album->getReleaseDateYear();
@@ -409,7 +394,7 @@ namespace soulsifter {
         }
         if (releaseDateMonth != album->getReleaseDateMonth()) {
             if (releaseDateMonth) {
-                cout << "updating album " << id << " releaseDateMonth from " << album->getReleaseDateMonth() << " to " << releaseDateMonth << endl;
+                LOG(INFO) << "updating album " << id << " releaseDateMonth from " << album->getReleaseDateMonth() << " to " << releaseDateMonth;
                 needsUpdate = true;
             } else {
                 releaseDateMonth = album->getReleaseDateMonth();
@@ -417,7 +402,7 @@ namespace soulsifter {
         }
         if (releaseDateDay != album->getReleaseDateDay()) {
             if (releaseDateDay) {
-                cout << "updating album " << id << " releaseDateDay from " << album->getReleaseDateDay() << " to " << releaseDateDay << endl;
+                LOG(INFO) << "updating album " << id << " releaseDateDay from " << album->getReleaseDateDay() << " to " << releaseDateDay;
                 needsUpdate = true;
             } else {
                 releaseDateDay = album->getReleaseDateDay();
@@ -425,7 +410,7 @@ namespace soulsifter {
         }
         if (basicGenreId != album->getBasicGenreId()) {
             if (basicGenreId) {
-                cout << "updating album " << id << " basicGenreId from " << album->getBasicGenreId() << " to " << basicGenreId << endl;
+                LOG(INFO) << "updating album " << id << " basicGenreId from " << album->getBasicGenreId() << " to " << basicGenreId;
                 needsUpdate = true;
             } else {
                 basicGenreId = album->getBasicGenreId();

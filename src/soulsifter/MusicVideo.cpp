@@ -14,13 +14,13 @@
 
 #include <boost/regex.hpp>
 #include <boost/algorithm/string.hpp>
-
 #include <cppconn/connection.h>
 #include <cppconn/statement.h>
 #include <cppconn/prepared_statement.h>
 #include <cppconn/resultset.h>
 #include <cppconn/exception.h>
 #include <cppconn/warning.h>
+#include <g3log/g3log.hpp>
 
 #include "MysqlAccess.h"
 #include "DTVectorUtil.h"
@@ -103,16 +103,13 @@ namespace soulsifter {
 
                 return musicVideo;
             } catch (sql::SQLException &e) {
-                cerr << "ERROR: SQLException in " << __FILE__;
-                cerr << " (" << __func__<< ") on line " << __LINE__ << endl;
-                cerr << "ERROR: " << e.what();
-                cerr << " (MySQL error code: " << e.getErrorCode();
-                cerr << ", SQLState: " << e.getSQLState() << ")" << endl;
+                LOG(WARNING) << "ERROR: SQLException in " << __FILE__ << " (" << __func__<< ") on line " << __LINE__;
+                LOG(WARNING) << "ERROR: " << e.what() << " (MySQL error code: " << e.getErrorCode() << ", SQLState: " << e.getSQLState() << ")";
                 bool reconnected = MysqlAccess::getInstance().reconnect();
-                std::cout << (reconnected ? "Successful" : "Failed") << " mysql reconnection" << std::endl;
+                LOG(INFO) << (reconnected ? "Successful" : "Failed") << " mysql reconnection";
             }
         }
-        exit(1);
+        LOG(FATAL) << "Unable to complete model operation";
     }
 
     MusicVideo* MusicVideo::findBySongId(int songId) {
@@ -131,16 +128,13 @@ namespace soulsifter {
 
                 return musicVideo;
             } catch (sql::SQLException &e) {
-                cerr << "ERROR: SQLException in " << __FILE__;
-                cerr << " (" << __func__<< ") on line " << __LINE__ << endl;
-                cerr << "ERROR: " << e.what();
-                cerr << " (MySQL error code: " << e.getErrorCode();
-                cerr << ", SQLState: " << e.getSQLState() << ")" << endl;
+                LOG(WARNING) << "ERROR: SQLException in " << __FILE__ << " (" << __func__<< ") on line " << __LINE__;
+                LOG(WARNING) << "ERROR: " << e.what() << " (MySQL error code: " << e.getErrorCode() << ", SQLState: " << e.getSQLState() << ")";
                 bool reconnected = MysqlAccess::getInstance().reconnect();
-                std::cout << (reconnected ? "Successful" : "Failed") << " mysql reconnection" << std::endl;
+                LOG(INFO) << (reconnected ? "Successful" : "Failed") << " mysql reconnection";
             }
         }
-        exit(1);
+        LOG(FATAL) << "Unable to complete model operation";
     }
 
     ResultSetIterator<MusicVideo>* MusicVideo::findAll() {
@@ -177,16 +171,13 @@ namespace soulsifter {
                 int result = ps->executeUpdate();
                 return result;
             } catch (sql::SQLException &e) {
-                cerr << "ERROR: SQLException in " << __FILE__;
-                cerr << " (" << __func__<< ") on line " << __LINE__ << endl;
-                cerr << "ERROR: " << e.what();
-                cerr << " (MySQL error code: " << e.getErrorCode();
-                cerr << ", SQLState: " << e.getSQLState() << ")" << endl;
+                LOG(WARNING) << "ERROR: SQLException in " << __FILE__ << " (" << __func__<< ") on line " << __LINE__;
+                LOG(WARNING) << "ERROR: " << e.what() << " (MySQL error code: " << e.getErrorCode() << ", SQLState: " << e.getSQLState() << ")";
                 bool reconnected = MysqlAccess::getInstance().reconnect();
-                std::cout << (reconnected ? "Successful" : "Failed") << " mysql reconnection" << std::endl;
+                LOG(INFO) << (reconnected ? "Successful" : "Failed") << " mysql reconnection";
             }
         }
-        exit(1);
+        LOG(FATAL) << "Unable to complete model operation";
     }
 
     int MusicVideo::save() {
@@ -212,27 +203,24 @@ namespace soulsifter {
                 else ps->setNull(3, sql::DataType::VARCHAR);
                 int saved = ps->executeUpdate();
                 if (!saved) {
-                    cerr << "Not able to save musicVideo" << endl;
+                    LOG(WARNING) << "Not able to save musicVideo";
                     return saved;
                 } else {
                     id = MysqlAccess::getInstance().getLastInsertId();
                     if (id == 0) {
-                        cerr << "Inserted musicVideo, but unable to retreive inserted ID." << endl;
+                        LOG(WARNING) << "Inserted musicVideo, but unable to retreive inserted ID.";
                         return saved;
                     }
                     return saved;
                 }
             } catch (sql::SQLException &e) {
-                cerr << "ERROR: SQLException in " << __FILE__;
-                cerr << " (" << __func__<< ") on line " << __LINE__ << endl;
-                cerr << "ERROR: " << e.what();
-                cerr << " (MySQL error code: " << e.getErrorCode();
-                cerr << ", SQLState: " << e.getSQLState() << ")" << endl;
+                LOG(WARNING) << "ERROR: SQLException in " << __FILE__ << " (" << __func__<< ") on line " << __LINE__;
+                LOG(WARNING) << "ERROR: " << e.what() << " (MySQL error code: " << e.getErrorCode() << ", SQLState: " << e.getSQLState() << ")";
                 bool reconnected = MysqlAccess::getInstance().reconnect();
-                std::cout << (reconnected ? "Successful" : "Failed") << " mysql reconnection" << std::endl;
+                LOG(INFO) << (reconnected ? "Successful" : "Failed") << " mysql reconnection";
             }
         }
-        exit(1);
+        LOG(FATAL) << "Unable to complete model operation";
     }
 
     bool MusicVideo::sync() {
@@ -252,7 +240,7 @@ namespace soulsifter {
         boost::smatch match2;
         if (id != musicVideo->getId()) {
             if (id) {
-                cout << "updating musicVideo " << id << " id from " << musicVideo->getId() << " to " << id << endl;
+                LOG(INFO) << "updating musicVideo " << id << " id from " << musicVideo->getId() << " to " << id;
                 needsUpdate = true;
             } else {
                 id = musicVideo->getId();
@@ -260,7 +248,7 @@ namespace soulsifter {
         }
         if (songId != musicVideo->getSongId()) {
             if (songId) {
-                cout << "updating musicVideo " << id << " songId from " << musicVideo->getSongId() << " to " << songId << endl;
+                LOG(INFO) << "updating musicVideo " << id << " songId from " << musicVideo->getSongId() << " to " << songId;
                 needsUpdate = true;
             } else {
                 songId = musicVideo->getSongId();
@@ -269,7 +257,7 @@ namespace soulsifter {
         if (song) needsUpdate |= song->sync();
         if (filePath.compare(musicVideo->getFilePath())  && (!boost::regex_match(filePath, match1, decimal) || !boost::regex_match(musicVideo->getFilePath(), match2, decimal) || match1[1].str().compare(match2[1].str()))) {
             if (!filePath.empty()) {
-                cout << "updating musicVideo " << id << " filePath from " << musicVideo->getFilePath() << " to " << filePath << endl;
+                LOG(INFO) << "updating musicVideo " << id << " filePath from " << musicVideo->getFilePath() << " to " << filePath;
                 needsUpdate = true;
             } else {
                 filePath = musicVideo->getFilePath();
@@ -277,7 +265,7 @@ namespace soulsifter {
         }
         if (thumbnailFilePath.compare(musicVideo->getThumbnailFilePath())  && (!boost::regex_match(thumbnailFilePath, match1, decimal) || !boost::regex_match(musicVideo->getThumbnailFilePath(), match2, decimal) || match1[1].str().compare(match2[1].str()))) {
             if (!thumbnailFilePath.empty()) {
-                cout << "updating musicVideo " << id << " thumbnailFilePath from " << musicVideo->getThumbnailFilePath() << " to " << thumbnailFilePath << endl;
+                LOG(INFO) << "updating musicVideo " << id << " thumbnailFilePath from " << musicVideo->getThumbnailFilePath() << " to " << thumbnailFilePath;
                 needsUpdate = true;
             } else {
                 thumbnailFilePath = musicVideo->getThumbnailFilePath();

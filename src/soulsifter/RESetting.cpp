@@ -14,13 +14,13 @@
 
 #include <boost/regex.hpp>
 #include <boost/algorithm/string.hpp>
-
 #include <cppconn/connection.h>
 #include <cppconn/statement.h>
 #include <cppconn/prepared_statement.h>
 #include <cppconn/resultset.h>
 #include <cppconn/exception.h>
 #include <cppconn/warning.h>
+#include <g3log/g3log.hpp>
 
 #include "MysqlAccess.h"
 #include "DTVectorUtil.h"
@@ -83,16 +83,13 @@ namespace soulsifter {
 
                 return reSetting;
             } catch (sql::SQLException &e) {
-                cerr << "ERROR: SQLException in " << __FILE__;
-                cerr << " (" << __func__<< ") on line " << __LINE__ << endl;
-                cerr << "ERROR: " << e.what();
-                cerr << " (MySQL error code: " << e.getErrorCode();
-                cerr << ", SQLState: " << e.getSQLState() << ")" << endl;
+                LOG(WARNING) << "ERROR: SQLException in " << __FILE__ << " (" << __func__<< ") on line " << __LINE__;
+                LOG(WARNING) << "ERROR: " << e.what() << " (MySQL error code: " << e.getErrorCode() << ", SQLState: " << e.getSQLState() << ")";
                 bool reconnected = MysqlAccess::getInstance().reconnect();
-                std::cout << (reconnected ? "Successful" : "Failed") << " mysql reconnection" << std::endl;
+                LOG(INFO) << (reconnected ? "Successful" : "Failed") << " mysql reconnection";
             }
         }
-        exit(1);
+        LOG(FATAL) << "Unable to complete model operation";
     }
 
     RESetting* RESetting::findByName(const string& name) {
@@ -112,16 +109,13 @@ namespace soulsifter {
 
                 return reSetting;
             } catch (sql::SQLException &e) {
-                cerr << "ERROR: SQLException in " << __FILE__;
-                cerr << " (" << __func__<< ") on line " << __LINE__ << endl;
-                cerr << "ERROR: " << e.what();
-                cerr << " (MySQL error code: " << e.getErrorCode();
-                cerr << ", SQLState: " << e.getSQLState() << ")" << endl;
+                LOG(WARNING) << "ERROR: SQLException in " << __FILE__ << " (" << __func__<< ") on line " << __LINE__;
+                LOG(WARNING) << "ERROR: " << e.what() << " (MySQL error code: " << e.getErrorCode() << ", SQLState: " << e.getSQLState() << ")";
                 bool reconnected = MysqlAccess::getInstance().reconnect();
-                std::cout << (reconnected ? "Successful" : "Failed") << " mysql reconnection" << std::endl;
+                LOG(INFO) << (reconnected ? "Successful" : "Failed") << " mysql reconnection";
             }
         }
-        exit(1);
+        LOG(FATAL) << "Unable to complete model operation";
     }
 
     ResultSetIterator<RESetting>* RESetting::findAll() {
@@ -146,16 +140,13 @@ namespace soulsifter {
                 int result = ps->executeUpdate();
                 return result;
             } catch (sql::SQLException &e) {
-                cerr << "ERROR: SQLException in " << __FILE__;
-                cerr << " (" << __func__<< ") on line " << __LINE__ << endl;
-                cerr << "ERROR: " << e.what();
-                cerr << " (MySQL error code: " << e.getErrorCode();
-                cerr << ", SQLState: " << e.getSQLState() << ")" << endl;
+                LOG(WARNING) << "ERROR: SQLException in " << __FILE__ << " (" << __func__<< ") on line " << __LINE__;
+                LOG(WARNING) << "ERROR: " << e.what() << " (MySQL error code: " << e.getErrorCode() << ", SQLState: " << e.getSQLState() << ")";
                 bool reconnected = MysqlAccess::getInstance().reconnect();
-                std::cout << (reconnected ? "Successful" : "Failed") << " mysql reconnection" << std::endl;
+                LOG(INFO) << (reconnected ? "Successful" : "Failed") << " mysql reconnection";
             }
         }
-        exit(1);
+        LOG(FATAL) << "Unable to complete model operation";
     }
 
     int RESetting::save() {
@@ -169,27 +160,24 @@ namespace soulsifter {
                 else ps->setNull(2, sql::DataType::VARCHAR);
                 int saved = ps->executeUpdate();
                 if (!saved) {
-                    cerr << "Not able to save reSetting" << endl;
+                    LOG(WARNING) << "Not able to save reSetting";
                     return saved;
                 } else {
                     id = MysqlAccess::getInstance().getLastInsertId();
                     if (id == 0) {
-                        cerr << "Inserted reSetting, but unable to retreive inserted ID." << endl;
+                        LOG(WARNING) << "Inserted reSetting, but unable to retreive inserted ID.";
                         return saved;
                     }
                     return saved;
                 }
             } catch (sql::SQLException &e) {
-                cerr << "ERROR: SQLException in " << __FILE__;
-                cerr << " (" << __func__<< ") on line " << __LINE__ << endl;
-                cerr << "ERROR: " << e.what();
-                cerr << " (MySQL error code: " << e.getErrorCode();
-                cerr << ", SQLState: " << e.getSQLState() << ")" << endl;
+                LOG(WARNING) << "ERROR: SQLException in " << __FILE__ << " (" << __func__<< ") on line " << __LINE__;
+                LOG(WARNING) << "ERROR: " << e.what() << " (MySQL error code: " << e.getErrorCode() << ", SQLState: " << e.getSQLState() << ")";
                 bool reconnected = MysqlAccess::getInstance().reconnect();
-                std::cout << (reconnected ? "Successful" : "Failed") << " mysql reconnection" << std::endl;
+                LOG(INFO) << (reconnected ? "Successful" : "Failed") << " mysql reconnection";
             }
         }
-        exit(1);
+        LOG(FATAL) << "Unable to complete model operation";
     }
 
     bool RESetting::sync() {
@@ -204,7 +192,7 @@ namespace soulsifter {
         boost::smatch match2;
         if (id != reSetting->getId()) {
             if (id) {
-                cout << "updating reSetting " << id << " id from " << reSetting->getId() << " to " << id << endl;
+                LOG(INFO) << "updating reSetting " << id << " id from " << reSetting->getId() << " to " << id;
                 needsUpdate = true;
             } else {
                 id = reSetting->getId();
@@ -212,7 +200,7 @@ namespace soulsifter {
         }
         if (name.compare(reSetting->getName())  && (!boost::regex_match(name, match1, decimal) || !boost::regex_match(reSetting->getName(), match2, decimal) || match1[1].str().compare(match2[1].str()))) {
             if (!name.empty()) {
-                cout << "updating reSetting " << id << " name from " << reSetting->getName() << " to " << name << endl;
+                LOG(INFO) << "updating reSetting " << id << " name from " << reSetting->getName() << " to " << name;
                 needsUpdate = true;
             } else {
                 name = reSetting->getName();
@@ -220,7 +208,7 @@ namespace soulsifter {
         }
         if (value.compare(reSetting->getValue())  && (!boost::regex_match(value, match1, decimal) || !boost::regex_match(reSetting->getValue(), match2, decimal) || match1[1].str().compare(match2[1].str()))) {
             if (!value.empty()) {
-                cout << "updating reSetting " << id << " value from " << reSetting->getValue() << " to " << value << endl;
+                LOG(INFO) << "updating reSetting " << id << " value from " << reSetting->getValue() << " to " << value;
                 needsUpdate = true;
             } else {
                 value = reSetting->getValue();

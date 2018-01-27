@@ -14,13 +14,13 @@
 
 #include <boost/regex.hpp>
 #include <boost/algorithm/string.hpp>
-
 #include <cppconn/connection.h>
 #include <cppconn/statement.h>
 #include <cppconn/prepared_statement.h>
 #include <cppconn/resultset.h>
 #include <cppconn/exception.h>
 #include <cppconn/warning.h>
+#include <g3log/g3log.hpp>
 
 #include "MysqlAccess.h"
 #include "DTVectorUtil.h"
@@ -123,16 +123,13 @@ namespace soulsifter {
 
                 return playlistEntry;
             } catch (sql::SQLException &e) {
-                cerr << "ERROR: SQLException in " << __FILE__;
-                cerr << " (" << __func__<< ") on line " << __LINE__ << endl;
-                cerr << "ERROR: " << e.what();
-                cerr << " (MySQL error code: " << e.getErrorCode();
-                cerr << ", SQLState: " << e.getSQLState() << ")" << endl;
+                LOG(WARNING) << "ERROR: SQLException in " << __FILE__ << " (" << __func__<< ") on line " << __LINE__;
+                LOG(WARNING) << "ERROR: " << e.what() << " (MySQL error code: " << e.getErrorCode() << ", SQLState: " << e.getSQLState() << ")";
                 bool reconnected = MysqlAccess::getInstance().reconnect();
-                std::cout << (reconnected ? "Successful" : "Failed") << " mysql reconnection" << std::endl;
+                LOG(INFO) << (reconnected ? "Successful" : "Failed") << " mysql reconnection";
             }
         }
-        exit(1);
+        LOG(FATAL) << "Unable to complete model operation";
     }
 
     PlaylistEntry* PlaylistEntry::findByPlaylistIdAndSongId(int playlistId, int songId) {
@@ -154,16 +151,13 @@ namespace soulsifter {
 
                 return playlistEntry;
             } catch (sql::SQLException &e) {
-                cerr << "ERROR: SQLException in " << __FILE__;
-                cerr << " (" << __func__<< ") on line " << __LINE__ << endl;
-                cerr << "ERROR: " << e.what();
-                cerr << " (MySQL error code: " << e.getErrorCode();
-                cerr << ", SQLState: " << e.getSQLState() << ")" << endl;
+                LOG(WARNING) << "ERROR: SQLException in " << __FILE__ << " (" << __func__<< ") on line " << __LINE__;
+                LOG(WARNING) << "ERROR: " << e.what() << " (MySQL error code: " << e.getErrorCode() << ", SQLState: " << e.getSQLState() << ")";
                 bool reconnected = MysqlAccess::getInstance().reconnect();
-                std::cout << (reconnected ? "Successful" : "Failed") << " mysql reconnection" << std::endl;
+                LOG(INFO) << (reconnected ? "Successful" : "Failed") << " mysql reconnection";
             }
         }
-        exit(1);
+        LOG(FATAL) << "Unable to complete model operation";
     }
 
     ResultSetIterator<PlaylistEntry>* PlaylistEntry::findAll() {
@@ -212,16 +206,13 @@ namespace soulsifter {
                 int result = ps->executeUpdate();
                 return result;
             } catch (sql::SQLException &e) {
-                cerr << "ERROR: SQLException in " << __FILE__;
-                cerr << " (" << __func__<< ") on line " << __LINE__ << endl;
-                cerr << "ERROR: " << e.what();
-                cerr << " (MySQL error code: " << e.getErrorCode();
-                cerr << ", SQLState: " << e.getSQLState() << ")" << endl;
+                LOG(WARNING) << "ERROR: SQLException in " << __FILE__ << " (" << __func__<< ") on line " << __LINE__;
+                LOG(WARNING) << "ERROR: " << e.what() << " (MySQL error code: " << e.getErrorCode() << ", SQLState: " << e.getSQLState() << ")";
                 bool reconnected = MysqlAccess::getInstance().reconnect();
-                std::cout << (reconnected ? "Successful" : "Failed") << " mysql reconnection" << std::endl;
+                LOG(INFO) << (reconnected ? "Successful" : "Failed") << " mysql reconnection";
             }
         }
-        exit(1);
+        LOG(FATAL) << "Unable to complete model operation";
     }
 
     int PlaylistEntry::save() {
@@ -259,27 +250,24 @@ namespace soulsifter {
                 else ps->setNull(4, sql::DataType::VARCHAR);
                 int saved = ps->executeUpdate();
                 if (!saved) {
-                    cerr << "Not able to save playlistEntry" << endl;
+                    LOG(WARNING) << "Not able to save playlistEntry";
                     return saved;
                 } else {
                     id = MysqlAccess::getInstance().getLastInsertId();
                     if (id == 0) {
-                        cerr << "Inserted playlistEntry, but unable to retreive inserted ID." << endl;
+                        LOG(WARNING) << "Inserted playlistEntry, but unable to retreive inserted ID.";
                         return saved;
                     }
                     return saved;
                 }
             } catch (sql::SQLException &e) {
-                cerr << "ERROR: SQLException in " << __FILE__;
-                cerr << " (" << __func__<< ") on line " << __LINE__ << endl;
-                cerr << "ERROR: " << e.what();
-                cerr << " (MySQL error code: " << e.getErrorCode();
-                cerr << ", SQLState: " << e.getSQLState() << ")" << endl;
+                LOG(WARNING) << "ERROR: SQLException in " << __FILE__ << " (" << __func__<< ") on line " << __LINE__;
+                LOG(WARNING) << "ERROR: " << e.what() << " (MySQL error code: " << e.getErrorCode() << ", SQLState: " << e.getSQLState() << ")";
                 bool reconnected = MysqlAccess::getInstance().reconnect();
-                std::cout << (reconnected ? "Successful" : "Failed") << " mysql reconnection" << std::endl;
+                LOG(INFO) << (reconnected ? "Successful" : "Failed") << " mysql reconnection";
             }
         }
-        exit(1);
+        LOG(FATAL) << "Unable to complete model operation";
     }
 
     bool PlaylistEntry::sync() {
@@ -304,7 +292,7 @@ namespace soulsifter {
         boost::smatch match2;
         if (id != playlistEntry->getId()) {
             if (id) {
-                cout << "updating playlistEntry " << id << " id from " << playlistEntry->getId() << " to " << id << endl;
+                LOG(INFO) << "updating playlistEntry " << id << " id from " << playlistEntry->getId() << " to " << id;
                 needsUpdate = true;
             } else {
                 id = playlistEntry->getId();
@@ -312,7 +300,7 @@ namespace soulsifter {
         }
         if (playlistId != playlistEntry->getPlaylistId()) {
             if (playlistId) {
-                cout << "updating playlistEntry " << id << " playlistId from " << playlistEntry->getPlaylistId() << " to " << playlistId << endl;
+                LOG(INFO) << "updating playlistEntry " << id << " playlistId from " << playlistEntry->getPlaylistId() << " to " << playlistId;
                 needsUpdate = true;
             } else {
                 playlistId = playlistEntry->getPlaylistId();
@@ -321,7 +309,7 @@ namespace soulsifter {
         if (playlist) needsUpdate |= playlist->sync();
         if (songId != playlistEntry->getSongId()) {
             if (songId) {
-                cout << "updating playlistEntry " << id << " songId from " << playlistEntry->getSongId() << " to " << songId << endl;
+                LOG(INFO) << "updating playlistEntry " << id << " songId from " << playlistEntry->getSongId() << " to " << songId;
                 needsUpdate = true;
             } else {
                 songId = playlistEntry->getSongId();
@@ -330,7 +318,7 @@ namespace soulsifter {
         if (song) needsUpdate |= song->sync();
         if (position != playlistEntry->getPosition()) {
             if (position) {
-                cout << "updating playlistEntry " << id << " position from " << playlistEntry->getPosition() << " to " << position << endl;
+                LOG(INFO) << "updating playlistEntry " << id << " position from " << playlistEntry->getPosition() << " to " << position;
                 needsUpdate = true;
             } else {
                 position = playlistEntry->getPosition();
@@ -338,7 +326,7 @@ namespace soulsifter {
         }
         if (time.compare(playlistEntry->getTime())  && (!boost::regex_match(time, match1, decimal) || !boost::regex_match(playlistEntry->getTime(), match2, decimal) || match1[1].str().compare(match2[1].str()))) {
             if (!time.empty()) {
-                cout << "updating playlistEntry " << id << " time from " << playlistEntry->getTime() << " to " << time << endl;
+                LOG(INFO) << "updating playlistEntry " << id << " time from " << playlistEntry->getTime() << " to " << time;
                 needsUpdate = true;
             } else {
                 time = playlistEntry->getTime();
@@ -354,20 +342,17 @@ namespace soulsifter {
                 ps->setInt(1, id);
                 int erased = ps->executeUpdate();
                 if (!erased) {
-                    cerr << "Not able to erase playlistEntry" << endl;
+                    LOG(WARNING) << "Not able to erase playlistEntry";
                 }
                 return erased;
             } catch (sql::SQLException &e) {
-                cerr << "ERROR: SQLException in " << __FILE__;
-                cerr << " (" << __func__<< ") on line " << __LINE__ << endl;
-                cerr << "ERROR: " << e.what();
-                cerr << " (MySQL error code: " << e.getErrorCode();
-                cerr << ", SQLState: " << e.getSQLState() << ")" << endl;
+                LOG(WARNING) << "ERROR: SQLException in " << __FILE__ << " (" << __func__<< ") on line " << __LINE__;
+                LOG(WARNING) << "ERROR: " << e.what() << " (MySQL error code: " << e.getErrorCode() << ", SQLState: " << e.getSQLState() << ")";
                 bool reconnected = MysqlAccess::getInstance().reconnect();
-                std::cout << (reconnected ? "Successful" : "Failed") << " mysql reconnection" << std::endl;
+                LOG(INFO) << (reconnected ? "Successful" : "Failed") << " mysql reconnection";
             }
         }
-        exit(1);
+        LOG(FATAL) << "Unable to complete model operation";
     }
 
 

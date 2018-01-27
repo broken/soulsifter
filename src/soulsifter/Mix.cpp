@@ -14,13 +14,13 @@
 
 #include <boost/regex.hpp>
 #include <boost/algorithm/string.hpp>
-
 #include <cppconn/connection.h>
 #include <cppconn/statement.h>
 #include <cppconn/prepared_statement.h>
 #include <cppconn/resultset.h>
 #include <cppconn/exception.h>
 #include <cppconn/warning.h>
+#include <g3log/g3log.hpp>
 
 #include "MysqlAccess.h"
 #include "DTVectorUtil.h"
@@ -132,16 +132,13 @@ namespace soulsifter {
 
                 return mix;
             } catch (sql::SQLException &e) {
-                cerr << "ERROR: SQLException in " << __FILE__;
-                cerr << " (" << __func__<< ") on line " << __LINE__ << endl;
-                cerr << "ERROR: " << e.what();
-                cerr << " (MySQL error code: " << e.getErrorCode();
-                cerr << ", SQLState: " << e.getSQLState() << ")" << endl;
+                LOG(WARNING) << "ERROR: SQLException in " << __FILE__ << " (" << __func__<< ") on line " << __LINE__;
+                LOG(WARNING) << "ERROR: " << e.what() << " (MySQL error code: " << e.getErrorCode() << ", SQLState: " << e.getSQLState() << ")";
                 bool reconnected = MysqlAccess::getInstance().reconnect();
-                std::cout << (reconnected ? "Successful" : "Failed") << " mysql reconnection" << std::endl;
+                LOG(INFO) << (reconnected ? "Successful" : "Failed") << " mysql reconnection";
             }
         }
-        exit(1);
+        LOG(FATAL) << "Unable to complete model operation";
     }
 
     Mix* Mix::findByOutSongIdAndInSongId(int outSongId, int inSongId) {
@@ -163,16 +160,13 @@ namespace soulsifter {
 
                 return mix;
             } catch (sql::SQLException &e) {
-                cerr << "ERROR: SQLException in " << __FILE__;
-                cerr << " (" << __func__<< ") on line " << __LINE__ << endl;
-                cerr << "ERROR: " << e.what();
-                cerr << " (MySQL error code: " << e.getErrorCode();
-                cerr << ", SQLState: " << e.getSQLState() << ")" << endl;
+                LOG(WARNING) << "ERROR: SQLException in " << __FILE__ << " (" << __func__<< ") on line " << __LINE__;
+                LOG(WARNING) << "ERROR: " << e.what() << " (MySQL error code: " << e.getErrorCode() << ", SQLState: " << e.getSQLState() << ")";
                 bool reconnected = MysqlAccess::getInstance().reconnect();
-                std::cout << (reconnected ? "Successful" : "Failed") << " mysql reconnection" << std::endl;
+                LOG(INFO) << (reconnected ? "Successful" : "Failed") << " mysql reconnection";
             }
         }
-        exit(1);
+        LOG(FATAL) << "Unable to complete model operation";
     }
 
     ResultSetIterator<Mix>* Mix::findAll() {
@@ -224,16 +218,13 @@ namespace soulsifter {
                 int result = ps->executeUpdate();
                 return result;
             } catch (sql::SQLException &e) {
-                cerr << "ERROR: SQLException in " << __FILE__;
-                cerr << " (" << __func__<< ") on line " << __LINE__ << endl;
-                cerr << "ERROR: " << e.what();
-                cerr << " (MySQL error code: " << e.getErrorCode();
-                cerr << ", SQLState: " << e.getSQLState() << ")" << endl;
+                LOG(WARNING) << "ERROR: SQLException in " << __FILE__ << " (" << __func__<< ") on line " << __LINE__;
+                LOG(WARNING) << "ERROR: " << e.what() << " (MySQL error code: " << e.getErrorCode() << ", SQLState: " << e.getSQLState() << ")";
                 bool reconnected = MysqlAccess::getInstance().reconnect();
-                std::cout << (reconnected ? "Successful" : "Failed") << " mysql reconnection" << std::endl;
+                LOG(INFO) << (reconnected ? "Successful" : "Failed") << " mysql reconnection";
             }
         }
-        exit(1);
+        LOG(FATAL) << "Unable to complete model operation";
     }
 
     int Mix::save() {
@@ -274,27 +265,24 @@ namespace soulsifter {
                 ps->setBoolean(6, addon);
                 int saved = ps->executeUpdate();
                 if (!saved) {
-                    cerr << "Not able to save mix" << endl;
+                    LOG(WARNING) << "Not able to save mix";
                     return saved;
                 } else {
                     id = MysqlAccess::getInstance().getLastInsertId();
                     if (id == 0) {
-                        cerr << "Inserted mix, but unable to retreive inserted ID." << endl;
+                        LOG(WARNING) << "Inserted mix, but unable to retreive inserted ID.";
                         return saved;
                     }
                     return saved;
                 }
             } catch (sql::SQLException &e) {
-                cerr << "ERROR: SQLException in " << __FILE__;
-                cerr << " (" << __func__<< ") on line " << __LINE__ << endl;
-                cerr << "ERROR: " << e.what();
-                cerr << " (MySQL error code: " << e.getErrorCode();
-                cerr << ", SQLState: " << e.getSQLState() << ")" << endl;
+                LOG(WARNING) << "ERROR: SQLException in " << __FILE__ << " (" << __func__<< ") on line " << __LINE__;
+                LOG(WARNING) << "ERROR: " << e.what() << " (MySQL error code: " << e.getErrorCode() << ", SQLState: " << e.getSQLState() << ")";
                 bool reconnected = MysqlAccess::getInstance().reconnect();
-                std::cout << (reconnected ? "Successful" : "Failed") << " mysql reconnection" << std::endl;
+                LOG(INFO) << (reconnected ? "Successful" : "Failed") << " mysql reconnection";
             }
         }
-        exit(1);
+        LOG(FATAL) << "Unable to complete model operation";
     }
 
     bool Mix::sync() {
@@ -319,7 +307,7 @@ namespace soulsifter {
         boost::smatch match2;
         if (id != mix->getId()) {
             if (id) {
-                cout << "updating mix " << id << " id from " << mix->getId() << " to " << id << endl;
+                LOG(INFO) << "updating mix " << id << " id from " << mix->getId() << " to " << id;
                 needsUpdate = true;
             } else {
                 id = mix->getId();
@@ -327,7 +315,7 @@ namespace soulsifter {
         }
         if (outSongId != mix->getOutSongId()) {
             if (outSongId) {
-                cout << "updating mix " << id << " outSongId from " << mix->getOutSongId() << " to " << outSongId << endl;
+                LOG(INFO) << "updating mix " << id << " outSongId from " << mix->getOutSongId() << " to " << outSongId;
                 needsUpdate = true;
             } else {
                 outSongId = mix->getOutSongId();
@@ -336,7 +324,7 @@ namespace soulsifter {
         if (outSong) needsUpdate |= outSong->sync();
         if (inSongId != mix->getInSongId()) {
             if (inSongId) {
-                cout << "updating mix " << id << " inSongId from " << mix->getInSongId() << " to " << inSongId << endl;
+                LOG(INFO) << "updating mix " << id << " inSongId from " << mix->getInSongId() << " to " << inSongId;
                 needsUpdate = true;
             } else {
                 inSongId = mix->getInSongId();
@@ -345,7 +333,7 @@ namespace soulsifter {
         if (inSong) needsUpdate |= inSong->sync();
         if (bpmDiff.compare(mix->getBpmDiff())  && (!boost::regex_match(bpmDiff, match1, decimal) || !boost::regex_match(mix->getBpmDiff(), match2, decimal) || match1[1].str().compare(match2[1].str()))) {
             if (!bpmDiff.empty()) {
-                cout << "updating mix " << id << " bpmDiff from " << mix->getBpmDiff() << " to " << bpmDiff << endl;
+                LOG(INFO) << "updating mix " << id << " bpmDiff from " << mix->getBpmDiff() << " to " << bpmDiff;
                 needsUpdate = true;
             } else {
                 bpmDiff = mix->getBpmDiff();
@@ -353,7 +341,7 @@ namespace soulsifter {
         }
         if (rank != mix->getRank()) {
             if (rank) {
-                cout << "updating mix " << id << " rank from " << mix->getRank() << " to " << rank << endl;
+                LOG(INFO) << "updating mix " << id << " rank from " << mix->getRank() << " to " << rank;
                 needsUpdate = true;
             } else {
                 rank = mix->getRank();
@@ -361,7 +349,7 @@ namespace soulsifter {
         }
         if (comments.compare(mix->getComments())  && (!boost::regex_match(comments, match1, decimal) || !boost::regex_match(mix->getComments(), match2, decimal) || match1[1].str().compare(match2[1].str()))) {
             if (!comments.empty()) {
-                cout << "updating mix " << id << " comments from " << mix->getComments() << " to " << comments << endl;
+                LOG(INFO) << "updating mix " << id << " comments from " << mix->getComments() << " to " << comments;
                 needsUpdate = true;
             } else {
                 comments = mix->getComments();
@@ -369,7 +357,7 @@ namespace soulsifter {
         }
         if (addon != mix->getAddon()) {
             if (addon) {
-                cout << "updating mix " << id << " addon from " << mix->getAddon() << " to " << addon << endl;
+                LOG(INFO) << "updating mix " << id << " addon from " << mix->getAddon() << " to " << addon;
                 needsUpdate = true;
             } else {
                 addon = mix->getAddon();

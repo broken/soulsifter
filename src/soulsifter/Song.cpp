@@ -14,13 +14,13 @@
 
 #include <boost/regex.hpp>
 #include <boost/algorithm/string.hpp>
-
 #include <cppconn/connection.h>
 #include <cppconn/statement.h>
 #include <cppconn/prepared_statement.h>
 #include <cppconn/resultset.h>
 #include <cppconn/exception.h>
 #include <cppconn/warning.h>
+#include <g3log/g3log.hpp>
 
 #include "MysqlAccess.h"
 #include "DTVectorUtil.h"
@@ -244,16 +244,13 @@ namespace soulsifter {
 
                 return song;
             } catch (sql::SQLException &e) {
-                cerr << "ERROR: SQLException in " << __FILE__;
-                cerr << " (" << __func__<< ") on line " << __LINE__ << endl;
-                cerr << "ERROR: " << e.what();
-                cerr << " (MySQL error code: " << e.getErrorCode();
-                cerr << ", SQLState: " << e.getSQLState() << ")" << endl;
+                LOG(WARNING) << "ERROR: SQLException in " << __FILE__ << " (" << __func__<< ") on line " << __LINE__;
+                LOG(WARNING) << "ERROR: " << e.what() << " (MySQL error code: " << e.getErrorCode() << ", SQLState: " << e.getSQLState() << ")";
                 bool reconnected = MysqlAccess::getInstance().reconnect();
-                std::cout << (reconnected ? "Successful" : "Failed") << " mysql reconnection" << std::endl;
+                LOG(INFO) << (reconnected ? "Successful" : "Failed") << " mysql reconnection";
             }
         }
-        exit(1);
+        LOG(FATAL) << "Unable to complete model operation";
     }
 
     Song* Song::findByFilepath(const string& filepath) {
@@ -272,16 +269,13 @@ namespace soulsifter {
 
                 return song;
             } catch (sql::SQLException &e) {
-                cerr << "ERROR: SQLException in " << __FILE__;
-                cerr << " (" << __func__<< ") on line " << __LINE__ << endl;
-                cerr << "ERROR: " << e.what();
-                cerr << " (MySQL error code: " << e.getErrorCode();
-                cerr << ", SQLState: " << e.getSQLState() << ")" << endl;
+                LOG(WARNING) << "ERROR: SQLException in " << __FILE__ << " (" << __func__<< ") on line " << __LINE__;
+                LOG(WARNING) << "ERROR: " << e.what() << " (MySQL error code: " << e.getErrorCode() << ", SQLState: " << e.getSQLState() << ")";
                 bool reconnected = MysqlAccess::getInstance().reconnect();
-                std::cout << (reconnected ? "Successful" : "Failed") << " mysql reconnection" << std::endl;
+                LOG(INFO) << (reconnected ? "Successful" : "Failed") << " mysql reconnection";
             }
         }
-        exit(1);
+        LOG(FATAL) << "Unable to complete model operation";
     }
 
     Song* Song::findByGoogleSongId(const string& googleSongId) {
@@ -300,16 +294,13 @@ namespace soulsifter {
 
                 return song;
             } catch (sql::SQLException &e) {
-                cerr << "ERROR: SQLException in " << __FILE__;
-                cerr << " (" << __func__<< ") on line " << __LINE__ << endl;
-                cerr << "ERROR: " << e.what();
-                cerr << " (MySQL error code: " << e.getErrorCode();
-                cerr << ", SQLState: " << e.getSQLState() << ")" << endl;
+                LOG(WARNING) << "ERROR: SQLException in " << __FILE__ << " (" << __func__<< ") on line " << __LINE__;
+                LOG(WARNING) << "ERROR: " << e.what() << " (MySQL error code: " << e.getErrorCode() << ", SQLState: " << e.getSQLState() << ")";
                 bool reconnected = MysqlAccess::getInstance().reconnect();
-                std::cout << (reconnected ? "Successful" : "Failed") << " mysql reconnection" << std::endl;
+                LOG(INFO) << (reconnected ? "Successful" : "Failed") << " mysql reconnection";
             }
         }
-        exit(1);
+        LOG(FATAL) << "Unable to complete model operation";
     }
 
     Song* Song::findByRESongId(int reSongId) {
@@ -329,16 +320,13 @@ namespace soulsifter {
 
                 return song;
             } catch (sql::SQLException &e) {
-                cerr << "ERROR: SQLException in " << __FILE__;
-                cerr << " (" << __func__<< ") on line " << __LINE__ << endl;
-                cerr << "ERROR: " << e.what();
-                cerr << " (MySQL error code: " << e.getErrorCode();
-                cerr << ", SQLState: " << e.getSQLState() << ")" << endl;
+                LOG(WARNING) << "ERROR: SQLException in " << __FILE__ << " (" << __func__<< ") on line " << __LINE__;
+                LOG(WARNING) << "ERROR: " << e.what() << " (MySQL error code: " << e.getErrorCode() << ", SQLState: " << e.getSQLState() << ")";
                 bool reconnected = MysqlAccess::getInstance().reconnect();
-                std::cout << (reconnected ? "Successful" : "Failed") << " mysql reconnection" << std::endl;
+                LOG(INFO) << (reconnected ? "Successful" : "Failed") << " mysql reconnection";
             }
         }
-        exit(1);
+        LOG(FATAL) << "Unable to complete model operation";
     }
 
     ResultSetIterator<Song>* Song::findAll() {
@@ -454,16 +442,13 @@ namespace soulsifter {
                 }
                 return result;
             } catch (sql::SQLException &e) {
-                cerr << "ERROR: SQLException in " << __FILE__;
-                cerr << " (" << __func__<< ") on line " << __LINE__ << endl;
-                cerr << "ERROR: " << e.what();
-                cerr << " (MySQL error code: " << e.getErrorCode();
-                cerr << ", SQLState: " << e.getSQLState() << ")" << endl;
+                LOG(WARNING) << "ERROR: SQLException in " << __FILE__ << " (" << __func__<< ") on line " << __LINE__;
+                LOG(WARNING) << "ERROR: " << e.what() << " (MySQL error code: " << e.getErrorCode() << ", SQLState: " << e.getSQLState() << ")";
                 bool reconnected = MysqlAccess::getInstance().reconnect();
-                std::cout << (reconnected ? "Successful" : "Failed") << " mysql reconnection" << std::endl;
+                LOG(INFO) << (reconnected ? "Successful" : "Failed") << " mysql reconnection";
             }
         }
-        exit(1);
+        LOG(FATAL) << "Unable to complete model operation";
     }
 
     int Song::save() {
@@ -540,12 +525,12 @@ namespace soulsifter {
                 else ps->setNull(21, sql::DataType::INTEGER);
                 int saved = ps->executeUpdate();
                 if (!saved) {
-                    cerr << "Not able to save song" << endl;
+                    LOG(WARNING) << "Not able to save song";
                     return saved;
                 } else {
                     id = MysqlAccess::getInstance().getLastInsertId();
                     if (id == 0) {
-                        cerr << "Inserted song, but unable to retreive inserted ID." << endl;
+                        LOG(WARNING) << "Inserted song, but unable to retreive inserted ID.";
                         return saved;
                     }
                     if (!styleIds.empty()) {
@@ -559,22 +544,19 @@ namespace soulsifter {
                             ps->setInt(i * 2 + 2, styleIds[i]);
                         }
                         if (!ps->executeUpdate()) {
-                            cerr << "Did not save style for song " << id << endl;
+                            LOG(WARNING) << "Did not save style for song " << id;
                         }
                     }
                     return saved;
                 }
             } catch (sql::SQLException &e) {
-                cerr << "ERROR: SQLException in " << __FILE__;
-                cerr << " (" << __func__<< ") on line " << __LINE__ << endl;
-                cerr << "ERROR: " << e.what();
-                cerr << " (MySQL error code: " << e.getErrorCode();
-                cerr << ", SQLState: " << e.getSQLState() << ")" << endl;
+                LOG(WARNING) << "ERROR: SQLException in " << __FILE__ << " (" << __func__<< ") on line " << __LINE__;
+                LOG(WARNING) << "ERROR: " << e.what() << " (MySQL error code: " << e.getErrorCode() << ", SQLState: " << e.getSQLState() << ")";
                 bool reconnected = MysqlAccess::getInstance().reconnect();
-                std::cout << (reconnected ? "Successful" : "Failed") << " mysql reconnection" << std::endl;
+                LOG(INFO) << (reconnected ? "Successful" : "Failed") << " mysql reconnection";
             }
         }
-        exit(1);
+        LOG(FATAL) << "Unable to complete model operation";
     }
 
     bool Song::sync() {
@@ -603,7 +585,7 @@ namespace soulsifter {
         boost::smatch match2;
         if (id != song->getId()) {
             if (id) {
-                cout << "updating song " << id << " id from " << song->getId() << " to " << id << endl;
+                LOG(INFO) << "updating song " << id << " id from " << song->getId() << " to " << id;
                 needsUpdate = true;
             } else {
                 id = song->getId();
@@ -611,7 +593,7 @@ namespace soulsifter {
         }
         if (artist.compare(song->getArtist())  && (!boost::regex_match(artist, match1, decimal) || !boost::regex_match(song->getArtist(), match2, decimal) || match1[1].str().compare(match2[1].str()))) {
             if (!artist.empty()) {
-                cout << "updating song " << id << " artist from " << song->getArtist() << " to " << artist << endl;
+                LOG(INFO) << "updating song " << id << " artist from " << song->getArtist() << " to " << artist;
                 needsUpdate = true;
             } else {
                 artist = song->getArtist();
@@ -619,7 +601,7 @@ namespace soulsifter {
         }
         if (track.compare(song->getTrack())  && (!boost::regex_match(track, match1, decimal) || !boost::regex_match(song->getTrack(), match2, decimal) || match1[1].str().compare(match2[1].str()))) {
             if (!track.empty()) {
-                cout << "updating song " << id << " track from " << song->getTrack() << " to " << track << endl;
+                LOG(INFO) << "updating song " << id << " track from " << song->getTrack() << " to " << track;
                 needsUpdate = true;
             } else {
                 track = song->getTrack();
@@ -627,7 +609,7 @@ namespace soulsifter {
         }
         if (title.compare(song->getTitle())  && (!boost::regex_match(title, match1, decimal) || !boost::regex_match(song->getTitle(), match2, decimal) || match1[1].str().compare(match2[1].str()))) {
             if (!title.empty()) {
-                cout << "updating song " << id << " title from " << song->getTitle() << " to " << title << endl;
+                LOG(INFO) << "updating song " << id << " title from " << song->getTitle() << " to " << title;
                 needsUpdate = true;
             } else {
                 title = song->getTitle();
@@ -635,7 +617,7 @@ namespace soulsifter {
         }
         if (remixer.compare(song->getRemixer())  && (!boost::regex_match(remixer, match1, decimal) || !boost::regex_match(song->getRemixer(), match2, decimal) || match1[1].str().compare(match2[1].str()))) {
             if (!remixer.empty()) {
-                cout << "updating song " << id << " remixer from " << song->getRemixer() << " to " << remixer << endl;
+                LOG(INFO) << "updating song " << id << " remixer from " << song->getRemixer() << " to " << remixer;
                 needsUpdate = true;
             } else {
                 remixer = song->getRemixer();
@@ -643,7 +625,7 @@ namespace soulsifter {
         }
         if (featuring.compare(song->getFeaturing())  && (!boost::regex_match(featuring, match1, decimal) || !boost::regex_match(song->getFeaturing(), match2, decimal) || match1[1].str().compare(match2[1].str()))) {
             if (!featuring.empty()) {
-                cout << "updating song " << id << " featuring from " << song->getFeaturing() << " to " << featuring << endl;
+                LOG(INFO) << "updating song " << id << " featuring from " << song->getFeaturing() << " to " << featuring;
                 needsUpdate = true;
             } else {
                 featuring = song->getFeaturing();
@@ -651,7 +633,7 @@ namespace soulsifter {
         }
         if (filepath.compare(song->getFilepath())  && (!boost::regex_match(filepath, match1, decimal) || !boost::regex_match(song->getFilepath(), match2, decimal) || match1[1].str().compare(match2[1].str()))) {
             if (!filepath.empty()) {
-                cout << "updating song " << id << " filepath from " << song->getFilepath() << " to " << filepath << endl;
+                LOG(INFO) << "updating song " << id << " filepath from " << song->getFilepath() << " to " << filepath;
                 needsUpdate = true;
             } else {
                 filepath = song->getFilepath();
@@ -659,7 +641,7 @@ namespace soulsifter {
         }
         if (rating != song->getRating()) {
             if (rating) {
-                cout << "updating song " << id << " rating from " << song->getRating() << " to " << rating << endl;
+                LOG(INFO) << "updating song " << id << " rating from " << song->getRating() << " to " << rating;
                 needsUpdate = true;
             } else {
                 rating = song->getRating();
@@ -667,7 +649,7 @@ namespace soulsifter {
         }
         if (dateAdded != song->getDateAdded()) {
             if (!song->getDateAdded()) {
-                cout << "updating song " << id << " dateAdded from " << song->getDateAdded() << " to " << dateAdded << endl;
+                LOG(INFO) << "updating song " << id << " dateAdded from " << song->getDateAdded() << " to " << dateAdded;
                 needsUpdate = true;
             } else {
                 dateAdded = song->getDateAdded();
@@ -675,7 +657,7 @@ namespace soulsifter {
         }
         if (bpm.compare(song->getBpm())  && (!boost::regex_match(bpm, match1, decimal) || !boost::regex_match(song->getBpm(), match2, decimal) || match1[1].str().compare(match2[1].str()))) {
             if (!bpm.empty()) {
-                cout << "updating song " << id << " bpm from " << song->getBpm() << " to " << bpm << endl;
+                LOG(INFO) << "updating song " << id << " bpm from " << song->getBpm() << " to " << bpm;
                 needsUpdate = true;
             } else {
                 bpm = song->getBpm();
@@ -683,14 +665,14 @@ namespace soulsifter {
         }
         if (!equivalentSets<string>(tonicKeys, song->tonicKeys)) {
             if (!containsSet<string>(tonicKeys, song->tonicKeys)) {
-                cout << "updating song " << id << " tonicKeys" << endl;
+                LOG(INFO) << "updating song " << id << " tonicKeys";
                 needsUpdate = true;
             }
             tonicKeys.insert(song->tonicKeys.begin(), song->tonicKeys.end());
         }
         if (tonicKey.compare(song->getTonicKey())  && (!boost::regex_match(tonicKey, match1, decimal) || !boost::regex_match(song->getTonicKey(), match2, decimal) || match1[1].str().compare(match2[1].str()))) {
             if (!tonicKey.empty()) {
-                cout << "updating song " << id << " tonicKey from " << song->getTonicKey() << " to " << tonicKey << endl;
+                LOG(INFO) << "updating song " << id << " tonicKey from " << song->getTonicKey() << " to " << tonicKey;
                 needsUpdate = true;
             } else {
                 tonicKey = song->getTonicKey();
@@ -698,7 +680,7 @@ namespace soulsifter {
         }
         if (energy != song->getEnergy()) {
             if (energy) {
-                cout << "updating song " << id << " energy from " << song->getEnergy() << " to " << energy << endl;
+                LOG(INFO) << "updating song " << id << " energy from " << song->getEnergy() << " to " << energy;
                 needsUpdate = true;
             } else {
                 energy = song->getEnergy();
@@ -706,7 +688,7 @@ namespace soulsifter {
         }
         if (comments.compare(song->getComments())  && (!boost::regex_match(comments, match1, decimal) || !boost::regex_match(song->getComments(), match2, decimal) || match1[1].str().compare(match2[1].str()))) {
             if (!comments.empty()) {
-                cout << "updating song " << id << " comments from " << song->getComments() << " to " << comments << endl;
+                LOG(INFO) << "updating song " << id << " comments from " << song->getComments() << " to " << comments;
                 needsUpdate = true;
             } else {
                 comments = song->getComments();
@@ -714,7 +696,7 @@ namespace soulsifter {
         }
         if (trashed != song->getTrashed()) {
             if (trashed) {
-                cout << "updating song " << id << " trashed from " << song->getTrashed() << " to " << trashed << endl;
+                LOG(INFO) << "updating song " << id << " trashed from " << song->getTrashed() << " to " << trashed;
                 needsUpdate = true;
             } else {
                 trashed = song->getTrashed();
@@ -722,7 +704,7 @@ namespace soulsifter {
         }
         if (lowQuality != song->getLowQuality()) {
             if (lowQuality) {
-                cout << "updating song " << id << " lowQuality from " << song->getLowQuality() << " to " << lowQuality << endl;
+                LOG(INFO) << "updating song " << id << " lowQuality from " << song->getLowQuality() << " to " << lowQuality;
                 needsUpdate = true;
             } else {
                 lowQuality = song->getLowQuality();
@@ -730,7 +712,7 @@ namespace soulsifter {
         }
         if (googleSongId.compare(song->getGoogleSongId())  && (!boost::regex_match(googleSongId, match1, decimal) || !boost::regex_match(song->getGoogleSongId(), match2, decimal) || match1[1].str().compare(match2[1].str()))) {
             if (!googleSongId.empty()) {
-                cout << "updating song " << id << " googleSongId from " << song->getGoogleSongId() << " to " << googleSongId << endl;
+                LOG(INFO) << "updating song " << id << " googleSongId from " << song->getGoogleSongId() << " to " << googleSongId;
                 needsUpdate = true;
             } else {
                 googleSongId = song->getGoogleSongId();
@@ -738,7 +720,7 @@ namespace soulsifter {
         }
         if (durationInMs != song->getDurationInMs()) {
             if (durationInMs) {
-                cout << "updating song " << id << " durationInMs from " << song->getDurationInMs() << " to " << durationInMs << endl;
+                LOG(INFO) << "updating song " << id << " durationInMs from " << song->getDurationInMs() << " to " << durationInMs;
                 needsUpdate = true;
             } else {
                 durationInMs = song->getDurationInMs();
@@ -746,7 +728,7 @@ namespace soulsifter {
         }
         if (curator.compare(song->getCurator())  && (!boost::regex_match(curator, match1, decimal) || !boost::regex_match(song->getCurator(), match2, decimal) || match1[1].str().compare(match2[1].str()))) {
             if (!curator.empty()) {
-                cout << "updating song " << id << " curator from " << song->getCurator() << " to " << curator << endl;
+                LOG(INFO) << "updating song " << id << " curator from " << song->getCurator() << " to " << curator;
                 needsUpdate = true;
             } else {
                 curator = song->getCurator();
@@ -754,7 +736,7 @@ namespace soulsifter {
         }
         if (reSongId != song->getRESongId()) {
             if (reSongId) {
-                cout << "updating song " << id << " reSongId from " << song->getRESongId() << " to " << reSongId << endl;
+                LOG(INFO) << "updating song " << id << " reSongId from " << song->getRESongId() << " to " << reSongId;
                 needsUpdate = true;
             } else {
                 reSongId = song->getRESongId();
@@ -763,7 +745,7 @@ namespace soulsifter {
         if (reSong) needsUpdate |= reSong->sync();
         if (albumId != song->getAlbumId()) {
             if (albumId) {
-                cout << "updating song " << id << " albumId from " << song->getAlbumId() << " to " << albumId << endl;
+                LOG(INFO) << "updating song " << id << " albumId from " << song->getAlbumId() << " to " << albumId;
                 needsUpdate = true;
             } else {
                 albumId = song->getAlbumId();
@@ -772,7 +754,7 @@ namespace soulsifter {
         if (album) needsUpdate |= album->sync();
         if (albumPartId != song->getAlbumPartId()) {
             if (albumPartId) {
-                cout << "updating song " << id << " albumPartId from " << song->getAlbumPartId() << " to " << albumPartId << endl;
+                LOG(INFO) << "updating song " << id << " albumPartId from " << song->getAlbumPartId() << " to " << albumPartId;
                 needsUpdate = true;
             } else {
                 albumPartId = song->getAlbumPartId();
@@ -781,7 +763,7 @@ namespace soulsifter {
         if (albumPart) needsUpdate |= albumPart->sync();
         if (!equivalentVectors<int>(styleIds, song->getStyleIds())) {
             if (!containsVector<int>(styleIds, song->getStyleIds())) {
-                cout << "updating song " << id << " styleIds" << endl;
+                LOG(INFO) << "updating song " << id << " styleIds";
                 needsUpdate = true;
             }
             appendUniqueVector<int>(song->getStyleIds(), &styleIds);

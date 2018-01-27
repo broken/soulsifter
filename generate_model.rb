@@ -162,7 +162,7 @@ end
 ######################### h & cc outputs
 
 def sqlCatchBlock()
-  return "            } catch (sql::SQLException &e) {\n                cerr << \"ERROR: SQLException in \" << __FILE__;\n                cerr << \" (\" << __func__<< \") on line \" << __LINE__ << endl;\n                cerr << \"ERROR: \" << e.what();\n                cerr << \" (MySQL error code: \" << e.getErrorCode();\n                cerr << \", SQLState: \" << e.getSQLState() << \")\" << endl;\n                bool reconnected = MysqlAccess::getInstance().reconnect();\n                std::cout << (reconnected ? \"Successful\" : \"Failed\") << \" mysql reconnection\" << std::endl;\n            }\n        }\n        exit(1);\n"
+  return "            } catch (sql::SQLException &e) {\n                LOG(WARNING) << \"ERROR: SQLException in \" << __FILE__ << \" (\" << __func__<< \") on line \" << __LINE__;\n                LOG(WARNING) << \"ERROR: \" << e.what() << \" (MySQL error code: \" << e.getErrorCode() << \", SQLState: \" << e.getSQLState() << \")\";\n                bool reconnected = MysqlAccess::getInstance().reconnect();\n                LOG(INFO) << (reconnected ? \"Successful\" : \"Failed\") << \" mysql reconnection\";\n            }\n        }\n        LOG(FATAL) << \"Unable to complete model operation\";\n"
 end
 
 def syncChildBlock(f)
@@ -409,24 +409,24 @@ def cSyncFunction(name, fields, secondaryKeys)
       next
     elsif ([:int, :bool].include?(f[$type]))
       str << "        if (#{f[$name]} != #{name}->get#{cap(f[$name])}()) {\n            if (#{f[$name]}) {\n"
-      str << "                cout << \"updating #{name} \" << id << \" #{f[$name]} from \" << #{name}->get#{cap(f[$name])}() << \" to \" << #{f[$name]} << endl;\n                needsUpdate = true;\n            } else {\n"
+      str << "                LOG(INFO) << \"updating #{name} \" << id << \" #{f[$name]} from \" << #{name}->get#{cap(f[$name])}() << \" to \" << #{f[$name]};\n                needsUpdate = true;\n            } else {\n"
       str << "                #{f[$name]} = #{name}->get#{cap(f[$name])}();\n            }\n        }\n"
     elsif ([:time_t].include?(f[$type]))
       str << "        if (#{f[$name]} != #{name}->get#{cap(f[$name])}()) {\n            if (!#{name}->get#{cap(f[$name])}()) {\n"
-      str << "                cout << \"updating #{name} \" << id << \" #{f[$name]} from \" << #{name}->get#{cap(f[$name])}() << \" to \" << #{f[$name]} << endl;\n                needsUpdate = true;\n            } else {\n"
+      str << "                LOG(INFO) << \"updating #{name} \" << id << \" #{f[$name]} from \" << #{name}->get#{cap(f[$name])}() << \" to \" << #{f[$name]};\n                needsUpdate = true;\n            } else {\n"
       str << "                #{f[$name]} = #{name}->get#{cap(f[$name])}();\n            }\n        }\n"
     elsif (f[$type] == :string)
       str << "        if (#{f[$name]}.compare(#{name}->get#{cap(f[$name])}())  && (!boost::regex_match(#{f[$name]}, match1, decimal) || !boost::regex_match(#{name}->get#{cap(f[$name])}(), match2, decimal) || match1[1].str().compare(match2[1].str()))) {\n"
       str << "            if (!#{f[$name]}.empty()) {\n"
-      str << "                cout << \"updating #{name} \" << id << \" #{f[$name]} from \" << #{name}->get#{cap(f[$name])}() << \" to \" << #{f[$name]} << endl;\n                needsUpdate = true;\n            } else {\n"
+      str << "                LOG(INFO) << \"updating #{name} \" << id << \" #{f[$name]} from \" << #{name}->get#{cap(f[$name])}() << \" to \" << #{f[$name]};\n                needsUpdate = true;\n            } else {\n"
       str << "                #{f[$name]} = #{name}->get#{cap(f[$name])}();\n            }\n        }\n"
     elsif (isVector(f[$type]) && f[$attrib] & Attrib::ID > 0)
       str << "        if (!equivalentVectors<int>(#{f[$name]}, #{name}->get#{cap(f[$name])}())) {\n            if (!containsVector<int>(#{f[$name]}, #{name}->get#{cap(f[$name])}())) {\n"
-      str << "                cout << \"updating #{name} \" << id << \" #{f[$name]}\" << endl;\n                needsUpdate = true;\n            }\n"
+      str << "                LOG(INFO) << \"updating #{name} \" << id << \" #{f[$name]}\";\n                needsUpdate = true;\n            }\n"
       str << "            appendUniqueVector<int>(#{name}->get#{cap(f[$name])}(), &#{f[$name]});\n        }\n"
     elsif (isSet(f[$type]))
       str << "        if (!equivalentSets<#{getSetGeneric(f[$type])}>(#{f[$name]}, #{name}->#{f[$name]})) {\n            if (!containsSet<#{getSetGeneric(f[$type])}>(#{f[$name]}, #{name}->#{f[$name]})) {\n"
-      str << "                cout << \"updating #{name} \" << id << \" #{f[$name]}\" << endl;\n                needsUpdate = true;\n            }\n"
+      str << "                LOG(INFO) << \"updating #{name} \" << id << \" #{f[$name]}\";\n                needsUpdate = true;\n            }\n"
       str << "            #{f[$name]}.insert(#{name}->#{f[$name]}.begin(), #{name}->#{f[$name]}.end());\n        }\n"
     elsif (f[$attrib] & Attrib::PTR > 0)
       str << "        if (#{f[$name]}) needsUpdate |= #{f[$name]}->sync();\n"
@@ -508,17 +508,17 @@ def cSaveFunction(name, fields, attribs)
     str << setField(f, i, "                ")
   end
   str << "                int saved = ps->executeUpdate();\n                if (!saved) {\n"
-  str << "                    cerr << \"Not able to save #{name}\" << endl;\n                    return saved;\n"
+  str << "                    LOG(WARNING) << \"Not able to save #{name}\";\n                    return saved;\n"
   str << "                } else {\n"
   if (attribs & Attrib::SAVEID == 0)
     str << "                    id = MysqlAccess::getInstance().getLastInsertId();\n                    if (id == 0) {\n"
-    str << "                        cerr << \"Inserted #{name}, but unable to retreive inserted ID.\" << endl;\n                        return saved;\n                    }\n"
+    str << "                        LOG(WARNING) << \"Inserted #{name}, but unable to retreive inserted ID.\";\n                        return saved;\n                    }\n"
   end
   fields.each do |f|
     if (isVector(f[$type]) && f[$attrib] & Attrib::ID == 0)
     t = vectorRelationTable(name, f)
     str << "                    if (!#{vectorIds(f)}.empty()) {\n                        stringstream ss(\"insert ignore into #{t[0]} (#{t[2]}, #{t[1]}) values (?, ?)\", ios_base::app | ios_base::out | ios_base::ate);\n                        for (int i = 1; i < #{vectorIds(f)}.size(); ++i) {\n                            ss << \", (?, ?)\";\n                        }\n                        ps = MysqlAccess::getInstance().getPreparedStatement(ss.str());\n"
-    str << "                        for (int i = 0; i < #{vectorIds(f)}.size(); ++i) {\n                            ps->setInt(i * 2 + 1, id);\n                            ps->setInt(i * 2 + 2, #{vectorIds(f)}[i]);\n                        }\n                        if (!ps->executeUpdate()) {\n                            cerr << \"Did not save #{single(f[$name])} for #{name} \" << id << endl;\n                        }\n                    }\n"
+    str << "                        for (int i = 0; i < #{vectorIds(f)}.size(); ++i) {\n                            ps->setInt(i * 2 + 1, id);\n                            ps->setInt(i * 2 + 2, #{vectorIds(f)}[i]);\n                        }\n                        if (!ps->executeUpdate()) {\n                            LOG(WARNING) << \"Did not save #{single(f[$name])} for #{name} \" << id;\n                        }\n                    }\n"
     end
   end
   str << "                    return saved;\n                }\n"
@@ -539,7 +539,7 @@ def cEraseFunction(name, fields)
   str << "                sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement(\"delete from #{cap(plural(name))} where id=?\");\n"
   str << "                ps->setInt(1, id);\n"
   str << "                int erased = ps->executeUpdate();\n                if (!erased) {\n"
-  str << "                    cerr << \"Not able to erase #{name}\" << endl;\n"
+  str << "                    LOG(WARNING) << \"Not able to erase #{name}\";\n"
   str << "                }\n"
   str << "                return erased;\n"
   str << sqlCatchBlock()
@@ -705,7 +705,7 @@ def writeCode (name, fields, attribs)
   capName = cap(name)
   secondaryKeys = fields.select{|f| f[$attrib] & Attrib::KEY2 > 0 }
   str = ""
-  str << "//\n//  #{capName}.cpp\n//  soul-sifter\n//\n//  Created by Robby Neale\n//  Generated by generate_model.rb\n//\n\n#include \"#{capName}.h\"\n\n#include <cmath>\n#include <string>\n#include <sstream>\n\n#include <boost/regex.hpp>\n#include <boost/algorithm/string.hpp>\n\n#include <cppconn/connection.h>\n#include <cppconn/statement.h>\n#include <cppconn/prepared_statement.h>\n#include <cppconn/resultset.h>\n#include <cppconn/exception.h>\n#include <cppconn/warning.h>\n\n#include \"MysqlAccess.h\"\n#include \"DTVectorUtil.h\"\n"
+  str << "//\n//  #{capName}.cpp\n//  soul-sifter\n//\n//  Created by Robby Neale\n//  Generated by generate_model.rb\n//\n\n#include \"#{capName}.h\"\n\n#include <cmath>\n#include <string>\n#include <sstream>\n\n#include <boost/regex.hpp>\n#include <boost/algorithm/string.hpp>\n#include <cppconn/connection.h>\n#include <cppconn/statement.h>\n#include <cppconn/prepared_statement.h>\n#include <cppconn/resultset.h>\n#include <cppconn/exception.h>\n#include <cppconn/warning.h>\n#include <g3log/g3log.hpp>\n\n#include \"MysqlAccess.h\"\n#include \"DTVectorUtil.h\"\n"
   fields.transpose[0].uniq.each do |t|
     unless ([:int, :bool, :time_t, :string].include?(t))
       if (!isVector(t) && !isSet(t))

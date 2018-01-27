@@ -14,13 +14,13 @@
 
 #include <boost/regex.hpp>
 #include <boost/algorithm/string.hpp>
-
 #include <cppconn/connection.h>
 #include <cppconn/statement.h>
 #include <cppconn/prepared_statement.h>
 #include <cppconn/resultset.h>
 #include <cppconn/exception.h>
 #include <cppconn/warning.h>
+#include <g3log/g3log.hpp>
 
 #include "MysqlAccess.h"
 #include "DTVectorUtil.h"
@@ -123,16 +123,13 @@ namespace soulsifter {
 
                 return style;
             } catch (sql::SQLException &e) {
-                cerr << "ERROR: SQLException in " << __FILE__;
-                cerr << " (" << __func__<< ") on line " << __LINE__ << endl;
-                cerr << "ERROR: " << e.what();
-                cerr << " (MySQL error code: " << e.getErrorCode();
-                cerr << ", SQLState: " << e.getSQLState() << ")" << endl;
+                LOG(WARNING) << "ERROR: SQLException in " << __FILE__ << " (" << __func__<< ") on line " << __LINE__;
+                LOG(WARNING) << "ERROR: " << e.what() << " (MySQL error code: " << e.getErrorCode() << ", SQLState: " << e.getSQLState() << ")";
                 bool reconnected = MysqlAccess::getInstance().reconnect();
-                std::cout << (reconnected ? "Successful" : "Failed") << " mysql reconnection" << std::endl;
+                LOG(INFO) << (reconnected ? "Successful" : "Failed") << " mysql reconnection";
             }
         }
-        exit(1);
+        LOG(FATAL) << "Unable to complete model operation";
     }
 
     Style* Style::findByREId(int reId) {
@@ -152,16 +149,13 @@ namespace soulsifter {
 
                 return style;
             } catch (sql::SQLException &e) {
-                cerr << "ERROR: SQLException in " << __FILE__;
-                cerr << " (" << __func__<< ") on line " << __LINE__ << endl;
-                cerr << "ERROR: " << e.what();
-                cerr << " (MySQL error code: " << e.getErrorCode();
-                cerr << ", SQLState: " << e.getSQLState() << ")" << endl;
+                LOG(WARNING) << "ERROR: SQLException in " << __FILE__ << " (" << __func__<< ") on line " << __LINE__;
+                LOG(WARNING) << "ERROR: " << e.what() << " (MySQL error code: " << e.getErrorCode() << ", SQLState: " << e.getSQLState() << ")";
                 bool reconnected = MysqlAccess::getInstance().reconnect();
-                std::cout << (reconnected ? "Successful" : "Failed") << " mysql reconnection" << std::endl;
+                LOG(INFO) << (reconnected ? "Successful" : "Failed") << " mysql reconnection";
             }
         }
-        exit(1);
+        LOG(FATAL) << "Unable to complete model operation";
     }
 
     ResultSetIterator<Style>* Style::findAll() {
@@ -244,16 +238,13 @@ namespace soulsifter {
                 }
                 return result;
             } catch (sql::SQLException &e) {
-                cerr << "ERROR: SQLException in " << __FILE__;
-                cerr << " (" << __func__<< ") on line " << __LINE__ << endl;
-                cerr << "ERROR: " << e.what();
-                cerr << " (MySQL error code: " << e.getErrorCode();
-                cerr << ", SQLState: " << e.getSQLState() << ")" << endl;
+                LOG(WARNING) << "ERROR: SQLException in " << __FILE__ << " (" << __func__<< ") on line " << __LINE__;
+                LOG(WARNING) << "ERROR: " << e.what() << " (MySQL error code: " << e.getErrorCode() << ", SQLState: " << e.getSQLState() << ")";
                 bool reconnected = MysqlAccess::getInstance().reconnect();
-                std::cout << (reconnected ? "Successful" : "Failed") << " mysql reconnection" << std::endl;
+                LOG(INFO) << (reconnected ? "Successful" : "Failed") << " mysql reconnection";
             }
         }
-        exit(1);
+        LOG(FATAL) << "Unable to complete model operation";
     }
 
     int Style::save() {
@@ -269,12 +260,12 @@ namespace soulsifter {
                 else ps->setNull(3, sql::DataType::VARCHAR);
                 int saved = ps->executeUpdate();
                 if (!saved) {
-                    cerr << "Not able to save style" << endl;
+                    LOG(WARNING) << "Not able to save style";
                     return saved;
                 } else {
                     id = MysqlAccess::getInstance().getLastInsertId();
                     if (id == 0) {
-                        cerr << "Inserted style, but unable to retreive inserted ID." << endl;
+                        LOG(WARNING) << "Inserted style, but unable to retreive inserted ID.";
                         return saved;
                     }
                     if (!childIds.empty()) {
@@ -288,7 +279,7 @@ namespace soulsifter {
                             ps->setInt(i * 2 + 2, childIds[i]);
                         }
                         if (!ps->executeUpdate()) {
-                            cerr << "Did not save child for style " << id << endl;
+                            LOG(WARNING) << "Did not save child for style " << id;
                         }
                     }
                     if (!parentIds.empty()) {
@@ -302,22 +293,19 @@ namespace soulsifter {
                             ps->setInt(i * 2 + 2, parentIds[i]);
                         }
                         if (!ps->executeUpdate()) {
-                            cerr << "Did not save parent for style " << id << endl;
+                            LOG(WARNING) << "Did not save parent for style " << id;
                         }
                     }
                     return saved;
                 }
             } catch (sql::SQLException &e) {
-                cerr << "ERROR: SQLException in " << __FILE__;
-                cerr << " (" << __func__<< ") on line " << __LINE__ << endl;
-                cerr << "ERROR: " << e.what();
-                cerr << " (MySQL error code: " << e.getErrorCode();
-                cerr << ", SQLState: " << e.getSQLState() << ")" << endl;
+                LOG(WARNING) << "ERROR: SQLException in " << __FILE__ << " (" << __func__<< ") on line " << __LINE__;
+                LOG(WARNING) << "ERROR: " << e.what() << " (MySQL error code: " << e.getErrorCode() << ", SQLState: " << e.getSQLState() << ")";
                 bool reconnected = MysqlAccess::getInstance().reconnect();
-                std::cout << (reconnected ? "Successful" : "Failed") << " mysql reconnection" << std::endl;
+                LOG(INFO) << (reconnected ? "Successful" : "Failed") << " mysql reconnection";
             }
         }
-        exit(1);
+        LOG(FATAL) << "Unable to complete model operation";
     }
 
     bool Style::sync() {
@@ -332,7 +320,7 @@ namespace soulsifter {
         boost::smatch match2;
         if (id != style->getId()) {
             if (id) {
-                cout << "updating style " << id << " id from " << style->getId() << " to " << id << endl;
+                LOG(INFO) << "updating style " << id << " id from " << style->getId() << " to " << id;
                 needsUpdate = true;
             } else {
                 id = style->getId();
@@ -340,7 +328,7 @@ namespace soulsifter {
         }
         if (name.compare(style->getName())  && (!boost::regex_match(name, match1, decimal) || !boost::regex_match(style->getName(), match2, decimal) || match1[1].str().compare(match2[1].str()))) {
             if (!name.empty()) {
-                cout << "updating style " << id << " name from " << style->getName() << " to " << name << endl;
+                LOG(INFO) << "updating style " << id << " name from " << style->getName() << " to " << name;
                 needsUpdate = true;
             } else {
                 name = style->getName();
@@ -348,7 +336,7 @@ namespace soulsifter {
         }
         if (reId != style->getREId()) {
             if (reId) {
-                cout << "updating style " << id << " reId from " << style->getREId() << " to " << reId << endl;
+                LOG(INFO) << "updating style " << id << " reId from " << style->getREId() << " to " << reId;
                 needsUpdate = true;
             } else {
                 reId = style->getREId();
@@ -356,7 +344,7 @@ namespace soulsifter {
         }
         if (reLabel.compare(style->getRELabel())  && (!boost::regex_match(reLabel, match1, decimal) || !boost::regex_match(style->getRELabel(), match2, decimal) || match1[1].str().compare(match2[1].str()))) {
             if (!reLabel.empty()) {
-                cout << "updating style " << id << " reLabel from " << style->getRELabel() << " to " << reLabel << endl;
+                LOG(INFO) << "updating style " << id << " reLabel from " << style->getRELabel() << " to " << reLabel;
                 needsUpdate = true;
             } else {
                 reLabel = style->getRELabel();
@@ -364,14 +352,14 @@ namespace soulsifter {
         }
         if (!equivalentVectors<int>(childIds, style->getChildIds())) {
             if (!containsVector<int>(childIds, style->getChildIds())) {
-                cout << "updating style " << id << " childIds" << endl;
+                LOG(INFO) << "updating style " << id << " childIds";
                 needsUpdate = true;
             }
             appendUniqueVector<int>(style->getChildIds(), &childIds);
         }
         if (!equivalentVectors<int>(parentIds, style->getParentIds())) {
             if (!containsVector<int>(parentIds, style->getParentIds())) {
-                cout << "updating style " << id << " parentIds" << endl;
+                LOG(INFO) << "updating style " << id << " parentIds";
                 needsUpdate = true;
             }
             appendUniqueVector<int>(style->getParentIds(), &parentIds);

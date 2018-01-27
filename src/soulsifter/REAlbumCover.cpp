@@ -14,13 +14,13 @@
 
 #include <boost/regex.hpp>
 #include <boost/algorithm/string.hpp>
-
 #include <cppconn/connection.h>
 #include <cppconn/statement.h>
 #include <cppconn/prepared_statement.h>
 #include <cppconn/resultset.h>
 #include <cppconn/exception.h>
 #include <cppconn/warning.h>
+#include <g3log/g3log.hpp>
 
 #include "MysqlAccess.h"
 #include "DTVectorUtil.h"
@@ -83,16 +83,13 @@ namespace soulsifter {
 
                 return reAlbumCover;
             } catch (sql::SQLException &e) {
-                cerr << "ERROR: SQLException in " << __FILE__;
-                cerr << " (" << __func__<< ") on line " << __LINE__ << endl;
-                cerr << "ERROR: " << e.what();
-                cerr << " (MySQL error code: " << e.getErrorCode();
-                cerr << ", SQLState: " << e.getSQLState() << ")" << endl;
+                LOG(WARNING) << "ERROR: SQLException in " << __FILE__ << " (" << __func__<< ") on line " << __LINE__;
+                LOG(WARNING) << "ERROR: " << e.what() << " (MySQL error code: " << e.getErrorCode() << ", SQLState: " << e.getSQLState() << ")";
                 bool reconnected = MysqlAccess::getInstance().reconnect();
-                std::cout << (reconnected ? "Successful" : "Failed") << " mysql reconnection" << std::endl;
+                LOG(INFO) << (reconnected ? "Successful" : "Failed") << " mysql reconnection";
             }
         }
-        exit(1);
+        LOG(FATAL) << "Unable to complete model operation";
     }
 
     REAlbumCover* REAlbumCover::findByREId(const string& reId) {
@@ -112,16 +109,13 @@ namespace soulsifter {
 
                 return reAlbumCover;
             } catch (sql::SQLException &e) {
-                cerr << "ERROR: SQLException in " << __FILE__;
-                cerr << " (" << __func__<< ") on line " << __LINE__ << endl;
-                cerr << "ERROR: " << e.what();
-                cerr << " (MySQL error code: " << e.getErrorCode();
-                cerr << ", SQLState: " << e.getSQLState() << ")" << endl;
+                LOG(WARNING) << "ERROR: SQLException in " << __FILE__ << " (" << __func__<< ") on line " << __LINE__;
+                LOG(WARNING) << "ERROR: " << e.what() << " (MySQL error code: " << e.getErrorCode() << ", SQLState: " << e.getSQLState() << ")";
                 bool reconnected = MysqlAccess::getInstance().reconnect();
-                std::cout << (reconnected ? "Successful" : "Failed") << " mysql reconnection" << std::endl;
+                LOG(INFO) << (reconnected ? "Successful" : "Failed") << " mysql reconnection";
             }
         }
-        exit(1);
+        LOG(FATAL) << "Unable to complete model operation";
     }
 
     ResultSetIterator<REAlbumCover>* REAlbumCover::findAll() {
@@ -146,16 +140,13 @@ namespace soulsifter {
                 int result = ps->executeUpdate();
                 return result;
             } catch (sql::SQLException &e) {
-                cerr << "ERROR: SQLException in " << __FILE__;
-                cerr << " (" << __func__<< ") on line " << __LINE__ << endl;
-                cerr << "ERROR: " << e.what();
-                cerr << " (MySQL error code: " << e.getErrorCode();
-                cerr << ", SQLState: " << e.getSQLState() << ")" << endl;
+                LOG(WARNING) << "ERROR: SQLException in " << __FILE__ << " (" << __func__<< ") on line " << __LINE__;
+                LOG(WARNING) << "ERROR: " << e.what() << " (MySQL error code: " << e.getErrorCode() << ", SQLState: " << e.getSQLState() << ")";
                 bool reconnected = MysqlAccess::getInstance().reconnect();
-                std::cout << (reconnected ? "Successful" : "Failed") << " mysql reconnection" << std::endl;
+                LOG(INFO) << (reconnected ? "Successful" : "Failed") << " mysql reconnection";
             }
         }
-        exit(1);
+        LOG(FATAL) << "Unable to complete model operation";
     }
 
     int REAlbumCover::save() {
@@ -169,27 +160,24 @@ namespace soulsifter {
                 else ps->setNull(2, sql::DataType::VARCHAR);
                 int saved = ps->executeUpdate();
                 if (!saved) {
-                    cerr << "Not able to save reAlbumCover" << endl;
+                    LOG(WARNING) << "Not able to save reAlbumCover";
                     return saved;
                 } else {
                     id = MysqlAccess::getInstance().getLastInsertId();
                     if (id == 0) {
-                        cerr << "Inserted reAlbumCover, but unable to retreive inserted ID." << endl;
+                        LOG(WARNING) << "Inserted reAlbumCover, but unable to retreive inserted ID.";
                         return saved;
                     }
                     return saved;
                 }
             } catch (sql::SQLException &e) {
-                cerr << "ERROR: SQLException in " << __FILE__;
-                cerr << " (" << __func__<< ") on line " << __LINE__ << endl;
-                cerr << "ERROR: " << e.what();
-                cerr << " (MySQL error code: " << e.getErrorCode();
-                cerr << ", SQLState: " << e.getSQLState() << ")" << endl;
+                LOG(WARNING) << "ERROR: SQLException in " << __FILE__ << " (" << __func__<< ") on line " << __LINE__;
+                LOG(WARNING) << "ERROR: " << e.what() << " (MySQL error code: " << e.getErrorCode() << ", SQLState: " << e.getSQLState() << ")";
                 bool reconnected = MysqlAccess::getInstance().reconnect();
-                std::cout << (reconnected ? "Successful" : "Failed") << " mysql reconnection" << std::endl;
+                LOG(INFO) << (reconnected ? "Successful" : "Failed") << " mysql reconnection";
             }
         }
-        exit(1);
+        LOG(FATAL) << "Unable to complete model operation";
     }
 
     bool REAlbumCover::sync() {
@@ -204,7 +192,7 @@ namespace soulsifter {
         boost::smatch match2;
         if (id != reAlbumCover->getId()) {
             if (id) {
-                cout << "updating reAlbumCover " << id << " id from " << reAlbumCover->getId() << " to " << id << endl;
+                LOG(INFO) << "updating reAlbumCover " << id << " id from " << reAlbumCover->getId() << " to " << id;
                 needsUpdate = true;
             } else {
                 id = reAlbumCover->getId();
@@ -212,7 +200,7 @@ namespace soulsifter {
         }
         if (reId.compare(reAlbumCover->getREId())  && (!boost::regex_match(reId, match1, decimal) || !boost::regex_match(reAlbumCover->getREId(), match2, decimal) || match1[1].str().compare(match2[1].str()))) {
             if (!reId.empty()) {
-                cout << "updating reAlbumCover " << id << " reId from " << reAlbumCover->getREId() << " to " << reId << endl;
+                LOG(INFO) << "updating reAlbumCover " << id << " reId from " << reAlbumCover->getREId() << " to " << reId;
                 needsUpdate = true;
             } else {
                 reId = reAlbumCover->getREId();
@@ -220,7 +208,7 @@ namespace soulsifter {
         }
         if (thumbnail.compare(reAlbumCover->getThumbnail())  && (!boost::regex_match(thumbnail, match1, decimal) || !boost::regex_match(reAlbumCover->getThumbnail(), match2, decimal) || match1[1].str().compare(match2[1].str()))) {
             if (!thumbnail.empty()) {
-                cout << "updating reAlbumCover " << id << " thumbnail from " << reAlbumCover->getThumbnail() << " to " << thumbnail << endl;
+                LOG(INFO) << "updating reAlbumCover " << id << " thumbnail from " << reAlbumCover->getThumbnail() << " to " << thumbnail;
                 needsUpdate = true;
             } else {
                 thumbnail = reAlbumCover->getThumbnail();
