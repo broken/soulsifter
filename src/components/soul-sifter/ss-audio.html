@@ -80,13 +80,19 @@
         type: String,
         value: 'Ø',
       },
+      disabled: {
+        type: Boolean,
+        value: true,
+      },
+      duration: {
+        type: Number,
+        value: 1,
+      },
+      currentTime: {
+        type: Number,
+        value: 0,
+      },
     },
-
-    duration: 1,
-
-    currentTime: 0,
-
-    disabled: true,
 
     ready: function() {
       this.fs = require('fs');

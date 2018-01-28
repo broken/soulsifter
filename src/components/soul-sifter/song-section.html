@@ -165,6 +165,7 @@
     },
 
     globalSongChanged: function(song) {
+      this.$.audio.pause();
       this.song = song;
       if (!song) {
         this._setCoverImage();
