@@ -58,6 +58,7 @@
 
     // Used for comparing BPMs when determining pitch shifts
     _canonicalizeBpm: function(bpm) {
+      if (bpm === 0) return bpm;
       if (bpm >= 150) return this._canonicalizeBpm(bpm / 2);
       if (bpm < 75) return this._canonicalizeBpm(bpm * 2);
       return bpm;
