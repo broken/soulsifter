@@ -123,7 +123,7 @@ vector<string> MusicVideoService::downloadAudio(const string& url) {
   return filepaths;
 }
 
-MusicVideo* MusicVideoService::associateYouTubeVideo(Song* const song, const string& id) {
+MusicVideo* MusicVideoService::associateYouTubeVideo(Song* song, const string& id) {
   LOG(INFO) << "Associate YouTube video " << id << " with song " << song->getId();
 
   boost::filesystem::path mvBasePath(SoulSifterSettings::getInstance().get<string>("mv.dir"));
