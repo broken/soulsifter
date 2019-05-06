@@ -5,7 +5,7 @@ module.exports = function(grunt) {
     builtAppDir: 'build/<%= pkg.name %> - v<%= pkg.version %>/osx64/<%= pkg.name %>.app',
     nwjs: {
       options: {
-        version: '0.21.6', // Version of node-webkit (http://dl.nwjs.io)
+        version: '0.37.4', // Version of node-webkit (http://dl.nwjs.io)
         buildDir: './build', // Where the build version of my node-webkit app is saved
         credits: './src/credits.html', // Mac credits
         macIcns: './DVDRipper.icns', // Path to the Mac icon file
@@ -30,7 +30,7 @@ module.exports = function(grunt) {
         },
       },
       nwgypconfigure: {
-        command: 'nw-gyp configure --arch=x64 --target=0.19.0-rc1',
+        command: 'nw-gyp configure --arch=x64 --target=0.37.4',
         options: {
           execOptions: {
             cwd: 'src/soulsifter',
@@ -38,7 +38,7 @@ module.exports = function(grunt) {
         },
       },
       nwgypbuild: {
-        command: 'nw-gyp build --target=0.19.0-rc1',
+        command: 'nw-gyp build --target=0.37.4',
         options: {
           execOptions: {
             cwd: 'src/soulsifter',
@@ -144,7 +144,7 @@ module.exports = function(grunt) {
 
   grunt.registerTask('run', ['spawn:run']);
   grunt.registerTask('css-hack', ['less:development', 'replace:less']);
-  grunt.registerTask('default', ['nwjs', 'css-hack', 'copy:ffmpeg', 'buildnumber', 'run']);
+  grunt.registerTask('default', ['nwjs', 'css-hack', 'buildnumber', 'run']);
   grunt.registerTask('nw-gyp', ['shell:nwgypclean', 'shell:nwgypconfigure', 'replace:rtti', 'shell:nwgypbuild']);
   grunt.registerTask('up', ['shell:updateviews', 'shell:updatecomponents', 'shell:updateworkers', 'css-hack', 'buildnumber']);
   grunt.registerTask('all', ['nw-gyp', 'default']);

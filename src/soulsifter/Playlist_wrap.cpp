@@ -119,7 +119,7 @@ void Playlist::findAll(const Nan::FunctionCallbackInfo<v8::Value>& info) {
   v8::Local<v8::Array> a = Nan::New<v8::Array>((int) v->size());
   for (int i = 0; i < (int) v->size(); i++) {
     v8::Local<v8::Function> cons = Nan::New<v8::Function>(constructor);
-    v8::Local<v8::Object> instance = cons->NewInstance();
+    v8::Local<v8::Object> instance = Nan::NewInstance(cons).ToLocalChecked();
     Playlist* o = Nan::ObjectWrap::Unwrap<Playlist>(instance);
     o->playlist = (*v)[i];
     a->Set(Nan::New<v8::Number>(i), instance);
