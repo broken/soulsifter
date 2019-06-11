@@ -23,81 +23,81 @@
 
 
 <dom-module id="soul-sifter">
-  <style is="custom-style">
-    :host {
-      position: absolute;
-      top: 0;
-      right: 0;
-      bottom: 0;
-      left: 0;
-      color: var(--primary-text-color);
-      background-color: var(--primary-background-color);
-      font-size: 13px;
-    }
-    #pageAnimatedPages {
-      height: 100%;
-    }
-    #drawer {
-      display: flex;
-      flex-direction: column;
-      background-color: var(--primary-background-color);
-    }
-    #drawer neon-animated-pages {
-      flex: 1;
-      overflow-y: scroll;
-    }
-    /* placed here since less preprocessor fails mixins. */
-    paper-tab {
-      --paper-tab: {
-        background-color: var(--paper-tab-bg);
-      };
-      --paper-tab-content: {
-        font-weight: 500 !important;
-      };
-    }
-
-
-    /* remove preset colors */
-/*    :host /deep/ input {
-      color: inherit;
-    }
-    :host /deep/ core-field {
-      color: inherit;
-    }
-    :host /deep/ paper-toolbar {
-      background-color: inherit;
-      font-size: 1em;
-    }
-    :host /deep/ paper-input {
-      color: inherit;
-    }
-*/
-
-    paper-icon-button {
-      position: absolute;
-      display: none;
-      width: 24px;
-      height: 24px;
-      font-size: 16px;
-      margin: 8px;
-    }
-
-    paper-toast {
-      left: auto;
-      right: 20px;
-    }
-
-    .vertical {
-      display: flex;
-      flex-direction: column;
-    }
-    .flex {
-      @apply(--layout-flex);
-    }
-  </style>
   <template>
-    <neon-animated-pages selected="{{selectedPage}}" entry-animation="[[pageEntryAnimation]]" exit-animation="[[pageExitAnimation]]" id="pageAnimatedPages">
-      <neon-animatable>
+    <custom-style>
+      <style>
+        :host {
+          position: absolute;
+          top: 0;
+          right: 0;
+          bottom: 0;
+          left: 0;
+          color: var(--primary-text-color);
+          background-color: var(--primary-background-color);
+          font-size: 13px;
+        }
+        #pageAnimatedPages {
+          height: 100%;
+        }
+        #drawer {
+          display: flex;
+          flex-direction: column;
+          background-color: var(--primary-background-color);
+        }
+        #drawer neon-animated-pages {
+          flex: 1;
+          overflow-y: scroll;
+        }
+        /* placed here since less preprocessor fails mixins. */
+        paper-tab {
+          --paper-tab: {
+            background-color: var(--paper-tab-bg);
+          };
+          --paper-tab-content: {
+            font-weight: 500 !important;
+          };
+        }
+
+
+        /* remove preset colors */
+    /*    :host /deep/ input {
+          color: inherit;
+        }
+        :host /deep/ core-field {
+          color: inherit;
+        }
+        :host /deep/ paper-toolbar {
+          background-color: inherit;
+          font-size: 1em;
+        }
+        :host /deep/ paper-input {
+          color: inherit;
+        }
+    */
+
+        paper-icon-button {
+          position: absolute;
+          display: none;
+          width: 24px;
+          height: 24px;
+          font-size: 16px;
+          margin: 8px;
+        }
+
+        paper-toast {
+          left: auto;
+          right: 20px;
+        }
+
+        .vertical {
+          display: flex;
+          flex-direction: column;
+        }
+        .flex {
+          @apply --layout-flex;
+        }
+      </style>
+    </custom-style>
         <paper-drawer-panel>
           <section drawer id="drawer">
             <paper-tabs selected="{{selectedTab}}">
@@ -117,22 +117,6 @@
             </search-toolbar>
             <song-list query="{{query}}" song-trail="[[songTrail]]" genres="[[genres]]" search-option-bpm-restrict="[[searchOptionBpmRestrict]]" search-option-key-restrict="[[searchOptionKeyRestrict]]" search-option-trashed-restrict="[[searchOptionTrashedRestrict]]" search-option-repeat-restrict="[[searchOptionRepeatRestrict]]" class="fit"></song-list>
           </paper-header-panel>
-        </paper-drawer-panel>
-      </neon-animatable>
-      <neon-animatable>
-        <genre-edit genre="{{genre}}"></genre-edit>
-      </neon-animatable>
-      <neon-animatable>
-        <playlist-edit playlist="{{playlist}}"></playlist-edit>
-      </neon-animatable>
-      <neon-animatable>
-        <song-edit song="{{song}}" filepaths="{{newSongFilepaths}}"></song-edit>
-      </neon-animatable>
-      <neon-animatable>
-        <ss-settings></ss-settings>
-      </neon-animatable>
-    </neon-animated-pages>
-    <paper-toast id="toast" text="{{errorText}}" duration="5000" autoCloseDisabled></paper-toast> 
   </template>
 </dom-module>
 
@@ -169,44 +153,46 @@
     },
 
     attached: function() {
-      // setup page listeners
-      var that = this;
-      var mainEntry = 'slide-from-left-animation', mainExit = 'slide-left-animation';
-      var subEntry = 'slide-from-right-animation', subExit = 'slide-right-animation';
-      this.addEventListener('page-main', function(e) {
-        that.pageEntryAnimation = mainEntry;
-        that.pageExitAnimation = subExit;
-        that.selectedPage = 0;
-      });
-      this.addEventListener('page-genre-edit', function(e) {
-        that.pageEntryAnimation = subEntry;
-        that.pageExitAnimation = mainExit;
-        that.selectedPage = 1;
-        that.genre = e.detail.genre;
-      });
-      this.addEventListener('page-playlist-edit', function(e) {
-        that.pageEntryAnimation = subEntry;
-        that.pageExitAnimation = mainExit;
-        that.selectedPage = 2;
-        that.playlist = e.detail.playlist;
-      });
-      this.addEventListener('page-song-edit', function(e) {
-        that.pageEntryAnimation = subEntry;
-        that.pageExitAnimation = mainExit;
-        that.selectedPage = 3;
-        if (e.detail.song) that.song = e.detail.song;
-        if (e.detail.filepaths) that.newSongFilepaths = e.detail.filepaths;
-      });
-      this.addEventListener('page-settings', function(e) {
-        that.pageEntryAnimation = subEntry;
-        that.pageExitAnimation = mainExit;
-        that.selectedPage = 4;
-      });
-      this.addEventListener('error-alert', function(e) {
-        console.log(e.detail.msg);
-        that.errorText = e.detail.msg;
-        that.$.toast.show();
-      });
+      Polymer.RenderStatus.afterNextRender(this, function() {
+        // setup page listeners
+        var that = this;
+        var mainEntry = 'slide-from-left-animation', mainExit = 'slide-left-animation';
+        var subEntry = 'slide-from-right-animation', subExit = 'slide-right-animation';
+        this.addEventListener('page-main', function(e) {
+          that.pageEntryAnimation = mainEntry;
+          that.pageExitAnimation = subExit;
+          that.selectedPage = 0;
+        });
+        this.addEventListener('page-genre-edit', function(e) {
+          that.pageEntryAnimation = subEntry;
+          that.pageExitAnimation = mainExit;
+          that.selectedPage = 1;
+          that.genre = e.detail.genre;
+        });
+        this.addEventListener('page-playlist-edit', function(e) {
+          that.pageEntryAnimation = subEntry;
+          that.pageExitAnimation = mainExit;
+          that.selectedPage = 2;
+          that.playlist = e.detail.playlist;
+        });
+        this.addEventListener('page-song-edit', function(e) {
+          that.pageEntryAnimation = subEntry;
+          that.pageExitAnimation = mainExit;
+          that.selectedPage = 3;
+          if (e.detail.song) that.song = e.detail.song;
+          if (e.detail.filepaths) that.newSongFilepaths = e.detail.filepaths;
+        });
+        this.addEventListener('page-settings', function(e) {
+          that.pageEntryAnimation = subEntry;
+          that.pageExitAnimation = mainExit;
+          that.selectedPage = 4;
+        });
+        this.addEventListener('error-alert', function(e) {
+          console.log(e.detail.msg);
+          that.errorText = e.detail.msg;
+          that.$.toast.show();
+        });
+      }.bind(this));
     },
 
     changeQuery: function(e, detail, sender) {

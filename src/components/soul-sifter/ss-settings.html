@@ -8,9 +8,11 @@
 
 
 <dom-module id="ss-settings">
-  <style is="custom-style">
-  </style>
   <template>
+    <custom-style>
+      <style>
+      </style>
+    </custom-style>
     <abstract-action-page id="abstractActionPage">
       <div class="fields">
         <paper-input label="Music Directory" value="{{musicDir}}"></paper-input>
@@ -53,8 +55,7 @@
     },
 
     attached: function() {
-      // https://www.polymer-project.org/1.0/docs/migration.html#domready
-      this.async(function() {
+      Polymer.RenderStatus.afterNextRender(this, function() {
         this.$.abstractActionPage.setAcceptAction(this.save);
       }.bind(this));
     },

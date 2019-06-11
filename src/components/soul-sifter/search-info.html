@@ -2,33 +2,35 @@
 
 
 <dom-module id="search-info">
-  <style is="custom-style">
-    :host {
-      display: flex;
-      flex-direction: column;
-      width: 575px;
-      white-space: nowrap;
-    }
-    header {
-      color: var(--ss-search-info-heading-color);
-      margin-top: 14px;
-    }
-    section {
-      display: flex;
-      flex-direction: row;
-    }
-    .emphasis {
-      color: var(--ss-search-info-emphasis-color);
-    }
-    .right {
-      text-align: right;
-    }
-    .flex {
-      flex: 1;
-      flex-basis: 0.000000001px;
-    }
-  </style>
   <template>
+    <custom-style>
+      <style>
+        :host {
+          display: flex;
+          flex-direction: column;
+          width: 575px;
+          white-space: nowrap;
+        }
+        header {
+          color: var(--ss-search-info-heading-color);
+          margin-top: 14px;
+        }
+        section {
+          display: flex;
+          flex-direction: row;
+        }
+        .emphasis {
+          color: var(--ss-search-info-emphasis-color);
+        }
+        .right {
+          text-align: right;
+        }
+        .flex {
+          flex: 1;
+          flex-basis: 0.000000001px;
+        }
+      </style>
+    </custom-style>
     <header>
       <span>Search atoms</span>
       <hr>

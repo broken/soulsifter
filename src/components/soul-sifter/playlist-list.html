@@ -11,14 +11,16 @@
 
 
 <dom-module id="playlist-list">
-  <style is="custom-style">
-    paper-fab {
-      bottom: 60px;
-      position: absolute;
-      right: 12px;
-    }
-  </style>
   <template>
+    <custom-style>
+      <style>
+        paper-fab {
+          bottom: 60px;
+          position: absolute;
+          right: 12px;
+        }
+      </style>
+    </custom-style>
     <iron-signals on-iron-signal-playlists-changed="updatePlaylists"></iron-signals>
 
     <template is="dom-repeat" items="[[playlists]]" id="playlistTpl">
@@ -41,8 +43,7 @@
     },
 
     attached: function() {
-      // https://www.polymer-project.org/1.0/docs/migration.html#domready
-      this.async(function() {
+      Polymer.RenderStatus.afterNextRender(this, function() {
         this.updatePlaylists();
       }.bind(this));
     },

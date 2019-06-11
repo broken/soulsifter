@@ -4,21 +4,23 @@
 
 
 <dom-module id="ss-options-menu-item">
-  <style is="custom-style">
-    :host {
-      line-height: 22px;
-      margin: 2px;
-      position: relative;
-      display: block;
-      white-space: nowrap;
-    }
-    :host:hover {
-      color: var(--secondary-text-color);
-      background-color: var(--ss-options-button-menu-item-hover-color);
-    }
-  </style>
   <template>
-    <content></content>
+    <custom-style>
+      <style>
+        :host {
+          line-height: 22px;
+          margin: 2px;
+          position: relative;
+          display: block;
+          white-space: nowrap;
+        }
+        :host:hover {
+          color: var(--secondary-text-color);
+          background-color: var(--ss-options-button-menu-item-hover-color);
+        }
+      </style>
+    </custom-style>
+    <slot></slot>
     <paper-ripple></paper-ripple>
   </template>
 </dom-module>

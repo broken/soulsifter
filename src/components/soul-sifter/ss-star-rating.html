@@ -4,24 +4,26 @@
 
 
 <dom-module id="ss-star-rating">
-  <style is="custom-style">
-    :host {
-      white-space: nowrap;
-      color: var(--ss-star-rating-color);
-    }
-    :host(.trashed) {
-      color: var(--ss-star-rating-trashed-color);
-    }
-    iron-icon {
-      height: 13px;
-      width: 13px;
-      color: inherit;
-    }
-    iron-icon[selected] {
-      color: var(--ss-star-rating-selected-color);
-    }
-  </style>
   <template>
+    <custom-style>
+      <style>
+        :host {
+          white-space: nowrap;
+          color: var(--ss-star-rating-color);
+        }
+        :host(.trashed) {
+          color: var(--ss-star-rating-trashed-color);
+        }
+        iron-icon {
+          height: 13px;
+          width: 13px;
+          color: inherit;
+        }
+        iron-icon[selected] {
+          color: var(--ss-star-rating-selected-color);
+        }
+      </style>
+    </custom-style>
     <template is="dom-repeat" items="[[stars]]">
       <iron-icon icon="star" selected$="[[_isSelected(item, value)]]" on-click="_select"></iron-icon>
     </template>

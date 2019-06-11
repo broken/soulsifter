@@ -9,129 +9,128 @@
 
 
 <dom-module id="song-list-item">
-  <style is="custom-style">
-
-
-    ss-star-rating {
-      margin: 0 6px;
-    }
-
-
-    .song-item {
-      @apply(--layout-horizontal);
-      @apply(--layout-center);
-      height: 30px;
-      padding: 0 8px;
-      margin: 0 10px;
-      border-bottom: var(--ss-song-list-item-border-bottom);
-    }
-    .song-item div {
-      margin: 3px;
-    }
-    .song-item:hover {
-      background-color: var(--ss-song-list-item-hover-background-color);
-    }
-    .song-item ss-options-menu::shadow #btn {
-      display: none;
-    }
-    .song-item:hover ss-options-menu::shadow #btn {
-      display: block;
-    }
-    ss-options-menu {
-      --iron-icon-height: 16px;
-      --iron-icon-width: 16px;
-      top: -4px;
-    }
-    /*.song-item #menuButton {
-      margin-top: 4px;
-      padding: 0;
-    }*/
-    .song-item .artist {
-      color: var(--ss-song-list-item-artist-color);
-    }
-    .song-item .title {
-      color: var(--ss-song-list-item-title-color);
-    }
-    .song-item .fade-out:after {
-      background: var(--ss-song-list-item-fade-out);
-    }
-    .song-item:hover .fade-out:after {
-      background: var(--ss-song-list-item-hover-fade-out);
-    }
-    .song-item #menuButton {
-      border: var(--ss-song-list-item-button-border);
-    }
-    .song-item #menuButton:hover {
-      border: var(--ss-song-list-item-button-hover-border);
-    }
-
-    #cover {
-      background-position: center center;
-      background-size: cover;
-      height: 30px;
-      width: 30px;
-    }
-
-    .key {
-      position: relative;
-      overflow: hidden;
-      white-space: nowrap;
-    }
-
-    .energy-0 {
-      color: var(--ss-song-list-item-energy-0);
-    }
-    .energy-1 {
-      color: var(--ss-song-list-item-energy-1);
-    }
-    .energy-2 {
-      color: var(--ss-song-list-item-energy-2);
-    }
-    .energy-3 {
-      color: var(--ss-song-list-item-energy-3);
-    }
-    .energy-4 {
-      color: var(--ss-song-list-item-energy-4);
-    }
-    .energy-5 {
-      color: var(--ss-song-list-item-energy-5);
-    }
-    .energy-6 {
-      color: var(--ss-song-list-item-energy-6);
-    }
-    .energy-7 {
-      color: var(--ss-song-list-item-energy-7);
-    }
-    .energy-8 {
-      color: var(--ss-song-list-item-energy-8);
-    }
-    .energy-9 {
-      color: var(--ss-song-list-item-energy-9);
-    }
-    .energy-10 {
-      color: var(--ss-song-list-item-energy-10);
-    }
-
-    .fade-out:after {
-      display: block;
-      position: absolute;
-      top: 0;
-      bottom: 0;
-      right: 0;
-      width: 30px;
-      content: "";
-    }
-
-    time {
-      text-align: right;
-      width: 64px;
-    }
-
-    .flex {
-      @apply(--layout-flex);
-    }
-  </style>
   <template>
+    <custom-style>
+      <style>
+        ss-star-rating {
+          margin: 0 6px;
+        }
+
+        .song-item {
+          @apply --layout-horizontal;
+          @apply --layout-center;
+          height: 30px;
+          padding: 0 8px;
+          margin: 0 10px;
+          border-bottom: var(--ss-song-list-item-border-bottom);
+        }
+        .song-item div {
+          margin: 3px;
+        }
+        .song-item:hover {
+          background-color: var(--ss-song-list-item-hover-background-color);
+        }
+        .song-item ss-options-menu::shadow #btn {
+          display: none;
+        }
+        .song-item:hover ss-options-menu::shadow #btn {
+          display: block;
+        }
+        ss-options-menu {
+          --iron-icon-height: 16px;
+          --iron-icon-width: 16px;
+          top: -4px;
+        }
+        /*.song-item #menuButton {
+          margin-top: 4px;
+          padding: 0;
+        }*/
+        .song-item .artist {
+          color: var(--ss-song-list-item-artist-color);
+        }
+        .song-item .title {
+          color: var(--ss-song-list-item-title-color);
+        }
+        .song-item .fade-out:after {
+          background: var(--ss-song-list-item-fade-out);
+        }
+        .song-item:hover .fade-out:after {
+          background: var(--ss-song-list-item-hover-fade-out);
+        }
+        .song-item #menuButton {
+          border: var(--ss-song-list-item-button-border);
+        }
+        .song-item #menuButton:hover {
+          border: var(--ss-song-list-item-button-hover-border);
+        }
+
+        #cover {
+          background-position: center center;
+          background-size: cover;
+          height: 30px;
+          width: 30px;
+        }
+
+        .key {
+          position: relative;
+          overflow: hidden;
+          white-space: nowrap;
+        }
+
+        .energy-0 {
+          color: var(--ss-song-list-item-energy-0);
+        }
+        .energy-1 {
+          color: var(--ss-song-list-item-energy-1);
+        }
+        .energy-2 {
+          color: var(--ss-song-list-item-energy-2);
+        }
+        .energy-3 {
+          color: var(--ss-song-list-item-energy-3);
+        }
+        .energy-4 {
+          color: var(--ss-song-list-item-energy-4);
+        }
+        .energy-5 {
+          color: var(--ss-song-list-item-energy-5);
+        }
+        .energy-6 {
+          color: var(--ss-song-list-item-energy-6);
+        }
+        .energy-7 {
+          color: var(--ss-song-list-item-energy-7);
+        }
+        .energy-8 {
+          color: var(--ss-song-list-item-energy-8);
+        }
+        .energy-9 {
+          color: var(--ss-song-list-item-energy-9);
+        }
+        .energy-10 {
+          color: var(--ss-song-list-item-energy-10);
+        }
+
+        .fade-out:after {
+          display: block;
+          position: absolute;
+          top: 0;
+          bottom: 0;
+          right: 0;
+          width: 30px;
+          content: "";
+        }
+
+        time {
+          text-align: right;
+          width: 64px;
+        }
+
+        .flex {
+          @apply --layout-flex;
+        }
+      </style>
+    </custom-style>
     <div class="song-item" draggable="true" on-dragstart="_dragSong" id="draggableItem">
       <div id="cover"></div>
       <div class="key fade-out flex">

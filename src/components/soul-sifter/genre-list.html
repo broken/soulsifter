@@ -4,14 +4,16 @@
 
 
 <dom-module id="genre-list">
-  <style is="custom-style">
-    paper-fab {
-      bottom: 15px;
-      position: relative;
-      left: 182px;
-    }
-  </style>
   <template>
+    <custom-style>
+      <style>
+        paper-fab {
+          bottom: 15px;
+          position: relative;
+          left: 182px;
+        }
+      </style>
+    </custom-style>
     <template is="dom-repeat" items="[[genreParents]]">
       <genre-list-item genre="[[item]]" on-genre-select="_selectGenre" single-select="[[singleSelect]]" main="[[main]]"></genre-list-item>
     </template>
@@ -45,7 +47,7 @@
     },
 
     _selectionChanged: function(genres) {
-      for (var i = 0, childNodes = Polymer.dom(this.root).querySelectorAll('genre-list-item');
+      for (var i = 0, childNodes = this.shadowRoot.querySelectorAll('genre-list-item');
            i < childNodes.length; ++i) {
         childNodes[i].selectIffInArray(genres);
       }

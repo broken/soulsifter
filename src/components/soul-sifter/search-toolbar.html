@@ -14,34 +14,36 @@
 
 
 <dom-module id="search-toolbar">
-  <style is="custom-style">
-    :host {
-      background-color: var(--search-toolbar-background);
-      display: flex;
-      flex-direction: row;
-      height: 42px;
-      padding-top: 5px;
-      padding-left: 17px;
-    }
-    paper-icon-button {
-      color: var(--primary-text-color);
-    }
-    #searchInfoDialog {
-      max-width: none !important;
-    }
-    #bpm {
-      width: 64px;
-    }
-    .flex {
-      flex: 1;
-      flex-basis: auto;
-    }
-    .menuItem {
-      white-space: nowrap;
-    }
-  </style>
   <template>
-    <content></content>  <!-- for drawer icon. needed? -->
+    <custom-style>
+      <style>
+        :host {
+          background-color: var(--search-toolbar-background);
+          display: flex;
+          flex-direction: row;
+          height: 42px;
+          padding-top: 5px;
+          padding-left: 17px;
+        }
+        paper-icon-button {
+          color: var(--primary-text-color);
+        }
+        #searchInfoDialog {
+          max-width: none !important;
+        }
+        #bpm {
+          width: 64px;
+        }
+        .flex {
+          flex: 1;
+          flex-basis: auto;
+        }
+        .menuItem {
+          white-space: nowrap;
+        }
+      </style>
+    </custom-style>
+    <slot></slot>  <!-- for drawer icon. needed? -->
     <paper-icon-button icon="search" on-click="search"></paper-icon-button>
     <paper-input label="search" value="{{query}}" class="flex" no-label-float></paper-input>
     <paper-icon-button icon="info-outline" on-click="_toggleSearchInfoDialog"></paper-icon-button>
@@ -104,8 +106,7 @@
     },
 
     attached: function() {
-      // https://www.polymer-project.org/1.0/docs/migration.html#domready
-      this.async(function() {
+      Polymer.RenderStatus.afterNextRender(this, function() {
         this.$.createSongButton.ondragover = function() {
           this.icon = 'add-circle-outline';
           return false;

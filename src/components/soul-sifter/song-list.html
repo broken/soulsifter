@@ -8,18 +8,20 @@
 
 
 <dom-module id="song-list">
-  <style is="custom-style">
-    core-tooltip {
-      position: absolute;
-      left: 50%;
-    }
-
-    .song {
-      height: 20px;
-      padding-left: 5px;
-    }
-  </style>
   <template>
+    <custom-style>
+      <style>
+        core-tooltip {
+          position: absolute;
+          left: 50%;
+        }
+
+        .song {
+          height: 20px;
+          padding-left: 5px;
+        }
+      </style>
+    </custom-style>
     <iron-signals on-iron-signal-search="search"></iron-signals>
 
     <core-tooltip id="tooltip" label="Searching..." noarrow position top></core-tooltip>
@@ -71,8 +73,7 @@
     ],
 
     attached: function() {
-      // https://www.polymer-project.org/1.0/docs/migration.html#domready
-      this.async(function() {
+      Polymer.RenderStatus.afterNextRender(this, function() {
         this.search();
       }.bind(this));
     },

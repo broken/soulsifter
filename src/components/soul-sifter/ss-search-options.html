@@ -4,26 +4,28 @@
 
 
 <dom-module id="ss-search-options">
-  <style is="custom-style">
-    :host {
-      display: flex;
-      flex-direction: column;
-      white-space: nowrap;
-    }
-    section {
-      display: flex;
-      flex-direction: row;
-    }
-    paper-toggle-button {
-      padding-top: 3px;
-      margin-left: 15px;
-    }
-    span {
-      padding-left: 10px;
-      margin-right: 15px;
-    }
-  </style>
   <template>
+    <custom-style>
+      <style>
+        :host {
+          display: flex;
+          flex-direction: column;
+          white-space: nowrap;
+        }
+        section {
+          display: flex;
+          flex-direction: row;
+        }
+        paper-toggle-button {
+          padding-top: 3px;
+          margin-left: 15px;
+        }
+        span {
+          padding-left: 10px;
+          margin-right: 15px;
+        }
+      </style>
+    </custom-style>
     <section>
       <paper-toggle-button checked="{{searchOptionBpmRestrict}}"></paper-toggle-button>
       <span>BPM restrict</span>

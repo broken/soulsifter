@@ -5,36 +5,38 @@
 
 
 <dom-module id="ss-options-menu">
-  <style is="custom-style">
-    :host {
-      position: relative;
-      height: 33px;
-    }
-    #btn {
-      line-height: inherit;
-      vertical-align: top;
-    }
-    #menu {
-      background-color: var(--ss-options-button-menu-background-color);
-      padding: 15px;
-      position: absolute;
-      top: 6px;
-      right: 8px;
-      border-radius: 2px;
-      display: block;
-      opacity: 1;
-      transition: opacity 1s;
-      z-index: 1;
-    }
-    #menu.hide {
-      display: none;
-      opacity: 0;
-    }
-  </style>
   <template>
+    <custom-style>
+      <style>
+        :host {
+          position: relative;
+          height: 33px;
+        }
+        #btn {
+          line-height: inherit;
+          vertical-align: top;
+        }
+        #menu {
+          background-color: var(--ss-options-button-menu-background-color);
+          padding: 15px;
+          position: absolute;
+          top: 6px;
+          right: 8px;
+          border-radius: 2px;
+          display: block;
+          opacity: 1;
+          transition: opacity 1s;
+          z-index: 1;
+        }
+        #menu.hide {
+          display: none;
+          opacity: 0;
+        }
+      </style>
+    </custom-style>
     <paper-icon-button id="btn" icon="more-vert"></paper-icon-button>
     <paper-material id="menu" class="hide" elevation="3">
-      <content></content>
+      <slot></slot>
     </paper-material>
     </div>
   </template>

@@ -6,18 +6,20 @@
 
 
 <dom-module id="pitch-slider">
-  <style is="custom-style">
-    paper-slider::shadow paper-input::shadow paper-input-decorator {
-      padding: 0 0 2px 0;
-    }
-    paper-slider::shadow paper-input::shadow input[is="core-input"] {
-      margin: 0.25em 0;
-    }
-    paper-slider::shadow #sliderContainer {
-      margin: 0;
-    }
-  </style>
   <template>
+    <custom-style>
+      <style>
+        paper-slider::shadow paper-input::shadow paper-input-decorator {
+          padding: 0 0 2px 0;
+        }
+        paper-slider::shadow paper-input::shadow input[is="core-input"] {
+          margin: 0.25em 0;
+        }
+        paper-slider::shadow #sliderContainer {
+          margin: 0;
+        }
+      </style>
+    </custom-style>
     <paper-slider editable pin value="{{pitch}}" step="0.1" min="{{pitchPctMin}}" max="{{pitchPctMax}}"></paper-slider>
   </template>
 </dom-module>

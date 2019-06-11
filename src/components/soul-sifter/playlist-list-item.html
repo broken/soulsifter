@@ -14,53 +14,55 @@
 
 
 <dom-module id="playlist-list-item">
-  <style is="custom-style">
-    :host[selected] #itemContainer {
-      background-color: var(--ss-playlist-list-item-selected-background-color);
-    }
-
-    #itemContainer {
-      border-radius: 2px;
-      margin: 7px 20px;
-      height: 30px;
-    }
-    #item {
-      height: 30px;
-      padding-left: 40px;
-      @apply(--layout-horizontal);
-      @apply(--layout-center);
-    }
-    #item iron-icon {
-      display: none;
-      vertical-align: top;
-      --iron-icon-height: 16px;
-      --iron-icon-width: 16px;
-    }
-    #item iron-icon.smart {
-      display: block;
-    }
-
-    #item paper-icon-button paper-icon-button {
-      margin-top: 4px;
-      padding: 0;
-    }
-
-    .content {
-      @apply(--layout-flex);
-      @apply(--layout-horizontal);
-    }
-    ss-options-menu {
-      --iron-icon-height: 16px;
-      --iron-icon-width: 16px;
-    }
-    #item ss-options-menu::shadow #btn {
-      display: none;
-    }
-    #item:hover ss-options-menu::shadow #btn {
-      display: block;
-    }
-  </style>
   <template>
+    <custom-style>
+      <style>
+        :host[selected] #itemContainer {
+          background-color: var(--ss-playlist-list-item-selected-background-color);
+        }
+
+        #itemContainer {
+          border-radius: 2px;
+          margin: 7px 20px;
+          height: 30px;
+        }
+        #item {
+          height: 30px;
+          padding-left: 40px;
+          @apply --layout-horizontal;
+          @apply --layout-center;
+        }
+        #item iron-icon {
+          display: none;
+          vertical-align: top;
+          --iron-icon-height: 16px;
+          --iron-icon-width: 16px;
+        }
+        #item iron-icon.smart {
+          display: block;
+        }
+
+        #item paper-icon-button paper-icon-button {
+          margin-top: 4px;
+          padding: 0;
+        }
+
+        .content {
+          @apply --layout-flex;
+          @apply --layout-horizontal;
+        }
+        ss-options-menu {
+          --iron-icon-height: 16px;
+          --iron-icon-width: 16px;
+        }
+        #item ss-options-menu::shadow #btn {
+          display: none;
+        }
+        #item:hover ss-options-menu::shadow #btn {
+          display: block;
+        }
+      </style>
+    </custom-style>
     <ss-googleplaymusic id="gpm"></ss-googleplaymusic>
 
     <div id="itemContainer" on-drop="_handleDrop">

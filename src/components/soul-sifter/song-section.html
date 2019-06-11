@@ -15,66 +15,68 @@
 
 
 <dom-module id="song-section">
-  <style is="custom-style">
-    paper-scroll-header-panel {
-      /*position: static;*/
-      height: 100%;
-    }
-    #header {
-      color: inherit;
-      background-color: transparent;
-      background-size: cover;
-      height: 256px;
-    }
-    .content {
-      margin: 10px 15px;
-    }
-    .title {
-      color: var(--secondary-text-color);
-    }
-    .slider {
-      @apply(--layout-horizontal);
-      @apply(--layout-center);
-    }
-    .flex {
-      @apply(--layout-flex);
-    }
-    .self-end {
-      @apply(--layout-self-end);
-    }
-    .vertical {
-      @apply(--layout-vertical);
-    }
-    #nav {
-      @apply(--layout-horizontal);
-      @apply(--layout-justified);
-      position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      margin: 0;
-    }
-    #nav paper-icon-button[disabled] {
-      visibility: hidden;
-    }
-    audio {
-      height: 30px;
-      width: 100%;
-    }
-    .hasMusicVideo {
-      display: none !important;
-    }
-    #musicVideoInput {
-      display: flex;
-      flex-direction: row;
-    }
-    #musicVideoThumbnail {
-      width: 100%;
-      height: 144px;
-      background-size: cover;
-    }
-  </style>
   <template>
+    <custom-style>
+      <style>
+        paper-scroll-header-panel {
+          /*position: static;*/
+          height: 100%;
+        }
+        #header {
+          color: inherit;
+          background-color: transparent;
+          background-size: cover;
+          height: 256px;
+        }
+        .content {
+          margin: 10px 15px;
+        }
+        .title {
+          color: var(--secondary-text-color);
+        }
+        .slider {
+          @apply --layout-horizontal;
+          @apply --layout-center;
+        }
+        .flex {
+          @apply --layout-flex;
+        }
+        .self-end {
+          @apply --layout-self-end;
+        }
+        .vertical {
+          @apply --layout-vertical;
+        }
+        #nav {
+          @apply --layout-horizontal;
+          @apply --layout-justified;
+          position: absolute;
+          top: 0;
+          left: 0;
+          right: 0;
+          margin: 0;
+        }
+        #nav paper-icon-button[disabled] {
+          visibility: hidden;
+        }
+        audio {
+          height: 30px;
+          width: 100%;
+        }
+        .hasMusicVideo {
+          display: none !important;
+        }
+        #musicVideoInput {
+          display: flex;
+          flex-direction: row;
+        }
+        #musicVideoThumbnail {
+          width: 100%;
+          height: 144px;
+          background-size: cover;
+        }
+      </style>
+    </custom-style>
     <iron-signals on-iron-signal-save-song-trail="saveSongTrail"></iron-signals>
 
     <paper-scroll-header-panel id="shp" condenses keepCondensedHeader condensedHeaderHeight="40" headerHeight="256">

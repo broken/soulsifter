@@ -14,85 +14,87 @@
 
 
 <dom-module id="song-edit">
-  <style is="custom-style">
-    :host {
-      font-size: 16px;
-    }
-
-    paper-input {
-      position: relative;
-      width: 240px;
-    }
-    paper-input::shadow .label-is-floating label {
-      text-align: right;
-    }
-    paper-dropdown-menu::shadow paper-input::shadow label {
-      text-align: right;
-    }
-
-    paper-checkbox {
-      margin: 10px 0;
-    }
-
-    #ratingContainer {
-      position: relative;
-      padding: 13px 0;
-      width: 240px;
-    }
-    #ratingContainer .label {
-      position: absolute;
-      right: 260px;
-      top: 15px;
-    }
-    .label {
-      font-size: 0.75em;
-    }
-    .prev {
-      font-size: 13px;
-      margin-top: 8px;
-      margin-bottom: -28px;
-      text-align: right;
-      color: #666;  /* TODO pull into theme */
-    }
-    .metadata {
-      display: flex;
-      flex-direction: row;
-      position: absolute;
-      align-content: flex-end;
-      bottom: 0;
-      right: 0;
-      left: 0;
-      font-size: 13px;
-      color: #777777;  /* TODO put into theme */
-    }
-    .metadata div {
-      padding: 0 20px;
-      white-space: nowrap;
-    }
-    .audio {
-      height: 24px;
-      width: 100%;
-      flex-grow: 10;
-    }
-
-    .cols {
-      display: flex;
-      flex-direction: row;
-      justify-content: space-between;
-    }
-    .rows {
-      display: flex;
-      flex-direction: column;
-    }
-    #cover {
-      background-position: center center;
-      background-size: cover;
-      background-color: #333;  /* TODO put into theme */
-      height: 108px;
-      width: 108px;
-    }
-  </style>
   <template>
+    <custom-style>
+      <style>
+        :host {
+          font-size: 16px;
+        }
+
+        paper-input {
+          position: relative;
+          width: 240px;
+        }
+        paper-input::shadow .label-is-floating label {
+          text-align: right;
+        }
+        paper-dropdown-menu::shadow paper-input::shadow label {
+          text-align: right;
+        }
+
+        paper-checkbox {
+          margin: 10px 0;
+        }
+
+        #ratingContainer {
+          position: relative;
+          padding: 13px 0;
+          width: 240px;
+        }
+        #ratingContainer .label {
+          position: absolute;
+          right: 260px;
+          top: 15px;
+        }
+        .label {
+          font-size: 0.75em;
+        }
+        .prev {
+          font-size: 13px;
+          margin-top: 8px;
+          margin-bottom: -28px;
+          text-align: right;
+          color: #666;  /* TODO pull into theme */
+        }
+        .metadata {
+          display: flex;
+          flex-direction: row;
+          position: absolute;
+          align-content: flex-end;
+          bottom: 0;
+          right: 0;
+          left: 0;
+          font-size: 13px;
+          color: #777777;  /* TODO put into theme */
+        }
+        .metadata div {
+          padding: 0 20px;
+          white-space: nowrap;
+        }
+        .audio {
+          height: 24px;
+          width: 100%;
+          flex-grow: 10;
+        }
+
+        .cols {
+          display: flex;
+          flex-direction: row;
+          justify-content: space-between;
+        }
+        .rows {
+          display: flex;
+          flex-direction: column;
+        }
+        #cover {
+          background-position: center center;
+          background-size: cover;
+          background-color: #333;  /* TODO put into theme */
+          height: 108px;
+          width: 108px;
+        }
+      </style>
+    </custom-style>
     <abstract-action-page id="abstractActionPage" do-not-call-exit>
       <div class="fields">
         <div class="prev">&nbsp;<span>[[_taggedSong.artist]]</span></div>
@@ -223,8 +225,7 @@
     ],
 
     attached: function() {
-      // https://www.polymer-project.org/1.0/docs/migration.html#domready
-      this.async(function() {
+      Polymer.RenderStatus.afterNextRender(this, function() {
         this.$.abstractActionPage.setAcceptAction(this.save);
         this.$.abstractActionPage.setCancelAction(this.skip);
         // select file dialog
@@ -381,7 +382,7 @@
 
     _validate: function() {
       var valid = 1;
-      var inputs = Polymer.dom(this.root).querySelectorAll('paper-input');
+      var inputs = this.shadowRoot.querySelectorAll('paper-input');
       for (var i = 0; i < inputs.length; ++i) {
         valid &= inputs[i].validate();
       }
