@@ -1,11 +1,13 @@
-<link href="../polymer/polymer.html" rel="import">
+// <link href="../polymer/polymer.html" rel="import">
 
-<link href="../paper-icon-button/paper-icon-button.html" rel="import">
-<link href="../paper-material/paper-material.html" rel="import">
+// <link href="../paper-icon-button/paper-icon-button.html" rel="import">
+// <link href="../paper-material/paper-material.html" rel="import">
 
+import { html, PolymerElement } from "../polymer/polymer-element.js";
 
-<dom-module id="ss-options-menu">
-  <template>
+class OptionsMenu extends PolymerElement {
+  static get template() {
+    return html`
     <custom-style>
       <style>
         :host {
@@ -39,18 +41,13 @@
       <slot></slot>
     </paper-material>
     </div>
-  </template>
-</dom-module>
-
-<script>
-  Polymer({
-    is: 'ss-options-menu',
-
+    `;
+  }
     listeners: {
       'click': '_openMenu',
-    },
+    }
 
-    _openMenu: function(e) {
+    _openMenu(e) {
       this.$.menu.classList.toggle('hide');
       this._closeMenu = function(e) {
         this.$.menu.classList.toggle('hide');
@@ -58,6 +55,8 @@
       }.bind(this);
       document.addEventListener('click', this._closeMenu, true);
       e.stopPropagation();
-    },
-  });
-</script>
+    }
+  }
+}
+
+window.customElements.define('ss-options-menu', OptionsMenu);

@@ -1,15 +1,17 @@
-<link href="../polymer/polymer.html" rel="import">
+// <link href="../polymer/polymer.html" rel="import">
 
-<link href="../iron-flex-layout/iron-flex-layout.html" rel="import">
-<link href="../iron-icon/iron-icon.html" rel="import">
-<link href="../iron-icons/av-icons.html" rel="import">
-<link href="../paper-slider/paper-slider.html" rel="import">
+// <link href="../iron-flex-layout/iron-flex-layout.html" rel="import">
+// <link href="../iron-icon/iron-icon.html" rel="import">
+// <link href="../iron-icons/av-icons.html" rel="import">
+// <link href="../paper-slider/paper-slider.html" rel="import">
 
-<link href="ss-googleplaymusic.html" rel="import">
+// <link href="ss-googleplaymusic.html" rel="import">
 
+import { html, PolymerElement } from "../polymer/polymer-element.js";
 
-<dom-module id="ss-audio">
-  <template>
+class Audio extends PolymerElement {
+  static get template() {
+    return html`
     <custom-style>
       <style>
         :host {
@@ -56,15 +58,10 @@
         <paper-slider id="slider" min="0" max="{{duration}}" value="{{currentTime}}" on-change="changeCurrentTime" disabled="{{disabled}}"></paper-slider>
       </div>
     </div>
-  </template>
-</dom-module>
-
-<script>
-
-  Polymer({
-    is: 'ss-audio',
-
-    properties: {
+    `;
+  }
+  static get properties() {
+    return {
       song: {
         type: Object,
         observer: '_songChanged'
@@ -75,7 +72,7 @@
       },
       _soulSifterSettings: {
         type: Object,
-        value: function() { return new ss.SoulSifterSettings(); },
+        value() { return new ss.SoulSifterSettings(); },
         readOnly: true
       },
       _currentTimeStr: {
@@ -94,13 +91,14 @@
         type: Number,
         value: 0,
       },
-    },
+    }
+  }
 
-    ready: function() {
+    ready() {
       this.fs = require('fs');
-    },
+    }
 
-    _songChanged: function(newValue, oldValue) {
+    _songChanged(newValue, oldValue) {
       this.set('_currentTimeStr', 'Ø');
       if (!newValue) {
         this.set('src', null);
@@ -128,9 +126,9 @@
         }
       });
 
-    },
+    }
 
-    _srcChanged: function(newValue, oldValue) {
+    _srcChanged(newValue, oldValue) {
       this.currentTime = 0;
       if (!newValue) {
         this.disabled = true;
@@ -166,35 +164,35 @@
         str += (secs < 10 && (hours || mins) ? '0' : '') + secs;
         that._currentTimeStr = str;
       });
-    },
+    }
 
-    playAction: function() {
+    playAction() {
       if (this.$.playPause.icon === 'av:play-arrow') {
         this.play();
       } else {
         this.pause();
       }
-    },
+    }
 
-    play: function() {
+    play() {
       if (this.disabled) return;
       this.audio.play();
       this.$.playPause.icon = 'av:pause';
-    },
+    }
 
-    pause: function() {
+    pause() {
       if (this.disabled) return;
       this.audio.pause();
       this.$.playPause.icon = 'av:play-arrow';
-    },
+    }
 
-    changeCurrentTime: function(event, detail, sender) {
+    changeCurrentTime(event, detail, sender) {
       this.audio.currentTime = this.$.slider.immediateValue;
-    },
+    }
 
-    computeIsDisabled: function(isDisabled) {
+    computeIsDisabled(isDisabled) {
       return (isDisabled ? "disabled " : "") + "horizontal";
-    },
+    }
+  }
 
-  });
-</script>
+window.customElements.define('ss-audio', Audio);

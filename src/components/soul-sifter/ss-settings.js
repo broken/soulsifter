@@ -1,14 +1,16 @@
-<link href="../polymer/polymer.html" rel="import">
+// <link href="../polymer/polymer.html" rel="import">
 
-<link href="../iron-flex-layout/iron-flex-layout.html" rel="import">
-<link href="../paper-checkbox/paper-checkbox.html" rel="import">
-<link href="../paper-input/paper-input.html" rel="import">
+// <link href="../iron-flex-layout/iron-flex-layout.html" rel="import">
+// <link href="../paper-checkbox/paper-checkbox.html" rel="import">
+// <link href="../paper-input/paper-input.html" rel="import">
 
-<link href="abstract-action-page.html" rel="import">
+// <link href="abstract-action-page.html" rel="import">
 
+import { html, PolymerElement } from "../polymer/polymer-element.js";
 
-<dom-module id="ss-settings">
-  <template>
+class Settings extends PolymerElement {
+  static get template() {
+    return html`
     <custom-style>
       <style>
       </style>
@@ -31,15 +33,10 @@
         <paper-input label="Database URL" value="{{dbUrl}}"></paper-input>
       </div>
     </abstract-action-page>
-  </template>
-</dom-module>
+    `;
+  }
 
-<script>
-
-  Polymer({
-    is: 'ss-settings',
-
-    ready: function() {
+    ready() {
       this.settings = new ss.SoulSifterSettings();
       this.musicDir = this.settings.getString('music.dir');
       this.musicVideoDir = this.settings.getString('mv.dir');
@@ -52,15 +49,15 @@
       this.songListLimit = this.settings.getInt('songList.limit');
       this.overwriteSongFromTag = this.settings.getBool('tag.readOverwrite');
       this.overwriteSongFromTagOriginalValue = this.overwriteSongFromTag;
-    },
+    }
 
-    attached: function() {
+    attached() {
       Polymer.RenderStatus.afterNextRender(this, function() {
         this.$.abstractActionPage.setAcceptAction(this.save);
       }.bind(this));
-    },
+    }
 
-    save: function(e, detail, sender) {
+    save(e, detail, sender) {
       this.puts('music.dir', this.musicDir);
       this.puts('mv.dir', this.musicVideoDir);
       this.puts('google.appKey', this.googleAppKey);
@@ -72,24 +69,25 @@
       this.puti('songList.limit', this.songListLimit);
       this.putb('tag.readOverwrite', this.overwriteSongFromTag, this.overwriteSongFromTagOriginalValue);
       this.settings.save();
-    },
+    }
 
-    puts: function(key, value) {
+    puts(key, value) {
       if (!!key && !!value) {
         this.settings.putString(key, value);
       }
-    },
+    }
 
-    puti: function(key, value) {
+    puti(key, value) {
       if (!!key && (!!value || value === 0)) {
         this.settings.putInt(key, value);
       }
-    },
+    }
 
-    putb: function(key, value, originalValue) {
+    putb(key, value, originalValue) {
       if (!!key && value !== originalValue) {
         this.settings.putBool(key, value);
       }
-    },
-  });
-</script>
+    }
+  }
+
+window.customElements.define('ss-settings', Settings);

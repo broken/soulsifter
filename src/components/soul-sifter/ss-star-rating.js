@@ -1,10 +1,12 @@
-<link href="../polymer/polymer.html" rel="import">
+// <link href="../polymer/polymer.html" rel="import">
 
-<link href="../iron-icon/iron-icon.html" rel="import">
+// <link href="../iron-icon/iron-icon.html" rel="import">
 
+import { html, PolymerElement } from "../polymer/polymer-element.js";
 
-<dom-module id="ss-star-rating">
-  <template>
+class StarRating extends PolymerElement {
+  static get template() {
+    return html`
     <custom-style>
       <style>
         :host {
@@ -27,14 +29,10 @@
     <template is="dom-repeat" items="[[stars]]">
       <iron-icon icon="star" selected$="[[_isSelected(item, value)]]" on-click="_select"></iron-icon>
     </template>
-  </template>
-</dom-module>
-
-<script>
-  Polymer({
-    is: 'ss-star-rating',
-
-    properties: {
+    `;
+  }
+  static get properties() {
+    return {
       count: {
         type: Number,
         value: 5
@@ -53,23 +51,25 @@
         computed: '_computeStars(count)',
         readOnly: true
       }
-    },
+    }
+  }
 
-    _computeStars: function(count) {
+    _computeStars(count) {
       var stars = [];
       for (var i = 0; i < count; ++i) {
         stars.push(i);
       }
       return stars;
-    },
+    }
 
-    _isSelected: function(item, value) {
+    _isSelected(item, value) {
       return item < value;
-    },
+    }
 
-    _select: function(e) {
+    _select(e) {
       if (!this.readOnly)
         this.value = e.model.item + 1;
-    },
-  });
-</script>
+    }
+}
+
+window.customElements.define('ss-star-rating', StarRating);

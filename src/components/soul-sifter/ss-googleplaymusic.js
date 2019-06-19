@@ -1,20 +1,12 @@
-<link href="../polymer/polymer.html" rel="import">
+// <link href="../polymer/polymer.html" rel="import">
 
-<link href="ss-global-behavior.html" rel="import">
+// <link href="ss-global-behavior.html" rel="import">
 
+import { html, PolymerElement } from "../polymer/polymer-element.js";
 
-<script>
-  Polymer({
-    is: 'ss-googleplaymusic',
+class GooglePlayMusic extends PolymerElement {
 
-    behaviors: [
-      GlobalBehavior
-    ],
-
-    properties: {
-    },
-
-    attached: function() {
+    attached() {
       if (!this.global.playmusic) {
         var PlayMusic = require('playmusic');
         var playmusic = new PlayMusic();
@@ -34,14 +26,18 @@
         }.bind(this));
         this.global.playmusic = playmusic;
       }
-    },
+    }
+
+    behaviors: [
+      GlobalBehavior
+    ],
 
     /**
      * Success callback takes a song.
      * Failure callback takes message, body, err, httpResonse
      * WARNING: Nothing uses this, and before usage, should verify it still works.
      */
-    findSong: function(song, success, failure) {
+    findSong(song, success, failure) {
       if (!this.connected) {
         return;
       }
@@ -81,12 +77,12 @@
             failure(message, body, err, httpResonse);
           }
       );
-    },
+    }
 
     /**
      * Add a new playlist, save the playlist id, and add the songs.
      */
-    createPlaylist: function(playlist) {
+    createPlaylist(playlist) {
       if (!playlist.gmusicId) {
         this.global.playmusic.addPlayList(playlist.name, function(err, mutationStatus) {
           if (err) {
@@ -100,13 +96,14 @@
           }
         });
       }
-    },
+    }
 
     /**
      * Callback returns err, streamUrl
      */
-    getStreamUrl: function(gmid, callback) {
-      this.global.playmusic.getStreamUrl(gmid, callback);
-    },
-  });
-</script>
+    getStreamUrl(gmid, callback) {
+      th
+  }
+}
+
+window.customElements.define('ss-googleplaymusic', GooglePlayMusic);

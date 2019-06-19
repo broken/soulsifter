@@ -1,10 +1,12 @@
-<link href="../polymer/polymer.html" rel="import">
+// <link href="../polymer/polymer.html" rel="import">
 
-<link href="../paper-toggle-button/paper-toggle-button.html" rel="import">
+// <link href="../paper-toggle-button/paper-toggle-button.html" rel="import">
 
+import { html, PolymerElement } from "../polymer/polymer-element.js";
 
-<dom-module id="ss-search-options">
-  <template>
+class SearchOptions extends PolymerElement {
+  static get template() {
+    return html`
     <custom-style>
       <style>
         :host {
@@ -36,14 +38,10 @@
       <paper-toggle-button checked="{{searchOptionRepeatRestrict}}"></paper-toggle-button>
       <span>Repeat restrict</span>
     <section>
-  </template>
-</dom-module>
-
-<script>
-  Polymer({
-    is: 'ss-search-options',
-  
-    properties: {
+    `;
+  }
+  static get properties() {
+    return {
       searchOptionBpmRestrict: {
         type: Boolean,
         notify: true,
@@ -64,6 +62,8 @@
         notify: true,
         value: false
       },
-    },
-  });
-</script>
+    }
+  }
+}
+
+window.customElements.define('ss-search-options', SearchOptions);

@@ -1,10 +1,12 @@
-<link href="../polymer/polymer.html" rel="import">
+// <link href="../polymer/polymer.html" rel="import">
 
-<link href="../paper-ripple/paper-ripple.html" rel="import">
+// <link href="../paper-ripple/paper-ripple.html" rel="import">
 
+import { html, PolymerElement } from "../polymer/polymer-element.js";
 
-<dom-module id="ss-options-menu-item">
-  <template>
+class OptionsMenuItem extends PolymerElement {
+  static get template() {
+    return html`
     <custom-style>
       <style>
         :host {
@@ -22,11 +24,9 @@
     </custom-style>
     <slot></slot>
     <paper-ripple></paper-ripple>
-  </template>
-</dom-module>
+    `;
+  }
+}
 
-<script>
-  Polymer({
-    is: 'ss-options-menu-item'
-  });
-</script>
+window.customElements.define('ss-options-menu-item', OptionsMenuItem);
+
