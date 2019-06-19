@@ -19,6 +19,8 @@
     "nan": "^2.14.0"
   },
   "dependencies": {
+    "@material/mwc-drawer": "^0.6.0",
+    "@polymer/lit-element": "^0.7.1",
     "@polymer/polymer": "^3.2.0",
     "async": "^3.0.1",
     "playmusic": "^2.3.0",
