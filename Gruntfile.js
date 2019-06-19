@@ -14,10 +14,8 @@ module.exports = function(grunt) {
       },
       src: [
           './src/**/*', // Your node-webkit app
-          './components/**/*',
           './fonts/**/*',
-          './node_modules/async/**/*',
-          './node_modules/playmusic/**/*'
+          './node_modules/@*/**/*'
       ]
     },
     shell: {
@@ -45,11 +43,11 @@ module.exports = function(grunt) {
           },
         },
       },
+      updatenodemodules: {
+        command: 'cp -r src/node_modules/* "<%= builtAppDir %>/Contents/Resources/app.nw/node_modules/"',
+      },
       updateviews: {
         command: 'cp src/views/*.html "<%= builtAppDir %>/Contents/Resources/app.nw/views/"',
-      },
-      updatecomponents: {
-        command: 'cp -r src/components/soul-sifter "<%= builtAppDir %>/Contents/Resources/app.nw/components/"',
       },
       updateworkers: {
         command: 'cp -r src/workers/*.js "<%= builtAppDir %>/Contents/Resources/app.nw/workers/"',
@@ -102,7 +100,7 @@ module.exports = function(grunt) {
     },
     bump: {  // grunt bump:patch/minor/major
       options: {
-        files: ['version.json', 'package.json', 'src/package.json', 'bower.json'],
+        files: ['version.json', 'package.json', 'src/package.json'],
         updateConfigs: [],
         commit: false,
         commitMessage: 'Release v%VERSION%',
@@ -146,6 +144,6 @@ module.exports = function(grunt) {
   grunt.registerTask('css-hack', ['less:development', 'replace:less']);
   grunt.registerTask('default', ['nwjs', 'css-hack', 'buildnumber', 'run']);
   grunt.registerTask('nw-gyp', ['shell:nwgypclean', 'shell:nwgypconfigure', 'replace:rtti', 'shell:nwgypbuild']);
-  grunt.registerTask('up', ['shell:updateviews', 'shell:updatecomponents', 'shell:updateworkers', 'css-hack', 'buildnumber']);
+  grunt.registerTask('up', ['shell:updateviews', 'shell:updatenodemodules', 'shell:updateworkers', 'css-hack', 'buildnumber']);
   grunt.registerTask('all', ['nw-gyp', 'default']);
 };

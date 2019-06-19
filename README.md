@@ -20,8 +20,7 @@ Presteps:
       sql-mode="STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION"
 * install npm modules
   * global: grunt-cli, nw-gyp, bower
-  * locally with npm install: grunt plugins
-* install bower components
+  * locally with npm install
 * custom build of nwjs (for drag & drop & mp3 play support)
 * required libs (brew install): mysql-connector-c++, libtag, mad, boost, youtube-dl (for music videos), ffmpeg (for youtube audio), g3log
 
