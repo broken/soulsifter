@@ -6,13 +6,12 @@
 *.sublime-workspace
 
 # Modules
-/components
 /node_modules
-/resources
-/tmp
+
+# nw-gyp build
 /src/soulsifter/build
-/libraries
 
 # grunt-node-webkit-builder
 /build
 /cache
+/dist

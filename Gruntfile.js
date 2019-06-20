@@ -2,20 +2,21 @@ module.exports = function(grunt) {
 
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
-    builtAppDir: 'build/<%= pkg.name %> - v<%= pkg.version %>/osx64/<%= pkg.name %>.app',
+    builtAppDir: 'dist/<%= pkg.name %> - v<%= pkg.version %>/osx64/<%= pkg.name %>.app',
+    builtNodeModulesDir: 'build/dev',
     nwjs: {
       options: {
         version: '0.37.4', // Version of node-webkit (http://dl.nwjs.io)
-        buildDir: './build', // Where the build version of my node-webkit app is saved
+        buildDir: './dist', // Where the build version of my node-webkit app is saved
         credits: './src/credits.html', // Mac credits
         macIcns: './DVDRipper.icns', // Path to the Mac icon file
         platforms: ['osx64'], // These are the platforms that we want to build
         buildType: 'versioned' // Append version to name
       },
       src: [
-          './src/**/*', // Your node-webkit app
+          '<%= builtNodeModulesDir %>/node_modules/**/*',  // Output from polymer build
+          '<%= builtNodeModulesDir %>/src/**/*', // Your node-webkit app
           './fonts/**/*',
-          './node_modules/@*/**/*'
       ]
     },
     shell: {
@@ -43,8 +44,14 @@ module.exports = function(grunt) {
           },
         },
       },
+      polymerbuild: {
+        command: 'polymer build',
+      },
+      fixthirdpartymodulesdir: {
+        command: 'mv "<%= builtAppDir %>/Contents/Resources/app.nw/<%= builtNodeModulesDir %>/node_modules/"* "<%= builtAppDir %>/Contents/Resources/app.nw/node_modules"',
+      },
       updatenodemodules: {
-        command: 'cp -r src/node_modules/* "<%= builtAppDir %>/Contents/Resources/app.nw/node_modules/"',
+        command: 'cp -r <%= builtNodeModulesDir %>/src/node_modules/* "<%= builtAppDir %>/Contents/Resources/app.nw/node_modules/"',
       },
       updateviews: {
         command: 'cp src/views/*.html "<%= builtAppDir %>/Contents/Resources/app.nw/views/"',
@@ -142,8 +149,8 @@ module.exports = function(grunt) {
 
   grunt.registerTask('run', ['spawn:run']);
   grunt.registerTask('css-hack', ['less:development', 'replace:less']);
-  grunt.registerTask('default', ['nwjs', 'css-hack', 'buildnumber', 'run']);
+  grunt.registerTask('default', ['shell:polymerbuild', 'nwjs', 'shell:fixthirdpartymodulesdir', 'css-hack', 'buildnumber', 'run']);
   grunt.registerTask('nw-gyp', ['shell:nwgypclean', 'shell:nwgypconfigure', 'replace:rtti', 'shell:nwgypbuild']);
-  grunt.registerTask('up', ['shell:updateviews', 'shell:updatenodemodules', 'shell:updateworkers', 'css-hack', 'buildnumber']);
+  grunt.registerTask('up', ['shell:polymerbuild', 'shell:updateviews', 'shell:updatenodemodules', 'shell:updateworkers', 'css-hack', 'buildnumber']);
   grunt.registerTask('all', ['nw-gyp', 'default']);
 };
