@@ -20,6 +20,8 @@
   },
   "dependencies": {
     "@material/mwc-drawer": "^0.6.0",
+    "@material/mwc-tab": "^0.6.0",
+    "@material/mwc-tab-bar": "^0.6.0",
     "@polymer/lit-element": "^0.7.1",
     "@polymer/polymer": "^3.2.0",
     "async": "^3.0.1",

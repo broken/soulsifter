@@ -5,16 +5,6 @@
   "npm": true,
   "builds": [
     { 
-      "name": "es5prod",
-      "preset": "es5-bundled",
-      "addServiceWorker": true
-    },
-    { 
-      "name": "es6prod",
-      "preset": "es6-unbundled",
-      "addServiceWorker": true
-    },
-    { 
       "name": "dev",
       "addServiceWorker": false,
       "js": {"minify": false, "compile": false},
