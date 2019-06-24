@@ -50,6 +50,9 @@ module.exports = function(grunt) {
       fixthirdpartymodulesdir: {
         command: 'mv "<%= builtAppDir %>/Contents/Resources/app.nw/<%= builtNodeModulesDir %>/node_modules/"* "<%= builtAppDir %>/Contents/Resources/app.nw/node_modules"',
       },
+      fixcss: {
+        command: 'cp "<%= builtAppDir %>/Contents/Resources/app.nw/node_modules/soul-sifter/"*.css "<%= builtAppDir %>/Contents/Resources/app.nw/views"',
+      },
       updatenodemodules: {
         command: 'cp -r <%= builtNodeModulesDir %>/src/node_modules/* "<%= builtAppDir %>/Contents/Resources/app.nw/node_modules/"',
       },
@@ -58,9 +61,6 @@ module.exports = function(grunt) {
       },
       updateworkers: {
         command: 'cp -r src/workers/*.js "<%= builtAppDir %>/Contents/Resources/app.nw/workers/"',
-      },
-      updatecss: {
-        command: 'cp "<%= builtAppDir %>/Contents/Resources/app.nw/node_modules/soul-sifter/"*.css "<%= builtAppDir %>/Contents/Resources/app.nw/views"',
       },
     },
     replace: {
@@ -152,8 +152,8 @@ module.exports = function(grunt) {
 
   grunt.registerTask('run', ['spawn:run']);
   grunt.registerTask('css-hack', ['less:development', 'replace:less']);
-  grunt.registerTask('default', ['shell:polymerbuild', 'nwjs', 'shell:fixthirdpartymodulesdir', 'css-hack', 'buildnumber', 'run']);
+  grunt.registerTask('default', ['shell:polymerbuild', 'nwjs', 'shell:fixthirdpartymodulesdir', 'shell:fixcss', 'css-hack', 'buildnumber', 'run']);
   grunt.registerTask('nw-gyp', ['shell:nwgypclean', 'shell:nwgypconfigure', 'replace:rtti', 'shell:nwgypbuild']);
-  grunt.registerTask('up', ['shell:polymerbuild', 'shell:updateviews', 'shell:updatenodemodules', 'shell:updateworkers', 'shell:updatecss', 'css-hack', 'buildnumber']);
+  grunt.registerTask('up', ['shell:polymerbuild', 'shell:updateviews', 'shell:updatenodemodules', 'shell:updateworkers', 'shell:fixcss', 'css-hack', 'buildnumber']);
   grunt.registerTask('all', ['nw-gyp', 'default']);
 };
