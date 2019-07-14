@@ -19,7 +19,6 @@
     "nan": "^2.14.0"
   },
   "dependencies": {
-    "@material/mwc-drawer": "^0.6.0",
     "@material/mwc-icon": "^0.6.0",
     "@material/mwc-tab": "^0.6.0",
     "@material/mwc-tab-bar": "^0.6.0",
