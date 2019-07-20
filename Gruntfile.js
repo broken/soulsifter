@@ -62,12 +62,6 @@ module.exports = function(grunt) {
       updateworkers: {
         command: 'cp -r src/workers/*.js "<%= builtAppDir %>/Contents/Resources/app.nw/workers/"',
       },
-      mixindrawerborderright : {
-        command: 'sed -i "" "s/border-right-width:1px;/border-right-width:0;/" build/dev/node_modules/@material/mwc-drawer/mwc-drawer-css.js'
-      },
-      mixindrawerborderleft : {
-        command: 'sed -i "" "s/border-left-width:1px;/border-left-width:0;/" build/dev/node_modules/@material/mwc-drawer/mwc-drawer-css.js'
-      },
       mixintabpadding: {
         command: 'sed -i "" "s/padding:0 24px;/padding:0 0;/" build/dev/node_modules/@material/mwc-tab/mwc-tab-css.js'
       },
@@ -162,7 +156,7 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-spawn');
   grunt.loadNpmTasks('grunt-text-replace');
 
-  grunt.registerTask('mixins', ['shell:mixintabpadding', 'shell:mixintabcase', 'shell:mixindrawerborderleft', 'shell:mixindrawerborderright']);
+  grunt.registerTask('mixins', ['shell:mixintabpadding', 'shell:mixintabcase']);
   grunt.registerTask('run', ['spawn:run']);
   grunt.registerTask('css-hack', ['less:development', 'replace:less']);
   grunt.registerTask('default', ['shell:polymerbuild', 'mixins', 'nwjs', 'shell:fixthirdpartymodulesdir', 'shell:fixcss', 'css-hack', 'buildnumber', 'run']);
