@@ -19,13 +19,17 @@
     "nan": "^2.14.0"
   },
   "dependencies": {
+    "@material/mwc-button": "^0.6.0",
     "@material/mwc-icon": "^0.6.0",
     "@material/mwc-tab": "^0.6.0",
     "@material/mwc-tab-bar": "^0.6.0",
     "@material/ripple": "^2.3.0",
     "@polymer/lit-element": "^0.7.1",
     "@polymer/paper-dialog": "^3.0.1",
+    "@polymer/paper-dropdown-menu": "^3.0.1",
     "@polymer/paper-input": "^3.0.2",
+    "@polymer/paper-item": "^3.0.1",
+    "@polymer/paper-listbox": "^3.0.1",
     "@polymer/polymer": "^3.2.0",
     "async": "^3.0.1",
     "playmusic": "^2.3.0",
