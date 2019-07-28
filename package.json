@@ -30,6 +30,7 @@
     "@polymer/paper-dialog": "^3.0.1",
     "@polymer/paper-input": "^3.0.2",
     "@polymer/paper-slider": "^3.0.1",
+    "@polymer/paper-toggle-button": "^3.0.1",
     "@polymer/polymer": "^3.2.0",
     "async": "^3.0.1",
     "playmusic": "^2.3.0",
