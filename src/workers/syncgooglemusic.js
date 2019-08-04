@@ -34,7 +34,7 @@ var processResults = function(err, library) {
     query += " t:\"" + title + "\" q:\"" + song.durationMillis + " between durationInMs-5000 and durationInMs+5000\"";
     let songs = ss.SearchUtil.searchSongs(query, 0, [], [], [], 2);
     if (songs.length == 1) {
-      if (songs[0].googleSongId && songs[0].googleSongId != song.id) {
+      if (!!songs[0].googleSongId && songs[0].googleSongId != song.id) {
         console.warn('song ' + songs[0].id + ' has a different id than found ' + song.id);
       } else if (!songs[0].googleSongId) {
         songs[0].googleSongId = song.id;
