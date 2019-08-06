@@ -389,7 +389,8 @@ namespace soulsifter {
                 ps->setString(8, stringFromTime(dateAdded));
                 if (!bpm.empty()) ps->setString(9, bpm);
                 else ps->setNull(9, sql::DataType::VARCHAR);
-                ps->setString(10, setToCsv(tonicKeys));
+                if (tonicKeys.size() > 0) ps->setString(10, setToCsv(tonicKeys));
+                else ps->setNull(10, sql::DataType::SET);
                 if (!tonicKey.empty()) ps->setString(11, tonicKey);
                 else ps->setNull(11, sql::DataType::VARCHAR);
                 if (energy > 0) ps->setInt(12, energy);
@@ -502,7 +503,8 @@ namespace soulsifter {
                 ps->setString(8, stringFromTime(dateAdded));
                 if (!bpm.empty()) ps->setString(9, bpm);
                 else ps->setNull(9, sql::DataType::VARCHAR);
-                ps->setString(10, setToCsv(tonicKeys));
+                if (tonicKeys.size() > 0) ps->setString(10, setToCsv(tonicKeys));
+                else ps->setNull(10, sql::DataType::SET);
                 if (!tonicKey.empty()) ps->setString(11, tonicKey);
                 else ps->setNull(11, sql::DataType::VARCHAR);
                 if (energy > 0) ps->setInt(12, energy);

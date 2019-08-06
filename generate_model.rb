@@ -130,7 +130,8 @@ def setField(f, i, indent)
   elsif (f[$type] == :time_t)
     str << indent << "ps->setString(#{i}, stringFromTime(#{f[$name]}));\n"
   elsif (isSet(f[$type]))
-    str << indent << "ps->set#{cap(getSetGeneric(f[$type]))}(#{i}, setToCsv(#{f[$name]}));\n"
+    str << indent << "if (#{f[$name]}.size() > 0) ps->set#{cap(getSetGeneric(f[$type]))}(#{i}, setToCsv(#{f[$name]}));\n"
+    str << indent << "else ps->setNull(#{i}, sql::DataType::SET);\n"
   elsif (f[$type] == :int && f[$attrib] & Attrib::NON_NULLABLE > 0)
     str << indent << "ps->set#{cap(f[$type].to_s)}(#{i}, #{f[$name]});\n"
   elsif (f[$type] == :int)

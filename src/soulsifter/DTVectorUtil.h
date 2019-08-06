@@ -9,6 +9,7 @@
 #ifndef soul_sifter_DTVectorUtil_h
 #define soul_sifter_DTVectorUtil_h
 
+#include <iostream>
 #include <sstream>
 #include <set>
 #include <vector>
@@ -69,7 +70,10 @@ namespace dogatech {
   
     template <typename T>
     static const string setToCsv(const set<T>& s) {
-        if (s.size() == 0) return "";
+        if (s.size() == 0) {
+            std::cerr << "Attempting to convert an empty set into a csv." << std::endl;
+            return "NULL";
+        }
         ostringstream ss;
         typename set<T>::iterator last = s.end();
         --last;
