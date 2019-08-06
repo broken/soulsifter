@@ -42,8 +42,8 @@ void MusicVideoService::Init(v8::Local<v8::Object> exports) {
   Nan::SetMethod(tpl, "associateYouTubeVideo", associateYouTubeVideo);
   Nan::SetMethod(tpl, "downloadAudio", downloadAudio);
 
-  constructor.Reset(tpl->GetFunction());
-  exports->Set(Nan::New<v8::String>("MusicVideoService").ToLocalChecked(), tpl->GetFunction());
+  constructor.Reset(Nan::GetFunction(tpl).ToLocalChecked());
+  exports->Set(Nan::New<v8::String>("MusicVideoService").ToLocalChecked(), Nan::GetFunction(tpl).ToLocalChecked());
 }
 
 void MusicVideoService::associateYouTubeVideo(const Nan::FunctionCallbackInfo<v8::Value>& info) {

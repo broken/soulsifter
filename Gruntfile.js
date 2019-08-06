@@ -6,7 +6,7 @@ module.exports = function(grunt) {
     builtNodeModulesDir: 'build/dev',
     nwjs: {
       options: {
-        version: '0.37.4', // Version of node-webkit (http://dl.nwjs.io)
+        version: '0.40.0', // Version of node-webkit (http://dl.nwjs.io)
         buildDir: './dist', // Where the build version of my node-webkit app is saved
         credits: './src/credits.html', // Mac credits
         macIcns: './DVDRipper.icns', // Path to the Mac icon file
@@ -29,7 +29,7 @@ module.exports = function(grunt) {
         },
       },
       nwgypconfigure: {
-        command: 'nw-gyp configure --arch=x64 --target=0.37.4',
+        command: 'nw-gyp configure --arch=x64 --target=0.40.0',
         options: {
           execOptions: {
             cwd: 'src/soulsifter',
@@ -37,7 +37,7 @@ module.exports = function(grunt) {
         },
       },
       nwgypbuild: {
-        command: 'nw-gyp build --target=0.37.4',
+        command: 'nw-gyp build --target=0.40.0',
         options: {
           execOptions: {
             cwd: 'src/soulsifter',

@@ -69,8 +69,8 @@ void PlaylistEntry::Init(v8::Local<v8::Object> exports) {
   Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("position").ToLocalChecked(), getPosition, setPosition);
   Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("time").ToLocalChecked(), getTime, setTime);
 
-  constructor.Reset(tpl->GetFunction());
-  exports->Set(Nan::New<v8::String>("PlaylistEntry").ToLocalChecked(), tpl->GetFunction());
+  constructor.Reset(Nan::GetFunction(tpl).ToLocalChecked());
+  exports->Set(Nan::New<v8::String>("PlaylistEntry").ToLocalChecked(), Nan::GetFunction(tpl).ToLocalChecked());
 }
 
 void PlaylistEntry::clear(const Nan::FunctionCallbackInfo<v8::Value>& info) {

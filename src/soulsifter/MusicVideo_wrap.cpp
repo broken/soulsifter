@@ -63,8 +63,8 @@ void MusicVideo::Init(v8::Local<v8::Object> exports) {
   Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("filePath").ToLocalChecked(), getFilePath, setFilePath);
   Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("thumbnailFilePath").ToLocalChecked(), getThumbnailFilePath, setThumbnailFilePath);
 
-  constructor.Reset(tpl->GetFunction());
-  exports->Set(Nan::New<v8::String>("MusicVideo").ToLocalChecked(), tpl->GetFunction());
+  constructor.Reset(Nan::GetFunction(tpl).ToLocalChecked());
+  exports->Set(Nan::New<v8::String>("MusicVideo").ToLocalChecked(), Nan::GetFunction(tpl).ToLocalChecked());
 }
 
 void MusicVideo::clear(const Nan::FunctionCallbackInfo<v8::Value>& info) {

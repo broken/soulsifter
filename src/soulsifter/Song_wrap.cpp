@@ -100,8 +100,8 @@ void Song::Init(v8::Local<v8::Object> exports) {
   Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("styleIds").ToLocalChecked(), getStyleIds, setStyleIds);
   Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("styles").ToLocalChecked(), getStyles, setStyles);
 
-  constructor.Reset(tpl->GetFunction());
-  exports->Set(Nan::New<v8::String>("Song").ToLocalChecked(), tpl->GetFunction());
+  constructor.Reset(Nan::GetFunction(tpl).ToLocalChecked());
+  exports->Set(Nan::New<v8::String>("Song").ToLocalChecked(), Nan::GetFunction(tpl).ToLocalChecked());
 }
 
 void Song::clear(const Nan::FunctionCallbackInfo<v8::Value>& info) {

@@ -69,8 +69,8 @@ void Mix::Init(v8::Local<v8::Object> exports) {
   Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("comments").ToLocalChecked(), getComments, setComments);
   Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("addon").ToLocalChecked(), getAddon, setAddon);
 
-  constructor.Reset(tpl->GetFunction());
-  exports->Set(Nan::New<v8::String>("Mix").ToLocalChecked(), tpl->GetFunction());
+  constructor.Reset(Nan::GetFunction(tpl).ToLocalChecked());
+  exports->Set(Nan::New<v8::String>("Mix").ToLocalChecked(), Nan::GetFunction(tpl).ToLocalChecked());
 }
 
 void Mix::clear(const Nan::FunctionCallbackInfo<v8::Value>& info) {

@@ -72,8 +72,8 @@ void Album::Init(v8::Local<v8::Object> exports) {
   Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("basicGenre").ToLocalChecked(), getBasicGenre, setBasicGenre);
   Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("basicGenreOnce").ToLocalChecked(), getBasicGenreOnce);
 
-  constructor.Reset(tpl->GetFunction());
-  exports->Set(Nan::New<v8::String>("Album").ToLocalChecked(), tpl->GetFunction());
+  constructor.Reset(Nan::GetFunction(tpl).ToLocalChecked());
+  exports->Set(Nan::New<v8::String>("Album").ToLocalChecked(), Nan::GetFunction(tpl).ToLocalChecked());
 }
 
 void Album::clear(const Nan::FunctionCallbackInfo<v8::Value>& info) {

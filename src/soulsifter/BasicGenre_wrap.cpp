@@ -59,8 +59,8 @@ void BasicGenre::Init(v8::Local<v8::Object> exports) {
   Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("id").ToLocalChecked(), getId, setId);
   Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("name").ToLocalChecked(), getName, setName);
 
-  constructor.Reset(tpl->GetFunction());
-  exports->Set(Nan::New<v8::String>("BasicGenre").ToLocalChecked(), tpl->GetFunction());
+  constructor.Reset(Nan::GetFunction(tpl).ToLocalChecked());
+  exports->Set(Nan::New<v8::String>("BasicGenre").ToLocalChecked(), Nan::GetFunction(tpl).ToLocalChecked());
 }
 
 void BasicGenre::clear(const Nan::FunctionCallbackInfo<v8::Value>& info) {

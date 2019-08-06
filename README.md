@@ -54,15 +54,15 @@ There are two reasons I need to manually build nwjs:
 * audio decoding using proprietary codecs
 
 ```
-Following for nw23 compilation (xcode 8.3.3 w/ 10.12 sdk):
+Following for nw40 compilation (xcode 10.3 w/ 10.14 sdk):
 # depot tools installation: https://commondatastorage.googleapis.com/chrome-infra-docs/flat/depot_tools/docs/html/depot_tools_tutorial.html#_setting_up
 # Use thier buildbot for confirmation of steps: http://buildbot-master.nwjs.io:8010/waterfall
 # Instructions: http://docs.nwjs.io/en/latest/For%20Developers/Building%20NW.js/
 # Hints on building ffmpeg which should be included below: https://github.com/butterproject/butter-desktop/issues/339
 
-export NWV=nw37
-export XCV=8.3.3
-# sudo xcode-select -s /Applications/Xcode$XCV.app/Contents/Developer/
+export NWV=nw40
+export XCV=10.3
+#sudo xcode-select -s /Applications/Xcode$XCV.app/Contents/Developer/
 xcode-select -p
 mkdir $(printf "%s_sdk_xcode%s" $NWV $XCV)
 cd $(printf "%s_sdk_xcode%s" $NWV $XCV)
@@ -97,7 +97,7 @@ export GYP_DEFINES=target_arch=x64 nwjs_sdk=1 mac_breakpad=1 buildtype=Official 
 export GYP_CHROMIUM_NO_ACTION=0
 gn gen src/out/nw '--args=is_debug=false is_component_ffmpeg=true target_cpu="x64" symbol_level=1 nwjs_sdk=true ffmpeg_branding="Chromium" enable_stripping=true enable_dsyms=true enable_precompiled_headers=false enable_widevine=true' --root=src
 python src/build/gyp_chromium -I src/third_party/node-nw/common.gypi src/third_party/node-nw/node.gyp
-vim src/content/browser/web_contents/web_drag_source_mac.mm
+vim src/content/app_shim_remote_cocoa/web_drag_source_mac.mm
 # edit extensis lines for osx drag&drop
 # https://github.com/broken/node-webkit-dragout/blob/master/src/content/browser/web_contents/web_drag_source_mac.mm
 # Building nwjs will take all f*@#ing day and all the cpu

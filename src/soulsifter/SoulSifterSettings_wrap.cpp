@@ -47,8 +47,8 @@ void SoulSifterSettings::Init(v8::Local<v8::Object> exports) {
   Nan::SetPrototypeMethod(tpl, "getBool", getBool);
   Nan::SetPrototypeMethod(tpl, "putBool", putBool);
 
-  constructor.Reset(tpl->GetFunction());
-  exports->Set(Nan::New<v8::String>("SoulSifterSettings").ToLocalChecked(), tpl->GetFunction());
+  constructor.Reset(Nan::GetFunction(tpl).ToLocalChecked());
+  exports->Set(Nan::New<v8::String>("SoulSifterSettings").ToLocalChecked(), Nan::GetFunction(tpl).ToLocalChecked());
 }
 
 void SoulSifterSettings::save(const Nan::FunctionCallbackInfo<v8::Value>& info) {

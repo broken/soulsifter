@@ -63,8 +63,8 @@ void AlbumPart::Init(v8::Local<v8::Object> exports) {
   Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("album").ToLocalChecked(), getAlbum, setAlbum);
   Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("albumOnce").ToLocalChecked(), getAlbumOnce);
 
-  constructor.Reset(tpl->GetFunction());
-  exports->Set(Nan::New<v8::String>("AlbumPart").ToLocalChecked(), tpl->GetFunction());
+  constructor.Reset(Nan::GetFunction(tpl).ToLocalChecked());
+  exports->Set(Nan::New<v8::String>("AlbumPart").ToLocalChecked(), Nan::GetFunction(tpl).ToLocalChecked());
 }
 
 void AlbumPart::clear(const Nan::FunctionCallbackInfo<v8::Value>& info) {

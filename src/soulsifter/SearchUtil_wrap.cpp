@@ -41,8 +41,8 @@ void SearchUtil::Init(v8::Local<v8::Object> exports) {
   // Prototype
   Nan::SetMethod(tpl, "searchSongs", searchSongs);
 
-  constructor.Reset(tpl->GetFunction());
-  exports->Set(Nan::New<v8::String>("SearchUtil").ToLocalChecked(), tpl->GetFunction());
+  constructor.Reset(Nan::GetFunction(tpl).ToLocalChecked());
+  exports->Set(Nan::New<v8::String>("SearchUtil").ToLocalChecked(), Nan::GetFunction(tpl).ToLocalChecked());
 }
 
 void SearchUtil::searchSongs(const Nan::FunctionCallbackInfo<v8::Value>& info) {

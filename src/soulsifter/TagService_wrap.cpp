@@ -41,8 +41,8 @@ void TagService::Init(v8::Local<v8::Object> exports) {
   Nan::SetMethod(tpl, "writeId3v2Tag", writeId3v2Tag);
   Nan::SetMethod(tpl, "updateSongAttributesFromTags", updateSongAttributesFromTags);
 
-  constructor.Reset(tpl->GetFunction());
-  exports->Set(Nan::New<v8::String>("TagService").ToLocalChecked(), tpl->GetFunction());
+  constructor.Reset(Nan::GetFunction(tpl).ToLocalChecked());
+  exports->Set(Nan::New<v8::String>("TagService").ToLocalChecked(), Nan::GetFunction(tpl).ToLocalChecked());
 }
 
 void TagService::readId3v2Tag(const Nan::FunctionCallbackInfo<v8::Value>& info) {

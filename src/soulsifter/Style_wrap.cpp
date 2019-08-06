@@ -66,8 +66,8 @@ void Style::Init(v8::Local<v8::Object> exports) {
   Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("parentIds").ToLocalChecked(), getParentIds, setParentIds);
   Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("parents").ToLocalChecked(), getParents, setParents);
 
-  constructor.Reset(tpl->GetFunction());
-  exports->Set(Nan::New<v8::String>("Style").ToLocalChecked(), tpl->GetFunction());
+  constructor.Reset(Nan::GetFunction(tpl).ToLocalChecked());
+  exports->Set(Nan::New<v8::String>("Style").ToLocalChecked(), Nan::GetFunction(tpl).ToLocalChecked());
 }
 
 void Style::clear(const Nan::FunctionCallbackInfo<v8::Value>& info) {

@@ -43,8 +43,8 @@ void NewSongManager::Init(v8::Local<v8::Object> exports) {
   Nan::SetPrototypeMethod(tpl, "processSong", processSong);
   Nan::SetPrototypeMethod(tpl, "trashMusicFile", trashMusicFile);
 
-  constructor.Reset(tpl->GetFunction());
-  exports->Set(Nan::New<v8::String>("NewSongManager").ToLocalChecked(), tpl->GetFunction());
+  constructor.Reset(Nan::GetFunction(tpl).ToLocalChecked());
+  exports->Set(Nan::New<v8::String>("NewSongManager").ToLocalChecked(), Nan::GetFunction(tpl).ToLocalChecked());
 }
 
 void NewSongManager::import(const Nan::FunctionCallbackInfo<v8::Value>& info) {
