@@ -6,9 +6,11 @@ var playmusic = new pm();
 
 var email = settings.getString('google.email');
 var appKey = settings.getString('google.appKey');
+var androidId = settings.getString('google.androidId');
 
-var maxReturned = 500;
+var maxReturned = 1000;
 var nextPageToken = undefined;
+var masterToken = undefined;
 
 var total = 0;
 
@@ -45,16 +47,23 @@ var processResults = function(err, library) {
     }
   }
   if (maxReturned == count) {
-    playmusic.getLibrary({limit: maxReturned, nextPageToken: nextPageToken}, processResults);
+    playmusic.getLibrary({limit: maxReturned, nextPageToken: nextPageToken, androidId: androidId, masterToken: masterToken}, processResults);
   } else {
     console.info('processed ' + total + ' songs');
   }
 };
 
-playmusic.init({email: email,  password: appKey}, function(err) {
+playmusic.login({email: email, password: appKey, androidId: androidId}, function(err, x) {
   if (err) {
     console.error(err);
     return;
   }
-  playmusic.getLibrary({limit: maxReturned, nextPageToken: nextPageToken}, processResults);
+  masterToken = x.masterToken;
+  playmusic.init({androidId: androidId, masterToken: masterToken}, function(err, x) {
+    if (err) {
+      console.error(err);
+      return;
+    }
+    playmusic.getLibrary({limit: maxReturned, androidId: androidId, masterToken: masterToken}, processResults);
+  });
 });
