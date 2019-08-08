@@ -36,6 +36,8 @@ namespace soulsifter {
 
         static Mix* findById(int id);
         static Mix* findByOutSongIdAndInSongId(int outSongId, int inSongId);
+        static ResultSetIterator<Mix>* findByOutSongId(int outSongId);
+        static ResultSetIterator<Mix>* findByInSongId(int inSongId);
         static ResultSetIterator<Mix>* findAll();
 
         int update();

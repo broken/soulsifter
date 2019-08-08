@@ -24,6 +24,8 @@ class Album : public Nan::ObjectWrap {
   static void findById(const Nan::FunctionCallbackInfo<v8::Value>& info);
   static void findByCoverFilepath(const Nan::FunctionCallbackInfo<v8::Value>& info);
   static void findByNameAndArtist(const Nan::FunctionCallbackInfo<v8::Value>& info);
+  static void findByName(const Nan::FunctionCallbackInfo<v8::Value>& info);
+  static void findByArtist(const Nan::FunctionCallbackInfo<v8::Value>& info);
   static void findAll(const Nan::FunctionCallbackInfo<v8::Value>& info);
   static void update(const Nan::FunctionCallbackInfo<v8::Value>& info);
   static void save(const Nan::FunctionCallbackInfo<v8::Value>& info);

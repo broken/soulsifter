@@ -169,6 +169,24 @@ namespace soulsifter {
         LOG(FATAL) << "Unable to complete model operation";
     }
 
+    ResultSetIterator<Mix>* Mix::findByOutSongId(int outSongId) {
+        sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select Mixes.* from Mixes where ifnull(outSongId,0) = ifnull(?,0)");
+        if (outSongId > 0) ps->setInt(1, outSongId);
+        else ps->setNull(1, sql::DataType::INTEGER);
+        sql::ResultSet *rs = ps->executeQuery();
+        ResultSetIterator<Mix> *dtrs = new ResultSetIterator<Mix>(rs);
+        return dtrs;
+    }
+
+    ResultSetIterator<Mix>* Mix::findByInSongId(int inSongId) {
+        sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select Mixes.* from Mixes where ifnull(inSongId,0) = ifnull(?,0)");
+        if (inSongId > 0) ps->setInt(1, inSongId);
+        else ps->setNull(1, sql::DataType::INTEGER);
+        sql::ResultSet *rs = ps->executeQuery();
+        ResultSetIterator<Mix> *dtrs = new ResultSetIterator<Mix>(rs);
+        return dtrs;
+    }
+
     ResultSetIterator<Mix>* Mix::findAll() {
         sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select Mixes.* from Mixes");
         sql::ResultSet *rs = ps->executeQuery();

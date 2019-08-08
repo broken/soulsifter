@@ -140,6 +140,24 @@ namespace soulsifter {
         LOG(FATAL) << "Unable to complete model operation";
     }
 
+    ResultSetIterator<AlbumPart>* AlbumPart::findByPos(string pos) {
+        sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select AlbumParts.* from AlbumParts where ifnull(pos,'') = ifnull(?,'')");
+        if (!pos.empty()) ps->setString(1, pos);
+        else ps->setNull(1, sql::DataType::VARCHAR);
+        sql::ResultSet *rs = ps->executeQuery();
+        ResultSetIterator<AlbumPart> *dtrs = new ResultSetIterator<AlbumPart>(rs);
+        return dtrs;
+    }
+
+    ResultSetIterator<AlbumPart>* AlbumPart::findByAlbumId(int albumId) {
+        sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select AlbumParts.* from AlbumParts where ifnull(albumId,0) = ifnull(?,0)");
+        if (albumId > 0) ps->setInt(1, albumId);
+        else ps->setNull(1, sql::DataType::INTEGER);
+        sql::ResultSet *rs = ps->executeQuery();
+        ResultSetIterator<AlbumPart> *dtrs = new ResultSetIterator<AlbumPart>(rs);
+        return dtrs;
+    }
+
     ResultSetIterator<AlbumPart>* AlbumPart::findAll() {
         sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select AlbumParts.* from AlbumParts");
         sql::ResultSet *rs = ps->executeQuery();

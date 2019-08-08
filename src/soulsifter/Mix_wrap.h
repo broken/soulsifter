@@ -23,6 +23,8 @@ class Mix : public Nan::ObjectWrap {
   static void clear(const Nan::FunctionCallbackInfo<v8::Value>& info);
   static void findById(const Nan::FunctionCallbackInfo<v8::Value>& info);
   static void findByOutSongIdAndInSongId(const Nan::FunctionCallbackInfo<v8::Value>& info);
+  static void findByOutSongId(const Nan::FunctionCallbackInfo<v8::Value>& info);
+  static void findByInSongId(const Nan::FunctionCallbackInfo<v8::Value>& info);
   static void findAll(const Nan::FunctionCallbackInfo<v8::Value>& info);
   static void update(const Nan::FunctionCallbackInfo<v8::Value>& info);
   static void save(const Nan::FunctionCallbackInfo<v8::Value>& info);

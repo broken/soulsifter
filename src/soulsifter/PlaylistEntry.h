@@ -37,6 +37,8 @@ namespace soulsifter {
 
         static PlaylistEntry* findById(int id);
         static PlaylistEntry* findByPlaylistIdAndSongId(int playlistId, int songId);
+        static ResultSetIterator<PlaylistEntry>* findByPlaylistId(int playlistId);
+        static ResultSetIterator<PlaylistEntry>* findBySongId(int songId);
         static ResultSetIterator<PlaylistEntry>* findAll();
 
         int update();

@@ -24,7 +24,6 @@ using namespace std;
 namespace dogatech {
 namespace soulsifter {
 
-    class PlaylistEntry;
     class Style;
 
     class Playlist {
@@ -53,10 +52,6 @@ namespace soulsifter {
         void setQuery(const string& query);
         const string& getGmusicId() const;
         void setGmusicId(const string& gmusicId);
-        const vector<int>& getPlaylistEntryIds() const;
-        void setPlaylistEntryIds(const vector<int>& playlistEntryIds);
-        const vector<PlaylistEntry*>& getPlaylistEntries();
-        void setPlaylistEntries(const vector<PlaylistEntry*>& playlistEntries);
         const vector<int>& getStyleIds() const;
         void setStyleIds(const vector<int>& styleIds);
         const vector<Style*>& getStyles();
@@ -69,8 +64,6 @@ namespace soulsifter {
         string name;
         string query;
         string gmusicId;
-        vector<int> playlistEntryIds;
-        vector<PlaylistEntry*> playlistEntries;
         vector<int> styleIds;
         vector<Style*> styles;
 

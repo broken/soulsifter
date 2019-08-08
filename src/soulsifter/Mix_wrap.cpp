@@ -52,6 +52,8 @@ void Mix::Init(v8::Local<v8::Object> exports) {
   Nan::SetPrototypeMethod(tpl, "clear", clear);
   Nan::SetMethod(tpl, "findById", findById);
   Nan::SetMethod(tpl, "findByOutSongIdAndInSongId", findByOutSongIdAndInSongId);
+  Nan::SetMethod(tpl, "findByOutSongId", findByOutSongId);
+  Nan::SetMethod(tpl, "findByInSongId", findByInSongId);
   Nan::SetMethod(tpl, "findAll", findAll);
   Nan::SetPrototypeMethod(tpl, "update", update);
   Nan::SetPrototypeMethod(tpl, "save", save);
@@ -111,6 +113,42 @@ void Mix::findByOutSongIdAndInSongId(const Nan::FunctionCallbackInfo<v8::Value>&
 
     info.GetReturnValue().Set(instance);
   }
+}
+
+void Mix::findByOutSongId(const Nan::FunctionCallbackInfo<v8::Value>& info) {
+  int a0(info[0]->IntegerValue());
+  dogatech::ResultSetIterator<dogatech::soulsifter::Mix>* result =
+      dogatech::soulsifter::Mix::findByOutSongId(a0);
+
+  vector<dogatech::soulsifter::Mix*>* v = result->toVector();
+  v8::Local<v8::Array> a = Nan::New<v8::Array>((int) v->size());
+  for (int i = 0; i < (int) v->size(); i++) {
+    v8::Local<v8::Function> cons = Nan::New<v8::Function>(constructor);
+    v8::Local<v8::Object> instance = Nan::NewInstance(cons).ToLocalChecked();
+    Mix* o = Nan::ObjectWrap::Unwrap<Mix>(instance);
+    o->mix = (*v)[i];
+    a->Set(Nan::New<v8::Number>(i), instance);
+  }
+  delete v;
+  info.GetReturnValue().Set(a);
+}
+
+void Mix::findByInSongId(const Nan::FunctionCallbackInfo<v8::Value>& info) {
+  int a0(info[0]->IntegerValue());
+  dogatech::ResultSetIterator<dogatech::soulsifter::Mix>* result =
+      dogatech::soulsifter::Mix::findByInSongId(a0);
+
+  vector<dogatech::soulsifter::Mix*>* v = result->toVector();
+  v8::Local<v8::Array> a = Nan::New<v8::Array>((int) v->size());
+  for (int i = 0; i < (int) v->size(); i++) {
+    v8::Local<v8::Function> cons = Nan::New<v8::Function>(constructor);
+    v8::Local<v8::Object> instance = Nan::NewInstance(cons).ToLocalChecked();
+    Mix* o = Nan::ObjectWrap::Unwrap<Mix>(instance);
+    o->mix = (*v)[i];
+    a->Set(Nan::New<v8::Number>(i), instance);
+  }
+  delete v;
+  info.GetReturnValue().Set(a);
 }
 
 void Mix::findAll(const Nan::FunctionCallbackInfo<v8::Value>& info) {

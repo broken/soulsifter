@@ -8,7 +8,7 @@ module Attrib
   TRANSIENT = 2**4  # field: not persistent
   KEY2 = 2**5  # field: secondary key, can be multiple fields which make it up
   NON_NULLABLE = 2**6 # field: if this field is not nullable. Note that this does not mean required. in fact, required fields should be allowed to be set to null so a proper error by the database is thrown.
-  JOINTABLE = 2**7 # field: if this field is to a many-to-many join table versus though one
+  JOINTABLE = 2**7 # field: if this field is to a many-to-many join table [unused]
   DELETABLE = 2**8 # class: create delete method
 end
 
@@ -325,6 +325,12 @@ def hSecondaryKeysFindFunction(name, secondaryKeys)
     end
   end
   str << ");\n"
+  if (secondaryKeys.length > 1)
+    secondaryKeys.each do |f|
+      str << "        static ResultSetIterator<#{cap(name)}>* findBy#{cap(f[$name])}(#{f[$type]} #{f[$name]});\n"
+    end
+  end
+  return str
 end
 
 def cSecondaryKeysFindFunction(name, secondaryKeys, fields)
@@ -362,6 +368,15 @@ def cSecondaryKeysFindFunction(name, secondaryKeys, fields)
   str << "                sql::ResultSet *rs = ps->executeQuery();\n                #{cap(name)} *#{name} = NULL;\n                if (rs->next()) {\n                    #{name} = new #{cap(name)}();\n                    populateFields(rs, #{name});\n                }\n                rs->close();\n                delete rs;\n\n                return #{name};\n"
   str << sqlCatchBlock()
   str << "    }\n\n"
+  if (secondaryKeys.length > 1)
+    secondaryKeys.each do |f|
+      str << "    ResultSetIterator<#{cap(name)}>* #{cap(name)}::findBy#{cap(f[$name])}(#{f[$type]} #{f[$name]}) {\n        sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement(\"select #{selectStar(name, fields)} from #{fromTable(name, fields)} where "
+      str << "ifnull(#{f[$name]}," << defaultNullValue(f) << ") = ifnull(?," << defaultNullValue(f) << ")"
+      str << "#{groupBy(name,fields)}\");\n" << setField(f, 1, "        ")
+      str << "        sql::ResultSet *rs = ps->executeQuery();\n        ResultSetIterator<#{cap(name)}> *dtrs = new ResultSetIterator<#{cap(name)}>(rs);\n        return dtrs;\n    }\n\n"
+    end
+  end
+  return str
 end
 
 def hFindAllFunction(name)
@@ -805,8 +820,6 @@ playlistFields = [
   [:string, "name", Attrib::FIND],
   [:string, "query", 0],
   [:string, "gmusicId", 0],
-  ["vector<int>", "playlistEntryIds", Attrib::ID | Attrib::JOINTABLE],
-  ["vector<PlaylistEntry*>", "playlistEntries", Attrib::JOINTABLE],
   ["vector<int>", "styleIds", Attrib::ID],
   ["vector<Style*>", "styles", 0],
 ]

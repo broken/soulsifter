@@ -23,6 +23,8 @@ class PlaylistEntry : public Nan::ObjectWrap {
   static void clear(const Nan::FunctionCallbackInfo<v8::Value>& info);
   static void findById(const Nan::FunctionCallbackInfo<v8::Value>& info);
   static void findByPlaylistIdAndSongId(const Nan::FunctionCallbackInfo<v8::Value>& info);
+  static void findByPlaylistId(const Nan::FunctionCallbackInfo<v8::Value>& info);
+  static void findBySongId(const Nan::FunctionCallbackInfo<v8::Value>& info);
   static void findAll(const Nan::FunctionCallbackInfo<v8::Value>& info);
   static void update(const Nan::FunctionCallbackInfo<v8::Value>& info);
   static void save(const Nan::FunctionCallbackInfo<v8::Value>& info);

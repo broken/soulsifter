@@ -23,6 +23,8 @@ class AlbumPart : public Nan::ObjectWrap {
   static void clear(const Nan::FunctionCallbackInfo<v8::Value>& info);
   static void findById(const Nan::FunctionCallbackInfo<v8::Value>& info);
   static void findByPosAndAlbumId(const Nan::FunctionCallbackInfo<v8::Value>& info);
+  static void findByPos(const Nan::FunctionCallbackInfo<v8::Value>& info);
+  static void findByAlbumId(const Nan::FunctionCallbackInfo<v8::Value>& info);
   static void findAll(const Nan::FunctionCallbackInfo<v8::Value>& info);
   static void update(const Nan::FunctionCallbackInfo<v8::Value>& info);
   static void save(const Nan::FunctionCallbackInfo<v8::Value>& info);

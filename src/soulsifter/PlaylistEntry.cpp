@@ -160,6 +160,24 @@ namespace soulsifter {
         LOG(FATAL) << "Unable to complete model operation";
     }
 
+    ResultSetIterator<PlaylistEntry>* PlaylistEntry::findByPlaylistId(int playlistId) {
+        sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select PlaylistEntries.* from PlaylistEntries where ifnull(playlistId,0) = ifnull(?,0)");
+        if (playlistId > 0) ps->setInt(1, playlistId);
+        else ps->setNull(1, sql::DataType::INTEGER);
+        sql::ResultSet *rs = ps->executeQuery();
+        ResultSetIterator<PlaylistEntry> *dtrs = new ResultSetIterator<PlaylistEntry>(rs);
+        return dtrs;
+    }
+
+    ResultSetIterator<PlaylistEntry>* PlaylistEntry::findBySongId(int songId) {
+        sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select PlaylistEntries.* from PlaylistEntries where ifnull(songId,0) = ifnull(?,0)");
+        if (songId > 0) ps->setInt(1, songId);
+        else ps->setNull(1, sql::DataType::INTEGER);
+        sql::ResultSet *rs = ps->executeQuery();
+        ResultSetIterator<PlaylistEntry> *dtrs = new ResultSetIterator<PlaylistEntry>(rs);
+        return dtrs;
+    }
+
     ResultSetIterator<PlaylistEntry>* PlaylistEntry::findAll() {
         sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select PlaylistEntries.* from PlaylistEntries");
         sql::ResultSet *rs = ps->executeQuery();

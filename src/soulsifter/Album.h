@@ -37,6 +37,8 @@ namespace soulsifter {
         static Album* findById(int id);
         static Album* findByCoverFilepath(const string& coverFilepath);
         static Album* findByNameAndArtist(const string& name, const string& artist);
+        static ResultSetIterator<Album>* findByName(string name);
+        static ResultSetIterator<Album>* findByArtist(string artist);
         static ResultSetIterator<Album>* findAll();
 
         int update();

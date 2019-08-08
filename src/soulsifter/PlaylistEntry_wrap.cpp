@@ -54,6 +54,8 @@ void PlaylistEntry::Init(v8::Local<v8::Object> exports) {
   Nan::SetPrototypeMethod(tpl, "clear", clear);
   Nan::SetMethod(tpl, "findById", findById);
   Nan::SetMethod(tpl, "findByPlaylistIdAndSongId", findByPlaylistIdAndSongId);
+  Nan::SetMethod(tpl, "findByPlaylistId", findByPlaylistId);
+  Nan::SetMethod(tpl, "findBySongId", findBySongId);
   Nan::SetMethod(tpl, "findAll", findAll);
   Nan::SetPrototypeMethod(tpl, "update", update);
   Nan::SetPrototypeMethod(tpl, "save", save);
@@ -111,6 +113,42 @@ void PlaylistEntry::findByPlaylistIdAndSongId(const Nan::FunctionCallbackInfo<v8
 
     info.GetReturnValue().Set(instance);
   }
+}
+
+void PlaylistEntry::findByPlaylistId(const Nan::FunctionCallbackInfo<v8::Value>& info) {
+  int a0(info[0]->IntegerValue());
+  dogatech::ResultSetIterator<dogatech::soulsifter::PlaylistEntry>* result =
+      dogatech::soulsifter::PlaylistEntry::findByPlaylistId(a0);
+
+  vector<dogatech::soulsifter::PlaylistEntry*>* v = result->toVector();
+  v8::Local<v8::Array> a = Nan::New<v8::Array>((int) v->size());
+  for (int i = 0; i < (int) v->size(); i++) {
+    v8::Local<v8::Function> cons = Nan::New<v8::Function>(constructor);
+    v8::Local<v8::Object> instance = Nan::NewInstance(cons).ToLocalChecked();
+    PlaylistEntry* o = Nan::ObjectWrap::Unwrap<PlaylistEntry>(instance);
+    o->playlistentry = (*v)[i];
+    a->Set(Nan::New<v8::Number>(i), instance);
+  }
+  delete v;
+  info.GetReturnValue().Set(a);
+}
+
+void PlaylistEntry::findBySongId(const Nan::FunctionCallbackInfo<v8::Value>& info) {
+  int a0(info[0]->IntegerValue());
+  dogatech::ResultSetIterator<dogatech::soulsifter::PlaylistEntry>* result =
+      dogatech::soulsifter::PlaylistEntry::findBySongId(a0);
+
+  vector<dogatech::soulsifter::PlaylistEntry*>* v = result->toVector();
+  v8::Local<v8::Array> a = Nan::New<v8::Array>((int) v->size());
+  for (int i = 0; i < (int) v->size(); i++) {
+    v8::Local<v8::Function> cons = Nan::New<v8::Function>(constructor);
+    v8::Local<v8::Object> instance = Nan::NewInstance(cons).ToLocalChecked();
+    PlaylistEntry* o = Nan::ObjectWrap::Unwrap<PlaylistEntry>(instance);
+    o->playlistentry = (*v)[i];
+    a->Set(Nan::New<v8::Number>(i), instance);
+  }
+  delete v;
+  info.GetReturnValue().Set(a);
 }
 
 void PlaylistEntry::findAll(const Nan::FunctionCallbackInfo<v8::Value>& info) {

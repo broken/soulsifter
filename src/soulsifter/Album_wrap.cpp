@@ -53,6 +53,8 @@ void Album::Init(v8::Local<v8::Object> exports) {
   Nan::SetMethod(tpl, "findById", findById);
   Nan::SetMethod(tpl, "findByCoverFilepath", findByCoverFilepath);
   Nan::SetMethod(tpl, "findByNameAndArtist", findByNameAndArtist);
+  Nan::SetMethod(tpl, "findByName", findByName);
+  Nan::SetMethod(tpl, "findByArtist", findByArtist);
   Nan::SetMethod(tpl, "findAll", findAll);
   Nan::SetPrototypeMethod(tpl, "update", update);
   Nan::SetPrototypeMethod(tpl, "save", save);
@@ -130,6 +132,42 @@ void Album::findByNameAndArtist(const Nan::FunctionCallbackInfo<v8::Value>& info
 
     info.GetReturnValue().Set(instance);
   }
+}
+
+void Album::findByName(const Nan::FunctionCallbackInfo<v8::Value>& info) {
+  string a0(*v8::String::Utf8Value(info[0]->ToString()));
+  dogatech::ResultSetIterator<dogatech::soulsifter::Album>* result =
+      dogatech::soulsifter::Album::findByName(a0);
+
+  vector<dogatech::soulsifter::Album*>* v = result->toVector();
+  v8::Local<v8::Array> a = Nan::New<v8::Array>((int) v->size());
+  for (int i = 0; i < (int) v->size(); i++) {
+    v8::Local<v8::Function> cons = Nan::New<v8::Function>(constructor);
+    v8::Local<v8::Object> instance = Nan::NewInstance(cons).ToLocalChecked();
+    Album* o = Nan::ObjectWrap::Unwrap<Album>(instance);
+    o->album = (*v)[i];
+    a->Set(Nan::New<v8::Number>(i), instance);
+  }
+  delete v;
+  info.GetReturnValue().Set(a);
+}
+
+void Album::findByArtist(const Nan::FunctionCallbackInfo<v8::Value>& info) {
+  string a0(*v8::String::Utf8Value(info[0]->ToString()));
+  dogatech::ResultSetIterator<dogatech::soulsifter::Album>* result =
+      dogatech::soulsifter::Album::findByArtist(a0);
+
+  vector<dogatech::soulsifter::Album*>* v = result->toVector();
+  v8::Local<v8::Array> a = Nan::New<v8::Array>((int) v->size());
+  for (int i = 0; i < (int) v->size(); i++) {
+    v8::Local<v8::Function> cons = Nan::New<v8::Function>(constructor);
+    v8::Local<v8::Object> instance = Nan::NewInstance(cons).ToLocalChecked();
+    Album* o = Nan::ObjectWrap::Unwrap<Album>(instance);
+    o->album = (*v)[i];
+    a->Set(Nan::New<v8::Number>(i), instance);
+  }
+  delete v;
+  info.GetReturnValue().Set(a);
 }
 
 void Album::findAll(const Nan::FunctionCallbackInfo<v8::Value>& info) {

@@ -200,6 +200,24 @@ namespace soulsifter {
         LOG(FATAL) << "Unable to complete model operation";
     }
 
+    ResultSetIterator<Album>* Album::findByName(string name) {
+        sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select Albums.* from Albums where ifnull(name,'') = ifnull(?,'')");
+        if (!name.empty()) ps->setString(1, name);
+        else ps->setNull(1, sql::DataType::VARCHAR);
+        sql::ResultSet *rs = ps->executeQuery();
+        ResultSetIterator<Album> *dtrs = new ResultSetIterator<Album>(rs);
+        return dtrs;
+    }
+
+    ResultSetIterator<Album>* Album::findByArtist(string artist) {
+        sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select Albums.* from Albums where ifnull(artist,'') = ifnull(?,'')");
+        if (!artist.empty()) ps->setString(1, artist);
+        else ps->setNull(1, sql::DataType::VARCHAR);
+        sql::ResultSet *rs = ps->executeQuery();
+        ResultSetIterator<Album> *dtrs = new ResultSetIterator<Album>(rs);
+        return dtrs;
+    }
+
     ResultSetIterator<Album>* Album::findAll() {
         sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select Albums.* from Albums");
         sql::ResultSet *rs = ps->executeQuery();
