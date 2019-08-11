@@ -41,8 +41,6 @@
           "MiniBpm.cpp",
           # organization
           "FilesToAdd.cpp",
-          "GoogleMusicService.cpp",
-          "GoogleMusicService_wrap.cpp",
           "MusicManager.cpp",
           "MusicVideoService.cpp",
           "MusicVideoService_wrap.cpp",
@@ -104,9 +102,6 @@
           "/usr/local/lib/libmysqlclient.20.dylib",
           "/usr/local/lib/libmysqlcppconn.7.dylib",
           "/usr/local/lib/libtag.1.17.0.dylib",
-          "/usr/local/lib/libGMusicApi.a",
-          "/usr/local/lib/libPythonHelper.a",
-          "/usr/local/Cellar/python/2.7.13/Frameworks/Python.framework/Versions/2.7/lib/libpython2.7.dylib",
         ],
       },
       'conditions': [
@@ -123,7 +118,6 @@
       "include_dirs" : [
         "<!(node -e \"require('nan')\")",
         "/usr/local/include",
-        "/System/Library/Frameworks/Python.framework/Versions/2.7/include/python2.7",
       ],
     }
   ]

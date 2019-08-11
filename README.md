@@ -22,16 +22,7 @@ Presteps:
   * global: grunt-cli, nw-gyp, bower
   * locally with npm install
 * custom build of nwjs (for drag & drop & mp3 play support)
-* required libs (brew install): mysql-connector-c++, libtag, mad, boost, youtube-dl (for music videos), ffmpeg (for youtube audio), g3log, cmake (for compiling gmusicapi-cpp), pybind11 (for gmusicapi-cpp)
-* install gmusicapi-cpp
-  * python -m pip install gmusicapi
-  * git clone --recurse-submodules -j8 https://github.com/dvirtz/gmusicapi-cpp.git
-  * cmake -DPYTHON_EXECUTABLE=$(python-config --prefix)/bin/python -DPYTHON_LIBRARY=$(python-config --prefix)/lib/libpython2.7.dylib -DPYTHON_INCLUDE_DIR=$(python-config --prefix)/include/python2.7 .
-  * env CTEST_OUTPUT_ON_FAILURE=1 GM_U=brokenbeat GM_P=yjpyiaoazggkqqet make test 
-  * cp /Users/dogatech/Development/open.src/gmusicapi-cpp/src/gmusicapi/libGMusicApi.a /usr/local/lib
-  * cp /Users/dogatech/Development/open.src/gmusicapi-cpp/src/PythonHelper/libPythonHelper.a /usr/local/lib
-  * cp -R /Users/dogatech/Development/open.src/gmusicapi-cpp/include/gmusicapi /usr/local/include
-  * cp -R /Users/dogatech/Development/open.src/gmusicapi-cpp/include/PythonHelper /usr/local/include
+* required libs (brew install): mysql-connector-c++, libtag, mad, boost, youtube-dl (for music videos), ffmpeg (for youtube audio), g3log
 
 ```
 grunt all
