@@ -19,7 +19,7 @@ Presteps:
       secure_file_priv=/Users/dogatech/Music/db
       sql-mode="STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION"
 * install npm modules
-  * global: grunt-cli, nw-gyp, bower
+  * global: grunt-cli, nw-gyp
   * locally with npm install
 * custom build of nwjs (for drag & drop & mp3 play support)
 * required libs (brew install): mysql-connector-c++, libtag, mad, boost, youtube-dl (for music videos), ffmpeg (for youtube audio), g3log
@@ -32,7 +32,7 @@ note: may want to setup a shortlink to the version working on: ln -s build/souls
 
 Win / Linux Differences
 =======================
-I run this on OSX 10.7 & 10.10 x64. While most things should work on the other systems, edits would need to happen. (these are just off the top of my head atm)
+I run this on OSX 10.14 (have used on as early as OSX 10.7). While most things should work on the other operating systems, edits would need to happen. (these are just off the top of my head atm)
 * update package.json files
 * update Gruntfile.js
 * the custom build of nwjs would need to edit a separate place for drag&drop support
@@ -45,12 +45,13 @@ Model Generation
 ================
 When I first started, I found myself doing much of the same work for the model objects. Rather than creating a hard to follow template, I created a ruby script to generate the model objects for me. This has proved to make model edits easy and safe.
 
-On the same token, the wrappers for nwjs is also generated. However, this code utilizes antlr and created in a separate project. I did just enough to get what I needed, but again it makes edits quick, safe, and painless. That project: https://github.com/broken/node-webkit-cpp-wrapper
+On the same token, the wrappers for nwjs is also generated. However, this code utilizes antlr and is created in a separate project. I did just enough to get what I needed, but again it makes edits quick, safe, and painless. That project: https://github.com/broken/node-webkit-cpp-wrapper
 
 NW.JS Build Directions
 ======================
-There are two reasons I need to manually build nwjs:
+There is now just one reason I need to manually build nwjs:
 * drag & drop to external native apps
+Old reasons:
 * audio decoding using proprietary codecs
 
 ```
