@@ -6,102 +6,103 @@ var playmusic = new pm();
 
 var email = settings.getString('google.email');
 var appKey = settings.getString('google.appKey');
+var androidId = settings.getString('google.androidId');
+var songLimit = 200;
 
-var maxReturned = 500;
+var maxReturned = 1000;
 var nextPageToken = undefined;
-var total = 0;
+var masterToken = undefined;
 
-var playlists = ss.Playlist.findAll().filter(function(p) {
-  return !!p.gmusicId;
-});
-var playlistEntries = {};
+let playlists = ss.Playlist.findAll();
+
+// create sets of song for each Google playlist
+let playlistsSongIds = {};
 for (let i = 0; i < playlists.length; ++i) {
-  let obj = {};
-  obj.playlist = playlists[i];
-  obj.entries = {};
-  playlistEntries[obj.playlist.gmusicId] = obj;
+  let playlist = playlists[i];
+  if (!playlist.gmusicId) continue;
+  let songs = [];
+  if (!playlist.query) {
+    // populate songs from entries
+    let entries = ss.PlaylistEntry.findByPlaylistId(playlist.id);
+    entries.sort((a, b) => a.position - b.position);
+    entries.forEach(entry => songs.push(entry.song));
+  } else {
+    // populate from query
+    songs = ss.SearchUtil.searchSongs(playlist.query, 0 /* bpm */, [] /* keys */, playlist.styles, [] /* songs to omit */, songLimit);
+  }
+  playlistsSongIds[playlist.gmusicId] = songs.map(s => s.googleSongId);
+  console.info(playlistsSongIds);
 }
 
-var getPlaylistEntriesFromDb = function(playlist) {
-  if (!playlist.query) {
-    let entries = playlist.playlistEntries;
-    return entries.sort(function(a, b) { return a.position - b.position; })
-                  .map(function(x) { return x.song; });
-  }
-  return ss.SearchUtil.searchSongs(playlist.query, 0, [], playlist.styles, [], 10000);
-};
-
-var processPlaylist = function(playlist, entries) {
-  let playlistEntriesFromDb = getPlaylistEntriesFromDb(playlist);
-  let songsToAdd = [];
-  for (let i = 0; i < playlistEntriesFromDb.length; ++i) {
-    let song = playlistEntriesFromDb[i];
-    if (!!song.googleSongId) {
-      if (!entries[song.googleSongId]) {
-        songsToAdd.push(song.googleSongId);
-      } else {
-        delete entries[song.googleSongId];
+// TODO Fix; as this only processes maxReturned at a time.
+function processResults(err, x) {
+  let entriesToRemove = [];
+  console.info('Processing ' + x.data.items.length + ' Google Music playlist entries.');
+  for (let i = 0; i < x.data.items.length; ++i) {
+    let entry = x.data.items[i];
+    if (!playlistsSongIds[entry.playlistId]) continue;
+    if (entry.deleted) {
+      console.info('track ' + entry.trackId + ' deleted in playlist ' + entry.playlistId);
+      continue;
+    }
+    let found = false;
+    for (let i = 0; i < playlistsSongIds[entry.playlistId].length; ++i) {
+      let songId = playlistsSongIds[entry.playlistId][i];
+      if (songId == entry.trackId) {
+        console.info('Track ' + entry.trackId + ' found in playlist ' + entry.playlistId);
+        found = true;
+        playlistsSongIds[entry.playlistId].splice(i, 1);
       }
     }
+    if (!found) {
+      console.info('Track ' + entry.trackId + ' not found in playlist ' + entry.playlistId);
+      entriesToRemove.push(entry.id);
+    }
   }
-  if (songsToAdd.length) {
-    playmusic.addTrackToPlayList(songsToAdd, playlist.gmusicId, function(err, mutationStatus) {
-      if (!!err) {
-        console.error(err);
-        return;
-      }
-      console.info(mutationStatus);
+  // remove old tracks
+  if (entriesToRemove.length > 0) {
+    console.info('Want to remove ' + entriesToRemove.length + ' entries.');
+    playmusic.removePlayListEntry(entriesToRemove, function(err, status) {
+      if (err) console.error('Error removing entries.');
+      else console.info('Successfully removed entries.');
+      console.info(status);
     });
-  }
-  if (entries.length) {
-    // todo uncomment after further testing
-    /*playmusic.removePlayListEntry(Object.keys(entries), function(err, mutationStatus) {
-      if (!!err) {
-        console.error(err);
-        return;
-      }
-      console.info(mutationStatus);
-    });*/
-    console.warn('Removing entries from playlist');
-    console.warn(playlist.gmusicId);
-    console.warn(entries);
-  }
-};
-
-var processEntries = function(err, entries) {
-  nextPageToken = entries.nextPageToken;
-  let count = 0;
-  if (err) {
-    console.error(err);
-    return;
-  }
-  for (let i = 0; i < entries.data.items.length; ++i) {
-    count++;
-    total++;
-    let entry = entries.data.items[i];
-    if (!!entry && !entry.deleted && !!playlistEntries[entry.playlistId]) {
-      playlistEntries[entry.playlistId].entries[entry.trackId] = true;
-    }
-  }
-  if (maxReturned == count) {
-    playmusic.getPlayListEntries({limit: maxReturned, nextPageToken: nextPageToken}, processEntries);
   } else {
-    console.info('processed ' + total + ' playlist entries.');
-    for (let gmusicId in playlistEntries) {
-      processPlaylist(playlistEntries[gmusicId].playlist, playlistEntries[gmusicId].entries);
+    console.info('No entries to remove.');
+  }
+  // add missing tracks
+  for (let [playlistId, songIds] of Object.entries(playlistsSongIds)) {
+    let tracksToAdd = [];
+    for (let i = 0; i < songIds.length; ++i) {
+      if (!!songIds[i]) tracksToAdd.push(songIds[i]);
+    }
+    if (tracksToAdd.length) {
+      console.info('Want to add ' + tracksToAdd.length + ' tracks for playlist ' + playlistId);
+      playmusic.addTrackToPlayList(tracksToAdd, playlistId, function(err, status) {
+        if (err) console.error('Unable to add tracks to playlist ' + playlistId);
+        else console.info('Tracks added to playlist ' + playlistId);
+        console.info(status);
+      });
+    } else {
+      console.info('No tracks to add for ' + playlistId);
     }
   }
-};
+}
 
-playmusic.init({email: email,  password: appKey}, function(err) {
+// compute differences of goldens with current
+playmusic.login({email: email, password: appKey, androidId: androidId}, function(err, x) {
   if (err) {
     console.error(err);
     return;
   }
-  playmusic.getPlayListEntries({limit: maxReturned, nextPageToken: nextPageToken}, processEntries);
+  console.info('Logged in to Google Music.');
+  masterToken = x.masterToken;
+  playmusic.init({androidId: androidId, masterToken: masterToken}, function(err, x) {
+    if (err) {
+      console.error(err);
+      return;
+    }
+    console.info('Initialized Google Music.');
+    playmusic.getPlayListEntries({limit: maxReturned, androidId: androidId, masterToken: masterToken}, processResults);
+  });
 });
-// get playlists w gmusic
-// get all playlist entries
-// sort
-// remove unused entries
-// add new entries
