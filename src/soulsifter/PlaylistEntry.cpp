@@ -216,8 +216,7 @@ namespace soulsifter {
                 else ps->setNull(1, sql::DataType::INTEGER);
                 if (songId > 0) ps->setInt(2, songId);
                 else ps->setNull(2, sql::DataType::INTEGER);
-                if (position > 0) ps->setInt(3, position);
-                else ps->setNull(3, sql::DataType::INTEGER);
+                ps->setInt(3, position);
                 if (!time.empty()) ps->setString(4, time);
                 else ps->setNull(4, sql::DataType::VARCHAR);
                 ps->setInt(5, id);
@@ -262,8 +261,7 @@ namespace soulsifter {
                 else ps->setNull(1, sql::DataType::INTEGER);
                 if (songId > 0) ps->setInt(2, songId);
                 else ps->setNull(2, sql::DataType::INTEGER);
-                if (position > 0) ps->setInt(3, position);
-                else ps->setNull(3, sql::DataType::INTEGER);
+                ps->setInt(3, position);
                 if (!time.empty()) ps->setString(4, time);
                 else ps->setNull(4, sql::DataType::VARCHAR);
                 int saved = ps->executeUpdate();
