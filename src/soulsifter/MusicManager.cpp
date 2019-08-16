@@ -60,9 +60,16 @@ namespace {
 
   const string FEATURING_REGEX = " [(]?[Ff](eaturing|t[.]?|eat[.]?) (.*?)[)]?$";
 
-  string* cleanDirName(string* name) {
-    std::replace(name->begin(), name->end(), '/', '-');
-    std::replace(name->begin(), name->end(), ':', ' ');
+  string cleanDirName(const string& s) {
+    string name(s);
+    std::replace(name.begin(), name.end(), '/', '-');
+    std::replace(name.begin(), name.end(), ':', ' ');
+    boost::regex charsToRemoveRegex("[!@#$%^&*?'\";]");
+    boost::regex prefixSpacesRegex("^[ ]*");
+    boost::regex suffixSpacesRegex("[ ]*$");
+    name = boost::regex_replace(name, charsToRemoveRegex, "");
+    name = boost::regex_replace(name, prefixSpacesRegex, "");
+    name = boost::regex_replace(name, suffixSpacesRegex, "");
     return name;
   }
 
@@ -284,12 +291,12 @@ bool MusicManager::moveSong(Song* song) {
             ostringstream ssdirpath;
             string albumartist = song->getAlbum()->getArtist().length() > 0 ? song->getAlbum()->getArtist() : "_compilations_";
             string albumname = song->getAlbum()->getName();
-            ssdirpath << song->getAlbum()->getBasicGenre()->getName() << "/" << *cleanDirName(&albumartist) << "/" << *cleanDirName(&albumname);
+            ssdirpath << song->getAlbum()->getBasicGenre()->getName() << "/" << cleanDirName(albumartist) << "/" << cleanDirName(albumname);
             albumSubPathForImage = ssdirpath.str();
             transform(albumSubPathForImage.begin(), albumSubPathForImage.end(), albumSubPathForImage.begin(), ::tolower);
             if (song->getAlbumPart() && song->getAlbumPart()->getName().length()) {
                 string part = song->getAlbumPart()->getName();
-                ssdirpath << "/" << *cleanDirName(&part);
+                ssdirpath << "/" << cleanDirName(part);
             }
             albumPath = ssdirpath.str();
         }
