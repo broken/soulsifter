@@ -101,10 +101,6 @@ bool NewSongManager::nextSong(Song* updatedSong, Song* originalSong) {
     originalSong->clear();
     originalSong->setFilepath(*path);
     MusicManager::getInstance().readTagsFromSong(originalSong);
-    if (originalSong->getAlbum() && !originalSong->getAlbum()->getBasicGenre() && !originalSong->getAlbum()->getArtist().empty()) {
-      BasicGenre* basicGenre = BasicGenre::findByArtist(originalSong->getAlbum()->getArtist());
-      if (basicGenre) originalSong->getAlbum()->setBasicGenre(basicGenre);
-    }
     MusicManager::getInstance().updateSongWithChanges(*originalSong, updatedSong);
 
     // Do not sync the song here. Since we just updated the album with possible
