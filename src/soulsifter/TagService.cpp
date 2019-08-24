@@ -143,7 +143,9 @@ bool readId3v2TagAttributes(Song* song, TagLib::ID3v2::Tag* id3v2) {
   const string keylist = getId3v2Text(id3v2, "TKEY");
   std::set<std::string> keys;
   boost::split(keys, keylist, boost::is_any_of("\\"));
-  if (keys != song->getTonicKeys() && (overwrite || !song->getTonicKeys().size())) {
+  if (keys != song->getTonicKeys() &&
+      (overwrite || !song->getTonicKeys().size()) &&
+      (keys.size() != 1 || keys.begin()->compare("All"))) {
     LOG(INFO) << "updating song " << song->getId()
          << " keys from " << boost::algorithm::join(song->getTonicKeys(), ",") << " or " << oldKey
          << " to " << boost::algorithm::join(keys, ",");
