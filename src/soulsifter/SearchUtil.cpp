@@ -25,6 +25,7 @@
 #include "DTVectorUtil.h"
 #include "MysqlAccess.h"
 #include "Song.h"
+#include "SoulSifterSettings.h"
 #include "Style.h"
 
 using namespace std;
@@ -316,6 +317,7 @@ string buildOptionPredicate(int bpm, const set<string>& keys, const vector<Style
           LOG(WARNING) << "Error. Unable to find key.";
           return "";
       }
+      if (SoulSifterSettings::getInstance().get<bool>("search.includeUnknownKeys")) ss << " or tonicKeys=''";
       ss << ")";
     }
   }

@@ -43,6 +43,7 @@ namespace soulsifter {
       //ptree.put("google.appKey", "");
       //ptree.put("google.email", "");
       //ptree.put("google.androidId", "");
+      ptree.put("search.includeUnknownKeys", true);
       ptree.put("songList.limit", 128);
       //ptree.put("tag.readOverwrite", "");
     }
