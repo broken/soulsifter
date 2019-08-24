@@ -45,6 +45,7 @@ namespace soulsifter {
       //ptree.put("google.androidId", "");
       ptree.put("search.includeUnknownKeys", true);
       ptree.put("songList.limit", 128);
+      ptree.put("songList.showComments", false);
       //ptree.put("tag.readOverwrite", "");
     }
   }
