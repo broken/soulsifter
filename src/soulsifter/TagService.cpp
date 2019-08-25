@@ -75,6 +75,32 @@ private:
   virtual bool save() { return false; }
 };
 
+// trim from start (in place)
+static inline void ltrim(std::string &s) {
+  s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](int ch) {
+    return !std::isspace(ch);
+  }));
+}
+
+// trim from end (in place)
+static inline void rtrim(std::string &s) {
+  s.erase(std::find_if(s.rbegin(), s.rend(), [](int ch) {
+    return !std::isspace(ch);
+  }).base(), s.end());
+}
+
+// trim from both ends (in place)
+static inline void trim(std::string &s) {
+  ltrim(s);
+  rtrim(s);
+}
+
+// trim from both ends (copying)
+static inline std::string trim_copy(std::string s) {
+    trim(s);
+    return s;
+}
+
 int canonicalizeBpm(const int bpm) {
   if (bpm <= 0) return 0;
   if (bpm < 75) return canonicalizeBpm(bpm << 1);
@@ -88,12 +114,12 @@ int canonicalizeBpm(const string& bpm) {
     
 const string getId3v2Text(TagLib::ID3v2::Tag* id3v2, const char* name) {
   TagLib::ID3v2::FrameList frameList = id3v2->frameListMap()[name];
-  return frameList.isEmpty() ? "" : frameList.front()->toString().to8Bit();
+  return frameList.isEmpty() ? "" : trim_copy(frameList.front()->toString().to8Bit());
 }
 
 const string getId3v2UserText(TagLib::ID3v2::Tag* id3v2, const char* description) {
   TagLib::ID3v2::UserTextIdentificationFrame* frame = TagLib::ID3v2::UserTextIdentificationFrame::find(id3v2, description);
-  return !frame ? "" : frame->fieldList()[1].to8Bit();  // the desciption is copied into the first element of the field list
+  return !frame ? "" : trim_copy(frame->fieldList()[1].to8Bit());  // the desciption is copied into the first element of the field list
 }
 
 bool readId3v2TagAttributes(Song* song, TagLib::ID3v2::Tag* id3v2) {
@@ -232,17 +258,17 @@ void TagService::readId3v2Tag(Song* song) {
     return;
   }
 
-    if (id3v2->artist() != TagLib::String::null) song->setArtist(id3v2->artist().to8Bit());
+    if (id3v2->artist() != TagLib::String::null) song->setArtist(trim_copy(id3v2->artist().to8Bit()));
     song->setTrack(getId3v2Text(id3v2, "TRCK"));
-    if (id3v2->title() != TagLib::String::null) song->setTitle(id3v2->title().to8Bit());
+    if (id3v2->title() != TagLib::String::null) song->setTitle(trim_copy(id3v2->title().to8Bit()));
     song->setRemixer(getId3v2Text(id3v2, "TPE4"));
     song->getAlbum()->setArtist(getId3v2Text(id3v2, "TPE2"));
-    if (id3v2->album() != TagLib::String::null) song->getAlbum()->setName(id3v2->album().to8Bit());
+    if (id3v2->album() != TagLib::String::null) song->getAlbum()->setName(trim_copy(id3v2->album().to8Bit()));
     song->getAlbum()->setLabel(getId3v2Text(id3v2, "TPUB"));
     song->getAlbum()->setCatalogId(getId3v2Text(id3v2, "TCID"));
     if (id3v2->year() != 0) song->getAlbum()->setReleaseDateYear(id3v2->year());
     //TODO if (id3v2->genre() != TagLib::String::null) song->setGenre(id3v2->genre().to8Bit());
-    if (id3v2->comment() != TagLib::String::null) song->setComments(id3v2->comment().to8Bit());
+    if (id3v2->comment() != TagLib::String::null) song->setComments(trim_copy(id3v2->comment().to8Bit()));
     
     TagLib::ID3v2::FrameList frameList = id3v2->frameListMap()["POPM"];
     if (!frameList.isEmpty()) {

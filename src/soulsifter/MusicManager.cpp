@@ -73,6 +73,32 @@ namespace {
     return name;
   }
 
+  // trim from start (in place)
+  static inline void ltrim(std::string &s) {
+    s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](int ch) {
+      return !std::isspace(ch);
+    }));
+  }
+
+  // trim from end (in place)
+  static inline void rtrim(std::string &s) {
+    s.erase(std::find_if(s.rbegin(), s.rend(), [](int ch) {
+      return !std::isspace(ch);
+    }).base(), s.end());
+  }
+
+  // trim from both ends (in place)
+  static inline void trim(std::string &s) {
+    ltrim(s);
+    rtrim(s);
+  }
+
+  // trim from both ends (copying)
+  static inline std::string trim_copy(std::string s) {
+      trim(s);
+      return s;
+  }
+
 }  // namespace
 
 # pragma mark initialization
@@ -109,10 +135,10 @@ void MusicManager::readTagsFromSong(Song* song) {
         TagLib::ID3v1::Tag* id3v1 = f.ID3v1Tag();
         if (id3v1) {
             stringstream ss;
-            if (id3v1->title() != TagLib::String::null) song->setTitle(id3v1->title().to8Bit());
-            if (id3v1->artist() != TagLib::String::null) song->setArtist(id3v1->artist().to8Bit());
-            if (id3v1->album() != TagLib::String::null) song->getAlbum()->setName(id3v1->album().to8Bit());
-            if (id3v1->comment() != TagLib::String::null) song->setComments(id3v1->comment().to8Bit());
+            if (id3v1->title() != TagLib::String::null) song->setTitle(trim_copy(id3v1->title().to8Bit()));
+            if (id3v1->artist() != TagLib::String::null) song->setArtist(trim_copy(id3v1->artist().to8Bit()));
+            if (id3v1->album() != TagLib::String::null) song->getAlbum()->setName(trim_copy(id3v1->album().to8Bit()));
+            if (id3v1->comment() != TagLib::String::null) song->setComments(trim_copy(id3v1->comment().to8Bit()));
             //TODO if (id3v1->genre() != TagLib::String::null) song->setGenre(id3v1->genre().to8Bit());
             if (id3v1->year() != 0) song->getAlbum()->setReleaseDateYear(id3v1->year());
             if (id3v1->track() != 0) {
@@ -130,11 +156,11 @@ void MusicManager::readTagsFromSong(Song* song) {
       TagLib::MP4::Tag* tag = f.tag();
       if (tag) {
         stringstream ss;
-        if (tag->title() != TagLib::String::null) song->setTitle(tag->title().to8Bit());
-        if (tag->artist() != TagLib::String::null) song->setArtist(tag->artist().to8Bit());
-        if (tag->track() != 0) song->setTrack((ostringstream() << tag->track()).str());
-        if (tag->album() != TagLib::String::null) song->getAlbum()->setName(tag->album().to8Bit());
-        if (tag->comment() != TagLib::String::null) song->setComments(tag->comment().to8Bit());
+        if (tag->title() != TagLib::String::null) song->setTitle(trim_copy(tag->title().to8Bit()));
+        if (tag->artist() != TagLib::String::null) song->setArtist(trim_copy(tag->artist().to8Bit()));
+        if (tag->track() != 0) song->setTrack(trim_copy((ostringstream() << tag->track()).str()));
+        if (tag->album() != TagLib::String::null) song->getAlbum()->setName(trim_copy(tag->album().to8Bit()));
+        if (tag->comment() != TagLib::String::null) song->setComments(trim_copy(tag->comment().to8Bit()));
         if (tag->year() != 0) song->getAlbum()->setReleaseDateYear(tag->year());
       }
       TagService::readId3v2Tag(song);
@@ -234,12 +260,12 @@ void MusicManager::writeTagsToSong(Song* song) {
       boost::regex featRegex(FEATURING_REGEX);
       boost::smatch featMatch;
       if (boost::regex_search(updatedSong->getArtist(), featMatch, featRegex, boost::match_extra)) {
-        updatedSong->getAlbum()->setArtist(featMatch[1]);
+        updatedSong->getAlbum()->setArtist(trim_copy(featMatch[1]));
       }
     }
     // add an album name if one does not exist
     if (updatedSong->getAlbum()->getName().empty()) {
-      updatedSong->getAlbum()->setName(updatedSong->getTitle());
+      updatedSong->getAlbum()->setName(trim_copy(updatedSong->getTitle()));
     }
     // remove album part if there is just one
     if (updatedSong->getAlbumPart() && !updatedSong->getAlbumPart()->getPos().compare("1/1")) {
@@ -486,8 +512,8 @@ bool MusicManager::splitArtistAndTitle(const string& songString, Song* updatedSo
   boost::regex splitRegex("^(.+) - (.+)$");
   boost::smatch match;
   if (boost::regex_search(songString, match, splitRegex, boost::match_extra)) {
-    updatedSong->setArtist(match[1]);
-    updatedSong->setTitle(match[2]);
+    updatedSong->setArtist(trim_copy(match[1]));
+    updatedSong->setTitle(trim_copy(match[2]));
     return true;
   }
   return false;
@@ -511,7 +537,7 @@ bool MusicManager::copyRemixer(Song* updatedSong) {
       updatedSong->getRemixer().length() == 0) {
     string remixer(rmxrMatch[1]);
     if (!!remixer.compare("original") && !!remixer.compare("Original")) {
-      updatedSong->setRemixer(remixer);
+      updatedSong->setRemixer(trim_copy(remixer));
       return true;
     }
   }
