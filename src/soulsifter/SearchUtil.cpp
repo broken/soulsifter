@@ -23,6 +23,7 @@
 #include "Album.h"
 #include "AlbumPart.h"
 #include "DTVectorUtil.h"
+#include "MusicVideo.h"
 #include "MysqlAccess.h"
 #include "Song.h"
 #include "SoulSifterSettings.h"
@@ -359,7 +360,7 @@ bool isLimit(const Atom& a) {
 
 }  // anon namespace
 
-vector<Song*>* SearchUtil::searchSongs(const string& query, int bpm, const set<string>& keys, const vector<Style*>& styles, const vector<Song*>& songsToOmit, int limit, bool hasMusicVideo) {
+vector<Song*>* SearchUtil::searchSongs(const string& query, int bpm, const set<string>& keys, const vector<Style*>& styles, const vector<Song*>& songsToOmit, int limit, bool musicVideoMode) {
   LOG(INFO) << "q:" << query << ", bpm:" << bpm << ", keys:" << setToCsv(keys) << ", styles:" << ", limit:" << limit;
 
   vector<string> fragments;
@@ -382,8 +383,8 @@ vector<Song*>* SearchUtil::searchSongs(const string& query, int bpm, const set<s
   }
   
   stringstream ss;
-  if (hasMusicVideo)
-    ss << "select s.*, s.id as songid, s.artist as songartist, group_concat(ss.styleid) as styleIds, a.*, a.id as albumid, a.artist as albumartist from Songs s inner join Albums a on s.albumid = a.id inner join MusicVideos v on s.id=v.songId left outer join SongStyles ss on ss.songid=s.id where true";
+  if (musicVideoMode)
+    ss << "select s.*, s.id as songid, s.artist as songartist, group_concat(ss.styleid) as styleIds, a.*, a.id as albumid, a.artist as albumartist, v.filepath as mvFilePath, v.thumbnailFilePath as mvTnFilePath from Songs s inner join Albums a on s.albumid = a.id inner join MusicVideos v on s.musicVideoId=v.id left outer join SongStyles ss on ss.songid=s.id where true";
   else
     ss << "select s.*, s.id as songid, s.artist as songartist, group_concat(ss.styleid) as styleIds, a.*, a.id as albumid, a.artist as albumartist from Songs s inner join Albums a on s.albumid = a.id left outer join SongStyles ss on ss.songid=s.id where true";
   ss << buildQueryPredicate(atoms);
@@ -451,8 +452,16 @@ vector<Song*>* SearchUtil::searchSongs(const string& query, int bpm, const set<s
         album->setReleaseDateMonth(rs->getInt("releaseDateMonth"));
         album->setReleaseDateDay(rs->getInt("releaseDateDay"));
         album->setBasicGenreId(rs->getInt("basicGenreId"));
-
         song->setAlbum(album);
+
+        if (musicVideoMode) {
+          MusicVideo* video = new MusicVideo();
+          video->setId(rs->getInt("musicVideoId"));
+          video->setFilePath(rs->getString("mvFilePath"));
+          video->setThumbnailFilePath(rs->getString("mvTnFilePath"));
+          song->setMusicVideo(video);
+        }
+
         songs->push_back(song);
       }
       rs->close();

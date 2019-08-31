@@ -225,8 +225,11 @@ MusicVideo* MusicVideoService::associateYouTubeVideo(Song* song, const string& i
   musicVideo->setFilePath(boost::algorithm::ireplace_first_copy(musicVideo->getFilePath(), SoulSifterSettings::getInstance().get<string>("mv.dir"), ""));
   musicVideo->setThumbnailFilePath(boost::algorithm::ireplace_first_copy(musicVideo->getThumbnailFilePath(), SoulSifterSettings::getInstance().get<string>("mv.dir"), ""));
   
-  musicVideo->setSongId(song->getId());
   musicVideo->save();
+
+  song->setMusicVideoId(musicVideo->getId());
+  song->update();
+
   return musicVideo;
 }
 

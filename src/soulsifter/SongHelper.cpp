@@ -17,6 +17,7 @@
 #include "Album.h"
 #include "AlbumPart.h"
 #include "BasicGenre.h"
+#include "MusicVideo.h"
 #include "MysqlAccess.h"
 #include "RESong.h"
 #include "Style.h"
@@ -49,6 +50,8 @@ namespace soulsifter {
     album(NULL),
     albumPartId(0),
     albumPart(NULL),
+    musicVideoId(0),
+    musicVideo(NULL),
     styles() {
         
         // styles
