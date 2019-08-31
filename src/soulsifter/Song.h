@@ -27,6 +27,7 @@ namespace soulsifter {
     class RESong;
     class Album;
     class AlbumPart;
+    class MusicVideo;
     class Style;
 
     class Song {
@@ -114,6 +115,12 @@ namespace soulsifter {
         AlbumPart* getAlbumPartOnce() const;
         void setAlbumPart(const AlbumPart& albumPart);
         void setAlbumPart(AlbumPart* albumPart);  // takes ownership
+        const int getMusicVideoId() const;
+        void setMusicVideoId(int musicVideoId);
+        MusicVideo* getMusicVideo();
+        MusicVideo* getMusicVideoOnce() const;
+        void setMusicVideo(const MusicVideo& musicVideo);
+        void setMusicVideo(MusicVideo* musicVideo);  // takes ownership
         const vector<int>& getStyleIds() const;
         void setStyleIds(const vector<int>& styleIds);
         const vector<Style*>& getStyles();
@@ -147,6 +154,8 @@ namespace soulsifter {
         Album* album;
         int albumPartId;
         AlbumPart* albumPart;
+        int musicVideoId;
+        MusicVideo* musicVideo;
         vector<int> styleIds;
         vector<Style*> styles;
 

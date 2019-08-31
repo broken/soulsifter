@@ -27,6 +27,7 @@
 #include "RESong.h"
 #include "Album.h"
 #include "AlbumPart.h"
+#include "MusicVideo.h"
 #include "Style.h"
 
 using namespace std;
@@ -62,6 +63,8 @@ namespace soulsifter {
     album(NULL),
     albumPartId(0),
     albumPart(NULL),
+    musicVideoId(0),
+    musicVideo(NULL),
     styleIds(),
     styles() {
     }
@@ -92,11 +95,14 @@ namespace soulsifter {
     album(NULL),
     albumPartId(song.getAlbumPartId()),
     albumPart(NULL),
+    musicVideoId(song.getMusicVideoId()),
+    musicVideo(NULL),
     styleIds(song.getStyleIds()),
     styles() {
         if (song.reSong) setRESong(*song.reSong);
         if (song.album) setAlbum(*song.album);
         if (song.albumPart) setAlbumPart(*song.albumPart);
+        if (song.musicVideo) setMusicVideo(*song.musicVideo);
     }
 
     void Song::operator=(const Song& song) {
@@ -143,6 +149,14 @@ namespace soulsifter {
             delete albumPart;
             albumPart = NULL;
         }
+        musicVideoId = song.getMusicVideoId();
+        if (!song.getMusicVideoId() && song.musicVideo) {
+            if (!musicVideo) musicVideo = new MusicVideo(*song.musicVideo);
+            else *musicVideo = *song.musicVideo;
+        } else {
+            delete musicVideo;
+            musicVideo = NULL;
+        }
         styleIds = song.getStyleIds();
         deleteVectorPointers(&styles);
     }
@@ -154,6 +168,8 @@ namespace soulsifter {
         album = NULL;
         delete albumPart;
         albumPart = NULL;
+        delete musicVideo;
+        musicVideo = NULL;
         while (!styles.empty()) delete styles.back(), styles.pop_back();
     }
 
@@ -186,6 +202,9 @@ namespace soulsifter {
         albumPartId = 0;
         delete albumPart;
         albumPart = NULL;
+        musicVideoId = 0;
+        delete musicVideo;
+        musicVideo = NULL;
         styleIds.clear();
         deleteVectorPointers(&styles);
     }
@@ -214,6 +233,7 @@ namespace soulsifter {
         song->setRESongId(rs->getInt("reSongId"));
         song->setAlbumId(rs->getInt("albumId"));
         song->setAlbumPartId(rs->getInt("albumPartId"));
+        song->setMusicVideoId(rs->getInt("musicVideoId"));
         if (!rs->isNull("styleIds")) {
             string csv = rs->getString("styleIds");
             istringstream iss(csv);
@@ -371,8 +391,18 @@ namespace soulsifter {
                 } else if (!albumPartId && albumPart) {
                     albumPartId = albumPart->getId();
                 }
+                if (musicVideo && musicVideo->sync()) {
+                    if (musicVideo->getId()) {
+                        musicVideo->update();
+                    } else {
+                        musicVideo->save();
+                    }
+                    musicVideoId = musicVideo->getId();
+                } else if (!musicVideoId && musicVideo) {
+                    musicVideoId = musicVideo->getId();
+                }
 
-                sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("update Songs set artist=?, track=?, title=?, remixer=?, featuring=?, filepath=?, rating=?, dateAdded=?, bpm=?, tonicKeys=?, tonicKey=?, energy=?, comments=?, trashed=?, lowQuality=?, googleSongId=?, durationInMs=?, curator=?, reSongId=?, albumId=?, albumPartId=? where id=?");
+                sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("update Songs set artist=?, track=?, title=?, remixer=?, featuring=?, filepath=?, rating=?, dateAdded=?, bpm=?, tonicKeys=?, tonicKey=?, energy=?, comments=?, trashed=?, lowQuality=?, googleSongId=?, durationInMs=?, curator=?, reSongId=?, albumId=?, albumPartId=?, musicVideoId=? where id=?");
                 if (!artist.empty()) ps->setString(1, artist);
                 else ps->setNull(1, sql::DataType::VARCHAR);
                 if (!track.empty()) ps->setString(2, track);
@@ -411,7 +441,9 @@ namespace soulsifter {
                 else ps->setNull(20, sql::DataType::INTEGER);
                 if (albumPartId > 0) ps->setInt(21, albumPartId);
                 else ps->setNull(21, sql::DataType::INTEGER);
-                ps->setInt(22, id);
+                if (musicVideoId > 0) ps->setInt(22, musicVideoId);
+                else ps->setNull(22, sql::DataType::INTEGER);
+                ps->setInt(23, id);
                 int result = ps->executeUpdate();
                 if (!styleIds.empty()) {
                     stringstream ss("insert ignore into SongStyles (songId, styleId) values (?, ?)", ios_base::app | ios_base::out | ios_base::ate);
@@ -485,8 +517,18 @@ namespace soulsifter {
                 } else if (!albumPartId && albumPart) {
                     albumPartId = albumPart->getId();
                 }
+                if (musicVideo && musicVideo->sync()) {
+                    if (musicVideo->getId()) {
+                        musicVideo->update();
+                    } else {
+                        musicVideo->save();
+                    }
+                    musicVideoId = musicVideo->getId();
+                } else if (!musicVideoId && musicVideo) {
+                    musicVideoId = musicVideo->getId();
+                }
 
-                sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("insert into Songs (artist, track, title, remixer, featuring, filepath, rating, dateAdded, bpm, tonicKeys, tonicKey, energy, comments, trashed, lowQuality, googleSongId, durationInMs, curator, reSongId, albumId, albumPartId) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("insert into Songs (artist, track, title, remixer, featuring, filepath, rating, dateAdded, bpm, tonicKeys, tonicKey, energy, comments, trashed, lowQuality, googleSongId, durationInMs, curator, reSongId, albumId, albumPartId, musicVideoId) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
                 if (!artist.empty()) ps->setString(1, artist);
                 else ps->setNull(1, sql::DataType::VARCHAR);
                 if (!track.empty()) ps->setString(2, track);
@@ -525,6 +567,8 @@ namespace soulsifter {
                 else ps->setNull(20, sql::DataType::INTEGER);
                 if (albumPartId > 0) ps->setInt(21, albumPartId);
                 else ps->setNull(21, sql::DataType::INTEGER);
+                if (musicVideoId > 0) ps->setInt(22, musicVideoId);
+                else ps->setNull(22, sql::DataType::INTEGER);
                 int saved = ps->executeUpdate();
                 if (!saved) {
                     LOG(WARNING) << "Not able to save song";
@@ -575,6 +619,10 @@ namespace soulsifter {
             if (!albumPartId && albumPart) {
                 albumPart->sync();
                 albumPartId = albumPart->getId();
+            }
+            if (!musicVideoId && musicVideo) {
+                musicVideo->sync();
+                musicVideoId = musicVideo->getId();
             }
         }
         if (!song) song = findByRESongId(getRESongId());
@@ -763,6 +811,15 @@ namespace soulsifter {
             }
         }
         if (albumPart) needsUpdate |= albumPart->sync();
+        if (musicVideoId != song->getMusicVideoId()) {
+            if (musicVideoId) {
+                LOG(INFO) << "updating song " << id << " musicVideoId from " << song->getMusicVideoId() << " to " << musicVideoId;
+                needsUpdate = true;
+            } else {
+                musicVideoId = song->getMusicVideoId();
+            }
+        }
+        if (musicVideo) needsUpdate |= musicVideo->sync();
         if (!equivalentVectors<int>(styleIds, song->getStyleIds())) {
             if (!containsVector<int>(styleIds, song->getStyleIds())) {
                 LOG(INFO) << "updating song " << id << " styleIds";
@@ -928,6 +985,35 @@ namespace soulsifter {
         this->albumPartId = albumPart->getId();
         delete this->albumPart;
         this->albumPart = albumPart;
+    }
+
+    const int Song::getMusicVideoId() const { 
+        return (!musicVideoId && musicVideo) ? musicVideo->getId() : musicVideoId;
+    }
+    void Song::setMusicVideoId(const int musicVideoId) {
+        this->musicVideoId = musicVideoId;
+        delete musicVideo;
+        musicVideo = NULL;
+    }
+
+    MusicVideo* Song::getMusicVideo() {
+        if (!musicVideo && musicVideoId) {
+            musicVideo = MusicVideo::findById(musicVideoId);
+        }
+        return musicVideo;
+    }
+    MusicVideo* Song::getMusicVideoOnce() const {
+        return (!musicVideo && musicVideoId) ? MusicVideo::findById(musicVideoId) : musicVideo;
+    }
+    void Song::setMusicVideo(const MusicVideo& musicVideo) {
+        this->musicVideoId = musicVideo.getId();
+        delete this->musicVideo;
+        this->musicVideo = new MusicVideo(musicVideo);
+    }
+    void Song::setMusicVideo(MusicVideo* musicVideo) {
+        this->musicVideoId = musicVideo->getId();
+        delete this->musicVideo;
+        this->musicVideo = musicVideo;
     }
 
     const vector<int>& Song::getStyleIds() const { return styleIds; }

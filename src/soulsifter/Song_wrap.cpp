@@ -6,6 +6,8 @@
 #include "AlbumPart.h"
 #include "AlbumPart_wrap.h"
 #include "Album_wrap.h"
+#include "MusicVideo.h"
+#include "MusicVideo_wrap.h"
 #include "ResultSetIterator.h"
 #include "Song.h"
 #include "Song_wrap.h"
@@ -97,6 +99,9 @@ void Song::Init(v8::Local<v8::Object> exports) {
   Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("albumPartId").ToLocalChecked(), getAlbumPartId, setAlbumPartId);
   Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("albumPart").ToLocalChecked(), getAlbumPart, setAlbumPart);
   Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("albumPartOnce").ToLocalChecked(), getAlbumPartOnce);
+  Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("musicVideoId").ToLocalChecked(), getMusicVideoId, setMusicVideoId);
+  Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("musicVideo").ToLocalChecked(), getMusicVideo, setMusicVideo);
+  Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("musicVideoOnce").ToLocalChecked(), getMusicVideoOnce);
   Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("styleIds").ToLocalChecked(), getStyleIds, setStyleIds);
   Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("styles").ToLocalChecked(), getStyles, setStyles);
 
@@ -666,6 +671,60 @@ NAN_SETTER(Song::setAlbumPart) {
   dogatech::soulsifter::AlbumPart* a0tmp(Nan::ObjectWrap::Unwrap<AlbumPart>(value->ToObject())->getNwcpValue());
   dogatech::soulsifter::AlbumPart& a0 = *a0tmp;
   obj->song->setAlbumPart(a0);
+
+  info.GetReturnValue().SetUndefined();
+}
+
+NAN_GETTER(Song::getMusicVideoId) {
+  Song* obj = Nan::ObjectWrap::Unwrap<Song>(info.Holder());
+  const int result =  obj->song->getMusicVideoId();
+
+  info.GetReturnValue().Set(Nan::New<v8::Integer>(result));
+}
+
+NAN_SETTER(Song::setMusicVideoId) {
+  Song* obj = Nan::ObjectWrap::Unwrap<Song>(info.Holder());
+  int a0(value->IntegerValue());
+  obj->song->setMusicVideoId(a0);
+
+  info.GetReturnValue().SetUndefined();
+}
+
+NAN_GETTER(Song::getMusicVideo) {
+  Song* obj = Nan::ObjectWrap::Unwrap<Song>(info.Holder());
+  dogatech::soulsifter::MusicVideo* result =  obj->song->getMusicVideo();
+
+  if (result == NULL) {
+    info.GetReturnValue().SetNull();
+  } else {
+    v8::Local<v8::Object> instance = MusicVideo::NewInstance();
+    MusicVideo* r = Nan::ObjectWrap::Unwrap<MusicVideo>(instance);
+    r->setNwcpValue(result, false);
+
+    info.GetReturnValue().Set(instance);
+  }
+}
+
+NAN_GETTER(Song::getMusicVideoOnce) {
+  Song* obj = Nan::ObjectWrap::Unwrap<Song>(info.Holder());
+  dogatech::soulsifter::MusicVideo* result =  obj->song->getMusicVideoOnce();
+
+  if (result == NULL) {
+    info.GetReturnValue().SetNull();
+  } else {
+    v8::Local<v8::Object> instance = MusicVideo::NewInstance();
+    MusicVideo* r = Nan::ObjectWrap::Unwrap<MusicVideo>(instance);
+    r->setNwcpValue(result, false);
+
+    info.GetReturnValue().Set(instance);
+  }
+}
+
+NAN_SETTER(Song::setMusicVideo) {
+  Song* obj = Nan::ObjectWrap::Unwrap<Song>(info.Holder());
+  dogatech::soulsifter::MusicVideo* a0tmp(Nan::ObjectWrap::Unwrap<MusicVideo>(value->ToObject())->getNwcpValue());
+  dogatech::soulsifter::MusicVideo& a0 = *a0tmp;
+  obj->song->setMusicVideo(a0);
 
   info.GetReturnValue().SetUndefined();
 }

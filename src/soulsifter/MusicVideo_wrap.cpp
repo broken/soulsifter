@@ -5,8 +5,6 @@
 #include "MusicVideo.h"
 #include "MusicVideo_wrap.h"
 #include "ResultSetIterator.h"
-#include "Song.h"
-#include "Song_wrap.h"
 
 Nan::Persistent<v8::Function> MusicVideo::constructor;
 
@@ -51,15 +49,11 @@ void MusicVideo::Init(v8::Local<v8::Object> exports) {
   // Prototype
   Nan::SetPrototypeMethod(tpl, "clear", clear);
   Nan::SetMethod(tpl, "findById", findById);
-  Nan::SetMethod(tpl, "findBySongId", findBySongId);
   Nan::SetMethod(tpl, "findAll", findAll);
   Nan::SetPrototypeMethod(tpl, "update", update);
   Nan::SetPrototypeMethod(tpl, "save", save);
   Nan::SetPrototypeMethod(tpl, "sync", sync);
   Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("id").ToLocalChecked(), getId, setId);
-  Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("songId").ToLocalChecked(), getSongId, setSongId);
-  Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("song").ToLocalChecked(), getSong, setSong);
-  Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("songOnce").ToLocalChecked(), getSongOnce);
   Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("filePath").ToLocalChecked(), getFilePath, setFilePath);
   Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("thumbnailFilePath").ToLocalChecked(), getThumbnailFilePath, setThumbnailFilePath);
 
@@ -78,22 +72,6 @@ void MusicVideo::findById(const Nan::FunctionCallbackInfo<v8::Value>& info) {
   int a0(info[0]->IntegerValue());
   dogatech::soulsifter::MusicVideo* result =
       dogatech::soulsifter::MusicVideo::findById(a0);
-
-  if (result == NULL) {
-    info.GetReturnValue().SetNull();
-  } else {
-    v8::Local<v8::Object> instance = MusicVideo::NewInstance();
-    MusicVideo* r = Nan::ObjectWrap::Unwrap<MusicVideo>(instance);
-    r->setNwcpValue(result, true);
-
-    info.GetReturnValue().Set(instance);
-  }
-}
-
-void MusicVideo::findBySongId(const Nan::FunctionCallbackInfo<v8::Value>& info) {
-  int a0(info[0]->IntegerValue());
-  dogatech::soulsifter::MusicVideo* result =
-      dogatech::soulsifter::MusicVideo::findBySongId(a0);
 
   if (result == NULL) {
     info.GetReturnValue().SetNull();
@@ -155,60 +133,6 @@ NAN_SETTER(MusicVideo::setId) {
   MusicVideo* obj = Nan::ObjectWrap::Unwrap<MusicVideo>(info.Holder());
   int a0(value->IntegerValue());
   obj->musicvideo->setId(a0);
-
-  info.GetReturnValue().SetUndefined();
-}
-
-NAN_GETTER(MusicVideo::getSongId) {
-  MusicVideo* obj = Nan::ObjectWrap::Unwrap<MusicVideo>(info.Holder());
-  const int result =  obj->musicvideo->getSongId();
-
-  info.GetReturnValue().Set(Nan::New<v8::Integer>(result));
-}
-
-NAN_SETTER(MusicVideo::setSongId) {
-  MusicVideo* obj = Nan::ObjectWrap::Unwrap<MusicVideo>(info.Holder());
-  int a0(value->IntegerValue());
-  obj->musicvideo->setSongId(a0);
-
-  info.GetReturnValue().SetUndefined();
-}
-
-NAN_GETTER(MusicVideo::getSong) {
-  MusicVideo* obj = Nan::ObjectWrap::Unwrap<MusicVideo>(info.Holder());
-  dogatech::soulsifter::Song* result =  obj->musicvideo->getSong();
-
-  if (result == NULL) {
-    info.GetReturnValue().SetNull();
-  } else {
-    v8::Local<v8::Object> instance = Song::NewInstance();
-    Song* r = Nan::ObjectWrap::Unwrap<Song>(instance);
-    r->setNwcpValue(result, false);
-
-    info.GetReturnValue().Set(instance);
-  }
-}
-
-NAN_GETTER(MusicVideo::getSongOnce) {
-  MusicVideo* obj = Nan::ObjectWrap::Unwrap<MusicVideo>(info.Holder());
-  dogatech::soulsifter::Song* result =  obj->musicvideo->getSongOnce();
-
-  if (result == NULL) {
-    info.GetReturnValue().SetNull();
-  } else {
-    v8::Local<v8::Object> instance = Song::NewInstance();
-    Song* r = Nan::ObjectWrap::Unwrap<Song>(instance);
-    r->setNwcpValue(result, false);
-
-    info.GetReturnValue().Set(instance);
-  }
-}
-
-NAN_SETTER(MusicVideo::setSong) {
-  MusicVideo* obj = Nan::ObjectWrap::Unwrap<MusicVideo>(info.Holder());
-  dogatech::soulsifter::Song* a0tmp(Nan::ObjectWrap::Unwrap<Song>(value->ToObject())->getNwcpValue());
-  dogatech::soulsifter::Song& a0 = *a0tmp;
-  obj->musicvideo->setSong(a0);
 
   info.GetReturnValue().SetUndefined();
 }

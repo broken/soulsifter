@@ -808,8 +808,6 @@ mixAttribs = 0
 mixCustomMethods = "        friend class RapidEvolutionDatabaseMixoutsMixoutHandler;\n\n        static int mixoutCountForRESongId(int outSongId);\n\n"
 musicVideoFields = [
   [:int, "id", Attrib::FIND],
-  [:int, "songId", Attrib::ID | Attrib::FIND],
-  ["Song", "song", Attrib::PTR],
   [:string, "filePath", 0],
   [:string, "thumbnailFilePath", 0],
 ]
@@ -899,6 +897,8 @@ songFields = [
   ["Album", "album", Attrib::PTR],
   [:int, "albumPartId", Attrib::ID],
   ["AlbumPart", "albumPart", Attrib::PTR],
+  [:int, "musicVideoId", Attrib::ID],
+  ["MusicVideo", "musicVideo", Attrib::PTR],
   ["vector<int>", "styleIds", Attrib::ID],
   ["vector<Style*>", "styles", 0],
 ]

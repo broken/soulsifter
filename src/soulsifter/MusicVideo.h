@@ -24,7 +24,6 @@ using namespace std;
 namespace dogatech {
 namespace soulsifter {
 
-    class Song;
 
     class MusicVideo {
     public:
@@ -35,7 +34,6 @@ namespace soulsifter {
         void clear();
 
         static MusicVideo* findById(int id);
-        static MusicVideo* findBySongId(int songId);
         static ResultSetIterator<MusicVideo>* findAll();
 
         int update();
@@ -45,12 +43,6 @@ namespace soulsifter {
 
         const int getId() const;
         void setId(int id);
-        const int getSongId() const;
-        void setSongId(int songId);
-        Song* getSong();
-        Song* getSongOnce() const;
-        void setSong(const Song& song);
-        void setSong(Song* song);  // takes ownership
         const string& getFilePath() const;
         void setFilePath(const string& filePath);
         const string& getThumbnailFilePath() const;
@@ -60,8 +52,6 @@ namespace soulsifter {
 
     private:
         int id;
-        int songId;
-        Song* song;
         string filePath;
         string thumbnailFilePath;
 

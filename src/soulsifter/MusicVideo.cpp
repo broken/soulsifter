@@ -24,7 +24,6 @@
 
 #include "MysqlAccess.h"
 #include "DTVectorUtil.h"
-#include "Song.h"
 
 using namespace std;
 
@@ -35,45 +34,27 @@ namespace soulsifter {
 
     MusicVideo::MusicVideo() :
     id(0),
-    songId(0),
-    song(NULL),
     filePath(),
     thumbnailFilePath() {
     }
 
     MusicVideo::MusicVideo(const MusicVideo& musicVideo) :
     id(musicVideo.getId()),
-    songId(musicVideo.getSongId()),
-    song(NULL),
     filePath(musicVideo.getFilePath()),
     thumbnailFilePath(musicVideo.getThumbnailFilePath()) {
-        if (musicVideo.song) setSong(*musicVideo.song);
     }
 
     void MusicVideo::operator=(const MusicVideo& musicVideo) {
         id = musicVideo.getId();
-        songId = musicVideo.getSongId();
-        if (!musicVideo.getSongId() && musicVideo.song) {
-            if (!song) song = new Song(*musicVideo.song);
-            else *song = *musicVideo.song;
-        } else {
-            delete song;
-            song = NULL;
-        }
         filePath = musicVideo.getFilePath();
         thumbnailFilePath = musicVideo.getThumbnailFilePath();
     }
 
     MusicVideo::~MusicVideo() {
-        delete song;
-        song = NULL;
     }
 
     void MusicVideo::clear() {
         id = 0;
-        songId = 0;
-        delete song;
-        song = NULL;
         filePath.clear();
         thumbnailFilePath.clear();
     }
@@ -82,7 +63,6 @@ namespace soulsifter {
 
     void MusicVideo::populateFields(const sql::ResultSet* rs, MusicVideo* musicVideo) {
         musicVideo->setId(rs->getInt("id"));
-        musicVideo->setSongId(rs->getInt("songId"));
         musicVideo->setFilePath(rs->getString("filePath"));
         musicVideo->setThumbnailFilePath(rs->getString("thumbnailFilePath"));
     }
@@ -92,31 +72,6 @@ namespace soulsifter {
             try {
                 sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select MusicVideos.* from MusicVideos where MusicVideos.id = ?");
                 ps->setInt(1, id);
-                sql::ResultSet *rs = ps->executeQuery();
-                MusicVideo *musicVideo = NULL;
-                if (rs->next()) {
-                    musicVideo = new MusicVideo();
-                    populateFields(rs, musicVideo);
-                }
-                rs->close();
-                delete rs;
-
-                return musicVideo;
-            } catch (sql::SQLException &e) {
-                LOG(WARNING) << "ERROR: SQLException in " << __FILE__ << " (" << __func__<< ") on line " << __LINE__;
-                LOG(WARNING) << "ERROR: " << e.what() << " (MySQL error code: " << e.getErrorCode() << ", SQLState: " << e.getSQLState() << ")";
-                bool reconnected = MysqlAccess::getInstance().reconnect();
-                LOG(INFO) << (reconnected ? "Successful" : "Failed") << " mysql reconnection";
-            }
-        }
-        LOG(FATAL) << "Unable to complete model operation";
-    }
-
-    MusicVideo* MusicVideo::findBySongId(int songId) {
-        for (int i = 0; i < 3; ++i) {
-            try {
-                sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select MusicVideos.* from MusicVideos where MusicVideos.songId = ?");
-                ps->setInt(1, songId);
                 sql::ResultSet *rs = ps->executeQuery();
                 MusicVideo *musicVideo = NULL;
                 if (rs->next()) {
@@ -149,25 +104,13 @@ namespace soulsifter {
     int MusicVideo::update() {
         for (int i = 0; i < 3; ++i) {
             try {
-                if (song && song->sync()) {
-                    if (song->getId()) {
-                        song->update();
-                    } else {
-                        song->save();
-                    }
-                    songId = song->getId();
-                } else if (!songId && song) {
-                    songId = song->getId();
-                }
 
-                sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("update MusicVideos set songId=?, filePath=?, thumbnailFilePath=? where id=?");
-                if (songId > 0) ps->setInt(1, songId);
-                else ps->setNull(1, sql::DataType::INTEGER);
-                if (!filePath.empty()) ps->setString(2, filePath);
+                sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("update MusicVideos set filePath=?, thumbnailFilePath=? where id=?");
+                if (!filePath.empty()) ps->setString(1, filePath);
+                else ps->setNull(1, sql::DataType::VARCHAR);
+                if (!thumbnailFilePath.empty()) ps->setString(2, thumbnailFilePath);
                 else ps->setNull(2, sql::DataType::VARCHAR);
-                if (!thumbnailFilePath.empty()) ps->setString(3, thumbnailFilePath);
-                else ps->setNull(3, sql::DataType::VARCHAR);
-                ps->setInt(4, id);
+                ps->setInt(3, id);
                 int result = ps->executeUpdate();
                 return result;
             } catch (sql::SQLException &e) {
@@ -183,24 +126,12 @@ namespace soulsifter {
     int MusicVideo::save() {
         for (int i = 0; i < 3; ++i) {
             try {
-                if (song && song->sync()) {
-                    if (song->getId()) {
-                        song->update();
-                    } else {
-                        song->save();
-                    }
-                    songId = song->getId();
-                } else if (!songId && song) {
-                    songId = song->getId();
-                }
 
-                sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("insert into MusicVideos (songId, filePath, thumbnailFilePath) values (?, ?, ?)");
-                if (songId > 0) ps->setInt(1, songId);
-                else ps->setNull(1, sql::DataType::INTEGER);
-                if (!filePath.empty()) ps->setString(2, filePath);
+                sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("insert into MusicVideos (filePath, thumbnailFilePath) values (?, ?)");
+                if (!filePath.empty()) ps->setString(1, filePath);
+                else ps->setNull(1, sql::DataType::VARCHAR);
+                if (!thumbnailFilePath.empty()) ps->setString(2, thumbnailFilePath);
                 else ps->setNull(2, sql::DataType::VARCHAR);
-                if (!thumbnailFilePath.empty()) ps->setString(3, thumbnailFilePath);
-                else ps->setNull(3, sql::DataType::VARCHAR);
                 int saved = ps->executeUpdate();
                 if (!saved) {
                     LOG(WARNING) << "Not able to save musicVideo";
@@ -225,12 +156,6 @@ namespace soulsifter {
 
     bool MusicVideo::sync() {
         MusicVideo* musicVideo = findById(id);
-        if (!musicVideo) {
-            if (!songId && song) {
-                song->sync();
-                songId = song->getId();
-            }
-        }
         if (!musicVideo) return true;
 
         // check fields
@@ -246,15 +171,6 @@ namespace soulsifter {
                 id = musicVideo->getId();
             }
         }
-        if (songId != musicVideo->getSongId()) {
-            if (songId) {
-                LOG(INFO) << "updating musicVideo " << id << " songId from " << musicVideo->getSongId() << " to " << songId;
-                needsUpdate = true;
-            } else {
-                songId = musicVideo->getSongId();
-            }
-        }
-        if (song) needsUpdate |= song->sync();
         if (filePath.compare(musicVideo->getFilePath())  && (!boost::regex_match(filePath, match1, decimal) || !boost::regex_match(musicVideo->getFilePath(), match2, decimal) || match1[1].str().compare(match2[1].str()))) {
             if (!filePath.empty()) {
                 LOG(INFO) << "updating musicVideo " << id << " filePath from " << musicVideo->getFilePath() << " to " << filePath;
@@ -279,35 +195,6 @@ namespace soulsifter {
 
     const int MusicVideo::getId() const { return id; }
     void MusicVideo::setId(const int id) { this->id = id; }
-
-    const int MusicVideo::getSongId() const { 
-        return (!songId && song) ? song->getId() : songId;
-    }
-    void MusicVideo::setSongId(const int songId) {
-        this->songId = songId;
-        delete song;
-        song = NULL;
-    }
-
-    Song* MusicVideo::getSong() {
-        if (!song && songId) {
-            song = Song::findById(songId);
-        }
-        return song;
-    }
-    Song* MusicVideo::getSongOnce() const {
-        return (!song && songId) ? Song::findById(songId) : song;
-    }
-    void MusicVideo::setSong(const Song& song) {
-        this->songId = song.getId();
-        delete this->song;
-        this->song = new Song(song);
-    }
-    void MusicVideo::setSong(Song* song) {
-        this->songId = song->getId();
-        delete this->song;
-        this->song = song;
-    }
 
     const string& MusicVideo::getFilePath() const { return filePath; }
     void MusicVideo::setFilePath(const string& filePath) { this->filePath = filePath; }
