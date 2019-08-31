@@ -151,7 +151,7 @@ MusicVideo* MusicVideoService::associateYouTubeVideo(Song* song, const string& i
       
   FILE *fpipe;
   stringstream command;
-  command << "cd \"" << mvArtistDir << "\"; youtube-dl --write-thumbnail --restrict-filenames www.youtube.com/watch?v=" << id;
+  command << "cd \"" << mvArtistDir << "\"; youtube-dl -f 'bestvideo[ext=mp4]+bestaudio' --write-thumbnail --restrict-filenames www.youtube.com/watch?v=" << id;
   if (!(fpipe = (FILE*)popen(command.str().c_str(), "r"))) {
     LOG(WARNING) << "Problem with youtube-dl pipe.";
     pclose(fpipe);
