@@ -151,9 +151,10 @@ MusicVideo* MusicVideoService::associateYouTubeVideo(Song* song, const string& i
       
   FILE *fpipe;
   stringstream command;
-  command << "cd \"" << mvArtistDir << "\"; youtube-dl --write-thumbnail --restrict-filenames --merge-output-format mp4 www.youtube.com/watch?v=" << id;
+  command << "cd \"" << mvArtistDir << "\"; youtube-dl --write-thumbnail --restrict-filenames www.youtube.com/watch?v=" << id;
   if (!(fpipe = (FILE*)popen(command.str().c_str(), "r"))) {
     LOG(WARNING) << "Problem with youtube-dl pipe.";
+    pclose(fpipe);
     return NULL;
   }
   
@@ -170,8 +171,9 @@ MusicVideo* MusicVideoService::associateYouTubeVideo(Song* song, const string& i
   LOG(INFO) << output;
   boost::regex thumbnailRegex("Writing thumbnail to: (.*)$");
   boost::smatch thumbnailMatch;
-  boost::regex videoRegex("Merging formats into \"(.*mp4)\"$");
+  boost::regex videoRegex("Merging formats into \"(.*)mkv\"$");
   boost::smatch videoMatch;
+  string tmpVideoName;
   MusicVideo* musicVideo = new MusicVideo();
   vector<string> lines;
   boost::split(lines, output, boost::is_any_of("\n"));
@@ -181,16 +183,29 @@ MusicVideo* MusicVideoService::associateYouTubeVideo(Song* song, const string& i
       ssTn << mvArtistDir << "/" << thumbnailMatch[1];
       musicVideo->setThumbnailFilePath(ssTn.str());
     } else if (boost::regex_search(line, videoMatch, videoRegex)) {
-      stringstream ssMv;
-      ssMv << mvArtistDir << "/" << videoMatch[1];
-      musicVideo->setFilePath(ssMv.str());
+      tmpVideoName = videoMatch[1];
     }
   }
-  if (musicVideo->getFilePath().empty()) {
+  if (tmpVideoName.empty()) {
     delete musicVideo;
     LOG(WARNING) << "Did not find music video file from youtube-dl output.";
     return NULL;
   }
+
+  // Convert to mp4 from mkv (mostly need audio codec conversion)
+  stringstream ffmpegCmd;
+  ffmpegCmd << "cd \"" << mvArtistDir << "\"; ffmpeg -i '" << tmpVideoName << "mkv' -c:v copy -c:a aac '" << tmpVideoName << "mp4' && rm '" << tmpVideoName << "mkv'";
+  if (!(fpipe = (FILE*)popen(ffmpegCmd.str().c_str(), "r"))) {
+    LOG(WARNING) << "Problem with ffmpeg pipe.";
+    pclose(fpipe);
+    return NULL;
+  }
+  pclose(fpipe);
+
+  // update music video
+  stringstream ssMv;
+  ssMv << mvArtistDir << "/" << tmpVideoName << "mp4";
+  musicVideo->setFilePath(ssMv.str());
 
   // remove special chars from files
   // TODO remove if --restrict-filenames works
