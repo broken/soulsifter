@@ -170,42 +170,51 @@ MusicVideo* MusicVideoService::associateYouTubeVideo(Song* song, const string& i
   string output(ss.str());
   LOG(INFO) << output;
   boost::regex thumbnailRegex("Writing thumbnail to: (.*)$");
-  boost::smatch thumbnailMatch;
-  boost::regex videoRegex("Merging formats into \"(.*)mkv\"$");
-  boost::smatch videoMatch;
+  boost::regex mp4VideoRegex("Merging formats into \"(.*)mp4\"$");
+  boost::regex mkvVideoRegex("Merging formats into \"(.*)mkv\"$");
+  boost::smatch match;
   string tmpVideoName;
+  bool needsConversion;
   MusicVideo* musicVideo = new MusicVideo();
   vector<string> lines;
   boost::split(lines, output, boost::is_any_of("\n"));
   for (string line : lines) {
-    if (boost::regex_search(line, thumbnailMatch, thumbnailRegex)) {
+    if (boost::regex_search(line, match, thumbnailRegex)) {
       stringstream ssTn;
-      ssTn << mvArtistDir << "/" << thumbnailMatch[1];
+      ssTn << mvArtistDir << "/" << match[1];
       musicVideo->setThumbnailFilePath(ssTn.str());
-    } else if (boost::regex_search(line, videoMatch, videoRegex)) {
-      tmpVideoName = videoMatch[1];
+    } else if (boost::regex_search(line, match, mkvVideoRegex)) {
+      tmpVideoName = match[1];
+      needsConversion = true;
+    } else if (boost::regex_search(line, match, mp4VideoRegex)) {
+      stringstream ss;
+      ss << mvArtistDir << "/" << match[1] << "mp4";
+      musicVideo->setFilePath(ss.str());
+      needsConversion = false;
     }
   }
-  if (tmpVideoName.empty()) {
+  if (tmpVideoName.empty() && musicVideo->getFilePath().empty()) {
     delete musicVideo;
     LOG(WARNING) << "Did not find music video file from youtube-dl output.";
     return NULL;
   }
 
   // Convert to mp4 from mkv (mostly need audio codec conversion)
-  stringstream ffmpegCmd;
-  ffmpegCmd << "cd \"" << mvArtistDir << "\"; ffmpeg -i '" << tmpVideoName << "mkv' -c:v copy -c:a aac '" << tmpVideoName << "mp4' && rm '" << tmpVideoName << "mkv'";
-  if (!(fpipe = (FILE*)popen(ffmpegCmd.str().c_str(), "r"))) {
-    LOG(WARNING) << "Problem with ffmpeg pipe.";
+  if (needsConversion) {
+    stringstream ffmpegCmd;
+    ffmpegCmd << "cd \"" << mvArtistDir << "\"; ffmpeg -i '" << tmpVideoName << "mkv' -c:v copy -c:a aac '" << tmpVideoName << "mp4' && rm '" << tmpVideoName << "mkv'";
+    if (!(fpipe = (FILE*)popen(ffmpegCmd.str().c_str(), "r"))) {
+      LOG(WARNING) << "Problem with ffmpeg pipe.";
+      pclose(fpipe);
+      return NULL;
+    }
     pclose(fpipe);
-    return NULL;
-  }
-  pclose(fpipe);
 
-  // update music video
-  stringstream ssMv;
-  ssMv << mvArtistDir << "/" << tmpVideoName << "mp4";
-  musicVideo->setFilePath(ssMv.str());
+    // update music video
+    stringstream ssMv;
+    ssMv << mvArtistDir << "/" << tmpVideoName << "mp4";
+    musicVideo->setFilePath(ssMv.str());
+  }
 
   // remove special chars from files
   // TODO remove if --restrict-filenames works
