@@ -359,7 +359,7 @@ bool isLimit(const Atom& a) {
 
 }  // anon namespace
 
-vector<Song*>* SearchUtil::searchSongs(const string& query, int bpm, const set<string>& keys, const vector<Style*>& styles, const vector<Song*>& songsToOmit, int limit) {
+vector<Song*>* SearchUtil::searchSongs(const string& query, int bpm, const set<string>& keys, const vector<Style*>& styles, const vector<Song*>& songsToOmit, int limit, bool hasMusicVideo) {
   LOG(INFO) << "q:" << query << ", bpm:" << bpm << ", keys:" << setToCsv(keys) << ", styles:" << ", limit:" << limit;
 
   vector<string> fragments;
@@ -382,7 +382,10 @@ vector<Song*>* SearchUtil::searchSongs(const string& query, int bpm, const set<s
   }
   
   stringstream ss;
-  ss << "select s.*, s.id as songid, s.artist as songartist, group_concat(ss.styleid) as styleIds, a.*, a.id as albumid, a.artist as albumartist from Songs s inner join Albums a on s.albumid = a.id left outer join SongStyles ss on ss.songid=s.id where true";
+  if (hasMusicVideo)
+    ss << "select s.*, s.id as songid, s.artist as songartist, group_concat(ss.styleid) as styleIds, a.*, a.id as albumid, a.artist as albumartist from Songs s inner join Albums a on s.albumid = a.id inner join MusicVideos v on s.id=v.songId left outer join SongStyles ss on ss.songid=s.id where true";
+  else
+    ss << "select s.*, s.id as songid, s.artist as songartist, group_concat(ss.styleid) as styleIds, a.*, a.id as albumid, a.artist as albumartist from Songs s inner join Albums a on s.albumid = a.id left outer join SongStyles ss on ss.songid=s.id where true";
   ss << buildQueryPredicate(atoms);
   ss << buildOptionPredicate(bpm, keys, styles, songsToOmit, limit);
   

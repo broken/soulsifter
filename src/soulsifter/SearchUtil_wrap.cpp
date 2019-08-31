@@ -70,8 +70,9 @@ void SearchUtil::searchSongs(const Nan::FunctionCallbackInfo<v8::Value>& info) {
     a4.push_back(x);
   }
   int a5(info[5]->IntegerValue());
+  bool a6(info[6]->BooleanValue());
   std::vector<dogatech::soulsifter::Song*>* result =
-      dogatech::soulsifter::SearchUtil::searchSongs(a0, a1, a2, a3, a4, a5);
+      dogatech::soulsifter::SearchUtil::searchSongs(a0, a1, a2, a3, a4, a5, a6);
 
   v8::Local<v8::Array> a = Nan::New<v8::Array>((int) result->size());
   for (int i = 0; i < (int) result->size(); i++) {
