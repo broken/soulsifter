@@ -58,7 +58,8 @@ namespace soulsifter {
 
 namespace {
 
-  const string FEATURING_REGEX = " [(]?[Ff](eaturing|t[.]?|eat[.]?) (.*?)[)]?$";
+  const string FEATURING_REGEX = " [(]?[Ff](eaturing|t[.]?|eat[.]?) ([^()]+)[)]?";
+  const string REMIX_REGEX = "[(]([^()]+) ([Rr]emix|[Rr]mx|[Mm]ix|[Rr]efix|[Dd]ub|[Ff]lip)[)]";
 
   string cleanDirName(const string& s) {
     string name(s);
@@ -98,6 +99,43 @@ namespace {
       trim(s);
       return s;
   }
+
+void moveFeaturingFromTitleToArtist(Song* updatedSong) {
+  boost::regex featRegex(FEATURING_REGEX);
+  boost::smatch featMatch;
+  if (boost::regex_search(updatedSong->getTitle(), featMatch, featRegex, boost::match_extra)) {
+    updatedSong->setArtist(updatedSong->getArtist() + " (ft. " + featMatch[2] + ")");
+    updatedSong->setTitle(boost::regex_replace(updatedSong->getTitle(), featRegex, ""));
+  }
+}
+
+void updateFeaturingInArtist(Song* updatedSong) {
+  boost::regex featRegex(FEATURING_REGEX);
+  boost::smatch featMatch;
+  if (boost::regex_search(updatedSong->getArtist(), featMatch, featRegex, boost::match_extra)) {
+    updatedSong->setArtist(boost::regex_replace(updatedSong->getArtist(), featRegex, "") + " (ft. " + featMatch[2] + ")");
+  }
+}
+
+void removeFeaturingFromAlbumArtist(Song* updatedSong) {
+  boost::regex featRegex(FEATURING_REGEX);
+  boost::smatch featMatch;
+  if (boost::regex_search(updatedSong->getAlbum()->getArtist(), featMatch, featRegex, boost::match_extra)) {
+    updatedSong->getAlbum()->setArtist(boost::regex_replace(updatedSong->getAlbum()->getArtist(), featRegex, ""));
+  }
+}
+
+void copyRemixer(Song* updatedSong) {
+  boost::regex rmxrRegex(REMIX_REGEX);
+  boost::smatch rmxrMatch;
+  if (boost::regex_search(updatedSong->getTitle(), rmxrMatch, rmxrRegex, boost::match_extra) &&
+      updatedSong->getRemixer().length() == 0) {
+    string remixer(rmxrMatch[1]);
+    if (!!remixer.compare("original") && !!remixer.compare("Original")) {
+      updatedSong->setRemixer(trim_copy(remixer));
+    }
+  }
+}
 
 }  // namespace
 
@@ -250,27 +288,27 @@ void MusicManager::writeTagsToSong(Song* song) {
         }
       }
     }
-    
-    // strip featuring from the title and add it to the artist.
-    moveFeaturing(updatedSong);
+
     // copy remixer
     copyRemixer(updatedSong);
+
     // add an album artist if one does not exist
     if (updatedSong->getAlbum()->getArtist().empty()) {
-      boost::regex featRegex(FEATURING_REGEX);
-      boost::smatch featMatch;
-      if (boost::regex_search(updatedSong->getArtist(), featMatch, featRegex, boost::match_extra)) {
-        updatedSong->getAlbum()->setArtist(trim_copy(featMatch[1]));
-      }
+      updatedSong->getAlbum()->setArtist(updatedSong->getArtist());
     }
     // add an album name if one does not exist
     if (updatedSong->getAlbum()->getName().empty()) {
-      updatedSong->getAlbum()->setName(trim_copy(updatedSong->getTitle()));
+      updatedSong->getAlbum()->setName(updatedSong->getTitle());
     }
     // remove album part if there is just one
     if (updatedSong->getAlbumPart() && !updatedSong->getAlbumPart()->getPos().compare("1/1")) {
       updatedSong->getAlbumPart()->setPos("");
     }
+
+    // handle featuring
+    updateFeaturingInArtist(updatedSong);
+    moveFeaturingFromTitleToArtist(updatedSong);
+    removeFeaturingFromAlbumArtist(updatedSong);
     
     delete lastParsedSong;
     lastParsedSong = new Song(song);
@@ -515,31 +553,6 @@ bool MusicManager::splitArtistAndTitle(const string& songString, Song* updatedSo
     updatedSong->setArtist(trim_copy(match[1]));
     updatedSong->setTitle(trim_copy(match[2]));
     return true;
-  }
-  return false;
-}
-
-bool MusicManager::moveFeaturing(Song* updatedSong) {
-  boost::regex featRegex(FEATURING_REGEX);
-  boost::smatch featMatch;
-  if (boost::regex_search(updatedSong->getTitle(), featMatch, featRegex, boost::match_extra)) {
-    updatedSong->setArtist(updatedSong->getArtist() + " (ft. " + featMatch[2] + ")");
-    updatedSong->setTitle(boost::regex_replace(updatedSong->getTitle(), featRegex, ""));
-    return true;
-  }
-  return false;
-}
-
-bool MusicManager::copyRemixer(Song* updatedSong) {
-  boost::regex rmxrRegex("[(](.+) ([Rr]emix|[Rr]mx|[Mm]ix|[Rr]efix|[Dd]ub)[)]$");
-  boost::smatch rmxrMatch;
-  if (boost::regex_search(updatedSong->getTitle(), rmxrMatch, rmxrRegex, boost::match_extra) &&
-      updatedSong->getRemixer().length() == 0) {
-    string remixer(rmxrMatch[1]);
-    if (!!remixer.compare("original") && !!remixer.compare("Original")) {
-      updatedSong->setRemixer(trim_copy(remixer));
-      return true;
-    }
   }
   return false;
 }

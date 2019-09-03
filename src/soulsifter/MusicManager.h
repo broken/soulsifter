@@ -52,8 +52,6 @@ public:
 
     // metadata
     bool splitArtistAndTitle(const string& songString, Song* updatedSong);
-    bool moveFeaturing(Song* updatedSong);
-    bool copyRemixer(Song* updatedSong);
 
 private:
     // tags

@@ -100,8 +100,6 @@ vector<string> MusicVideoService::downloadAudio(const string& url) {
         song->setArtist(ptree.get<string>("uploader"));
         song->setTitle(title);
       }
-      MusicManager::getInstance().moveFeaturing(song);
-      MusicManager::getInstance().copyRemixer(song);
       song->setLowQuality(true);
       song->setCurator(ptree.get<string>("uploader"));
       string date = ptree.get<string>("upload_date", "00000000");
@@ -110,8 +108,6 @@ vector<string> MusicVideoService::downloadAudio(const string& url) {
         album->setReleaseDateMonth(std::stoi(date.substr(4, 2)));
         album->setReleaseDateDay(std::stoi(date.substr(6, 4)));
       }
-      album->setArtist(song->getArtist());
-      album->setName(song->getTitle());
 
       TagService::writeId3v2Tag(song);
       filepaths.push_back(song->getFilepath());
