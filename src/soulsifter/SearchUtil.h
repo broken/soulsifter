@@ -20,9 +20,18 @@ namespace soulsifter {
 class Song;
 class Style;
 
+enum OrderBy { DATE_ADDED, RELEASE_DATE, RANDOM };
+
 class SearchUtil {
 public:
-  static vector<Song*>* searchSongs(const string& query, int bpm, const set<string>& keys, const vector<Style*>& styles, const vector<Song*>& songsToOmit, int limit, bool hasMusicVideo=false);
+  static vector<Song*>* searchSongs(const string& query,
+                                    const int bpm,
+                                    const set<string>& keys,
+                                    const vector<Style*>& styles,
+                                    const vector<Song*>& songsToOmit,
+                                    int limit,
+                                    const bool musicVideoMode=false,
+                                    const int orderBy=DATE_ADDED);
 };
   
 }  // namespace soulsifter

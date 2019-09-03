@@ -243,7 +243,7 @@ string buildQueryPredicate(const vector<Atom>& atoms) {
   return ss.str();
 }
 
-string buildOptionPredicate(int bpm, const set<string>& keys, const vector<Style*>& styles, const vector<Song*>& songsToOmit, int limit) {
+string buildOptionPredicate(const int bpm, const set<string>& keys, const vector<Style*>& styles, const vector<Song*>& songsToOmit, int limit, const int orderBy) {
   stringstream ss;
   for (const string& key : keys) {
     if (CamelotKeys::rmap.find(key) != CamelotKeys::rmap.end()) {
@@ -350,7 +350,15 @@ string buildOptionPredicate(int bpm, const set<string>& keys, const vector<Style
     ss << ")";
   }
   
-  ss << " group by s.id order by dateAdded desc limit " << limit;
+  ss << " group by s.id order by ";
+  if (orderBy == RELEASE_DATE) {
+    ss << "a.releaseDateYear desc, a.releaseDateMonth desc, a.releaseDateDay desc";
+  } else if (orderBy == RANDOM) {
+    ss << "rand()";
+  } else {
+    ss << "s.id desc";
+  }
+  ss << " limit " << limit;
   return ss.str();
 }
 
@@ -360,7 +368,14 @@ bool isLimit(const Atom& a) {
 
 }  // anon namespace
 
-vector<Song*>* SearchUtil::searchSongs(const string& query, int bpm, const set<string>& keys, const vector<Style*>& styles, const vector<Song*>& songsToOmit, int limit, bool musicVideoMode) {
+vector<Song*>* SearchUtil::searchSongs(const string& query,
+                                       const int bpm,
+                                       const set<string>& keys,
+                                       const vector<Style*>& styles,
+                                       const vector<Song*>& songsToOmit,
+                                       int limit,
+                                       const bool musicVideoMode,
+                                       const int orderBy) {
   LOG(INFO) << "q:" << query << ", bpm:" << bpm << ", keys:" << setToCsv(keys) << ", styles:" << ", limit:" << limit;
 
   vector<string> fragments;
@@ -388,7 +403,7 @@ vector<Song*>* SearchUtil::searchSongs(const string& query, int bpm, const set<s
   else
     ss << "select s.*, s.id as songid, s.artist as songartist, group_concat(ss.styleid) as styleIds, a.*, a.id as albumid, a.artist as albumartist from Songs s inner join Albums a on s.albumid = a.id left outer join SongStyles ss on ss.songid=s.id where true";
   ss << buildQueryPredicate(atoms);
-  ss << buildOptionPredicate(bpm, keys, styles, songsToOmit, limit);
+  ss << buildOptionPredicate(bpm, keys, styles, songsToOmit, limit, orderBy);
   
   LOG(DEBUG) << "Query:";
   LOG(DEBUG) << ss.str();
