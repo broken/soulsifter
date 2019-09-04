@@ -151,9 +151,13 @@ bool parse(const string& queryFragment, Atom* atom) {
   if (!boost::regex_match(queryFragment, match, regex)) {
     return false;
   }
+  // set value
+  boost::regex quoteRegex("'");
+  atom->value = boost::regex_replace(string(match[4]), quoteRegex, "\\\\'");
   if (match[1].length() > 0) {
     atom->props |= Atom::NEGATED;
   }
+  // set type
   if (match[2].length() > 0) {
     if (!match[3].compare("id")) {
       atom->type = Atom::S_ID;
@@ -179,7 +183,7 @@ bool parse(const string& queryFragment, Atom* atom) {
       atom->type = Atom::A_NAME;
     } else if (!match[3].compare("m") || !match[3].compare("mixed")) {
       atom->type = Atom::A_MIXED;
-    } else if (!match[3].compare("l") || !match[3].compare("label")) {
+    } else if (!match[3].compare("label")) {
       atom->type = Atom::A_LABEL;
     } else if (!match[3].compare("y") || !match[3].compare("year")) {
       atom->type = Atom::A_YEAR;
@@ -187,19 +191,36 @@ bool parse(const string& queryFragment, Atom* atom) {
       atom->type = Atom::CUSTOM_QUERY_PREDICATE;
     } else if (!match[3].compare("limit")) {
       atom->type = Atom::LIMIT;
+    } else if (!match[3].compare("l")) {
+      // This is special, as l can be label or limit depending on usage
+      boost::regex numRegex("^[0-9]+$");
+      boost::smatch ignored;
+      if (boost::regex_match(atom->value, ignored, numRegex)) {
+        atom->type = Atom::LIMIT;
+      } else {
+        atom->type = Atom::A_LABEL;
+      }
     } else {
       // error
       return false;
     }
   }
-  boost::regex quoteRegex("'");
-  atom->value = boost::regex_replace(string(match[4]), quoteRegex, "\\\\'");
   return true;
 }
 
-string buildQueryPredicate(const vector<Atom>& atoms) {
+string buildQueryPredicate(const string& query, int* limit) {
+  // Break query up into fragments
+  vector<string> fragments;
+  splitString(query, &fragments);
+
   stringstream ss;
-  for (Atom atom : atoms) {
+  for (string fragment : fragments) {
+    Atom atom;
+    if (!parse(fragment, &atom)) {
+      LOG(WARNING) << "ERROR: Unable to parse query fragment '" << fragment << "'";
+      continue;
+    }
+
     ss << " and ";
     if (atom.props & Atom::NEGATED) {
       ss << "not ";
@@ -237,6 +258,7 @@ string buildQueryPredicate(const vector<Atom>& atoms) {
     } else if (atom.type == Atom::CUSTOM_QUERY_PREDICATE) {
       ss << atom.value;
     } else if (atom.type == Atom::LIMIT) {
+      *limit = atoi(atom.value.c_str());
       ss << "true";
     }
   }
@@ -349,7 +371,7 @@ string buildOptionPredicate(const int bpm, const set<string>& keys, const vector
     }
     ss << ")";
   }
-  
+
   ss << " group by s.id order by ";
   if (orderBy == RELEASE_DATE) {
     ss << "a.releaseDateYear desc, a.releaseDateMonth desc, a.releaseDateDay desc";
@@ -360,10 +382,6 @@ string buildOptionPredicate(const int bpm, const set<string>& keys, const vector
   }
   ss << " limit " << limit;
   return ss.str();
-}
-
-bool isLimit(const Atom& a) {
-  return a.type == Atom::Type::LIMIT;
 }
 
 }  // anon namespace
@@ -378,36 +396,17 @@ vector<Song*>* SearchUtil::searchSongs(const string& query,
                                        const int orderBy) {
   LOG(INFO) << "q:" << query << ", bpm:" << bpm << ", keys:" << setToCsv(keys) << ", styles:" << ", limit:" << limit;
 
-  vector<string> fragments;
-  splitString(query, &fragments);
-  
-  vector<Atom> atoms;
-  for (string fragment : fragments) {
-    Atom atom;
-    if (parse(fragment, &atom)) {
-      atoms.push_back(atom);
-    } else {
-      LOG(WARNING) << "ERROR: Unable to parse query fragment '" << fragment << "'";
-    }
-  }
-
-  // update options from atoms
-  vector<Atom>::iterator it = std::find_if(atoms.begin(), atoms.end(), isLimit);
-  if (it != atoms.end()) {
-    limit = atoi(it->value.c_str());
-  }
-  
   stringstream ss;
   if (musicVideoMode)
     ss << "select s.*, s.id as songid, s.artist as songartist, group_concat(ss.styleid) as styleIds, a.*, a.id as albumid, a.artist as albumartist, v.filepath as mvFilePath, v.thumbnailFilePath as mvTnFilePath from Songs s inner join Albums a on s.albumid = a.id inner join MusicVideos v on s.musicVideoId=v.id left outer join SongStyles ss on ss.songid=s.id where true";
   else
     ss << "select s.*, s.id as songid, s.artist as songartist, group_concat(ss.styleid) as styleIds, a.*, a.id as albumid, a.artist as albumartist from Songs s inner join Albums a on s.albumid = a.id left outer join SongStyles ss on ss.songid=s.id where true";
-  ss << buildQueryPredicate(atoms);
+  ss << buildQueryPredicate(query, &limit);
   ss << buildOptionPredicate(bpm, keys, styles, songsToOmit, limit, orderBy);
-  
+
   LOG(DEBUG) << "Query:";
   LOG(DEBUG) << ss.str();
-  
+
   vector<Song*>* songs = new vector<Song*>();
   for (int i = 0; i < 3; ++i) {
     try {
