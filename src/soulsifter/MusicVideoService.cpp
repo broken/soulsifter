@@ -119,8 +119,8 @@ vector<string> MusicVideoService::downloadAudio(const string& url) {
   return filepaths;
 }
 
-MusicVideo* MusicVideoService::associateYouTubeVideo(Song* song, const string& id) {
-  LOG(INFO) << "Associate YouTube video " << id << " with song " << song->getId();
+MusicVideo* MusicVideoService::associateYouTubeVideo(Song* song, const string& url) {
+  LOG(INFO) << "Associate YouTube video " << url << " with song " << song->getId();
 
   boost::filesystem::path mvBasePath(SoulSifterSettings::getInstance().get<string>("mv.dir"));
   if (!boost::filesystem::exists(mvBasePath) || !boost::filesystem::is_directory(mvBasePath)) {
@@ -147,7 +147,7 @@ MusicVideo* MusicVideoService::associateYouTubeVideo(Song* song, const string& i
       
   FILE *fpipe;
   stringstream command;
-  command << "cd \"" << mvArtistDir << "\"; youtube-dl -f 'bestvideo[ext=mp4]+bestaudio' --write-thumbnail --restrict-filenames www.youtube.com/watch?v=" << id;
+  command << "cd \"" << mvArtistDir << "\"; youtube-dl -f 'bestvideo[ext=mp4]+bestaudio' --write-thumbnail --restrict-filenames " << url;
   if (!(fpipe = (FILE*)popen(command.str().c_str(), "r"))) {
     LOG(WARNING) << "Problem with youtube-dl pipe.";
     pclose(fpipe);

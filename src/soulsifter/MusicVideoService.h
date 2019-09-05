@@ -14,7 +14,7 @@ class MusicVideo;
 
 class MusicVideoService {
 public:
-  static MusicVideo* associateYouTubeVideo(Song* song, const string& id);
+  static MusicVideo* associateYouTubeVideo(Song* song, const string& url);
   static vector<string> downloadAudio(const string& url);
 };
 
