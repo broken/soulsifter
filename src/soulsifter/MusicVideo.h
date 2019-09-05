@@ -49,6 +49,7 @@ namespace soulsifter {
         void setThumbnailFilePath(const string& thumbnailFilePath);
 
         friend ResultSetIterator<MusicVideo>;
+        friend class SearchUtil;
 
     private:
         int id;

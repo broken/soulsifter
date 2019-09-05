@@ -67,6 +67,7 @@ namespace soulsifter {
         void setTime(const string& time);
 
         friend ResultSetIterator<PlaylistEntry>;
+        friend class SearchUtil;
 
     private:
         int id;

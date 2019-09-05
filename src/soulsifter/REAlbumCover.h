@@ -50,6 +50,7 @@ namespace soulsifter {
         void setThumbnail(const string& thumbnail);
 
         friend ResultSetIterator<REAlbumCover>;
+        friend class SearchUtil;
 
     private:
         int id;

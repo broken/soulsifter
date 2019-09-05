@@ -52,6 +52,7 @@ namespace soulsifter {
         void setXml(const string& xml);
 
         friend ResultSetIterator<REXml>;
+        friend class SearchUtil;
 
     private:
         int id;

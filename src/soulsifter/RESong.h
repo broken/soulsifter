@@ -115,6 +115,7 @@ namespace soulsifter {
         void setStylesBitmask(const string& stylesBitmask);
 
         friend ResultSetIterator<RESong>;
+        friend class SearchUtil;
 
     private:
         int id;

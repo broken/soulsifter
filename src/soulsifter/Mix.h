@@ -73,6 +73,7 @@ namespace soulsifter {
         void setAddon(bool addon);
 
         friend ResultSetIterator<Mix>;
+        friend class SearchUtil;
 
     private:
         int id;

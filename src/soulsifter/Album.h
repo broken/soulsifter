@@ -76,6 +76,7 @@ namespace soulsifter {
         void setBasicGenre(BasicGenre* basicGenre);  // takes ownership
 
         friend ResultSetIterator<Album>;
+        friend class SearchUtil;
 
     private:
         int id;

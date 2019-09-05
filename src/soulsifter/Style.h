@@ -68,6 +68,7 @@ namespace soulsifter {
         void setParents(const vector<Style*>& parents);
 
         friend ResultSetIterator<Style>;
+        friend class SearchUtil;
 
     private:
         int id;

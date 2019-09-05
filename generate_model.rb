@@ -705,6 +705,7 @@ def writeHeader (name, fields, attribs, customMethods, customHeaders)
     str << hAccessor(f)
   end
   str << "\n        friend ResultSetIterator<#{cap(name)}>;\n"
+  str << "        friend class SearchUtil;\n"
   str << "\n    private:\n"
   fields.each do |f|
     str << hFieldDeclaration(f)

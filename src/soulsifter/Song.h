@@ -127,6 +127,7 @@ namespace soulsifter {
         void setStyles(const vector<Style*>& styles);
 
         friend ResultSetIterator<Song>;
+        friend class SearchUtil;
 
     private:
         int id;

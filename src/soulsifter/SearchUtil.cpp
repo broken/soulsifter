@@ -414,58 +414,14 @@ vector<Song*>* SearchUtil::searchSongs(const string& query,
       sql::ResultSet *rs = stmt->executeQuery(ss.str());
       while (rs->next()) {
         Song* song = new Song();
-        // copied *yuck* from song.cpp
+        song->populateFields(rs, song);
         song->setId(rs->getInt("songid"));
         song->setArtist(rs->getString("songartist"));
-        song->setTrack(rs->getString("track"));
-        song->setTitle(rs->getString("title"));
-        song->setRemixer(rs->getString("remixer"));
-        song->setFeaturing(rs->getString("featuring"));
-        song->setFilepath(rs->getString("filepath"));
-        song->setRating(rs->getInt("rating"));
-        song->setDateAdded(timeFromString(rs->getString("dateAdded")));
-        song->setBpm(rs->getString("bpm"));
-        song->setTonicKey(rs->getString("tonicKey"));
-        song->setEnergy(rs->getInt("energy"));
-        song->setComments(rs->getString("comments"));
-        song->setTrashed(rs->getBoolean("trashed"));
-        song->setGoogleSongId(rs->getString("googleSongId"));
-        song->setLowQuality(rs->getBoolean("lowQuality"));
-        song->setRESongId(rs->getInt("reSongId"));
-        song->setDurationInMs(rs->getInt("durationInMs"));
-        song->setCurator(rs->getString("curator"));
-        song->setAlbumId(rs->getInt("albumId"));
-        if (rs->isNull("albumPartId")) song->setAlbumPartId(0);
-        else song->setAlbumPartId(rs->getInt("albumPartId"));
-        vector<int> styleIds;
-        if (!rs->isNull("styleIds")) {
-            string csv = rs->getString("styleIds");
-            istringstream iss(csv);
-            string id;
-            while (getline(iss, id, ',')) {
-              styleIds.push_back(atoi(id.c_str()));
-            }
-        }
-        song->setStyleIds(styleIds);
-        if (!rs->isNull("tonicKeys")) {
-            string dbSet = rs->getString("tonicKeys");
-            set<string> dbKeys;
-            boost::split(dbKeys, dbSet, boost::is_any_of(","));
-            song->setTonicKeys(dbKeys);
-        }
-        // copied *yuck* from album.cpp
+
         Album* album = new Album();
+        album->populateFields(rs, album);
         album->setId(rs->getInt("albumid"));
-        album->setName(rs->getString("name"));
         album->setArtist(rs->getString("albumartist"));
-        album->setCoverFilepath(rs->getString("coverFilepath"));
-        album->setMixed(rs->getBoolean("mixed"));
-        album->setLabel(rs->getString("label"));
-        album->setCatalogId(rs->getString("catalogId"));
-        album->setReleaseDateYear(rs->getInt("releaseDateYear"));
-        album->setReleaseDateMonth(rs->getInt("releaseDateMonth"));
-        album->setReleaseDateDay(rs->getInt("releaseDateDay"));
-        album->setBasicGenreId(rs->getInt("basicGenreId"));
         song->setAlbum(album);
 
         if (musicVideoMode) {

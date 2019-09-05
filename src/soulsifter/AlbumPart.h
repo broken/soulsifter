@@ -59,6 +59,7 @@ namespace soulsifter {
         void setAlbum(Album* album);  // takes ownership
 
         friend ResultSetIterator<AlbumPart>;
+        friend class SearchUtil;
 
     private:
         int id;

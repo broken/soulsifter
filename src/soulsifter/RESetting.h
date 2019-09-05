@@ -54,6 +54,7 @@ namespace soulsifter {
         void setValue(const string& value);
 
         friend ResultSetIterator<RESetting>;
+        friend class SearchUtil;
 
     private:
         int id;
