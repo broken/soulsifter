@@ -38,13 +38,25 @@ void AudioAnalyzer::Init(v8::Local<v8::Object> exports) {
 
   // Prototype
   // Unable to process analyzeKey
-  // Unable to process analyzeBpm
+  Nan::SetMethod(tpl, "analyzeBpm", analyzeBpm);
   Nan::SetMethod(tpl, "analyzeBpms", analyzeBpms);
   Nan::SetMethod(tpl, "analyzeDuration", analyzeDuration);
   Nan::SetMethod(tpl, "analyzeDurations", analyzeDurations);
 
   constructor.Reset(Nan::GetFunction(tpl).ToLocalChecked());
   exports->Set(Nan::New<v8::String>("AudioAnalyzer").ToLocalChecked(), Nan::GetFunction(tpl).ToLocalChecked());
+}
+
+void AudioAnalyzer::analyzeBpm(const Nan::FunctionCallbackInfo<v8::Value>& info) {
+  dogatech::soulsifter::Song* a0(Nan::ObjectWrap::Unwrap<Song>(info[0]->ToObject())->getNwcpValue());
+  const std::vector<double> result =
+      dogatech::soulsifter::AudioAnalyzer::analyzeBpm(a0);
+
+  v8::Local<v8::Array> a = Nan::New<v8::Array>((int) result.size());
+  for (int i = 0; i < (int) result.size(); i++) {
+    a->Set(Nan::New<v8::Number>(i), Nan::New<v8::Number>(result[i]));
+  }
+  info.GetReturnValue().Set(a);
 }
 
 void AudioAnalyzer::analyzeBpms(const Nan::FunctionCallbackInfo<v8::Value>& info) {
