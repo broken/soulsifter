@@ -323,7 +323,7 @@ namespace soulsifter {
         }
         return album;
     }
-    Album* AlbumPart::getAlbumOnce() const {
+    Album* AlbumPart::getAlbumConst() const {
         return (!album && albumId) ? Album::findById(albumId) : album;
     }
     void AlbumPart::setAlbum(const Album& album) {

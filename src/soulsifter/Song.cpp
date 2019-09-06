@@ -915,7 +915,7 @@ namespace soulsifter {
         }
         return reSong;
     }
-    RESong* Song::getRESongOnce() const {
+    RESong* Song::getRESongConst() const {
         return (!reSong && reSongId) ? RESong::findById(reSongId) : reSong;
     }
     void Song::setRESong(const RESong& reSong) {
@@ -944,7 +944,7 @@ namespace soulsifter {
         }
         return album;
     }
-    Album* Song::getAlbumOnce() const {
+    Album* Song::getAlbumConst() const {
         return (!album && albumId) ? Album::findById(albumId) : album;
     }
     void Song::setAlbum(const Album& album) {
@@ -973,7 +973,7 @@ namespace soulsifter {
         }
         return albumPart;
     }
-    AlbumPart* Song::getAlbumPartOnce() const {
+    AlbumPart* Song::getAlbumPartConst() const {
         return (!albumPart && albumPartId) ? AlbumPart::findById(albumPartId) : albumPart;
     }
     void Song::setAlbumPart(const AlbumPart& albumPart) {
@@ -1002,7 +1002,7 @@ namespace soulsifter {
         }
         return musicVideo;
     }
-    MusicVideo* Song::getMusicVideoOnce() const {
+    MusicVideo* Song::getMusicVideoConst() const {
         return (!musicVideo && musicVideoId) ? MusicVideo::findById(musicVideoId) : musicVideo;
     }
     void Song::setMusicVideo(const MusicVideo& musicVideo) {

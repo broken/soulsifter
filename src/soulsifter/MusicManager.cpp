@@ -236,9 +236,9 @@ void MusicManager::writeTagsToSong(Song* song) {
           }
         }
       }
-      // I created these 'Once' methods so you can retrieve model without saving the pointer and method remains const
-      Album* songAlbum = song.getAlbumOnce();
-      AlbumPart* songAlbumPart = song.getAlbumPartOnce();
+      // I created these 'Const' methods so you can retrieve model (if needed) without saving the pointer and method remains const
+      Album* songAlbum = song.getAlbumConst();
+      AlbumPart* songAlbumPart = song.getAlbumPartConst();
       // we shouldn't auto set track title b/c it changes so much
       // nor should we auto update remixer
       if (!songAlbum->getArtist().compare(lastParsedSong->getAlbum()->getArtist())) {

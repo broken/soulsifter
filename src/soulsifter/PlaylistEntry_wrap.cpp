@@ -64,10 +64,10 @@ void PlaylistEntry::Init(v8::Local<v8::Object> exports) {
   Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("id").ToLocalChecked(), getId, setId);
   Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("playlistId").ToLocalChecked(), getPlaylistId, setPlaylistId);
   Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("playlist").ToLocalChecked(), getPlaylist, setPlaylist);
-  Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("playlistOnce").ToLocalChecked(), getPlaylistOnce);
+  Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("playlistConst").ToLocalChecked(), getPlaylistConst);
   Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("songId").ToLocalChecked(), getSongId, setSongId);
   Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("song").ToLocalChecked(), getSong, setSong);
-  Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("songOnce").ToLocalChecked(), getSongOnce);
+  Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("songConst").ToLocalChecked(), getSongConst);
   Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("position").ToLocalChecked(), getPosition, setPosition);
   Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("time").ToLocalChecked(), getTime, setTime);
 
@@ -241,9 +241,9 @@ NAN_GETTER(PlaylistEntry::getPlaylist) {
   }
 }
 
-NAN_GETTER(PlaylistEntry::getPlaylistOnce) {
+NAN_GETTER(PlaylistEntry::getPlaylistConst) {
   PlaylistEntry* obj = Nan::ObjectWrap::Unwrap<PlaylistEntry>(info.Holder());
-  dogatech::soulsifter::Playlist* result =  obj->playlistentry->getPlaylistOnce();
+  dogatech::soulsifter::Playlist* result =  obj->playlistentry->getPlaylistConst();
 
   if (result == NULL) {
     info.GetReturnValue().SetNull();
@@ -295,9 +295,9 @@ NAN_GETTER(PlaylistEntry::getSong) {
   }
 }
 
-NAN_GETTER(PlaylistEntry::getSongOnce) {
+NAN_GETTER(PlaylistEntry::getSongConst) {
   PlaylistEntry* obj = Nan::ObjectWrap::Unwrap<PlaylistEntry>(info.Holder());
-  dogatech::soulsifter::Song* result =  obj->playlistentry->getSongOnce();
+  dogatech::soulsifter::Song* result =  obj->playlistentry->getSongConst();
 
   if (result == NULL) {
     info.GetReturnValue().SetNull();

@@ -63,7 +63,7 @@ void AlbumPart::Init(v8::Local<v8::Object> exports) {
   Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("name").ToLocalChecked(), getName, setName);
   Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("albumId").ToLocalChecked(), getAlbumId, setAlbumId);
   Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("album").ToLocalChecked(), getAlbum, setAlbum);
-  Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("albumOnce").ToLocalChecked(), getAlbumOnce);
+  Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("albumConst").ToLocalChecked(), getAlbumConst);
 
   constructor.Reset(Nan::GetFunction(tpl).ToLocalChecked());
   exports->Set(Nan::New<v8::String>("AlbumPart").ToLocalChecked(), Nan::GetFunction(tpl).ToLocalChecked());
@@ -258,9 +258,9 @@ NAN_GETTER(AlbumPart::getAlbum) {
   }
 }
 
-NAN_GETTER(AlbumPart::getAlbumOnce) {
+NAN_GETTER(AlbumPart::getAlbumConst) {
   AlbumPart* obj = Nan::ObjectWrap::Unwrap<AlbumPart>(info.Holder());
-  dogatech::soulsifter::Album* result =  obj->albumpart->getAlbumOnce();
+  dogatech::soulsifter::Album* result =  obj->albumpart->getAlbumConst();
 
   if (result == NULL) {
     info.GetReturnValue().SetNull();

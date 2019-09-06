@@ -91,17 +91,17 @@ void Song::Init(v8::Local<v8::Object> exports) {
   Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("curator").ToLocalChecked(), getCurator, setCurator);
   Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("rESongId").ToLocalChecked(), getRESongId, setRESongId);
   // Unable to process getRESong
-  // Unable to process getRESongOnce
+  // Unable to process getRESongConst
   // Unable to process setRESong
   Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("albumId").ToLocalChecked(), getAlbumId, setAlbumId);
   Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("album").ToLocalChecked(), getAlbum, setAlbum);
-  Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("albumOnce").ToLocalChecked(), getAlbumOnce);
+  Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("albumConst").ToLocalChecked(), getAlbumConst);
   Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("albumPartId").ToLocalChecked(), getAlbumPartId, setAlbumPartId);
   Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("albumPart").ToLocalChecked(), getAlbumPart, setAlbumPart);
-  Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("albumPartOnce").ToLocalChecked(), getAlbumPartOnce);
+  Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("albumPartConst").ToLocalChecked(), getAlbumPartConst);
   Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("musicVideoId").ToLocalChecked(), getMusicVideoId, setMusicVideoId);
   Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("musicVideo").ToLocalChecked(), getMusicVideo, setMusicVideo);
-  Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("musicVideoOnce").ToLocalChecked(), getMusicVideoOnce);
+  Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("musicVideoConst").ToLocalChecked(), getMusicVideoConst);
   Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("styleIds").ToLocalChecked(), getStyleIds, setStyleIds);
   Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("styles").ToLocalChecked(), getStyles, setStyles);
 
@@ -597,9 +597,9 @@ NAN_GETTER(Song::getAlbum) {
   }
 }
 
-NAN_GETTER(Song::getAlbumOnce) {
+NAN_GETTER(Song::getAlbumConst) {
   Song* obj = Nan::ObjectWrap::Unwrap<Song>(info.Holder());
-  dogatech::soulsifter::Album* result =  obj->song->getAlbumOnce();
+  dogatech::soulsifter::Album* result =  obj->song->getAlbumConst();
 
   if (result == NULL) {
     info.GetReturnValue().SetNull();
@@ -651,9 +651,9 @@ NAN_GETTER(Song::getAlbumPart) {
   }
 }
 
-NAN_GETTER(Song::getAlbumPartOnce) {
+NAN_GETTER(Song::getAlbumPartConst) {
   Song* obj = Nan::ObjectWrap::Unwrap<Song>(info.Holder());
-  dogatech::soulsifter::AlbumPart* result =  obj->song->getAlbumPartOnce();
+  dogatech::soulsifter::AlbumPart* result =  obj->song->getAlbumPartConst();
 
   if (result == NULL) {
     info.GetReturnValue().SetNull();
@@ -705,9 +705,9 @@ NAN_GETTER(Song::getMusicVideo) {
   }
 }
 
-NAN_GETTER(Song::getMusicVideoOnce) {
+NAN_GETTER(Song::getMusicVideoConst) {
   Song* obj = Nan::ObjectWrap::Unwrap<Song>(info.Holder());
-  dogatech::soulsifter::MusicVideo* result =  obj->song->getMusicVideoOnce();
+  dogatech::soulsifter::MusicVideo* result =  obj->song->getMusicVideoConst();
 
   if (result == NULL) {
     info.GetReturnValue().SetNull();

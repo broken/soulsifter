@@ -62,10 +62,10 @@ void Mix::Init(v8::Local<v8::Object> exports) {
   Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("id").ToLocalChecked(), getId, setId);
   Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("outSongId").ToLocalChecked(), getOutSongId, setOutSongId);
   Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("outSong").ToLocalChecked(), getOutSong, setOutSong);
-  Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("outSongOnce").ToLocalChecked(), getOutSongOnce);
+  Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("outSongConst").ToLocalChecked(), getOutSongConst);
   Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("inSongId").ToLocalChecked(), getInSongId, setInSongId);
   Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("inSong").ToLocalChecked(), getInSong, setInSong);
-  Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("inSongOnce").ToLocalChecked(), getInSongOnce);
+  Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("inSongConst").ToLocalChecked(), getInSongConst);
   Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("bpmDiff").ToLocalChecked(), getBpmDiff, setBpmDiff);
   Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("rank").ToLocalChecked(), getRank, setRank);
   Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("comments").ToLocalChecked(), getComments, setComments);
@@ -242,9 +242,9 @@ NAN_GETTER(Mix::getOutSong) {
   }
 }
 
-NAN_GETTER(Mix::getOutSongOnce) {
+NAN_GETTER(Mix::getOutSongConst) {
   Mix* obj = Nan::ObjectWrap::Unwrap<Mix>(info.Holder());
-  dogatech::soulsifter::Song* result =  obj->mix->getOutSongOnce();
+  dogatech::soulsifter::Song* result =  obj->mix->getOutSongConst();
 
   if (result == NULL) {
     info.GetReturnValue().SetNull();
@@ -296,9 +296,9 @@ NAN_GETTER(Mix::getInSong) {
   }
 }
 
-NAN_GETTER(Mix::getInSongOnce) {
+NAN_GETTER(Mix::getInSongConst) {
   Mix* obj = Nan::ObjectWrap::Unwrap<Mix>(info.Holder());
-  dogatech::soulsifter::Song* result =  obj->mix->getInSongOnce();
+  dogatech::soulsifter::Song* result =  obj->mix->getInSongConst();
 
   if (result == NULL) {
     info.GetReturnValue().SetNull();

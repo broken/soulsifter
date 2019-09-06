@@ -486,7 +486,7 @@ namespace soulsifter {
         }
         return basicGenre;
     }
-    BasicGenre* Album::getBasicGenreOnce() const {
+    BasicGenre* Album::getBasicGenreConst() const {
         return (!basicGenre && basicGenreId) ? BasicGenre::findById(basicGenreId) : basicGenre;
     }
     void Album::setBasicGenre(const BasicGenre& basicGenre) {

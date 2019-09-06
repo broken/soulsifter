@@ -100,25 +100,25 @@ namespace soulsifter {
         const int getRESongId() const;
         void setRESongId(int reSongId);
         RESong* getRESong();
-        RESong* getRESongOnce() const;
+        RESong* getRESongConst() const;
         void setRESong(const RESong& reSong);
         void setRESong(RESong* reSong);  // takes ownership
         const int getAlbumId() const;
         void setAlbumId(int albumId);
         Album* getAlbum();
-        Album* getAlbumOnce() const;
+        Album* getAlbumConst() const;
         void setAlbum(const Album& album);
         void setAlbum(Album* album);  // takes ownership
         const int getAlbumPartId() const;
         void setAlbumPartId(int albumPartId);
         AlbumPart* getAlbumPart();
-        AlbumPart* getAlbumPartOnce() const;
+        AlbumPart* getAlbumPartConst() const;
         void setAlbumPart(const AlbumPart& albumPart);
         void setAlbumPart(AlbumPart* albumPart);  // takes ownership
         const int getMusicVideoId() const;
         void setMusicVideoId(int musicVideoId);
         MusicVideo* getMusicVideo();
-        MusicVideo* getMusicVideoOnce() const;
+        MusicVideo* getMusicVideoConst() const;
         void setMusicVideo(const MusicVideo& musicVideo);
         void setMusicVideo(MusicVideo* musicVideo);  // takes ownership
         const vector<int>& getStyleIds() const;

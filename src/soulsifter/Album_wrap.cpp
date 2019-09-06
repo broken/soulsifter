@@ -72,7 +72,7 @@ void Album::Init(v8::Local<v8::Object> exports) {
   Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("releaseDateDay").ToLocalChecked(), getReleaseDateDay, setReleaseDateDay);
   Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("basicGenreId").ToLocalChecked(), getBasicGenreId, setBasicGenreId);
   Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("basicGenre").ToLocalChecked(), getBasicGenre, setBasicGenre);
-  Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("basicGenreOnce").ToLocalChecked(), getBasicGenreOnce);
+  Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("basicGenreConst").ToLocalChecked(), getBasicGenreConst);
 
   constructor.Reset(Nan::GetFunction(tpl).ToLocalChecked());
   exports->Set(Nan::New<v8::String>("Album").ToLocalChecked(), Nan::GetFunction(tpl).ToLocalChecked());
@@ -395,9 +395,9 @@ NAN_GETTER(Album::getBasicGenre) {
   }
 }
 
-NAN_GETTER(Album::getBasicGenreOnce) {
+NAN_GETTER(Album::getBasicGenreConst) {
   Album* obj = Nan::ObjectWrap::Unwrap<Album>(info.Holder());
-  dogatech::soulsifter::BasicGenre* result =  obj->album->getBasicGenreOnce();
+  dogatech::soulsifter::BasicGenre* result =  obj->album->getBasicGenreConst();
 
   if (result == NULL) {
     info.GetReturnValue().SetNull();

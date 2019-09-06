@@ -54,13 +54,13 @@ namespace soulsifter {
         const int getOutSongId() const;
         void setOutSongId(int outSongId);
         Song* getOutSong();
-        Song* getOutSongOnce() const;
+        Song* getOutSongConst() const;
         void setOutSong(const Song& outSong);
         void setOutSong(Song* outSong);  // takes ownership
         const int getInSongId() const;
         void setInSongId(int inSongId);
         Song* getInSong();
-        Song* getInSongOnce() const;
+        Song* getInSongConst() const;
         void setInSong(const Song& inSong);
         void setInSong(Song* inSong);  // takes ownership
         const string& getBpmDiff() const;
