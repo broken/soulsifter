@@ -42,7 +42,7 @@ void SearchUtil::Init(v8::Local<v8::Object> exports) {
   Nan::SetMethod(tpl, "searchSongs", searchSongs);
 
   constructor.Reset(Nan::GetFunction(tpl).ToLocalChecked());
-  exports->Set(Nan::New<v8::String>("SearchUtil").ToLocalChecked(), Nan::GetFunction(tpl).ToLocalChecked());
+  exports->Set(Nan::GetCurrentContext(), Nan::New<v8::String>("SearchUtil").ToLocalChecked(), Nan::GetFunction(tpl).ToLocalChecked());
 }
 
 void SearchUtil::searchSongs(const Nan::FunctionCallbackInfo<v8::Value>& info) {
@@ -51,22 +51,22 @@ void SearchUtil::searchSongs(const Nan::FunctionCallbackInfo<v8::Value>& info) {
   v8::Local<v8::Array> a2Array = v8::Local<v8::Array>::Cast(info[2]);
   std::set<string> a2;
   for (int i = 0; i < a2Array->Length(); ++i) {
-    v8::Local<v8::Value> tmp = a2Array->Get(i);
+    v8::Local<v8::Value> tmp = a2Array->Get(Nan::GetCurrentContext(), i).ToLocalChecked();
     string x(*v8::String::Utf8Value(tmp->ToString()));
     a2.insert(x);
   }
   v8::Local<v8::Array> a3Array = v8::Local<v8::Array>::Cast(info[3]);
   std::vector<dogatech::soulsifter::Style*> a3;
-  for (int i = 0; i < a3Array->Length(); ++i) {
-    v8::Local<v8::Value> tmp = a3Array->Get(i);
-    dogatech::soulsifter::Style* x(Nan::ObjectWrap::Unwrap<Style>(tmp->ToObject())->getNwcpValue());
+  for (uint32_t i = 0; i < a3Array->Length(); ++i) {
+    v8::Local<v8::Value> tmp = a3Array->Get(Nan::GetCurrentContext(), i).ToLocalChecked();
+    dogatech::soulsifter::Style* x(Nan::ObjectWrap::Unwrap<Style>(tmp->ToObject(Nan::GetCurrentContext()).ToLocalChecked())->getNwcpValue());
     a3.push_back(x);
   }
   v8::Local<v8::Array> a4Array = v8::Local<v8::Array>::Cast(info[4]);
   std::vector<dogatech::soulsifter::Song*> a4;
-  for (int i = 0; i < a4Array->Length(); ++i) {
-    v8::Local<v8::Value> tmp = a4Array->Get(i);
-    dogatech::soulsifter::Song* x(Nan::ObjectWrap::Unwrap<Song>(tmp->ToObject())->getNwcpValue());
+  for (uint32_t i = 0; i < a4Array->Length(); ++i) {
+    v8::Local<v8::Value> tmp = a4Array->Get(Nan::GetCurrentContext(), i).ToLocalChecked();
+    dogatech::soulsifter::Song* x(Nan::ObjectWrap::Unwrap<Song>(tmp->ToObject(Nan::GetCurrentContext()).ToLocalChecked())->getNwcpValue());
     a4.push_back(x);
   }
   int a5(info[5]->IntegerValue());
@@ -80,7 +80,7 @@ void SearchUtil::searchSongs(const Nan::FunctionCallbackInfo<v8::Value>& info) {
     v8::Local<v8::Object> instance = Song::NewInstance();
     Song* r = Nan::ObjectWrap::Unwrap<Song>(instance);
     r->setNwcpValue((*result)[i], true);
-    a->Set(Nan::New<v8::Number>(i), instance);
+    a->Set(Nan::GetCurrentContext(), Nan::New<v8::Number>(i), instance);
   }
   delete result;
   info.GetReturnValue().Set(a);

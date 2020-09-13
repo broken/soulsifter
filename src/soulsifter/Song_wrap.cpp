@@ -106,14 +106,12 @@ void Song::Init(v8::Local<v8::Object> exports) {
   Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("styles").ToLocalChecked(), getStyles, setStyles);
 
   constructor.Reset(Nan::GetFunction(tpl).ToLocalChecked());
-  exports->Set(Nan::New<v8::String>("Song").ToLocalChecked(), Nan::GetFunction(tpl).ToLocalChecked());
+  exports->Set(Nan::GetCurrentContext(), Nan::New<v8::String>("Song").ToLocalChecked(), Nan::GetFunction(tpl).ToLocalChecked());
 }
 
 void Song::clear(const Nan::FunctionCallbackInfo<v8::Value>& info) {
   Song* obj = Nan::ObjectWrap::Unwrap<Song>(info.Holder());
   obj->song->clear();
-
-  info.GetReturnValue().SetUndefined();
 }
 
 void Song::findById(const Nan::FunctionCallbackInfo<v8::Value>& info) {
@@ -191,7 +189,7 @@ void Song::findAll(const Nan::FunctionCallbackInfo<v8::Value>& info) {
     v8::Local<v8::Object> instance = Nan::NewInstance(cons).ToLocalChecked();
     Song* o = Nan::ObjectWrap::Unwrap<Song>(instance);
     o->song = (*v)[i];
-    a->Set(Nan::New<v8::Number>(i), instance);
+    a->Set(Nan::GetCurrentContext(), Nan::New<v8::Number>(i), instance);
   }
   delete v;
   info.GetReturnValue().Set(a);
@@ -235,8 +233,6 @@ NAN_GETTER(Song::getDateAddedString) {
 void Song::setDateAddedToNow(const Nan::FunctionCallbackInfo<v8::Value>& info) {
   Song* obj = Nan::ObjectWrap::Unwrap<Song>(info.Holder());
   obj->song->setDateAddedToNow();
-
-  info.GetReturnValue().SetUndefined();
 }
 
 NAN_GETTER(Song::getId) {
@@ -250,8 +246,6 @@ NAN_SETTER(Song::setId) {
   Song* obj = Nan::ObjectWrap::Unwrap<Song>(info.Holder());
   int a0(value->IntegerValue());
   obj->song->setId(a0);
-
-  info.GetReturnValue().SetUndefined();
 }
 
 NAN_GETTER(Song::getArtist) {
@@ -265,8 +259,6 @@ NAN_SETTER(Song::setArtist) {
   Song* obj = Nan::ObjectWrap::Unwrap<Song>(info.Holder());
   string a0(*v8::String::Utf8Value(value->ToString()));
   obj->song->setArtist(a0);
-
-  info.GetReturnValue().SetUndefined();
 }
 
 NAN_GETTER(Song::getTrack) {
@@ -280,8 +272,6 @@ NAN_SETTER(Song::setTrack) {
   Song* obj = Nan::ObjectWrap::Unwrap<Song>(info.Holder());
   string a0(*v8::String::Utf8Value(value->ToString()));
   obj->song->setTrack(a0);
-
-  info.GetReturnValue().SetUndefined();
 }
 
 NAN_GETTER(Song::getTitle) {
@@ -295,8 +285,6 @@ NAN_SETTER(Song::setTitle) {
   Song* obj = Nan::ObjectWrap::Unwrap<Song>(info.Holder());
   string a0(*v8::String::Utf8Value(value->ToString()));
   obj->song->setTitle(a0);
-
-  info.GetReturnValue().SetUndefined();
 }
 
 NAN_GETTER(Song::getRemixer) {
@@ -310,8 +298,6 @@ NAN_SETTER(Song::setRemixer) {
   Song* obj = Nan::ObjectWrap::Unwrap<Song>(info.Holder());
   string a0(*v8::String::Utf8Value(value->ToString()));
   obj->song->setRemixer(a0);
-
-  info.GetReturnValue().SetUndefined();
 }
 
 NAN_GETTER(Song::getFeaturing) {
@@ -325,8 +311,6 @@ NAN_SETTER(Song::setFeaturing) {
   Song* obj = Nan::ObjectWrap::Unwrap<Song>(info.Holder());
   string a0(*v8::String::Utf8Value(value->ToString()));
   obj->song->setFeaturing(a0);
-
-  info.GetReturnValue().SetUndefined();
 }
 
 NAN_GETTER(Song::getFilepath) {
@@ -340,8 +324,6 @@ NAN_SETTER(Song::setFilepath) {
   Song* obj = Nan::ObjectWrap::Unwrap<Song>(info.Holder());
   string a0(*v8::String::Utf8Value(value->ToString()));
   obj->song->setFilepath(a0);
-
-  info.GetReturnValue().SetUndefined();
 }
 
 NAN_GETTER(Song::getRating) {
@@ -355,8 +337,6 @@ NAN_SETTER(Song::setRating) {
   Song* obj = Nan::ObjectWrap::Unwrap<Song>(info.Holder());
   int a0(value->IntegerValue());
   obj->song->setRating(a0);
-
-  info.GetReturnValue().SetUndefined();
 }
 
 NAN_GETTER(Song::getDateAdded) {
@@ -370,8 +350,6 @@ NAN_SETTER(Song::setDateAdded) {
   Song* obj = Nan::ObjectWrap::Unwrap<Song>(info.Holder());
   time_t a0(value->IntegerValue() / 1000);
   obj->song->setDateAdded(a0);
-
-  info.GetReturnValue().SetUndefined();
 }
 
 NAN_GETTER(Song::getBpm) {
@@ -385,8 +363,6 @@ NAN_SETTER(Song::setBpm) {
   Song* obj = Nan::ObjectWrap::Unwrap<Song>(info.Holder());
   string a0(*v8::String::Utf8Value(value->ToString()));
   obj->song->setBpm(a0);
-
-  info.GetReturnValue().SetUndefined();
 }
 
 NAN_GETTER(Song::getTonicKeys) {
@@ -396,7 +372,7 @@ NAN_GETTER(Song::getTonicKeys) {
   v8::Local<v8::Array> a = Nan::New<v8::Array>((int) result.size());
   int idx = 0;
   for (const auto& element : result) {
-    a->Set(Nan::New<v8::Number>(idx), Nan::New<v8::String>(element).ToLocalChecked());
+    a->Set(Nan::GetCurrentContext(), Nan::New<v8::Number>(idx), Nan::New<v8::String>(element).ToLocalChecked());
     ++idx;
   }
   info.GetReturnValue().Set(a);
@@ -407,29 +383,23 @@ NAN_SETTER(Song::setTonicKeys) {
   v8::Local<v8::Array> a0Array = v8::Local<v8::Array>::Cast(value);
   std::set<string> a0;
   for (int i = 0; i < a0Array->Length(); ++i) {
-    v8::Local<v8::Value> tmp = a0Array->Get(i);
+    v8::Local<v8::Value> tmp = a0Array->Get(Nan::GetCurrentContext(), i).ToLocalChecked();
     string x(*v8::String::Utf8Value(tmp->ToString()));
     a0.insert(x);
   }
   obj->song->setTonicKeys(a0);
-
-  info.GetReturnValue().SetUndefined();
 }
 
 void Song::addTonicKey(const Nan::FunctionCallbackInfo<v8::Value>& info) {
   Song* obj = Nan::ObjectWrap::Unwrap<Song>(info.Holder());
   string a0(*v8::String::Utf8Value(info[0]->ToString()));
   obj->song->addTonicKey(a0);
-
-  info.GetReturnValue().SetUndefined();
 }
 
 void Song::removeTonicKey(const Nan::FunctionCallbackInfo<v8::Value>& info) {
   Song* obj = Nan::ObjectWrap::Unwrap<Song>(info.Holder());
   string a0(*v8::String::Utf8Value(info[0]->ToString()));
   obj->song->removeTonicKey(a0);
-
-  info.GetReturnValue().SetUndefined();
 }
 
 NAN_GETTER(Song::getTonicKey) {
@@ -443,8 +413,6 @@ NAN_SETTER(Song::setTonicKey) {
   Song* obj = Nan::ObjectWrap::Unwrap<Song>(info.Holder());
   string a0(*v8::String::Utf8Value(value->ToString()));
   obj->song->setTonicKey(a0);
-
-  info.GetReturnValue().SetUndefined();
 }
 
 NAN_GETTER(Song::getEnergy) {
@@ -458,8 +426,6 @@ NAN_SETTER(Song::setEnergy) {
   Song* obj = Nan::ObjectWrap::Unwrap<Song>(info.Holder());
   int a0(value->IntegerValue());
   obj->song->setEnergy(a0);
-
-  info.GetReturnValue().SetUndefined();
 }
 
 NAN_GETTER(Song::getComments) {
@@ -473,8 +439,6 @@ NAN_SETTER(Song::setComments) {
   Song* obj = Nan::ObjectWrap::Unwrap<Song>(info.Holder());
   string a0(*v8::String::Utf8Value(value->ToString()));
   obj->song->setComments(a0);
-
-  info.GetReturnValue().SetUndefined();
 }
 
 NAN_GETTER(Song::getTrashed) {
@@ -488,8 +452,6 @@ NAN_SETTER(Song::setTrashed) {
   Song* obj = Nan::ObjectWrap::Unwrap<Song>(info.Holder());
   bool a0(value->BooleanValue());
   obj->song->setTrashed(a0);
-
-  info.GetReturnValue().SetUndefined();
 }
 
 NAN_GETTER(Song::getLowQuality) {
@@ -503,8 +465,6 @@ NAN_SETTER(Song::setLowQuality) {
   Song* obj = Nan::ObjectWrap::Unwrap<Song>(info.Holder());
   bool a0(value->BooleanValue());
   obj->song->setLowQuality(a0);
-
-  info.GetReturnValue().SetUndefined();
 }
 
 NAN_GETTER(Song::getGoogleSongId) {
@@ -518,8 +478,6 @@ NAN_SETTER(Song::setGoogleSongId) {
   Song* obj = Nan::ObjectWrap::Unwrap<Song>(info.Holder());
   string a0(*v8::String::Utf8Value(value->ToString()));
   obj->song->setGoogleSongId(a0);
-
-  info.GetReturnValue().SetUndefined();
 }
 
 NAN_GETTER(Song::getDurationInMs) {
@@ -533,8 +491,6 @@ NAN_SETTER(Song::setDurationInMs) {
   Song* obj = Nan::ObjectWrap::Unwrap<Song>(info.Holder());
   int a0(value->IntegerValue());
   obj->song->setDurationInMs(a0);
-
-  info.GetReturnValue().SetUndefined();
 }
 
 NAN_GETTER(Song::getCurator) {
@@ -548,8 +504,6 @@ NAN_SETTER(Song::setCurator) {
   Song* obj = Nan::ObjectWrap::Unwrap<Song>(info.Holder());
   string a0(*v8::String::Utf8Value(value->ToString()));
   obj->song->setCurator(a0);
-
-  info.GetReturnValue().SetUndefined();
 }
 
 NAN_GETTER(Song::getRESongId) {
@@ -563,8 +517,6 @@ NAN_SETTER(Song::setRESongId) {
   Song* obj = Nan::ObjectWrap::Unwrap<Song>(info.Holder());
   int a0(value->IntegerValue());
   obj->song->setRESongId(a0);
-
-  info.GetReturnValue().SetUndefined();
 }
 
 NAN_GETTER(Song::getAlbumId) {
@@ -578,8 +530,6 @@ NAN_SETTER(Song::setAlbumId) {
   Song* obj = Nan::ObjectWrap::Unwrap<Song>(info.Holder());
   int a0(value->IntegerValue());
   obj->song->setAlbumId(a0);
-
-  info.GetReturnValue().SetUndefined();
 }
 
 NAN_GETTER(Song::getAlbum) {
@@ -614,11 +564,9 @@ NAN_GETTER(Song::getAlbumConst) {
 
 NAN_SETTER(Song::setAlbum) {
   Song* obj = Nan::ObjectWrap::Unwrap<Song>(info.Holder());
-  dogatech::soulsifter::Album* a0tmp(Nan::ObjectWrap::Unwrap<Album>(value->ToObject())->getNwcpValue());
+  dogatech::soulsifter::Album* a0tmp(Nan::ObjectWrap::Unwrap<Album>(value->ToObject(Nan::GetCurrentContext()).ToLocalChecked())->getNwcpValue());
   dogatech::soulsifter::Album& a0 = *a0tmp;
   obj->song->setAlbum(a0);
-
-  info.GetReturnValue().SetUndefined();
 }
 
 NAN_GETTER(Song::getAlbumPartId) {
@@ -632,8 +580,6 @@ NAN_SETTER(Song::setAlbumPartId) {
   Song* obj = Nan::ObjectWrap::Unwrap<Song>(info.Holder());
   int a0(value->IntegerValue());
   obj->song->setAlbumPartId(a0);
-
-  info.GetReturnValue().SetUndefined();
 }
 
 NAN_GETTER(Song::getAlbumPart) {
@@ -668,11 +614,9 @@ NAN_GETTER(Song::getAlbumPartConst) {
 
 NAN_SETTER(Song::setAlbumPart) {
   Song* obj = Nan::ObjectWrap::Unwrap<Song>(info.Holder());
-  dogatech::soulsifter::AlbumPart* a0tmp(Nan::ObjectWrap::Unwrap<AlbumPart>(value->ToObject())->getNwcpValue());
+  dogatech::soulsifter::AlbumPart* a0tmp(Nan::ObjectWrap::Unwrap<AlbumPart>(value->ToObject(Nan::GetCurrentContext()).ToLocalChecked())->getNwcpValue());
   dogatech::soulsifter::AlbumPart& a0 = *a0tmp;
   obj->song->setAlbumPart(a0);
-
-  info.GetReturnValue().SetUndefined();
 }
 
 NAN_GETTER(Song::getMusicVideoId) {
@@ -686,8 +630,6 @@ NAN_SETTER(Song::setMusicVideoId) {
   Song* obj = Nan::ObjectWrap::Unwrap<Song>(info.Holder());
   int a0(value->IntegerValue());
   obj->song->setMusicVideoId(a0);
-
-  info.GetReturnValue().SetUndefined();
 }
 
 NAN_GETTER(Song::getMusicVideo) {
@@ -722,11 +664,9 @@ NAN_GETTER(Song::getMusicVideoConst) {
 
 NAN_SETTER(Song::setMusicVideo) {
   Song* obj = Nan::ObjectWrap::Unwrap<Song>(info.Holder());
-  dogatech::soulsifter::MusicVideo* a0tmp(Nan::ObjectWrap::Unwrap<MusicVideo>(value->ToObject())->getNwcpValue());
+  dogatech::soulsifter::MusicVideo* a0tmp(Nan::ObjectWrap::Unwrap<MusicVideo>(value->ToObject(Nan::GetCurrentContext()).ToLocalChecked())->getNwcpValue());
   dogatech::soulsifter::MusicVideo& a0 = *a0tmp;
   obj->song->setMusicVideo(a0);
-
-  info.GetReturnValue().SetUndefined();
 }
 
 NAN_GETTER(Song::getStyleIds) {
@@ -735,7 +675,7 @@ NAN_GETTER(Song::getStyleIds) {
 
   v8::Local<v8::Array> a = Nan::New<v8::Array>((int) result.size());
   for (int i = 0; i < (int) result.size(); i++) {
-    a->Set(Nan::New<v8::Number>(i), Nan::New<v8::Integer>(result[i]));
+    a->Set(Nan::GetCurrentContext(), Nan::New<v8::Number>(i), Nan::New<v8::Integer>(result[i]));
   }
   info.GetReturnValue().Set(a);
 }
@@ -744,14 +684,12 @@ NAN_SETTER(Song::setStyleIds) {
   Song* obj = Nan::ObjectWrap::Unwrap<Song>(info.Holder());
   v8::Local<v8::Array> a0Array = v8::Local<v8::Array>::Cast(value);
   std::vector<int> a0;
-  for (int i = 0; i < a0Array->Length(); ++i) {
-    v8::Local<v8::Value> tmp = a0Array->Get(i);
+  for (uint32_t i = 0; i < a0Array->Length(); ++i) {
+    v8::Local<v8::Value> tmp = a0Array->Get(Nan::GetCurrentContext(), i).ToLocalChecked();
     int x(tmp->IntegerValue());
     a0.push_back(x);
   }
   obj->song->setStyleIds(a0);
-
-  info.GetReturnValue().SetUndefined();
 }
 
 NAN_GETTER(Song::getStyles) {
@@ -763,7 +701,7 @@ NAN_GETTER(Song::getStyles) {
     v8::Local<v8::Object> instance = Style::NewInstance();
     Style* r = Nan::ObjectWrap::Unwrap<Style>(instance);
     r->setNwcpValue((result)[i], false);
-    a->Set(Nan::New<v8::Number>(i), instance);
+    a->Set(Nan::GetCurrentContext(), Nan::New<v8::Number>(i), instance);
   }
   info.GetReturnValue().Set(a);
 }
@@ -772,13 +710,11 @@ NAN_SETTER(Song::setStyles) {
   Song* obj = Nan::ObjectWrap::Unwrap<Song>(info.Holder());
   v8::Local<v8::Array> a0Array = v8::Local<v8::Array>::Cast(value);
   std::vector<dogatech::soulsifter::Style*> a0;
-  for (int i = 0; i < a0Array->Length(); ++i) {
-    v8::Local<v8::Value> tmp = a0Array->Get(i);
-    dogatech::soulsifter::Style* x(Nan::ObjectWrap::Unwrap<Style>(tmp->ToObject())->getNwcpValue());
+  for (uint32_t i = 0; i < a0Array->Length(); ++i) {
+    v8::Local<v8::Value> tmp = a0Array->Get(Nan::GetCurrentContext(), i).ToLocalChecked();
+    dogatech::soulsifter::Style* x(Nan::ObjectWrap::Unwrap<Style>(tmp->ToObject(Nan::GetCurrentContext()).ToLocalChecked())->getNwcpValue());
     a0.push_back(x);
   }
   obj->song->setStyles(a0);
-
-  info.GetReturnValue().SetUndefined();
 }
 

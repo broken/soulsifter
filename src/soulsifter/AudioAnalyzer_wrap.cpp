@@ -44,17 +44,17 @@ void AudioAnalyzer::Init(v8::Local<v8::Object> exports) {
   Nan::SetMethod(tpl, "analyzeDurations", analyzeDurations);
 
   constructor.Reset(Nan::GetFunction(tpl).ToLocalChecked());
-  exports->Set(Nan::New<v8::String>("AudioAnalyzer").ToLocalChecked(), Nan::GetFunction(tpl).ToLocalChecked());
+  exports->Set(Nan::GetCurrentContext(), Nan::New<v8::String>("AudioAnalyzer").ToLocalChecked(), Nan::GetFunction(tpl).ToLocalChecked());
 }
 
 void AudioAnalyzer::analyzeBpm(const Nan::FunctionCallbackInfo<v8::Value>& info) {
-  dogatech::soulsifter::Song* a0(Nan::ObjectWrap::Unwrap<Song>(info[0]->ToObject())->getNwcpValue());
+  dogatech::soulsifter::Song* a0(Nan::ObjectWrap::Unwrap<Song>(info[0]->ToObject(Nan::GetCurrentContext()).ToLocalChecked())->getNwcpValue());
   const std::vector<double> result =
       dogatech::soulsifter::AudioAnalyzer::analyzeBpm(a0);
 
   v8::Local<v8::Array> a = Nan::New<v8::Array>((int) result.size());
   for (int i = 0; i < (int) result.size(); i++) {
-    a->Set(Nan::New<v8::Number>(i), Nan::New<v8::Number>(result[i]));
+    a->Set(Nan::GetCurrentContext(), Nan::New<v8::Number>(i), Nan::New<v8::Number>(result[i]));
   }
   info.GetReturnValue().Set(a);
 }
@@ -62,12 +62,10 @@ void AudioAnalyzer::analyzeBpm(const Nan::FunctionCallbackInfo<v8::Value>& info)
 void AudioAnalyzer::analyzeBpms(const Nan::FunctionCallbackInfo<v8::Value>& info) {
 
       dogatech::soulsifter::AudioAnalyzer::analyzeBpms();
-
-  info.GetReturnValue().SetUndefined();
 }
 
 void AudioAnalyzer::analyzeDuration(const Nan::FunctionCallbackInfo<v8::Value>& info) {
-  dogatech::soulsifter::Song* a0(Nan::ObjectWrap::Unwrap<Song>(info[0]->ToObject())->getNwcpValue());
+  dogatech::soulsifter::Song* a0(Nan::ObjectWrap::Unwrap<Song>(info[0]->ToObject(Nan::GetCurrentContext()).ToLocalChecked())->getNwcpValue());
   int result =
       dogatech::soulsifter::AudioAnalyzer::analyzeDuration(a0);
 
@@ -77,7 +75,5 @@ void AudioAnalyzer::analyzeDuration(const Nan::FunctionCallbackInfo<v8::Value>& 
 void AudioAnalyzer::analyzeDurations(const Nan::FunctionCallbackInfo<v8::Value>& info) {
 
       dogatech::soulsifter::AudioAnalyzer::analyzeDurations();
-
-  info.GetReturnValue().SetUndefined();
 }
 

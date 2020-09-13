@@ -19,10 +19,10 @@ Presteps:
       secure_file_priv=/Users/dogatech/Music/db
       sql-mode="STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION"
 * install npm modules
-  * global: grunt-cli, nw-gyp
+  * global: grunt-cli, nw-gyp, n
   * locally with npm install
 * custom build of nwjs (for drag & drop & mp3 play support)
-* required libs (brew install): mysql-connector-c++, libtag, mad, boost, youtube-dl (for music videos), ffmpeg (for youtube audio), g3log
+* required libs (brew install): mysql-connector-c++ (-DWITH_JDBC=ON), libtag, mad, boost, youtube-dl (for music videos), ffmpeg (for youtube audio), g3log
 
 ```
 grunt all
@@ -61,13 +61,14 @@ Following for nw40 compilation (xcode 10.3 w/ 10.14 sdk):
 # Instructions: http://docs.nwjs.io/en/latest/For%20Developers/Building%20NW.js/
 # Hints on building ffmpeg which should be included below: https://github.com/butterproject/butter-desktop/issues/339
 
-export NWV=nw40
-export XCV=10.3
+export NWV=48.1
+export NWV_MINOR=$(echo nw$NWV | awk -F . '{print $1}' )
+export XCV=11.0
 #sudo xcode-select -s /Applications/Xcode$XCV.app/Contents/Developer/
 xcode-select -p
-mkdir $(printf "%s_sdk_xcode%s" $NWV $XCV)
-cd $(printf "%s_sdk_xcode%s" $NWV $XCV)
-gclient config --name=src https://github.com/nwjs/chromium.src.git@origin/$NWV
+mkdir $(printf "nw%s_sdk_xcode%s" $NWV $XCV)
+cd $(printf "nw%s_sdk_xcode%s" $NWV $XCV)
+gclient config --name=src https://github.com/nwjs/chromium.src.git@origin/$NWV_MINOR
 vim .gclient
 # update custom_deps of .gclient with:
       "src/third_party/WebKit/LayoutTests": None,
@@ -80,18 +81,18 @@ vim .gclient
 --
 git clone https://github.com/nwjs/nw.js src/content/nw
 cd src/content/nw
-git checkout $NWV
+git checkout nw-v0.$NWV
 cd ../../..
 git clone https://github.com/nwjs/node src/third_party/node-nw
 cd src/third_party/node-nw
-git checkout $NWV
+git checkout $NWV_MINOR
 cd ../../..
 git clone https://github.com/nwjs/v8 src/v8
 cd src/v8
-git checkout $NWV
+git checkout $NWV_MINOR
 cd ../..
 cd src
-# gclient takes awhile (>1 hr) to run & must use python 2.7+
+# gclient takes awhile (1-4 hr) to run & must use python 2.7+
 python content/nw/tools/sync.py
 cd ..
 export GYP_DEFINES=target_arch=x64 nwjs_sdk=1 mac_breakpad=1 buildtype=Official disable_nacl=0 building_nw=1

@@ -43,11 +43,11 @@ void MusicVideoService::Init(v8::Local<v8::Object> exports) {
   Nan::SetMethod(tpl, "downloadAudio", downloadAudio);
 
   constructor.Reset(Nan::GetFunction(tpl).ToLocalChecked());
-  exports->Set(Nan::New<v8::String>("MusicVideoService").ToLocalChecked(), Nan::GetFunction(tpl).ToLocalChecked());
+  exports->Set(Nan::GetCurrentContext(), Nan::New<v8::String>("MusicVideoService").ToLocalChecked(), Nan::GetFunction(tpl).ToLocalChecked());
 }
 
 void MusicVideoService::associateYouTubeVideo(const Nan::FunctionCallbackInfo<v8::Value>& info) {
-  dogatech::soulsifter::Song* a0(Nan::ObjectWrap::Unwrap<Song>(info[0]->ToObject())->getNwcpValue());
+  dogatech::soulsifter::Song* a0(Nan::ObjectWrap::Unwrap<Song>(info[0]->ToObject(Nan::GetCurrentContext()).ToLocalChecked())->getNwcpValue());
   string a1(*v8::String::Utf8Value(info[1]->ToString()));
   dogatech::soulsifter::MusicVideo* result =
       dogatech::soulsifter::MusicVideoService::associateYouTubeVideo(a0, a1);
@@ -70,7 +70,7 @@ void MusicVideoService::downloadAudio(const Nan::FunctionCallbackInfo<v8::Value>
 
   v8::Local<v8::Array> a = Nan::New<v8::Array>((int) result.size());
   for (int i = 0; i < (int) result.size(); i++) {
-    a->Set(Nan::New<v8::Number>(i), Nan::New<v8::String>(result[i]).ToLocalChecked());
+    a->Set(Nan::GetCurrentContext(), Nan::New<v8::Number>(i), Nan::New<v8::String>(result[i]).ToLocalChecked());
   }
   info.GetReturnValue().Set(a);
 }

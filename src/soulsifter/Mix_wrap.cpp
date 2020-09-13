@@ -72,14 +72,12 @@ void Mix::Init(v8::Local<v8::Object> exports) {
   Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("addon").ToLocalChecked(), getAddon, setAddon);
 
   constructor.Reset(Nan::GetFunction(tpl).ToLocalChecked());
-  exports->Set(Nan::New<v8::String>("Mix").ToLocalChecked(), Nan::GetFunction(tpl).ToLocalChecked());
+  exports->Set(Nan::GetCurrentContext(), Nan::New<v8::String>("Mix").ToLocalChecked(), Nan::GetFunction(tpl).ToLocalChecked());
 }
 
 void Mix::clear(const Nan::FunctionCallbackInfo<v8::Value>& info) {
   Mix* obj = Nan::ObjectWrap::Unwrap<Mix>(info.Holder());
   obj->mix->clear();
-
-  info.GetReturnValue().SetUndefined();
 }
 
 void Mix::findById(const Nan::FunctionCallbackInfo<v8::Value>& info) {
@@ -127,7 +125,7 @@ void Mix::findByOutSongId(const Nan::FunctionCallbackInfo<v8::Value>& info) {
     v8::Local<v8::Object> instance = Nan::NewInstance(cons).ToLocalChecked();
     Mix* o = Nan::ObjectWrap::Unwrap<Mix>(instance);
     o->mix = (*v)[i];
-    a->Set(Nan::New<v8::Number>(i), instance);
+    a->Set(Nan::GetCurrentContext(), Nan::New<v8::Number>(i), instance);
   }
   delete v;
   info.GetReturnValue().Set(a);
@@ -145,7 +143,7 @@ void Mix::findByInSongId(const Nan::FunctionCallbackInfo<v8::Value>& info) {
     v8::Local<v8::Object> instance = Nan::NewInstance(cons).ToLocalChecked();
     Mix* o = Nan::ObjectWrap::Unwrap<Mix>(instance);
     o->mix = (*v)[i];
-    a->Set(Nan::New<v8::Number>(i), instance);
+    a->Set(Nan::GetCurrentContext(), Nan::New<v8::Number>(i), instance);
   }
   delete v;
   info.GetReturnValue().Set(a);
@@ -162,7 +160,7 @@ void Mix::findAll(const Nan::FunctionCallbackInfo<v8::Value>& info) {
     v8::Local<v8::Object> instance = Nan::NewInstance(cons).ToLocalChecked();
     Mix* o = Nan::ObjectWrap::Unwrap<Mix>(instance);
     o->mix = (*v)[i];
-    a->Set(Nan::New<v8::Number>(i), instance);
+    a->Set(Nan::GetCurrentContext(), Nan::New<v8::Number>(i), instance);
   }
   delete v;
   info.GetReturnValue().Set(a);
@@ -208,8 +206,6 @@ NAN_SETTER(Mix::setId) {
   Mix* obj = Nan::ObjectWrap::Unwrap<Mix>(info.Holder());
   int a0(value->IntegerValue());
   obj->mix->setId(a0);
-
-  info.GetReturnValue().SetUndefined();
 }
 
 NAN_GETTER(Mix::getOutSongId) {
@@ -223,8 +219,6 @@ NAN_SETTER(Mix::setOutSongId) {
   Mix* obj = Nan::ObjectWrap::Unwrap<Mix>(info.Holder());
   int a0(value->IntegerValue());
   obj->mix->setOutSongId(a0);
-
-  info.GetReturnValue().SetUndefined();
 }
 
 NAN_GETTER(Mix::getOutSong) {
@@ -259,11 +253,9 @@ NAN_GETTER(Mix::getOutSongConst) {
 
 NAN_SETTER(Mix::setOutSong) {
   Mix* obj = Nan::ObjectWrap::Unwrap<Mix>(info.Holder());
-  dogatech::soulsifter::Song* a0tmp(Nan::ObjectWrap::Unwrap<Song>(value->ToObject())->getNwcpValue());
+  dogatech::soulsifter::Song* a0tmp(Nan::ObjectWrap::Unwrap<Song>(value->ToObject(Nan::GetCurrentContext()).ToLocalChecked())->getNwcpValue());
   dogatech::soulsifter::Song& a0 = *a0tmp;
   obj->mix->setOutSong(a0);
-
-  info.GetReturnValue().SetUndefined();
 }
 
 NAN_GETTER(Mix::getInSongId) {
@@ -277,8 +269,6 @@ NAN_SETTER(Mix::setInSongId) {
   Mix* obj = Nan::ObjectWrap::Unwrap<Mix>(info.Holder());
   int a0(value->IntegerValue());
   obj->mix->setInSongId(a0);
-
-  info.GetReturnValue().SetUndefined();
 }
 
 NAN_GETTER(Mix::getInSong) {
@@ -313,11 +303,9 @@ NAN_GETTER(Mix::getInSongConst) {
 
 NAN_SETTER(Mix::setInSong) {
   Mix* obj = Nan::ObjectWrap::Unwrap<Mix>(info.Holder());
-  dogatech::soulsifter::Song* a0tmp(Nan::ObjectWrap::Unwrap<Song>(value->ToObject())->getNwcpValue());
+  dogatech::soulsifter::Song* a0tmp(Nan::ObjectWrap::Unwrap<Song>(value->ToObject(Nan::GetCurrentContext()).ToLocalChecked())->getNwcpValue());
   dogatech::soulsifter::Song& a0 = *a0tmp;
   obj->mix->setInSong(a0);
-
-  info.GetReturnValue().SetUndefined();
 }
 
 NAN_GETTER(Mix::getBpmDiff) {
@@ -331,8 +319,6 @@ NAN_SETTER(Mix::setBpmDiff) {
   Mix* obj = Nan::ObjectWrap::Unwrap<Mix>(info.Holder());
   string a0(*v8::String::Utf8Value(value->ToString()));
   obj->mix->setBpmDiff(a0);
-
-  info.GetReturnValue().SetUndefined();
 }
 
 NAN_GETTER(Mix::getRank) {
@@ -346,8 +332,6 @@ NAN_SETTER(Mix::setRank) {
   Mix* obj = Nan::ObjectWrap::Unwrap<Mix>(info.Holder());
   int a0(value->IntegerValue());
   obj->mix->setRank(a0);
-
-  info.GetReturnValue().SetUndefined();
 }
 
 NAN_GETTER(Mix::getComments) {
@@ -361,8 +345,6 @@ NAN_SETTER(Mix::setComments) {
   Mix* obj = Nan::ObjectWrap::Unwrap<Mix>(info.Holder());
   string a0(*v8::String::Utf8Value(value->ToString()));
   obj->mix->setComments(a0);
-
-  info.GetReturnValue().SetUndefined();
 }
 
 NAN_GETTER(Mix::getAddon) {
@@ -376,7 +358,5 @@ NAN_SETTER(Mix::setAddon) {
   Mix* obj = Nan::ObjectWrap::Unwrap<Mix>(info.Holder());
   bool a0(value->BooleanValue());
   obj->mix->setAddon(a0);
-
-  info.GetReturnValue().SetUndefined();
 }
 

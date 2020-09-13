@@ -60,14 +60,12 @@ void BasicGenre::Init(v8::Local<v8::Object> exports) {
   Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("name").ToLocalChecked(), getName, setName);
 
   constructor.Reset(Nan::GetFunction(tpl).ToLocalChecked());
-  exports->Set(Nan::New<v8::String>("BasicGenre").ToLocalChecked(), Nan::GetFunction(tpl).ToLocalChecked());
+  exports->Set(Nan::GetCurrentContext(), Nan::New<v8::String>("BasicGenre").ToLocalChecked(), Nan::GetFunction(tpl).ToLocalChecked());
 }
 
 void BasicGenre::clear(const Nan::FunctionCallbackInfo<v8::Value>& info) {
   BasicGenre* obj = Nan::ObjectWrap::Unwrap<BasicGenre>(info.Holder());
   obj->basicgenre->clear();
-
-  info.GetReturnValue().SetUndefined();
 }
 
 void BasicGenre::findById(const Nan::FunctionCallbackInfo<v8::Value>& info) {
@@ -113,7 +111,7 @@ void BasicGenre::findAll(const Nan::FunctionCallbackInfo<v8::Value>& info) {
     v8::Local<v8::Object> instance = Nan::NewInstance(cons).ToLocalChecked();
     BasicGenre* o = Nan::ObjectWrap::Unwrap<BasicGenre>(instance);
     o->basicgenre = (*v)[i];
-    a->Set(Nan::New<v8::Number>(i), instance);
+    a->Set(Nan::GetCurrentContext(), Nan::New<v8::Number>(i), instance);
   }
   delete v;
   info.GetReturnValue().Set(a);
@@ -183,8 +181,6 @@ NAN_SETTER(BasicGenre::setId) {
   BasicGenre* obj = Nan::ObjectWrap::Unwrap<BasicGenre>(info.Holder());
   int a0(value->IntegerValue());
   obj->basicgenre->setId(a0);
-
-  info.GetReturnValue().SetUndefined();
 }
 
 NAN_GETTER(BasicGenre::getName) {
@@ -198,7 +194,5 @@ NAN_SETTER(BasicGenre::setName) {
   BasicGenre* obj = Nan::ObjectWrap::Unwrap<BasicGenre>(info.Holder());
   string a0(*v8::String::Utf8Value(value->ToString()));
   obj->basicgenre->setName(a0);
-
-  info.GetReturnValue().SetUndefined();
 }
 

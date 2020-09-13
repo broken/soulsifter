@@ -67,14 +67,12 @@ void Style::Init(v8::Local<v8::Object> exports) {
   Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("parents").ToLocalChecked(), getParents, setParents);
 
   constructor.Reset(Nan::GetFunction(tpl).ToLocalChecked());
-  exports->Set(Nan::New<v8::String>("Style").ToLocalChecked(), Nan::GetFunction(tpl).ToLocalChecked());
+  exports->Set(Nan::GetCurrentContext(), Nan::New<v8::String>("Style").ToLocalChecked(), Nan::GetFunction(tpl).ToLocalChecked());
 }
 
 void Style::clear(const Nan::FunctionCallbackInfo<v8::Value>& info) {
   Style* obj = Nan::ObjectWrap::Unwrap<Style>(info.Holder());
   obj->style->clear();
-
-  info.GetReturnValue().SetUndefined();
 }
 
 void Style::findById(const Nan::FunctionCallbackInfo<v8::Value>& info) {
@@ -120,7 +118,7 @@ void Style::findAll(const Nan::FunctionCallbackInfo<v8::Value>& info) {
     v8::Local<v8::Object> instance = Nan::NewInstance(cons).ToLocalChecked();
     Style* o = Nan::ObjectWrap::Unwrap<Style>(instance);
     o->style = (*v)[i];
-    a->Set(Nan::New<v8::Number>(i), instance);
+    a->Set(Nan::GetCurrentContext(), Nan::New<v8::Number>(i), instance);
   }
   delete v;
   info.GetReturnValue().Set(a);
@@ -158,7 +156,7 @@ void Style::findAllParents(const Nan::FunctionCallbackInfo<v8::Value>& info) {
     v8::Local<v8::Object> instance = Nan::NewInstance(cons).ToLocalChecked();
     Style* o = Nan::ObjectWrap::Unwrap<Style>(instance);
     o->style = (*v)[i];
-    a->Set(Nan::New<v8::Number>(i), instance);
+    a->Set(Nan::GetCurrentContext(), Nan::New<v8::Number>(i), instance);
   }
   delete v;
   info.GetReturnValue().Set(a);
@@ -175,8 +173,6 @@ NAN_SETTER(Style::setId) {
   Style* obj = Nan::ObjectWrap::Unwrap<Style>(info.Holder());
   int a0(value->IntegerValue());
   obj->style->setId(a0);
-
-  info.GetReturnValue().SetUndefined();
 }
 
 NAN_GETTER(Style::getName) {
@@ -190,8 +186,6 @@ NAN_SETTER(Style::setName) {
   Style* obj = Nan::ObjectWrap::Unwrap<Style>(info.Holder());
   string a0(*v8::String::Utf8Value(value->ToString()));
   obj->style->setName(a0);
-
-  info.GetReturnValue().SetUndefined();
 }
 
 NAN_GETTER(Style::getREId) {
@@ -205,8 +199,6 @@ NAN_SETTER(Style::setREId) {
   Style* obj = Nan::ObjectWrap::Unwrap<Style>(info.Holder());
   int a0(value->IntegerValue());
   obj->style->setREId(a0);
-
-  info.GetReturnValue().SetUndefined();
 }
 
 NAN_GETTER(Style::getRELabel) {
@@ -220,8 +212,6 @@ NAN_SETTER(Style::setRELabel) {
   Style* obj = Nan::ObjectWrap::Unwrap<Style>(info.Holder());
   string a0(*v8::String::Utf8Value(value->ToString()));
   obj->style->setRELabel(a0);
-
-  info.GetReturnValue().SetUndefined();
 }
 
 NAN_GETTER(Style::getChildIds) {
@@ -230,7 +220,7 @@ NAN_GETTER(Style::getChildIds) {
 
   v8::Local<v8::Array> a = Nan::New<v8::Array>((int) result.size());
   for (int i = 0; i < (int) result.size(); i++) {
-    a->Set(Nan::New<v8::Number>(i), Nan::New<v8::Integer>(result[i]));
+    a->Set(Nan::GetCurrentContext(), Nan::New<v8::Number>(i), Nan::New<v8::Integer>(result[i]));
   }
   info.GetReturnValue().Set(a);
 }
@@ -239,14 +229,12 @@ NAN_SETTER(Style::setChildIds) {
   Style* obj = Nan::ObjectWrap::Unwrap<Style>(info.Holder());
   v8::Local<v8::Array> a0Array = v8::Local<v8::Array>::Cast(value);
   std::vector<int> a0;
-  for (int i = 0; i < a0Array->Length(); ++i) {
-    v8::Local<v8::Value> tmp = a0Array->Get(i);
+  for (uint32_t i = 0; i < a0Array->Length(); ++i) {
+    v8::Local<v8::Value> tmp = a0Array->Get(Nan::GetCurrentContext(), i).ToLocalChecked();
     int x(tmp->IntegerValue());
     a0.push_back(x);
   }
   obj->style->setChildIds(a0);
-
-  info.GetReturnValue().SetUndefined();
 }
 
 NAN_GETTER(Style::getChildren) {
@@ -258,7 +246,7 @@ NAN_GETTER(Style::getChildren) {
     v8::Local<v8::Object> instance = Style::NewInstance();
     Style* r = Nan::ObjectWrap::Unwrap<Style>(instance);
     r->setNwcpValue((result)[i], false);
-    a->Set(Nan::New<v8::Number>(i), instance);
+    a->Set(Nan::GetCurrentContext(), Nan::New<v8::Number>(i), instance);
   }
   info.GetReturnValue().Set(a);
 }
@@ -267,14 +255,12 @@ NAN_SETTER(Style::setChildren) {
   Style* obj = Nan::ObjectWrap::Unwrap<Style>(info.Holder());
   v8::Local<v8::Array> a0Array = v8::Local<v8::Array>::Cast(value);
   std::vector<dogatech::soulsifter::Style*> a0;
-  for (int i = 0; i < a0Array->Length(); ++i) {
-    v8::Local<v8::Value> tmp = a0Array->Get(i);
-    dogatech::soulsifter::Style* x(Nan::ObjectWrap::Unwrap<Style>(tmp->ToObject())->getNwcpValue());
+  for (uint32_t i = 0; i < a0Array->Length(); ++i) {
+    v8::Local<v8::Value> tmp = a0Array->Get(Nan::GetCurrentContext(), i).ToLocalChecked();
+    dogatech::soulsifter::Style* x(Nan::ObjectWrap::Unwrap<Style>(tmp->ToObject(Nan::GetCurrentContext()).ToLocalChecked())->getNwcpValue());
     a0.push_back(x);
   }
   obj->style->setChildren(a0);
-
-  info.GetReturnValue().SetUndefined();
 }
 
 NAN_GETTER(Style::getParentIds) {
@@ -283,7 +269,7 @@ NAN_GETTER(Style::getParentIds) {
 
   v8::Local<v8::Array> a = Nan::New<v8::Array>((int) result.size());
   for (int i = 0; i < (int) result.size(); i++) {
-    a->Set(Nan::New<v8::Number>(i), Nan::New<v8::Integer>(result[i]));
+    a->Set(Nan::GetCurrentContext(), Nan::New<v8::Number>(i), Nan::New<v8::Integer>(result[i]));
   }
   info.GetReturnValue().Set(a);
 }
@@ -292,14 +278,12 @@ NAN_SETTER(Style::setParentIds) {
   Style* obj = Nan::ObjectWrap::Unwrap<Style>(info.Holder());
   v8::Local<v8::Array> a0Array = v8::Local<v8::Array>::Cast(value);
   std::vector<int> a0;
-  for (int i = 0; i < a0Array->Length(); ++i) {
-    v8::Local<v8::Value> tmp = a0Array->Get(i);
+  for (uint32_t i = 0; i < a0Array->Length(); ++i) {
+    v8::Local<v8::Value> tmp = a0Array->Get(Nan::GetCurrentContext(), i).ToLocalChecked();
     int x(tmp->IntegerValue());
     a0.push_back(x);
   }
   obj->style->setParentIds(a0);
-
-  info.GetReturnValue().SetUndefined();
 }
 
 NAN_GETTER(Style::getParents) {
@@ -311,7 +295,7 @@ NAN_GETTER(Style::getParents) {
     v8::Local<v8::Object> instance = Style::NewInstance();
     Style* r = Nan::ObjectWrap::Unwrap<Style>(instance);
     r->setNwcpValue((result)[i], false);
-    a->Set(Nan::New<v8::Number>(i), instance);
+    a->Set(Nan::GetCurrentContext(), Nan::New<v8::Number>(i), instance);
   }
   info.GetReturnValue().Set(a);
 }
@@ -320,13 +304,11 @@ NAN_SETTER(Style::setParents) {
   Style* obj = Nan::ObjectWrap::Unwrap<Style>(info.Holder());
   v8::Local<v8::Array> a0Array = v8::Local<v8::Array>::Cast(value);
   std::vector<dogatech::soulsifter::Style*> a0;
-  for (int i = 0; i < a0Array->Length(); ++i) {
-    v8::Local<v8::Value> tmp = a0Array->Get(i);
-    dogatech::soulsifter::Style* x(Nan::ObjectWrap::Unwrap<Style>(tmp->ToObject())->getNwcpValue());
+  for (uint32_t i = 0; i < a0Array->Length(); ++i) {
+    v8::Local<v8::Value> tmp = a0Array->Get(Nan::GetCurrentContext(), i).ToLocalChecked();
+    dogatech::soulsifter::Style* x(Nan::ObjectWrap::Unwrap<Style>(tmp->ToObject(Nan::GetCurrentContext()).ToLocalChecked())->getNwcpValue());
     a0.push_back(x);
   }
   obj->style->setParents(a0);
-
-  info.GetReturnValue().SetUndefined();
 }
 

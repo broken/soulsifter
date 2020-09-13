@@ -75,14 +75,12 @@ void Album::Init(v8::Local<v8::Object> exports) {
   Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("basicGenreConst").ToLocalChecked(), getBasicGenreConst);
 
   constructor.Reset(Nan::GetFunction(tpl).ToLocalChecked());
-  exports->Set(Nan::New<v8::String>("Album").ToLocalChecked(), Nan::GetFunction(tpl).ToLocalChecked());
+  exports->Set(Nan::GetCurrentContext(), Nan::New<v8::String>("Album").ToLocalChecked(), Nan::GetFunction(tpl).ToLocalChecked());
 }
 
 void Album::clear(const Nan::FunctionCallbackInfo<v8::Value>& info) {
   Album* obj = Nan::ObjectWrap::Unwrap<Album>(info.Holder());
   obj->album->clear();
-
-  info.GetReturnValue().SetUndefined();
 }
 
 void Album::findById(const Nan::FunctionCallbackInfo<v8::Value>& info) {
@@ -146,7 +144,7 @@ void Album::findByName(const Nan::FunctionCallbackInfo<v8::Value>& info) {
     v8::Local<v8::Object> instance = Nan::NewInstance(cons).ToLocalChecked();
     Album* o = Nan::ObjectWrap::Unwrap<Album>(instance);
     o->album = (*v)[i];
-    a->Set(Nan::New<v8::Number>(i), instance);
+    a->Set(Nan::GetCurrentContext(), Nan::New<v8::Number>(i), instance);
   }
   delete v;
   info.GetReturnValue().Set(a);
@@ -164,7 +162,7 @@ void Album::findByArtist(const Nan::FunctionCallbackInfo<v8::Value>& info) {
     v8::Local<v8::Object> instance = Nan::NewInstance(cons).ToLocalChecked();
     Album* o = Nan::ObjectWrap::Unwrap<Album>(instance);
     o->album = (*v)[i];
-    a->Set(Nan::New<v8::Number>(i), instance);
+    a->Set(Nan::GetCurrentContext(), Nan::New<v8::Number>(i), instance);
   }
   delete v;
   info.GetReturnValue().Set(a);
@@ -181,7 +179,7 @@ void Album::findAll(const Nan::FunctionCallbackInfo<v8::Value>& info) {
     v8::Local<v8::Object> instance = Nan::NewInstance(cons).ToLocalChecked();
     Album* o = Nan::ObjectWrap::Unwrap<Album>(instance);
     o->album = (*v)[i];
-    a->Set(Nan::New<v8::Number>(i), instance);
+    a->Set(Nan::GetCurrentContext(), Nan::New<v8::Number>(i), instance);
   }
   delete v;
   info.GetReturnValue().Set(a);
@@ -226,8 +224,6 @@ NAN_SETTER(Album::setId) {
   Album* obj = Nan::ObjectWrap::Unwrap<Album>(info.Holder());
   int a0(value->IntegerValue());
   obj->album->setId(a0);
-
-  info.GetReturnValue().SetUndefined();
 }
 
 NAN_GETTER(Album::getName) {
@@ -241,8 +237,6 @@ NAN_SETTER(Album::setName) {
   Album* obj = Nan::ObjectWrap::Unwrap<Album>(info.Holder());
   string a0(*v8::String::Utf8Value(value->ToString()));
   obj->album->setName(a0);
-
-  info.GetReturnValue().SetUndefined();
 }
 
 NAN_GETTER(Album::getArtist) {
@@ -256,8 +250,6 @@ NAN_SETTER(Album::setArtist) {
   Album* obj = Nan::ObjectWrap::Unwrap<Album>(info.Holder());
   string a0(*v8::String::Utf8Value(value->ToString()));
   obj->album->setArtist(a0);
-
-  info.GetReturnValue().SetUndefined();
 }
 
 NAN_GETTER(Album::getCoverFilepath) {
@@ -271,8 +263,6 @@ NAN_SETTER(Album::setCoverFilepath) {
   Album* obj = Nan::ObjectWrap::Unwrap<Album>(info.Holder());
   string a0(*v8::String::Utf8Value(value->ToString()));
   obj->album->setCoverFilepath(a0);
-
-  info.GetReturnValue().SetUndefined();
 }
 
 NAN_GETTER(Album::getMixed) {
@@ -286,8 +276,6 @@ NAN_SETTER(Album::setMixed) {
   Album* obj = Nan::ObjectWrap::Unwrap<Album>(info.Holder());
   bool a0(value->BooleanValue());
   obj->album->setMixed(a0);
-
-  info.GetReturnValue().SetUndefined();
 }
 
 NAN_GETTER(Album::getLabel) {
@@ -301,8 +289,6 @@ NAN_SETTER(Album::setLabel) {
   Album* obj = Nan::ObjectWrap::Unwrap<Album>(info.Holder());
   string a0(*v8::String::Utf8Value(value->ToString()));
   obj->album->setLabel(a0);
-
-  info.GetReturnValue().SetUndefined();
 }
 
 NAN_GETTER(Album::getCatalogId) {
@@ -316,8 +302,6 @@ NAN_SETTER(Album::setCatalogId) {
   Album* obj = Nan::ObjectWrap::Unwrap<Album>(info.Holder());
   string a0(*v8::String::Utf8Value(value->ToString()));
   obj->album->setCatalogId(a0);
-
-  info.GetReturnValue().SetUndefined();
 }
 
 NAN_GETTER(Album::getReleaseDateYear) {
@@ -331,8 +315,6 @@ NAN_SETTER(Album::setReleaseDateYear) {
   Album* obj = Nan::ObjectWrap::Unwrap<Album>(info.Holder());
   int a0(value->IntegerValue());
   obj->album->setReleaseDateYear(a0);
-
-  info.GetReturnValue().SetUndefined();
 }
 
 NAN_GETTER(Album::getReleaseDateMonth) {
@@ -346,8 +328,6 @@ NAN_SETTER(Album::setReleaseDateMonth) {
   Album* obj = Nan::ObjectWrap::Unwrap<Album>(info.Holder());
   int a0(value->IntegerValue());
   obj->album->setReleaseDateMonth(a0);
-
-  info.GetReturnValue().SetUndefined();
 }
 
 NAN_GETTER(Album::getReleaseDateDay) {
@@ -361,8 +341,6 @@ NAN_SETTER(Album::setReleaseDateDay) {
   Album* obj = Nan::ObjectWrap::Unwrap<Album>(info.Holder());
   int a0(value->IntegerValue());
   obj->album->setReleaseDateDay(a0);
-
-  info.GetReturnValue().SetUndefined();
 }
 
 NAN_GETTER(Album::getBasicGenreId) {
@@ -376,8 +354,6 @@ NAN_SETTER(Album::setBasicGenreId) {
   Album* obj = Nan::ObjectWrap::Unwrap<Album>(info.Holder());
   int a0(value->IntegerValue());
   obj->album->setBasicGenreId(a0);
-
-  info.GetReturnValue().SetUndefined();
 }
 
 NAN_GETTER(Album::getBasicGenre) {
@@ -412,10 +388,8 @@ NAN_GETTER(Album::getBasicGenreConst) {
 
 NAN_SETTER(Album::setBasicGenre) {
   Album* obj = Nan::ObjectWrap::Unwrap<Album>(info.Holder());
-  dogatech::soulsifter::BasicGenre* a0tmp(Nan::ObjectWrap::Unwrap<BasicGenre>(value->ToObject())->getNwcpValue());
+  dogatech::soulsifter::BasicGenre* a0tmp(Nan::ObjectWrap::Unwrap<BasicGenre>(value->ToObject(Nan::GetCurrentContext()).ToLocalChecked())->getNwcpValue());
   dogatech::soulsifter::BasicGenre& a0 = *a0tmp;
   obj->album->setBasicGenre(a0);
-
-  info.GetReturnValue().SetUndefined();
 }
 

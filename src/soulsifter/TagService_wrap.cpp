@@ -42,29 +42,23 @@ void TagService::Init(v8::Local<v8::Object> exports) {
   Nan::SetMethod(tpl, "updateSongAttributesFromTags", updateSongAttributesFromTags);
 
   constructor.Reset(Nan::GetFunction(tpl).ToLocalChecked());
-  exports->Set(Nan::New<v8::String>("TagService").ToLocalChecked(), Nan::GetFunction(tpl).ToLocalChecked());
+  exports->Set(Nan::GetCurrentContext(), Nan::New<v8::String>("TagService").ToLocalChecked(), Nan::GetFunction(tpl).ToLocalChecked());
 }
 
 void TagService::readId3v2Tag(const Nan::FunctionCallbackInfo<v8::Value>& info) {
-  dogatech::soulsifter::Song* a0(Nan::ObjectWrap::Unwrap<Song>(info[0]->ToObject())->getNwcpValue());
+  dogatech::soulsifter::Song* a0(Nan::ObjectWrap::Unwrap<Song>(info[0]->ToObject(Nan::GetCurrentContext()).ToLocalChecked())->getNwcpValue());
 
       dogatech::soulsifter::TagService::readId3v2Tag(a0);
-
-  info.GetReturnValue().SetUndefined();
 }
 
 void TagService::writeId3v2Tag(const Nan::FunctionCallbackInfo<v8::Value>& info) {
-  dogatech::soulsifter::Song* a0(Nan::ObjectWrap::Unwrap<Song>(info[0]->ToObject())->getNwcpValue());
+  dogatech::soulsifter::Song* a0(Nan::ObjectWrap::Unwrap<Song>(info[0]->ToObject(Nan::GetCurrentContext()).ToLocalChecked())->getNwcpValue());
 
       dogatech::soulsifter::TagService::writeId3v2Tag(a0);
-
-  info.GetReturnValue().SetUndefined();
 }
 
 void TagService::updateSongAttributesFromTags(const Nan::FunctionCallbackInfo<v8::Value>& info) {
 
       dogatech::soulsifter::TagService::updateSongAttributesFromTags();
-
-  info.GetReturnValue().SetUndefined();
 }
 

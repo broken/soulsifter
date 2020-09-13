@@ -44,27 +44,25 @@ void NewSongManager::Init(v8::Local<v8::Object> exports) {
   Nan::SetPrototypeMethod(tpl, "trashMusicFile", trashMusicFile);
 
   constructor.Reset(Nan::GetFunction(tpl).ToLocalChecked());
-  exports->Set(Nan::New<v8::String>("NewSongManager").ToLocalChecked(), Nan::GetFunction(tpl).ToLocalChecked());
+  exports->Set(Nan::GetCurrentContext(), Nan::New<v8::String>("NewSongManager").ToLocalChecked(), Nan::GetFunction(tpl).ToLocalChecked());
 }
 
 void NewSongManager::import(const Nan::FunctionCallbackInfo<v8::Value>& info) {
   NewSongManager* obj = Nan::ObjectWrap::Unwrap<NewSongManager>(info.Holder());
   v8::Local<v8::Array> a0Array = v8::Local<v8::Array>::Cast(info[0]);
   std::vector<string> a0;
-  for (int i = 0; i < a0Array->Length(); ++i) {
-    v8::Local<v8::Value> tmp = a0Array->Get(i);
+  for (uint32_t i = 0; i < a0Array->Length(); ++i) {
+    v8::Local<v8::Value> tmp = a0Array->Get(Nan::GetCurrentContext(), i).ToLocalChecked();
     string x(*v8::String::Utf8Value(tmp->ToString()));
     a0.push_back(x);
   }
   obj->newsongmanager->import(a0);
-
-  info.GetReturnValue().SetUndefined();
 }
 
 void NewSongManager::nextSong(const Nan::FunctionCallbackInfo<v8::Value>& info) {
   NewSongManager* obj = Nan::ObjectWrap::Unwrap<NewSongManager>(info.Holder());
-  dogatech::soulsifter::Song* a0(Nan::ObjectWrap::Unwrap<Song>(info[0]->ToObject())->getNwcpValue());
-  dogatech::soulsifter::Song* a1(Nan::ObjectWrap::Unwrap<Song>(info[1]->ToObject())->getNwcpValue());
+  dogatech::soulsifter::Song* a0(Nan::ObjectWrap::Unwrap<Song>(info[0]->ToObject(Nan::GetCurrentContext()).ToLocalChecked())->getNwcpValue());
+  dogatech::soulsifter::Song* a1(Nan::ObjectWrap::Unwrap<Song>(info[1]->ToObject(Nan::GetCurrentContext()).ToLocalChecked())->getNwcpValue());
   bool result =  obj->newsongmanager->nextSong(a0, a1);
 
   info.GetReturnValue().Set(Nan::New<v8::Boolean>(result));
@@ -79,7 +77,7 @@ void NewSongManager::coverImagePath(const Nan::FunctionCallbackInfo<v8::Value>& 
 
 void NewSongManager::processSong(const Nan::FunctionCallbackInfo<v8::Value>& info) {
   NewSongManager* obj = Nan::ObjectWrap::Unwrap<NewSongManager>(info.Holder());
-  dogatech::soulsifter::Song* a0(Nan::ObjectWrap::Unwrap<Song>(info[0]->ToObject())->getNwcpValue());
+  dogatech::soulsifter::Song* a0(Nan::ObjectWrap::Unwrap<Song>(info[0]->ToObject(Nan::GetCurrentContext()).ToLocalChecked())->getNwcpValue());
   bool result =  obj->newsongmanager->processSong(a0);
 
   info.GetReturnValue().Set(Nan::New<v8::Boolean>(result));
@@ -87,9 +85,7 @@ void NewSongManager::processSong(const Nan::FunctionCallbackInfo<v8::Value>& inf
 
 void NewSongManager::trashMusicFile(const Nan::FunctionCallbackInfo<v8::Value>& info) {
   NewSongManager* obj = Nan::ObjectWrap::Unwrap<NewSongManager>(info.Holder());
-  dogatech::soulsifter::Song* a0(Nan::ObjectWrap::Unwrap<Song>(info[0]->ToObject())->getNwcpValue());
+  dogatech::soulsifter::Song* a0(Nan::ObjectWrap::Unwrap<Song>(info[0]->ToObject(Nan::GetCurrentContext()).ToLocalChecked())->getNwcpValue());
   obj->newsongmanager->trashMusicFile(a0);
-
-  info.GetReturnValue().SetUndefined();
 }
 

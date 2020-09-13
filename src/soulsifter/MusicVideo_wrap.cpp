@@ -58,14 +58,12 @@ void MusicVideo::Init(v8::Local<v8::Object> exports) {
   Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("thumbnailFilePath").ToLocalChecked(), getThumbnailFilePath, setThumbnailFilePath);
 
   constructor.Reset(Nan::GetFunction(tpl).ToLocalChecked());
-  exports->Set(Nan::New<v8::String>("MusicVideo").ToLocalChecked(), Nan::GetFunction(tpl).ToLocalChecked());
+  exports->Set(Nan::GetCurrentContext(), Nan::New<v8::String>("MusicVideo").ToLocalChecked(), Nan::GetFunction(tpl).ToLocalChecked());
 }
 
 void MusicVideo::clear(const Nan::FunctionCallbackInfo<v8::Value>& info) {
   MusicVideo* obj = Nan::ObjectWrap::Unwrap<MusicVideo>(info.Holder());
   obj->musicvideo->clear();
-
-  info.GetReturnValue().SetUndefined();
 }
 
 void MusicVideo::findById(const Nan::FunctionCallbackInfo<v8::Value>& info) {
@@ -95,7 +93,7 @@ void MusicVideo::findAll(const Nan::FunctionCallbackInfo<v8::Value>& info) {
     v8::Local<v8::Object> instance = Nan::NewInstance(cons).ToLocalChecked();
     MusicVideo* o = Nan::ObjectWrap::Unwrap<MusicVideo>(instance);
     o->musicvideo = (*v)[i];
-    a->Set(Nan::New<v8::Number>(i), instance);
+    a->Set(Nan::GetCurrentContext(), Nan::New<v8::Number>(i), instance);
   }
   delete v;
   info.GetReturnValue().Set(a);
@@ -133,8 +131,6 @@ NAN_SETTER(MusicVideo::setId) {
   MusicVideo* obj = Nan::ObjectWrap::Unwrap<MusicVideo>(info.Holder());
   int a0(value->IntegerValue());
   obj->musicvideo->setId(a0);
-
-  info.GetReturnValue().SetUndefined();
 }
 
 NAN_GETTER(MusicVideo::getFilePath) {
@@ -148,8 +144,6 @@ NAN_SETTER(MusicVideo::setFilePath) {
   MusicVideo* obj = Nan::ObjectWrap::Unwrap<MusicVideo>(info.Holder());
   string a0(*v8::String::Utf8Value(value->ToString()));
   obj->musicvideo->setFilePath(a0);
-
-  info.GetReturnValue().SetUndefined();
 }
 
 NAN_GETTER(MusicVideo::getThumbnailFilePath) {
@@ -163,7 +157,5 @@ NAN_SETTER(MusicVideo::setThumbnailFilePath) {
   MusicVideo* obj = Nan::ObjectWrap::Unwrap<MusicVideo>(info.Holder());
   string a0(*v8::String::Utf8Value(value->ToString()));
   obj->musicvideo->setThumbnailFilePath(a0);
-
-  info.GetReturnValue().SetUndefined();
 }
 
