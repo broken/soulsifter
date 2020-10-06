@@ -65,7 +65,7 @@ vector<string> MusicVideoService::downloadAudio(const string& url) {
 
   FILE *fpipe;
   stringstream command;
-  command << "cd " << tmpPath << "; youtube-dl --print-json --write-all-thumbnails --restrict-filenames --extract-audio --audio-format mp3 --audio-quality 0 --quiet " << url;
+  command << "cd " << tmpPath << "; youtube-dl --print-json --write-thumbnail --restrict-filenames --extract-audio --audio-format mp3 --audio-quality 0 --quiet " << url;
   if (!(fpipe = (FILE*)popen(command.str().c_str(), "r"))) {
     LOG(WARNING) << "Problem with youtube-dl pipe.";
     return filepaths;
@@ -95,6 +95,10 @@ vector<string> MusicVideoService::downloadAudio(const string& url) {
       string baseFileName = ptree.get<string>("_filename").substr(0, ptree.get<string>("_filename").size() - ptree.get<string>("ext").size());
       song->setFilepath(SoulSifterSettings::getInstance().get<string>("dir.tmp") + '/' + baseFileName + "mp3");
       album->setCoverFilepath(SoulSifterSettings::getInstance().get<string>("dir.tmp") + '/' + baseFileName + "jpg");
+      if (!boost::filesystem::exists(album->getCoverFilepath())) {
+        album->setCoverFilepath(SoulSifterSettings::getInstance().get<string>("dir.tmp") + '/' + baseFileName + "webp");
+      }
+      // TODO check again and throw warning if still missing
       string title = ptree.get<string>("title");
       if (!MusicManager::getInstance().splitArtistAndTitle(title, song)) {
         song->setArtist(ptree.get<string>("uploader"));
