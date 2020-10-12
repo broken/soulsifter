@@ -216,10 +216,6 @@ void MusicManager::writeTagsToSong(Song* song) {
   
   void MusicManager::updateSongWithChanges(const Song& song, Song* updatedSong) {
     *updatedSong = song;
-    
-    // Remove " - Topic" from artist field
-    boost::regex artistTopicRegex(" - Topic$");
-    updatedSong->setArtist(boost::regex_replace(updatedSong->getArtist(), artistTopicRegex, ""));
 
     // compare with last
     if (lastParsedSong && lastSongFixed) {

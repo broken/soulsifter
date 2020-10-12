@@ -101,8 +101,11 @@ vector<string> MusicVideoService::downloadAudio(const string& url) {
       // TODO check again and throw warning if still missing
       string title = ptree.get<string>("title");
       if (!MusicManager::getInstance().splitArtistAndTitle(title, song)) {
-        song->setArtist(ptree.get<string>("uploader"));
         song->setTitle(title);
+        song->setArtist(ptree.get<string>("uploader"));
+        // Remove " - Topic" from artist field
+        boost::regex artistTopicRegex(" - Topic$");
+        song->setArtist(boost::regex_replace(song->getArtist(), artistTopicRegex, ""));
       }
       song->setLowQuality(true);
       song->setCurator(ptree.get<string>("uploader"));
