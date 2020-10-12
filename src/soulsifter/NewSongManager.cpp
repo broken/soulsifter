@@ -45,13 +45,8 @@ void NewSongManager::import(const vector<string>& filepaths) {
   // loadNextSong();
 }
 
-// This was ported from TagInfoController. In there I had a TODO to move this over
-// to the FilesToAdd object.
 void NewSongManager::preprocessAllFiles(const vector<filesystem::path>& filepaths) {
-  
-  // TODO So I'd like to do this all in the FilesToAdd class, and should slowly move this over, but
-  // I don't want to rewrite a lot of code, so I'll leverage this until porting the code over
-  // to c++.
+
   for (const filesystem::path& filepath : filepaths) {
 
     // skip files starting with period
