@@ -31,6 +31,7 @@
     "@polymer/paper-dialog": "^3.0.1",
     "@polymer/paper-input": "^3.0.2",
     "@polymer/paper-radio-button": "^3.0.1",
+    "@polymer/paper-toast": "^3.0.1",
     "@polymer/paper-toggle-button": "^3.0.1",
     "@polymer/polymer": "^3.2.0",
     "async": "^3.0.1",
