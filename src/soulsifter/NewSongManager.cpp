@@ -155,6 +155,7 @@ bool NewSongManager::nextSong(Song* updatedSong, Song* originalSong) {
     [[NSFileManager defaultManager] trashItemAtURL:fileToTrash resultingItemURL:nil error:nil];
   }*/
   filesToTrash.clear();
+  MusicManager::getInstance().clearLastSongs();
   return false;
 }
 

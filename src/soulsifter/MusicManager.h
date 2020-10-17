@@ -38,6 +38,7 @@ public:
     void updateSongWithChanges(const Song& song, Song* updatedSong);
     void setNewSongChanges(const Song& song);
     void updateLastSongAlbumArtWithImage(const string& filepath);
+    void clearLastSongs();
     
     // paths
     string getCopyToPath();

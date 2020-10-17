@@ -331,6 +331,11 @@ void MusicManager::writeTagsToSong(Song* song) {
         album->setCoverFilepath(destpath.str());
         album->update();
     }
+    
+    void MusicManager::clearLastSongs() {
+      delete lastParsedSong;
+      lastParsedSong = NULL;
+    }
                 
 # pragma mark paths
  
