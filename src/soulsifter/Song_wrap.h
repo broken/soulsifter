@@ -24,6 +24,7 @@ class Song : public Nan::ObjectWrap {
   static void findById(const Nan::FunctionCallbackInfo<v8::Value>& info);
   static void findByFilepath(const Nan::FunctionCallbackInfo<v8::Value>& info);
   static void findByGoogleSongId(const Nan::FunctionCallbackInfo<v8::Value>& info);
+  static void findByYoutubeSongId(const Nan::FunctionCallbackInfo<v8::Value>& info);
   static void findByRESongId(const Nan::FunctionCallbackInfo<v8::Value>& info);
   static void findAll(const Nan::FunctionCallbackInfo<v8::Value>& info);
   static void update(const Nan::FunctionCallbackInfo<v8::Value>& info);
@@ -69,6 +70,8 @@ class Song : public Nan::ObjectWrap {
   static void setLowQuality(v8::Local<v8::String> property, v8::Local<v8::Value> value, const Nan::PropertyCallbackInfo<void>& info);
   static void getGoogleSongId(v8::Local<v8::String> property, const Nan::PropertyCallbackInfo<v8::Value>& info);
   static void setGoogleSongId(v8::Local<v8::String> property, v8::Local<v8::Value> value, const Nan::PropertyCallbackInfo<void>& info);
+  static void getYoutubeSongId(v8::Local<v8::String> property, const Nan::PropertyCallbackInfo<v8::Value>& info);
+  static void setYoutubeSongId(v8::Local<v8::String> property, v8::Local<v8::Value> value, const Nan::PropertyCallbackInfo<void>& info);
   static void getDurationInMs(v8::Local<v8::String> property, const Nan::PropertyCallbackInfo<v8::Value>& info);
   static void setDurationInMs(v8::Local<v8::String> property, v8::Local<v8::Value> value, const Nan::PropertyCallbackInfo<void>& info);
   static void getCurator(v8::Local<v8::String> property, const Nan::PropertyCallbackInfo<v8::Value>& info);
