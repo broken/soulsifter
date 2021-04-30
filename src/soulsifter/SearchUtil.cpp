@@ -110,6 +110,7 @@ struct Atom {
     S_RATING,
     S_COMMENT,
     S_CURATOR,
+    S_ENERGY,
     S_TRASHED,
     S_LOW_QUALITY,
     A_ID,
@@ -146,7 +147,7 @@ void splitString(const string& query, vector<string>* atoms) {
 
 bool parse(const string& queryFragment, Atom* atom) {
   atom->clear();
-  boost::regex regex("^(-)?((id|a|artist|t|title|remixer|r|rating|comment|c|curator|trashed|lowq|aid|n|album|m|mixed|l|label|y|year|q|query|limit):)?(.+)$");
+  boost::regex regex("^(-)?((id|a|artist|t|title|remixer|r|rating|comment|c|curator|e|energy|trashed|lowq|aid|n|album|m|mixed|l|label|y|year|q|query|limit):)?(.+)$");
   boost::smatch match;
   if (!boost::regex_match(queryFragment, match, regex)) {
     return false;
@@ -173,6 +174,8 @@ bool parse(const string& queryFragment, Atom* atom) {
       atom->type = Atom::S_COMMENT;
     } else if (!match[3].compare("c") || !match[3].compare("curator")) {
       atom->type = Atom::S_CURATOR;
+    } else if (!match[3].compare("e") || !match[3].compare("energy")) {
+      atom->type = Atom::S_ENERGY;
     } else if (!match[3].compare("trashed")) {
       atom->type = Atom::S_TRASHED;
     } else if (!match[3].compare("lowq")) {
@@ -208,7 +211,7 @@ bool parse(const string& queryFragment, Atom* atom) {
   return true;
 }
 
-string buildQueryPredicate(const string& query, int* limit) {
+string buildQueryPredicate(const string& query, int* limit, int* energy) {
   // Break query up into fragments
   vector<string> fragments;
   splitString(query, &fragments);
@@ -260,12 +263,15 @@ string buildQueryPredicate(const string& query, int* limit) {
     } else if (atom.type == Atom::LIMIT) {
       *limit = atoi(atom.value.c_str());
       ss << "true";
+    } else if (atom.type == Atom::S_ENERGY) {
+      *energy = atoi(atom.value.c_str());
+      ss << "true";
     }
   }
   return ss.str();
 }
 
-string buildOptionPredicate(const int bpm, const set<string>& keys, const vector<Style*>& styles, const vector<Song*>& songsToOmit, int limit, const int orderBy) {
+string buildOptionPredicate(const int bpm, const set<string>& keys, const vector<Style*>& styles, const vector<Song*>& songsToOmit, const int limit, const int energy, const int orderBy) {
   stringstream ss;
   for (const string& key : keys) {
     if (CamelotKeys::rmap.find(key) != CamelotKeys::rmap.end()) {
@@ -353,6 +359,10 @@ string buildOptionPredicate(const int bpm, const set<string>& keys, const vector
     if (min_bpm < 90) ss << " or bpm between " << min_bpm * 2 << " and " << max_bpm * 2;
     ss << ")";
   }
+  if (energy > 0) {
+    int diff = SoulSifterSettings::getInstance().get<int>("search.energyGap");
+    ss << " and (energy between " << energy - diff << " and " << energy + diff << ")";
+  }
   if (styles.size() > 0) {
     ss << " and exists (select 1 from SongStyles g where s.id = g.songId and g.styleId in (";
     string separator("");
@@ -392,6 +402,7 @@ vector<Song*>* SearchUtil::searchSongs(const string& query,
                                        const vector<Style*>& styles,
                                        const vector<Song*>& songsToOmit,
                                        int limit,
+                                       int energy,
                                        const bool musicVideoMode,
                                        const int orderBy) {
   LOG(INFO) << "q:" << query << ", bpm:" << bpm << ", keys:" << setToCsv(keys) << ", styles:" << ", limit:" << limit;
@@ -401,8 +412,8 @@ vector<Song*>* SearchUtil::searchSongs(const string& query,
     ss << "select s.*, s.id as songid, s.artist as songartist, group_concat(ss.styleid) as styleIds, a.*, a.id as albumid, a.artist as albumartist, v.filepath as mvFilePath, v.thumbnailFilePath as mvTnFilePath from Songs s inner join Albums a on s.albumid = a.id inner join MusicVideos v on s.musicVideoId=v.id left outer join SongStyles ss on ss.songid=s.id where true";
   else
     ss << "select s.*, s.id as songid, s.artist as songartist, group_concat(ss.styleid) as styleIds, a.*, a.id as albumid, a.artist as albumartist from Songs s inner join Albums a on s.albumid = a.id left outer join SongStyles ss on ss.songid=s.id where true";
-  ss << buildQueryPredicate(query, &limit);
-  ss << buildOptionPredicate(bpm, keys, styles, songsToOmit, limit, orderBy);
+  ss << buildQueryPredicate(query, &limit, &energy);
+  ss << buildOptionPredicate(bpm, keys, styles, songsToOmit, limit, energy, orderBy);
 
   LOG(DEBUG) << "Query:";
   LOG(DEBUG) << ss.str();

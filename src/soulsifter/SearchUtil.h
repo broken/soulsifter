@@ -30,6 +30,7 @@ public:
                                     const vector<Style*>& styles,
                                     const vector<Song*>& songsToOmit,
                                     int limit,
+                                    int energy=0,
                                     const bool musicVideoMode=false,
                                     const int orderBy=DATE_ADDED);
 };
