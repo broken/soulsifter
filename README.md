@@ -51,19 +51,25 @@ NW.JS Build Directions
 ======================
 There is now just one reason I need to manually build nwjs:
 * drag & drop to external native apps
+
 Old reasons:
 * audio decoding using proprietary codecs
 
+The last run was using:
+* nw 0.53.1 
+* xcodebuild -version == 12.5
+* xcodebuild -showsdks == 11.3
+* python --version == 2.7.18
+
 ```
-Following for nw40 compilation (xcode 10.3 w/ 10.14 sdk):
 # depot tools installation: https://commondatastorage.googleapis.com/chrome-infra-docs/flat/depot_tools/docs/html/depot_tools_tutorial.html#_setting_up
 # Use thier buildbot for confirmation of steps: http://buildbot-master.nwjs.io:8010/waterfall
 # Instructions: http://docs.nwjs.io/en/latest/For%20Developers/Building%20NW.js/
 # Hints on building ffmpeg which should be included below: https://github.com/butterproject/butter-desktop/issues/339
 
-export NWV=48.1
+export NWV=53.1
 export NWV_MINOR=$(echo nw$NWV | awk -F . '{print $1}' )
-export XCV=11.0
+export XCV=11.3
 #sudo xcode-select -s /Applications/Xcode$XCV.app/Contents/Developer/
 xcode-select -p
 mkdir $(printf "nw%s_sdk_xcode%s" $NWV $XCV)
@@ -112,3 +118,5 @@ unset GYP_DEFINES
 unset GYP_CHROMIUM_NO_ACTION
 sudo xcode-select -s /Applications/Xcode.app/Contents/Developer/
 ```
+
+After create directory soulsifter/cache/0.$NWV-sdk and copy the files in src/out/nw/nwdist
