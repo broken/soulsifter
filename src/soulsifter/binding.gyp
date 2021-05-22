@@ -99,7 +99,7 @@
           "/usr/local/lib/libboost_thread-mt.dylib",
           "/usr/local/lib/libg3logger.dylib",
           "/usr/local/lib/libmad.0.2.1.dylib",
-          "/usr/local/lib/libmysqlclient.20.dylib",
+          "/usr/local/lib/libmysqlclient.21.dylib",
           "/usr/local/lib/libmysqlcppconn.7.dylib",
           "/usr/local/lib/libtag.1.17.0.dylib",
         ],
