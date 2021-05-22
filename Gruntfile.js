@@ -6,7 +6,7 @@
     builtNodeModulesDir: 'build/dev',
     nwjs: {
       options: {
-        version: '0.48.1', // Version of node-webkit (http://dl.nwjs.io)
+        version: '0.53.1', // Version of node-webkit (http://dl.nwjs.io)
         buildDir: './dist', // Where the build version of my node-webkit app is saved
         credits: './src/credits.html', // Mac credits
         macIcns: './DVDRipper.icns', // Path to the Mac icon file
@@ -29,7 +29,7 @@
         },
       },
       nwgypconfigure: {
-        command: 'nw-gyp configure --arch=x64 --target=0.48.1',
+        command: 'nw-gyp configure --arch=x64 --target=0.53.1',
         options: {
           execOptions: {
             cwd: 'src/soulsifter',
