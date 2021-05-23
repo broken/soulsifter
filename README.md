@@ -107,7 +107,7 @@ gn gen src/out/nw '--args=is_debug=false is_component_ffmpeg=true target_cpu="x6
 python src/build/gyp_chromium -I src/third_party/node-nw/common.gypi src/third_party/node-nw/node.gyp
 vim src/content/app_shim_remote_cocoa/web_drag_source_mac.mm
 # edit extensis lines for osx drag&drop
-# https://github.com/broken/node-webkit-dragout/blob/master/src/content/browser/web_contents/web_drag_source_mac.mm
+# https://github.com/broken/node-webkit-dragout/blob/master/src/content/app_shim_remote_cocoa/web_drag_source_mac.mm
 # Building nwjs will take all f*@#ing day and all the cpu
 ninja -C src/out/nw nwjs
 ninja -C src/out/Release node
