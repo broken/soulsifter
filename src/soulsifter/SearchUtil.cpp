@@ -419,7 +419,7 @@ vector<Song*>* SearchUtil::searchSongs(const string& query,
   LOG(DEBUG) << ss.str();
 
   vector<Song*>* songs = new vector<Song*>();
-  for (int i = 0; i < 3; ++i) {
+  for (int i = 0; i < 2; ++i) {
     try {
       sql::Statement *stmt = MysqlAccess::getInstance().createStatement();
       sql::ResultSet *rs = stmt->executeQuery(ss.str());
@@ -448,8 +448,6 @@ vector<Song*>* SearchUtil::searchSongs(const string& query,
       rs->close();
       delete rs;
       delete stmt;
-
-      return songs;
     } catch (sql::SQLException &e) {
       LOG(WARNING) << "ERROR: SQLException in " << __FILE__ << " (" << __func__<< ") on line " << __LINE__;
       LOG(WARNING) << "ERROR: " << e.what() << " (MySQL error code: " << e.getErrorCode() << ", SQLState: " << e.getSQLState() << ")";
@@ -457,7 +455,8 @@ vector<Song*>* SearchUtil::searchSongs(const string& query,
       LOG(INFO) << (reconnected ? "Successful" : "Failed") << " mysql reconnection";
     }
   }
-  LOG(FATAL) << "Failed searching songs";
+
+  return songs;
 }
   
 }  // namespace soulsifter
