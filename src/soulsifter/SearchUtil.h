@@ -9,6 +9,7 @@
 #ifndef __soul_sifter__Search__
 #define __soul_sifter__Search__
 
+#include <functional>
 #include <set>
 #include <string>
 #include <vector>
@@ -30,9 +31,10 @@ public:
                                     const vector<Style*>& styles,
                                     const vector<Song*>& songsToOmit,
                                     int limit,
-                                    int energy=0,
-                                    const bool musicVideoMode=false,
-                                    const int orderBy=DATE_ADDED);
+                                    int energy = 0,
+                                    const bool musicVideoMode = false,
+                                    const int orderBy = DATE_ADDED,
+                                    std::function<void(string)> = {});
 };
   
 }  // namespace soulsifter

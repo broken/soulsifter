@@ -73,8 +73,14 @@ void SearchUtil::searchSongs(const Nan::FunctionCallbackInfo<v8::Value>& info) {
   int a6(info[6]->IntegerValue());
   bool a7(info[7]->BooleanValue());
   int a8(info[8]->IntegerValue());
+  Nan::Callback cb;
+  cb.Reset(info[9].As<v8::Function>());
+  auto callbackFn = [&cb](string msg) {
+    v8::Local<v8::Value> vs = Nan::New<v8::String>(msg).ToLocalChecked();
+    cb.Call(1, &vs);
+  };
   std::vector<dogatech::soulsifter::Song*>* result =
-      dogatech::soulsifter::SearchUtil::searchSongs(a0, a1, a2, a3, a4, a5, a6, a7, a8);
+      dogatech::soulsifter::SearchUtil::searchSongs(a0, a1, a2, a3, a4, a5, a6, a7, a8, callbackFn);
 
   v8::Local<v8::Array> a = Nan::New<v8::Array>((int) result->size());
   for (int i = 0; i < (int) result->size(); i++) {
@@ -86,4 +92,3 @@ void SearchUtil::searchSongs(const Nan::FunctionCallbackInfo<v8::Value>& info) {
   delete result;
   info.GetReturnValue().Set(a);
 }
-

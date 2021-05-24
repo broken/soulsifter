@@ -404,7 +404,8 @@ vector<Song*>* SearchUtil::searchSongs(const string& query,
                                        int limit,
                                        int energy,
                                        const bool musicVideoMode,
-                                       const int orderBy) {
+                                       const int orderBy,
+                                       std::function<void(string)> errorCallback) {
   LOG(INFO) << "q:" << query << ", bpm:" << bpm << ", keys:" << setToCsv(keys) << ", styles:" << ", limit:" << limit;
 
   stringstream ss;
@@ -419,7 +420,8 @@ vector<Song*>* SearchUtil::searchSongs(const string& query,
   LOG(DEBUG) << ss.str();
 
   vector<Song*>* songs = new vector<Song*>();
-  for (int i = 0; i < 2; ++i) {
+  int i = 0;
+  for (; i < 2; ++i) {
     try {
       sql::Statement *stmt = MysqlAccess::getInstance().createStatement();
       sql::ResultSet *rs = stmt->executeQuery(ss.str());
@@ -451,8 +453,13 @@ vector<Song*>* SearchUtil::searchSongs(const string& query,
     } catch (sql::SQLException &e) {
       LOG(WARNING) << "ERROR: SQLException in " << __FILE__ << " (" << __func__<< ") on line " << __LINE__;
       LOG(WARNING) << "ERROR: " << e.what() << " (MySQL error code: " << e.getErrorCode() << ", SQLState: " << e.getSQLState() << ")";
-      bool reconnected = MysqlAccess::getInstance().reconnect();
-      LOG(INFO) << (reconnected ? "Successful" : "Failed") << " mysql reconnection";
+      if (i == 0) {
+        bool reconnected = MysqlAccess::getInstance().reconnect();
+        LOG(INFO) << (reconnected ? "Successful" : "Failed") << " mysql reconnection";
+      } else {
+        if (errorCallback) errorCallback(e.what());
+        else LOG(WARNING) << "Undefined callback. Unable to send error.";
+      }
     }
   }
 
