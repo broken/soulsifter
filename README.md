@@ -119,4 +119,4 @@ unset GYP_CHROMIUM_NO_ACTION
 sudo xcode-select -s /Applications/Xcode.app/Contents/Developer/
 ```
 
-After create directory soulsifter/cache/0.$NWV-sdk and copy the files in src/out/nw/nwdist
+After create directory soulsifter/cache/0.$NWV-sdk/osx64 and copy the files in src/out/nw/nwdist
