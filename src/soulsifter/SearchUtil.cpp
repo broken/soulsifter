@@ -450,6 +450,8 @@ vector<Song*>* SearchUtil::searchSongs(const string& query,
       rs->close();
       delete rs;
       delete stmt;
+
+      return songs;
     } catch (sql::SQLException &e) {
       LOG(WARNING) << "ERROR: SQLException in " << __FILE__ << " (" << __func__<< ") on line " << __LINE__;
       LOG(WARNING) << "ERROR: " << e.what() << " (MySQL error code: " << e.getErrorCode() << ", SQLState: " << e.getSQLState() << ")";
