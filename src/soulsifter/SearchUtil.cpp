@@ -111,6 +111,7 @@ struct Atom {
     S_COMMENT,
     S_CURATOR,
     S_ENERGY,
+    S_BPM,
     S_TRASHED,
     S_LOW_QUALITY,
     A_ID,
@@ -147,7 +148,7 @@ void splitString(const string& query, vector<string>* atoms) {
 
 bool parse(const string& queryFragment, Atom* atom) {
   atom->clear();
-  boost::regex regex("^(-)?((id|a|artist|t|title|remixer|r|rating|comment|c|curator|e|energy|trashed|lowq|aid|n|album|m|mixed|l|label|y|year|q|query|limit):)?(.+)$");
+  boost::regex regex("^(-)?((id|a|artist|t|title|remixer|r|rating|comment|c|curator|e|energy|bpm|trashed|lowq|aid|n|album|m|mixed|l|label|y|year|q|query|limit):)?(.+)$");
   boost::smatch match;
   if (!boost::regex_match(queryFragment, match, regex)) {
     return false;
@@ -176,6 +177,8 @@ bool parse(const string& queryFragment, Atom* atom) {
       atom->type = Atom::S_CURATOR;
     } else if (!match[3].compare("e") || !match[3].compare("energy")) {
       atom->type = Atom::S_ENERGY;
+    } else if (!match[3].compare("bpm")) {
+      atom->type = Atom::S_BPM;
     } else if (!match[3].compare("trashed")) {
       atom->type = Atom::S_TRASHED;
     } else if (!match[3].compare("lowq")) {
@@ -260,6 +263,15 @@ string buildQueryPredicate(const string& query, int* limit, int* energy) {
       ss << "a.releaseDateYear = " << atom.value;
     } else if (atom.type == Atom::CUSTOM_QUERY_PREDICATE) {
       ss << atom.value;
+    } else if (atom.type == Atom::S_BPM) {
+      int min_bpm = atoi(atom.value.c_str());
+      if (min_bpm > 0) {
+        int max_bpm = min_bpm + 1;
+        ss << "(s.bpm between " << min_bpm << " and " << max_bpm;
+        if (max_bpm > 120) ss << " or s.bpm between " << min_bpm / 2 << " and " << max_bpm / 2;
+        if (min_bpm <= 90) ss << " or s.bpm between " << min_bpm * 2 << " and " << max_bpm * 2;
+        ss << ")";
+      }
     } else if (atom.type == Atom::LIMIT) {
       *limit = atoi(atom.value.c_str());
       ss << "true";
@@ -355,8 +367,8 @@ string buildOptionPredicate(const int bpm, const set<string>& keys, const vector
   int min_bpm = bpm * (100 - pitchPctMax) / 100;
   if (max_bpm > 0 && min_bpm > 0) {
     ss << " and (bpm between " << min_bpm << " and " << max_bpm;
-    if (max_bpm > 130) ss << " or bpm between " << min_bpm / 2 << " and " << max_bpm / 2;
-    if (min_bpm < 90) ss << " or bpm between " << min_bpm * 2 << " and " << max_bpm * 2;
+    if (max_bpm > 120) ss << " or bpm between " << min_bpm / 2 << " and " << max_bpm / 2;
+    if (min_bpm <= 90) ss << " or bpm between " << min_bpm * 2 << " and " << max_bpm * 2;
     ss << ")";
   }
   if (energy > 0) {
