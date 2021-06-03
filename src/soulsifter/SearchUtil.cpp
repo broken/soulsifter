@@ -264,9 +264,17 @@ string buildQueryPredicate(const string& query, int* limit, int* energy) {
     } else if (atom.type == Atom::CUSTOM_QUERY_PREDICATE) {
       ss << atom.value;
     } else if (atom.type == Atom::S_BPM) {
-      int min_bpm = atoi(atom.value.c_str());
-      if (min_bpm > 0) {
-        int max_bpm = min_bpm + 1;
+      // can be a single number or a range
+      size_t pos;
+      int min_bpm, max_bpm = 0;
+      if ((pos = atom.value.find("-")) != string::npos) {
+        min_bpm = atoi(atom.value.substr(0, pos).c_str());
+        max_bpm = atoi(atom.value.substr(pos + 1, atom.value.length()).c_str());
+      } else {
+        min_bpm = atoi(atom.value.c_str());
+        max_bpm = min_bpm + 1;
+      }
+      if (min_bpm > 0 && max_bpm > 0) {
         ss << "(s.bpm between " << min_bpm << " and " << max_bpm;
         if (max_bpm > 120) ss << " or s.bpm between " << min_bpm / 2 << " and " << max_bpm / 2;
         if (min_bpm <= 90) ss << " or s.bpm between " << min_bpm * 2 << " and " << max_bpm * 2;
