@@ -1,6 +1,7 @@
 #include "TagService.h"
 
 #include <cmath>
+#include <functional>
 #include <sstream>
 #include <stdlib.h>
 #include <string>
@@ -402,7 +403,7 @@ void TagService::writeId3v2Tag(Song* song) {
   }
 }
 
-void TagService::updateSongAttributesFromTags() {
+void TagService::updateSongAttributesFromTags(std::function<void(float)> progressCallback) {
   LOG(INFO) << "updating song attributes from tags";
 
   // get max id
@@ -419,6 +420,7 @@ void TagService::updateSongAttributesFromTags() {
   // loop through songs
   int span = 100;
   for (int i = 0; i <= maxId; i += span) {
+    progressCallback(i / maxId);
     stringstream ss;
     ss << "q:\"s.id >= " << i << "\" q:\"s.id < " << (i + span) << "\"";
     ss << " trashed:0";  // q:\"bpm is null\"";

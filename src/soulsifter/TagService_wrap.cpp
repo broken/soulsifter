@@ -58,7 +58,14 @@ void TagService::writeId3v2Tag(const Nan::FunctionCallbackInfo<v8::Value>& info)
 }
 
 void TagService::updateSongAttributesFromTags(const Nan::FunctionCallbackInfo<v8::Value>& info) {
+  Nan::Callback a0Fn;
+  a0Fn.Reset(info[0].As<v8::Function>());
+  auto a0 = [&a0Fn](float p0) {
+    v8::Local<v8::Value> v0 = Nan::New<v8::Number>(p0);
+    v8::Local<v8::Value> argv[] = {v0};
+    a0Fn.Call(1, argv);
+  };
 
-      dogatech::soulsifter::TagService::updateSongAttributesFromTags();
+      dogatech::soulsifter::TagService::updateSongAttributesFromTags(a0);
 }
 
