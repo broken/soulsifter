@@ -59,39 +59,36 @@ void TagService::writeId3v2Tag(const Nan::FunctionCallbackInfo<v8::Value>& info)
 
 class UpdateSongAttributesFromTagsWorker : public Nan::AsyncProgressWorkerBase<float> {
  public:
-  UpdateSongAttributesFromTagsWorker(Nan::Callback *progressCallback)
-      : AsyncProgressWorkerBase(progressCallback), progressCallback(progressCallback) {
+  UpdateSongAttributesFromTagsWorker(Nan::Callback* a0)
+      : AsyncProgressWorkerBase(a0), progressCallback(a0) {
   }
 
   ~UpdateSongAttributesFromTagsWorker() {
-    //delete progressCallback;
+    // Sharing progressWorker currently; otherwise:
+    // delete progressCallback;
   }
 
-  // Executed inside the worker-thread.
-  // It is not safe to access V8, or V8 data structures
-  // here, so everything we need for input and output
-  // should go on `this`.
-  void Execute (const Nan::AsyncProgressWorkerBase<float>::ExecutionProgress& progress) {
-    auto a0 = [&progress](float p0) {
-      progress.Send(&p0, 1);
+  void Execute(const Nan::AsyncProgressWorkerBase<float>::ExecutionProgress& ep) {
+    auto a0 = [&ep](float p) {
+      ep.Send(&p, 1);
     };
     dogatech::soulsifter::TagService::updateSongAttributesFromTags(a0);
   }
 
   void HandleProgressCallback(const float *data, size_t count) {
     Nan::HandleScope scope;
-    v8::Local<v8::Value> v0 = Nan::New<v8::Number>(*data);
-    v8::Local<v8::Value> argv[] = {v0};
+    v8::Local<v8::Value> v = Nan::New<v8::Number>(*data);
+    v8::Local<v8::Value> argv[] = {v};
     progressCallback->Call(1, argv);
   }
 
  private:
-  Nan::Callback *progressCallback;
+  Nan::Callback* progressCallback;
 };
 
 void TagService::updateSongAttributesFromTags(const Nan::FunctionCallbackInfo<v8::Value>& info) {
-  Nan::Callback* a0Fn = new Nan::Callback();
-  a0Fn->Reset(info[0].As<v8::Function>());
-  Nan::AsyncQueueWorker(new UpdateSongAttributesFromTagsWorker(a0Fn));
+  Nan::Callback* a0 = new Nan::Callback();
+  a0->Reset(info[0].As<v8::Function>());
+  Nan::AsyncQueueWorker(new UpdateSongAttributesFromTagsWorker(a0));
 }
 
