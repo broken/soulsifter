@@ -421,7 +421,7 @@ void TagService::updateSongAttributesFromTags(std::function<void(float)> progres
   int span = 100;
   int callbackBreakpoint = span * ceil((maxId / /* num of updates */ 50) / span);
   for (int i = 0; i <= maxId; i += span) {
-    if (i % callbackBreakpoint == 0) progressCallback(i / maxId);
+    if (i % callbackBreakpoint == 0) progressCallback((float) i / maxId);
     stringstream ss;
     ss << "q:\"s.id >= " << i << "\" q:\"s.id < " << (i + span) << "\"";
     ss << " trashed:0";  // q:\"bpm is null\"";
@@ -436,6 +436,7 @@ void TagService::updateSongAttributesFromTags(std::function<void(float)> progres
     }
     deleteVectorPointers(songs);
   }
+  progressCallback(1);
 }
     
 }  // namespace soulsifter
