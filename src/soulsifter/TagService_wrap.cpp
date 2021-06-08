@@ -59,13 +59,12 @@ void TagService::writeId3v2Tag(const Nan::FunctionCallbackInfo<v8::Value>& info)
 
 class UpdateSongAttributesFromTagsWorker : public Nan::AsyncProgressWorkerBase<float> {
  public:
-  UpdateSongAttributesFromTagsWorker(Nan::Callback* a0)
-      : AsyncProgressWorkerBase(a0), progressCallback(a0) {
+  UpdateSongAttributesFromTagsWorker(Nan::Callback* a0, Nan::Callback* callback)
+      : AsyncProgressWorkerBase(callback), progressCallback(a0) {
   }
 
   ~UpdateSongAttributesFromTagsWorker() {
-    // Sharing progressWorker currently; otherwise:
-    // delete progressCallback;
+    delete progressCallback;
   }
 
   void Execute(const Nan::AsyncProgressWorkerBase<float>::ExecutionProgress& ep) {
@@ -89,6 +88,8 @@ class UpdateSongAttributesFromTagsWorker : public Nan::AsyncProgressWorkerBase<f
 void TagService::updateSongAttributesFromTags(const Nan::FunctionCallbackInfo<v8::Value>& info) {
   Nan::Callback* a0 = new Nan::Callback();
   a0->Reset(info[0].As<v8::Function>());
-  Nan::AsyncQueueWorker(new UpdateSongAttributesFromTagsWorker(a0));
+  Nan::Callback* callback = new Nan::Callback();
+  callback->Reset(info[1].As<v8::Function>());
+  Nan::AsyncQueueWorker(new UpdateSongAttributesFromTagsWorker(a0, callback));
 }
 
