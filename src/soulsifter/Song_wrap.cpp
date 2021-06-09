@@ -79,9 +79,6 @@ void Song::Init(v8::Local<v8::Object> exports) {
   Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("rating").ToLocalChecked(), getRating, setRating);
   Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("dateAdded").ToLocalChecked(), getDateAdded, setDateAdded);
   Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("bpm").ToLocalChecked(), getBpm, setBpm);
-  Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("tonicKeys").ToLocalChecked(), getTonicKeys, setTonicKeys);
-  Nan::SetPrototypeMethod(tpl, "addTonicKey", addTonicKey);
-  Nan::SetPrototypeMethod(tpl, "removeTonicKey", removeTonicKey);
   Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("tonicKey").ToLocalChecked(), getTonicKey, setTonicKey);
   Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("energy").ToLocalChecked(), getEnergy, setEnergy);
   Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("comments").ToLocalChecked(), getComments, setComments);
@@ -381,43 +378,6 @@ NAN_SETTER(Song::setBpm) {
   Song* obj = Nan::ObjectWrap::Unwrap<Song>(info.Holder());
   string a0(*v8::String::Utf8Value(value->ToString()));
   obj->song->setBpm(a0);
-}
-
-NAN_GETTER(Song::getTonicKeys) {
-  Song* obj = Nan::ObjectWrap::Unwrap<Song>(info.Holder());
-  const std::set<string> result =  obj->song->getTonicKeys();
-
-  v8::Local<v8::Array> a = Nan::New<v8::Array>((int) result.size());
-  int idx = 0;
-  for (const auto& element : result) {
-    a->Set(Nan::GetCurrentContext(), Nan::New<v8::Number>(idx), Nan::New<v8::String>(element).ToLocalChecked());
-    ++idx;
-  }
-  info.GetReturnValue().Set(a);
-}
-
-NAN_SETTER(Song::setTonicKeys) {
-  Song* obj = Nan::ObjectWrap::Unwrap<Song>(info.Holder());
-  v8::Local<v8::Array> a0Array = v8::Local<v8::Array>::Cast(value);
-  std::set<string> a0;
-  for (int i = 0; i < a0Array->Length(); ++i) {
-    v8::Local<v8::Value> tmp = a0Array->Get(Nan::GetCurrentContext(), i).ToLocalChecked();
-    string x(*v8::String::Utf8Value(tmp->ToString()));
-    a0.insert(x);
-  }
-  obj->song->setTonicKeys(a0);
-}
-
-void Song::addTonicKey(const Nan::FunctionCallbackInfo<v8::Value>& info) {
-  Song* obj = Nan::ObjectWrap::Unwrap<Song>(info.Holder());
-  string a0(*v8::String::Utf8Value(info[0]->ToString()));
-  obj->song->addTonicKey(a0);
-}
-
-void Song::removeTonicKey(const Nan::FunctionCallbackInfo<v8::Value>& info) {
-  Song* obj = Nan::ObjectWrap::Unwrap<Song>(info.Holder());
-  string a0(*v8::String::Utf8Value(info[0]->ToString()));
-  obj->song->removeTonicKey(a0);
 }
 
 NAN_GETTER(Song::getTonicKey) {

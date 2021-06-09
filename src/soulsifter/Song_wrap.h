@@ -54,10 +54,6 @@ class Song : public Nan::ObjectWrap {
   static void setDateAdded(v8::Local<v8::String> property, v8::Local<v8::Value> value, const Nan::PropertyCallbackInfo<void>& info);
   static void getBpm(v8::Local<v8::String> property, const Nan::PropertyCallbackInfo<v8::Value>& info);
   static void setBpm(v8::Local<v8::String> property, v8::Local<v8::Value> value, const Nan::PropertyCallbackInfo<void>& info);
-  static void getTonicKeys(v8::Local<v8::String> property, const Nan::PropertyCallbackInfo<v8::Value>& info);
-  static void setTonicKeys(v8::Local<v8::String> property, v8::Local<v8::Value> value, const Nan::PropertyCallbackInfo<void>& info);
-  static void addTonicKey(const Nan::FunctionCallbackInfo<v8::Value>& info);
-  static void removeTonicKey(const Nan::FunctionCallbackInfo<v8::Value>& info);
   static void getTonicKey(v8::Local<v8::String> property, const Nan::PropertyCallbackInfo<v8::Value>& info);
   static void setTonicKey(v8::Local<v8::String> property, v8::Local<v8::Value> value, const Nan::PropertyCallbackInfo<void>& info);
   static void getEnergy(v8::Local<v8::String> property, const Nan::PropertyCallbackInfo<v8::Value>& info);

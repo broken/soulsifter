@@ -883,7 +883,6 @@ songFields = [
   [:int, "rating", Attrib::NON_NULLABLE],
   [:time_t, "dateAdded", 0],
   [:string, "bpm", 0],
-  ["set<string>", "tonicKeys", 0],
   [:string, "tonicKey", 0],
   [:int, "energy", 0],
   [:string, "comments", 0],

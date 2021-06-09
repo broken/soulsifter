@@ -78,10 +78,6 @@ namespace soulsifter {
         void setDateAdded(time_t dateAdded);
         const string& getBpm() const;
         void setBpm(const string& bpm);
-        const set<string>& getTonicKeys() const;
-        void setTonicKeys(const set<string>& tonicKeys);
-        void addTonicKey(const string& tonicKey);
-        void removeTonicKey(const string& tonicKey);
         const string& getTonicKey() const;
         void setTonicKey(const string& tonicKey);
         const int getEnergy() const;
@@ -143,7 +139,6 @@ namespace soulsifter {
         int rating;
         time_t dateAdded;
         string bpm;
-        set<string> tonicKeys;
         string tonicKey;
         int energy;
         string comments;
