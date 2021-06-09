@@ -63,7 +63,7 @@ namespace soulsifter {
     }
 
     BasicGenre* BasicGenre::findById(int id) {
-        for (int i = 0; i < 3; ++i) {
+        for (int i = 0; i < 2; ++i) {
             try {
                 sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select BasicGenres.* from BasicGenres where BasicGenres.id = ?");
                 ps->setInt(1, id);
@@ -88,7 +88,7 @@ namespace soulsifter {
     }
 
     BasicGenre* BasicGenre::findByName(const string& name) {
-        for (int i = 0; i < 3; ++i) {
+        for (int i = 0; i < 2; ++i) {
             try {
                 sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select BasicGenres.* from BasicGenres where ifnull(name,'') = ifnull(?,'')");
                 if (!name.empty()) ps->setString(1, name);
@@ -123,7 +123,7 @@ namespace soulsifter {
 # pragma mark persistence
 
     int BasicGenre::update() {
-        for (int i = 0; i < 3; ++i) {
+        for (int i = 0; i < 2; ++i) {
             try {
 
                 sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("update BasicGenres set name=? where id=?");
@@ -143,7 +143,7 @@ namespace soulsifter {
     }
 
     int BasicGenre::save() {
-        for (int i = 0; i < 3; ++i) {
+        for (int i = 0; i < 2; ++i) {
             try {
 
                 sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("insert into BasicGenres (name) values (?)");

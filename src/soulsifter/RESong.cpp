@@ -217,7 +217,7 @@ namespace soulsifter {
     }
 
     RESong* RESong::findById(int id) {
-        for (int i = 0; i < 3; ++i) {
+        for (int i = 0; i < 2; ++i) {
             try {
                 sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select RESongs.* from RESongs where RESongs.id = ?");
                 ps->setInt(1, id);
@@ -242,7 +242,7 @@ namespace soulsifter {
     }
 
     RESong* RESong::findBySongid(const string& songid) {
-        for (int i = 0; i < 3; ++i) {
+        for (int i = 0; i < 2; ++i) {
             try {
                 sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select RESongs.* from RESongs where RESongs.songid = ?");
                 ps->setString(1, songid);
@@ -276,7 +276,7 @@ namespace soulsifter {
 # pragma mark persistence
 
     int RESong::update() {
-        for (int i = 0; i < 3; ++i) {
+        for (int i = 0; i < 2; ++i) {
             try {
 
                 sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("update RESongs set songidWinfo=?, songid=?, shortid=?, shortidWinfo=?, artist=?, album=?, track=?, title=?, time=?, timeSignature=?, filename=?, digitalOnly=?, compilation=?, keyStart=?, keyAccuracy=?, bpmStart=?, bpmAccuracy=?, rating=?, dateAdded=?, catalogId=?, label=?, remix=?, numPlays=?, comments=?, releaseDate=?, featuring=?, keyEnd=?, disabled=?, bpmEnd=?, beatIntensity=?, replayGain=? where id=?");
@@ -356,7 +356,7 @@ namespace soulsifter {
     }
 
     int RESong::save() {
-        for (int i = 0; i < 3; ++i) {
+        for (int i = 0; i < 2; ++i) {
             try {
                 if (id == 0) {
                     sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select max(id) from RESongs");

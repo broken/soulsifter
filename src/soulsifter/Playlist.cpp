@@ -91,7 +91,7 @@ namespace soulsifter {
     }
 
     Playlist* Playlist::findById(int id) {
-        for (int i = 0; i < 3; ++i) {
+        for (int i = 0; i < 2; ++i) {
             try {
                 sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select Playlists.*, group_concat(distinct(styles.styleId)) as styleIds from Playlists left outer join PlaylistStyles styles on Playlists.id = styles.playlistId where Playlists.id = ? group by Playlists.id");
                 ps->setInt(1, id);
@@ -116,7 +116,7 @@ namespace soulsifter {
     }
 
     Playlist* Playlist::findByName(const string& name) {
-        for (int i = 0; i < 3; ++i) {
+        for (int i = 0; i < 2; ++i) {
             try {
                 sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select Playlists.*, group_concat(distinct(styles.styleId)) as styleIds from Playlists left outer join PlaylistStyles styles on Playlists.id = styles.playlistId where Playlists.name = ? group by Playlists.id");
                 ps->setString(1, name);
@@ -150,7 +150,7 @@ namespace soulsifter {
 # pragma mark persistence
 
     int Playlist::update() {
-        for (int i = 0; i < 3; ++i) {
+        for (int i = 0; i < 2; ++i) {
             try {
 
                 sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("update Playlists set name=?, query=?, gmusicId=? where id=?");
@@ -202,7 +202,7 @@ namespace soulsifter {
     }
 
     int Playlist::save() {
-        for (int i = 0; i < 3; ++i) {
+        for (int i = 0; i < 2; ++i) {
             try {
 
                 sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("insert into Playlists (name, query, gmusicId) values (?, ?, ?)");
@@ -300,7 +300,7 @@ namespace soulsifter {
     }
 
     int Playlist::erase() {
-        for (int i = 0; i < 3; ++i) {
+        for (int i = 0; i < 2; ++i) {
             try {
                 sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("delete from Playlists where id=?");
                 ps->setInt(1, id);

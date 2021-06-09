@@ -123,7 +123,7 @@ namespace soulsifter {
     }
 
     Album* Album::findById(int id) {
-        for (int i = 0; i < 3; ++i) {
+        for (int i = 0; i < 2; ++i) {
             try {
                 sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select Albums.* from Albums where Albums.id = ?");
                 ps->setInt(1, id);
@@ -148,7 +148,7 @@ namespace soulsifter {
     }
 
     Album* Album::findByCoverFilepath(const string& coverFilepath) {
-        for (int i = 0; i < 3; ++i) {
+        for (int i = 0; i < 2; ++i) {
             try {
                 sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select Albums.* from Albums where Albums.coverFilepath = ?");
                 ps->setString(1, coverFilepath);
@@ -173,7 +173,7 @@ namespace soulsifter {
     }
 
     Album* Album::findByNameAndArtist(const string& name, const string& artist) {
-        for (int i = 0; i < 3; ++i) {
+        for (int i = 0; i < 2; ++i) {
             try {
                 sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select Albums.* from Albums where ifnull(name,'') = ifnull(?,'') and ifnull(artist,'') = ifnull(?,'')");
                 if (!name.empty()) ps->setString(1, name);
@@ -228,7 +228,7 @@ namespace soulsifter {
 # pragma mark persistence
 
     int Album::update() {
-        for (int i = 0; i < 3; ++i) {
+        for (int i = 0; i < 2; ++i) {
             try {
                 if (basicGenre && basicGenre->sync()) {
                     if (basicGenre->getId()) {
@@ -275,7 +275,7 @@ namespace soulsifter {
     }
 
     int Album::save() {
-        for (int i = 0; i < 3; ++i) {
+        for (int i = 0; i < 2; ++i) {
             try {
                 if (basicGenre && basicGenre->sync()) {
                     if (basicGenre->getId()) {

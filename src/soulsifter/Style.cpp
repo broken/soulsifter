@@ -108,7 +108,7 @@ namespace soulsifter {
     }
 
     Style* Style::findById(int id) {
-        for (int i = 0; i < 3; ++i) {
+        for (int i = 0; i < 2; ++i) {
             try {
                 sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select Styles.*, group_concat(distinct(children.childId)) as childIds, group_concat(distinct(parents.parentId)) as parentIds from Styles left outer join StyleChildren children on Styles.id = children.parentId left outer join StyleChildren parents on Styles.id = parents.childId where Styles.id = ? group by Styles.id");
                 ps->setInt(1, id);
@@ -133,7 +133,7 @@ namespace soulsifter {
     }
 
     Style* Style::findByREId(int reId) {
-        for (int i = 0; i < 3; ++i) {
+        for (int i = 0; i < 2; ++i) {
             try {
                 sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select Styles.*, group_concat(distinct(children.childId)) as childIds, group_concat(distinct(parents.parentId)) as parentIds from Styles left outer join StyleChildren children on Styles.id = children.parentId left outer join StyleChildren parents on Styles.id = parents.childId where ifnull(reId,0) = ifnull(?,0) group by Styles.id");
                 if (reId > 0) ps->setInt(1, reId);
@@ -168,7 +168,7 @@ namespace soulsifter {
 # pragma mark persistence
 
     int Style::update() {
-        for (int i = 0; i < 3; ++i) {
+        for (int i = 0; i < 2; ++i) {
             try {
 
                 sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("update Styles set name=?, reId=?, reLabel=? where id=?");
@@ -248,7 +248,7 @@ namespace soulsifter {
     }
 
     int Style::save() {
-        for (int i = 0; i < 3; ++i) {
+        for (int i = 0; i < 2; ++i) {
             try {
 
                 sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("insert into Styles (name, reId, reLabel) values (?, ?, ?)");

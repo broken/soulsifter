@@ -68,7 +68,7 @@ namespace soulsifter {
     }
 
     REAlbumCover* REAlbumCover::findById(int id) {
-        for (int i = 0; i < 3; ++i) {
+        for (int i = 0; i < 2; ++i) {
             try {
                 sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select REAlbumCovers.* from REAlbumCovers where REAlbumCovers.id = ?");
                 ps->setInt(1, id);
@@ -93,7 +93,7 @@ namespace soulsifter {
     }
 
     REAlbumCover* REAlbumCover::findByREId(const string& reId) {
-        for (int i = 0; i < 3; ++i) {
+        for (int i = 0; i < 2; ++i) {
             try {
                 sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select REAlbumCovers.* from REAlbumCovers where ifnull(reId,'') = ifnull(?,'')");
                 if (!reId.empty()) ps->setString(1, reId);
@@ -128,7 +128,7 @@ namespace soulsifter {
 # pragma mark persistence
 
     int REAlbumCover::update() {
-        for (int i = 0; i < 3; ++i) {
+        for (int i = 0; i < 2; ++i) {
             try {
 
                 sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("update REAlbumCovers set reId=?, thumbnail=? where id=?");
@@ -150,7 +150,7 @@ namespace soulsifter {
     }
 
     int REAlbumCover::save() {
-        for (int i = 0; i < 3; ++i) {
+        for (int i = 0; i < 2; ++i) {
             try {
 
                 sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("insert into REAlbumCovers (reId, thumbnail) values (?, ?)");

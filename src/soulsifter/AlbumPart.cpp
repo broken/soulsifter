@@ -88,7 +88,7 @@ namespace soulsifter {
     }
 
     AlbumPart* AlbumPart::findById(int id) {
-        for (int i = 0; i < 3; ++i) {
+        for (int i = 0; i < 2; ++i) {
             try {
                 sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select AlbumParts.* from AlbumParts where AlbumParts.id = ?");
                 ps->setInt(1, id);
@@ -113,7 +113,7 @@ namespace soulsifter {
     }
 
     AlbumPart* AlbumPart::findByPosAndAlbumId(const string& pos, int albumId) {
-        for (int i = 0; i < 3; ++i) {
+        for (int i = 0; i < 2; ++i) {
             try {
                 sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select AlbumParts.* from AlbumParts where ifnull(pos,'') = ifnull(?,'') and ifnull(albumId,0) = ifnull(?,0)");
                 if (!pos.empty()) ps->setString(1, pos);
@@ -168,7 +168,7 @@ namespace soulsifter {
 # pragma mark persistence
 
     int AlbumPart::update() {
-        for (int i = 0; i < 3; ++i) {
+        for (int i = 0; i < 2; ++i) {
             try {
                 if (album && album->sync()) {
                     if (album->getId()) {
@@ -202,7 +202,7 @@ namespace soulsifter {
     }
 
     int AlbumPart::save() {
-        for (int i = 0; i < 3; ++i) {
+        for (int i = 0; i < 2; ++i) {
             try {
                 if (album && album->sync()) {
                     if (album->getId()) {

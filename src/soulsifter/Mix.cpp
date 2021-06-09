@@ -117,7 +117,7 @@ namespace soulsifter {
     }
 
     Mix* Mix::findById(int id) {
-        for (int i = 0; i < 3; ++i) {
+        for (int i = 0; i < 2; ++i) {
             try {
                 sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select Mixes.* from Mixes where Mixes.id = ?");
                 ps->setInt(1, id);
@@ -142,7 +142,7 @@ namespace soulsifter {
     }
 
     Mix* Mix::findByOutSongIdAndInSongId(int outSongId, int inSongId) {
-        for (int i = 0; i < 3; ++i) {
+        for (int i = 0; i < 2; ++i) {
             try {
                 sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select Mixes.* from Mixes where ifnull(outSongId,0) = ifnull(?,0) and ifnull(inSongId,0) = ifnull(?,0)");
                 if (outSongId > 0) ps->setInt(1, outSongId);
@@ -197,7 +197,7 @@ namespace soulsifter {
 # pragma mark persistence
 
     int Mix::update() {
-        for (int i = 0; i < 3; ++i) {
+        for (int i = 0; i < 2; ++i) {
             try {
                 if (outSong && outSong->sync()) {
                     if (outSong->getId()) {
@@ -246,7 +246,7 @@ namespace soulsifter {
     }
 
     int Mix::save() {
-        for (int i = 0; i < 3; ++i) {
+        for (int i = 0; i < 2; ++i) {
             try {
                 if (outSong && outSong->sync()) {
                     if (outSong->getId()) {

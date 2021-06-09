@@ -68,7 +68,7 @@ namespace soulsifter {
     }
 
     RESetting* RESetting::findById(int id) {
-        for (int i = 0; i < 3; ++i) {
+        for (int i = 0; i < 2; ++i) {
             try {
                 sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select RESettings.* from RESettings where RESettings.id = ?");
                 ps->setInt(1, id);
@@ -93,7 +93,7 @@ namespace soulsifter {
     }
 
     RESetting* RESetting::findByName(const string& name) {
-        for (int i = 0; i < 3; ++i) {
+        for (int i = 0; i < 2; ++i) {
             try {
                 sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select RESettings.* from RESettings where ifnull(name,'') = ifnull(?,'')");
                 if (!name.empty()) ps->setString(1, name);
@@ -128,7 +128,7 @@ namespace soulsifter {
 # pragma mark persistence
 
     int RESetting::update() {
-        for (int i = 0; i < 3; ++i) {
+        for (int i = 0; i < 2; ++i) {
             try {
 
                 sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("update RESettings set name=?, value=? where id=?");
@@ -150,7 +150,7 @@ namespace soulsifter {
     }
 
     int RESetting::save() {
-        for (int i = 0; i < 3; ++i) {
+        for (int i = 0; i < 2; ++i) {
             try {
 
                 sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("insert into RESettings (name, value) values (?, ?)");

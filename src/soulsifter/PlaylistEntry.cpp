@@ -108,7 +108,7 @@ namespace soulsifter {
     }
 
     PlaylistEntry* PlaylistEntry::findById(int id) {
-        for (int i = 0; i < 3; ++i) {
+        for (int i = 0; i < 2; ++i) {
             try {
                 sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select PlaylistEntries.* from PlaylistEntries where PlaylistEntries.id = ?");
                 ps->setInt(1, id);
@@ -133,7 +133,7 @@ namespace soulsifter {
     }
 
     PlaylistEntry* PlaylistEntry::findByPlaylistIdAndSongId(int playlistId, int songId) {
-        for (int i = 0; i < 3; ++i) {
+        for (int i = 0; i < 2; ++i) {
             try {
                 sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select PlaylistEntries.* from PlaylistEntries where ifnull(playlistId,0) = ifnull(?,0) and ifnull(songId,0) = ifnull(?,0)");
                 if (playlistId > 0) ps->setInt(1, playlistId);
@@ -188,7 +188,7 @@ namespace soulsifter {
 # pragma mark persistence
 
     int PlaylistEntry::update() {
-        for (int i = 0; i < 3; ++i) {
+        for (int i = 0; i < 2; ++i) {
             try {
                 if (playlist && playlist->sync()) {
                     if (playlist->getId()) {
@@ -233,7 +233,7 @@ namespace soulsifter {
     }
 
     int PlaylistEntry::save() {
-        for (int i = 0; i < 3; ++i) {
+        for (int i = 0; i < 2; ++i) {
             try {
                 if (playlist && playlist->sync()) {
                     if (playlist->getId()) {
@@ -352,7 +352,7 @@ namespace soulsifter {
     }
 
     int PlaylistEntry::erase() {
-        for (int i = 0; i < 3; ++i) {
+        for (int i = 0; i < 2; ++i) {
             try {
                 sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("delete from PlaylistEntries where id=?");
                 ps->setInt(1, id);

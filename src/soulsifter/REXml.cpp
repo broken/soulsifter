@@ -68,7 +68,7 @@ namespace soulsifter {
     }
 
     REXml* REXml::findById(int id) {
-        for (int i = 0; i < 3; ++i) {
+        for (int i = 0; i < 2; ++i) {
             try {
                 sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select REXml.* from REXml where REXml.id = ?");
                 ps->setInt(1, id);
@@ -93,7 +93,7 @@ namespace soulsifter {
     }
 
     REXml* REXml::findByName(const string& name) {
-        for (int i = 0; i < 3; ++i) {
+        for (int i = 0; i < 2; ++i) {
             try {
                 sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select REXml.* from REXml where ifnull(name,'') = ifnull(?,'')");
                 if (!name.empty()) ps->setString(1, name);
@@ -128,7 +128,7 @@ namespace soulsifter {
 # pragma mark persistence
 
     int REXml::update() {
-        for (int i = 0; i < 3; ++i) {
+        for (int i = 0; i < 2; ++i) {
             try {
 
                 sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("update REXml set name=?, xml=? where id=?");
@@ -150,7 +150,7 @@ namespace soulsifter {
     }
 
     int REXml::save() {
-        for (int i = 0; i < 3; ++i) {
+        for (int i = 0; i < 2; ++i) {
             try {
 
                 sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("insert into REXml (name, xml) values (?, ?)");

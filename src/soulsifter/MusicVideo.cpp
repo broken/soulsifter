@@ -68,7 +68,7 @@ namespace soulsifter {
     }
 
     MusicVideo* MusicVideo::findById(int id) {
-        for (int i = 0; i < 3; ++i) {
+        for (int i = 0; i < 2; ++i) {
             try {
                 sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select MusicVideos.* from MusicVideos where MusicVideos.id = ?");
                 ps->setInt(1, id);
@@ -102,7 +102,7 @@ namespace soulsifter {
 # pragma mark persistence
 
     int MusicVideo::update() {
-        for (int i = 0; i < 3; ++i) {
+        for (int i = 0; i < 2; ++i) {
             try {
 
                 sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("update MusicVideos set filePath=?, thumbnailFilePath=? where id=?");
@@ -124,7 +124,7 @@ namespace soulsifter {
     }
 
     int MusicVideo::save() {
-        for (int i = 0; i < 3; ++i) {
+        for (int i = 0; i < 2; ++i) {
             try {
 
                 sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("insert into MusicVideos (filePath, thumbnailFilePath) values (?, ?)");

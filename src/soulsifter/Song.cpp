@@ -254,7 +254,7 @@ namespace soulsifter {
     }
 
     Song* Song::findById(int id) {
-        for (int i = 0; i < 3; ++i) {
+        for (int i = 0; i < 2; ++i) {
             try {
                 sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select Songs.*, group_concat(distinct(styles.styleId)) as styleIds from Songs left outer join SongStyles styles on Songs.id = styles.songId where Songs.id = ? group by Songs.id");
                 ps->setInt(1, id);
@@ -279,7 +279,7 @@ namespace soulsifter {
     }
 
     Song* Song::findByFilepath(const string& filepath) {
-        for (int i = 0; i < 3; ++i) {
+        for (int i = 0; i < 2; ++i) {
             try {
                 sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select Songs.*, group_concat(distinct(styles.styleId)) as styleIds from Songs left outer join SongStyles styles on Songs.id = styles.songId where Songs.filepath = ? group by Songs.id");
                 ps->setString(1, filepath);
@@ -304,7 +304,7 @@ namespace soulsifter {
     }
 
     Song* Song::findByGoogleSongId(const string& googleSongId) {
-        for (int i = 0; i < 3; ++i) {
+        for (int i = 0; i < 2; ++i) {
             try {
                 sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select Songs.*, group_concat(distinct(styles.styleId)) as styleIds from Songs left outer join SongStyles styles on Songs.id = styles.songId where Songs.googleSongId = ? group by Songs.id");
                 ps->setString(1, googleSongId);
@@ -329,7 +329,7 @@ namespace soulsifter {
     }
 
     Song* Song::findByYoutubeSongId(const string& youtubeSongId) {
-        for (int i = 0; i < 3; ++i) {
+        for (int i = 0; i < 2; ++i) {
             try {
                 sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select Songs.*, group_concat(distinct(styles.styleId)) as styleIds from Songs left outer join SongStyles styles on Songs.id = styles.songId where Songs.youtubeSongId = ? group by Songs.id");
                 ps->setString(1, youtubeSongId);
@@ -354,7 +354,7 @@ namespace soulsifter {
     }
 
     Song* Song::findByRESongId(int reSongId) {
-        for (int i = 0; i < 3; ++i) {
+        for (int i = 0; i < 2; ++i) {
             try {
                 sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select Songs.*, group_concat(distinct(styles.styleId)) as styleIds from Songs left outer join SongStyles styles on Songs.id = styles.songId where ifnull(reSongId,0) = ifnull(?,0) group by Songs.id");
                 if (reSongId > 0) ps->setInt(1, reSongId);
@@ -389,7 +389,7 @@ namespace soulsifter {
 # pragma mark persistence
 
     int Song::update() {
-        for (int i = 0; i < 3; ++i) {
+        for (int i = 0; i < 2; ++i) {
             try {
                 if (reSong && reSong->sync()) {
                     if (reSong->getId()) {
@@ -517,7 +517,7 @@ namespace soulsifter {
     }
 
     int Song::save() {
-        for (int i = 0; i < 3; ++i) {
+        for (int i = 0; i < 2; ++i) {
             try {
                 if (reSong && reSong->sync()) {
                     if (reSong->getId()) {
