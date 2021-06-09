@@ -48,13 +48,7 @@ void SearchUtil::Init(v8::Local<v8::Object> exports) {
 void SearchUtil::searchSongs(const Nan::FunctionCallbackInfo<v8::Value>& info) {
   string a0(*v8::String::Utf8Value(info[0]->ToString()));
   int a1(info[1]->IntegerValue());
-  v8::Local<v8::Array> a2Array = v8::Local<v8::Array>::Cast(info[2]);
-  std::set<string> a2;
-  for (int i = 0; i < a2Array->Length(); ++i) {
-    v8::Local<v8::Value> tmp = a2Array->Get(Nan::GetCurrentContext(), i).ToLocalChecked();
-    string x(*v8::String::Utf8Value(tmp->ToString()));
-    a2.insert(x);
-  }
+  string a2(*v8::String::Utf8Value(info[2]->ToString()));
   v8::Local<v8::Array> a3Array = v8::Local<v8::Array>::Cast(info[3]);
   std::vector<dogatech::soulsifter::Style*> a3;
   for (uint32_t i = 0; i < a3Array->Length(); ++i) {

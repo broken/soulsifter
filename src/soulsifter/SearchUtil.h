@@ -27,7 +27,7 @@ class SearchUtil {
 public:
   static vector<Song*>* searchSongs(const string& query,
                                     const int bpm,
-                                    const set<string>& keys,
+                                    const string& keys,
                                     const vector<Style*>& styles,
                                     const vector<Song*>& songsToOmit,
                                     int limit,

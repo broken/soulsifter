@@ -38,7 +38,6 @@ namespace soulsifter {
     rating(song->getRating()),
     dateAdded(timeFromString(song->getDateAdded())),
     bpm(song->getBpmStart()),
-    tonicKeys(),
     energy(0),
     comments(song->getComments()),
     trashed(!song->getDisabled().compare("yes")),
@@ -93,7 +92,7 @@ namespace soulsifter {
         dateAdded = timeFromString(song->getDateAdded());
       
         // keys
-        // TODO tonicKeys.insert(<RE KEY TO KEY>);
+        // TODO tonicKey(<RE KEY TO KEY>);
     }
     
     const string Song::reAlbum() {
@@ -122,7 +121,7 @@ namespace soulsifter {
         re->setRemix(song.getRemixer());
         re->setComments(song.getComments());
         re->setBpmStart(song.getBpm());
-        re->setKeyStart(song.getTonicKeys().size() > 0 ? *(song.getTonicKeys().begin()) : "");
+        re->setKeyStart(song.getTonicKey());
         re->setReleaseDate(song.getAlbum()->reReleaseDate());
         re->setFeaturing(song.getFeaturing());
         re->setDisabled(song.getTrashed() ? "yes" : "no");

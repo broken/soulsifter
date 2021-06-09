@@ -120,16 +120,7 @@ bool NewSongManager::nextSong(Song* updatedSong, Song* originalSong) {
       int duration = AudioAnalyzer::analyzeDuration(updatedSong);
       originalSong->setDurationInMs(duration);
     }
-    
-    /*const Keys *keys = AudioAnalyzer::analyzeKey(updatedSong);
-    if (updatedSong->getTonicKeys().empty()) [key setStringValue:[NSString stringWithFormat:@"%s",keys->candidate[0].first.c_str()]];
-    stringstream ss;
-    boost::format fmt("%.1f");
-    for (int i = 0; i < keys->candidate.size() && keys->candidate[i].second > 20; ++i) {
-      ss << keys->candidate[i].first.c_str() << "(" << fmt % keys->candidate[i].second << "), ";
-    }
-    [keyAnalyzed setStringValue:[NSString stringWithFormat:@"%s", ss.str().c_str()]];
-    delete keys;*/
+
     return true;
   }
   

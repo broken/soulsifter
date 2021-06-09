@@ -291,84 +291,83 @@ string buildQueryPredicate(const string& query, int* limit, int* energy) {
   return ss.str();
 }
 
-string buildOptionPredicate(const int bpm, const set<string>& keys, const vector<Style*>& styles, const vector<Song*>& songsToOmit, const int limit, const int energy, const int orderBy) {
+string buildOptionPredicate(const int bpm, const string& key, const vector<Style*>& styles, const vector<Song*>& songsToOmit, const int limit, const int energy, const int orderBy) {
   stringstream ss;
-  for (const string& key : keys) {
-    if (CamelotKeys::rmap.find(key) != CamelotKeys::rmap.end()) {
-      // assume key lock always on for now
-      ss << " and (";
-      int num = 0;
-      switch (CamelotKeys::rmap.at(key)) {
-        case 17: // Abm = 1A
-        case 5:  // B = 1B
-          ss << "find_in_set('" << CamelotKeys::map.at("12A") << "', tonicKeys)>0 or find_in_set('" << CamelotKeys::map.at("12B") << "', tonicKeys)>0";
-          if (++num == 3) break;
-        case 18: // Ebm = 2A
-        case 6:  // Gb = 2B
-          if (num != 0) ss << " or ";
-          ss << "find_in_set('" << CamelotKeys::map.at("1A") << "', tonicKeys)>0 or find_in_set('" << CamelotKeys::map.at("1B") << "', tonicKeys)>0";
-          if (++num == 3) break;
-        case 19: // Bbm = 3A
-        case 7:  // Db = 3B
-          if (num != 0) ss << " or ";
-          ss << "find_in_set('" << CamelotKeys::map.at("2A") << "', tonicKeys)>0 or find_in_set('" << CamelotKeys::map.at("2B") << "', tonicKeys)>0";
-          if (++num == 3) break;
-        case 20: // Fm = 4A
-        case 8:  // Ab = 4B
-          if (num != 0) ss << " or ";
-          ss << "find_in_set('" << CamelotKeys::map.at("3A") << "', tonicKeys)>0 or find_in_set('" << CamelotKeys::map.at("3B") << "', tonicKeys)>0";
-          if (++num == 3) break;
-        case 21: // Cm = 5A
-        case 9:  // Eb = 5B
-          if (num != 0) ss << " or ";
-          ss << "find_in_set('" << CamelotKeys::map.at("4A") << "', tonicKeys)>0 or find_in_set('" << CamelotKeys::map.at("4B") << "', tonicKeys)>0";
-          if (++num == 3) break;
-        case 22: // Gm = 6A
-        case 10: // Bb = 6B
-          if (num != 0) ss << " or ";
-          ss << "find_in_set('" << CamelotKeys::map.at("5A") << "', tonicKeys)>0 or find_in_set('" << CamelotKeys::map.at("5B") << "', tonicKeys)>0";
-          if (++num == 3) break;
-        case 23: // Dm = 7A
-        case 11: // F = 7B
-          if (num != 0) ss << " or ";
-          ss << "find_in_set('" << CamelotKeys::map.at("6A") << "', tonicKeys)>0 or find_in_set('" << CamelotKeys::map.at("6B") << "', tonicKeys)>0";
-          if (++num == 3) break;
-        case 12: // Am = 8A
-        case 0:  // C = 8B
-          if (num != 0) ss << " or ";
-          ss << "find_in_set('" << CamelotKeys::map.at("7A") << "', tonicKeys)>0 or find_in_set('" << CamelotKeys::map.at("7B") << "', tonicKeys)>0";
-          if (++num == 3) break;
-        case 13: // Em = 9A
-        case 1:  // G = 9B
-          if (num != 0) ss << " or ";
-          ss << "find_in_set('" << CamelotKeys::map.at("8A") << "', tonicKeys)>0 or find_in_set('" << CamelotKeys::map.at("8B") << "', tonicKeys)>0";
-          if (++num == 3) break;
-        case 14: // Bm = 10A
-        case 2:  // D = 10B
-          if (num != 0) ss << " or ";
-          ss << "find_in_set('" << CamelotKeys::map.at("9A") << "', tonicKeys)>0 or find_in_set('" << CamelotKeys::map.at("9B") << "', tonicKeys)>0";
-          if (++num == 3) break;
-        case 15: // Gbm = 11A
-        case 3:  // A = 11B
-          if (num != 0) ss << " or ";
-          ss << "find_in_set('" << CamelotKeys::map.at("10A") << "', tonicKeys)>0 or find_in_set('" << CamelotKeys::map.at("10B") << "', tonicKeys)>0";
-          if (++num == 3) break;
-        case 16: // Csm = 12A
-        case 4:  // E = 12B
-          if (num != 0) ss << " or ";
-          ss << "find_in_set('" << CamelotKeys::map.at("11A") << "', tonicKeys)>0 or find_in_set('" << CamelotKeys::map.at("11B") << "', tonicKeys)>0";
-          if (++num == 3) break;
-          ss << " or find_in_set('" << CamelotKeys::map.at("12A") << "', tonicKeys)>0 or find_in_set('" << CamelotKeys::map.at("12B") << "', tonicKeys)>0";
-          if (++num == 3) break;
-          ss << " or find_in_set('" << CamelotKeys::map.at("1A") << "', tonicKeys)>0 or find_in_set('" << CamelotKeys::map.at("1B") << "', tonicKeys)>0";
-          if (++num == 3) break;
-        default:
-          LOG(WARNING) << "Error. Unable to find key.";
-          return "";
-      }
-      if (SoulSifterSettings::getInstance().get<bool>("search.includeUnknownKeys")) ss << " or tonicKeys=''";
-      ss << ")";
+  if (CamelotKeys::rmap.find(key) != CamelotKeys::rmap.end()) {
+    // assume key lock always on for now
+    ss << " and (";
+    int num = 0;
+    switch (CamelotKeys::rmap.at(key)) {
+      case 17: // Abm = 1A
+      case 5:  // B = 1B
+        ss << "tonicKey = '" << CamelotKeys::map.at("12A") << "' or tonicKey = '" << CamelotKeys::map.at("12B") << "'";
+        if (++num == 3) break;
+      case 18: // Ebm = 2A
+      case 6:  // Gb = 2B
+        if (num != 0) ss << " or ";
+        ss << "tonicKey = '" << CamelotKeys::map.at("1A") << "' or tonicKey = '" << CamelotKeys::map.at("1B") << "'";
+        if (++num == 3) break;
+      case 19: // Bbm = 3A
+      case 7:  // Db = 3B
+        if (num != 0) ss << " or ";
+        ss << "tonicKey = '" << CamelotKeys::map.at("2A") << "' or tonicKey = '" << CamelotKeys::map.at("2B") << "'";
+        if (++num == 3) break;
+      case 20: // Fm = 4A
+      case 8:  // Ab = 4B
+        if (num != 0) ss << " or ";
+        ss << "tonicKey = '" << CamelotKeys::map.at("3A") << "' or tonicKey = '" << CamelotKeys::map.at("3B") << "'";
+        if (++num == 3) break;
+      case 21: // Cm = 5A
+      case 9:  // Eb = 5B
+        if (num != 0) ss << " or ";
+        ss << "tonicKey = '" << CamelotKeys::map.at("4A") << "' or tonicKey = '" << CamelotKeys::map.at("4B") << "'";
+        if (++num == 3) break;
+      case 22: // Gm = 6A
+      case 10: // Bb = 6B
+        if (num != 0) ss << " or ";
+        ss << "tonicKey = '" << CamelotKeys::map.at("5A") << "' or tonicKey = '" << CamelotKeys::map.at("5B") << "'";
+        if (++num == 3) break;
+      case 23: // Dm = 7A
+      case 11: // F = 7B
+        if (num != 0) ss << " or ";
+        ss << "tonicKey = '" << CamelotKeys::map.at("6A") << "' or tonicKey = '" << CamelotKeys::map.at("6B") << "'";
+        if (++num == 3) break;
+      case 12: // Am = 8A
+      case 0:  // C = 8B
+        if (num != 0) ss << " or ";
+        ss << "tonicKey = '" << CamelotKeys::map.at("7A") << "' or tonicKey = '" << CamelotKeys::map.at("7B") << "'";
+        if (++num == 3) break;
+      case 13: // Em = 9A
+      case 1:  // G = 9B
+        if (num != 0) ss << " or ";
+        ss << "tonicKey = '" << CamelotKeys::map.at("8A") << "' or tonicKey = '" << CamelotKeys::map.at("8B") << "'";
+        if (++num == 3) break;
+      case 14: // Bm = 10A
+      case 2:  // D = 10B
+        if (num != 0) ss << " or ";
+        ss << "tonicKey = '" << CamelotKeys::map.at("9A") << "' or tonicKey = '" << CamelotKeys::map.at("9B") << "'";
+        if (++num == 3) break;
+      case 15: // Gbm = 11A
+      case 3:  // A = 11B
+        if (num != 0) ss << " or ";
+        ss << "tonicKey = '" << CamelotKeys::map.at("10A") << "' or tonicKey = '" << CamelotKeys::map.at("10B") << "'";
+        if (++num == 3) break;
+      case 16: // Csm = 12A
+      case 4:  // E = 12B
+        if (num != 0) ss << " or ";
+        ss << "tonicKey = '" << CamelotKeys::map.at("11A") << "' or tonicKey = '" << CamelotKeys::map.at("11B") << "'";
+        if (++num == 3) break;
+        ss << " or tonicKey = '" << CamelotKeys::map.at("12A") << "' or tonicKey = '" << CamelotKeys::map.at("12B") << "'";
+        if (++num == 3) break;
+        ss << " or tonicKey = '" << CamelotKeys::map.at("1A") << "' or tonicKey = '" << CamelotKeys::map.at("1B") << "'";
+        if (++num == 3) break;
+      default:
+        // TODO bubble up this error
+        LOG(WARNING) << "Error. Unable to find key.";
+        return "";
     }
+    if (SoulSifterSettings::getInstance().get<bool>("search.includeUnknownKeys")) ss << " or tonicKey is null";
+    ss << ")";
   }
   int pitchPctMax = 8;  // TODO should be a setting
   int max_bpm = bpm * (100 + pitchPctMax) / 100;
@@ -418,7 +417,7 @@ string buildOptionPredicate(const int bpm, const set<string>& keys, const vector
 
 vector<Song*>* SearchUtil::searchSongs(const string& query,
                                        const int bpm,
-                                       const set<string>& keys,
+                                       const string& key,
                                        const vector<Style*>& styles,
                                        const vector<Song*>& songsToOmit,
                                        int limit,
@@ -426,7 +425,7 @@ vector<Song*>* SearchUtil::searchSongs(const string& query,
                                        const bool musicVideoMode,
                                        const int orderBy,
                                        std::function<void(string)> errorCallback) {
-  LOG(INFO) << "q:" << query << ", bpm:" << bpm << ", keys:" << setToCsv(keys) << ", styles:" << ", limit:" << limit;
+  LOG(INFO) << "q:" << query << ", bpm:" << bpm << ", key:" << key << ", styles:" << ", limit:" << limit;
 
   stringstream ss;
   if (musicVideoMode)
@@ -434,7 +433,7 @@ vector<Song*>* SearchUtil::searchSongs(const string& query,
   else
     ss << "select s.*, s.id as songid, s.artist as songartist, group_concat(ss.styleid) as styleIds, a.*, a.id as albumid, a.artist as albumartist from Songs s inner join Albums a on s.albumid = a.id left outer join SongStyles ss on ss.songid=s.id where true";
   ss << buildQueryPredicate(query, &limit, &energy);
-  ss << buildOptionPredicate(bpm, keys, styles, songsToOmit, limit, energy, orderBy);
+  ss << buildOptionPredicate(bpm, key, styles, songsToOmit, limit, energy, orderBy);
 
   LOG(DEBUG) << "Query:";
   LOG(DEBUG) << ss.str();

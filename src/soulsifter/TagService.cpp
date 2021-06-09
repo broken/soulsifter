@@ -167,25 +167,24 @@ bool readId3v2TagAttributes(Song* song, TagLib::ID3v2::Tag* id3v2) {
     }
   }
   // key
-  const string keylist = getId3v2Text(id3v2, "TKEY");
-  std::set<std::string> keys;
-  boost::split(keys, keylist, boost::is_any_of("\\"));
-  if (keys != song->getTonicKeys() &&
-      (overwrite || !song->getTonicKeys().size()) &&
-      (keys.size() != 1 || keys.begin()->compare("All"))) {
-    LOG(INFO) << "updating song " << song->getId()
-         << " keys from " << boost::algorithm::join(song->getTonicKeys(), ",") << " or " << oldKey
-         << " to " << boost::algorithm::join(keys, ",");
-    if (keys.size() > 0) {
-      // convert old key from sharp to flat
-      if (oldKey.length() >= 2 && oldKey[1] == '#') {
-        if (oldKey[0] == 'G') oldKey[0] = 'A';
-        else oldKey[0] = oldKey[0] + 1;
-        oldKey[1] = 'b';
+  string initialKey = getId3v2Text(id3v2, "TKEY");
+  if (!initialKey.empty()) {
+    if ((size_t pos = initialKey.find("\\")) != string::npos) {
+      initialKey = initialKey.substr(0, pos);
+    }
+    if (initialKey != song->getTonicKey() &&
+        (overwrite || song->getTonicKey().empty()) &&
+        initialKey != "All") {
+      LOG(INFO) << "updating song " << song->getId()
+           << " key from " << song->getTonicKey()
+           << " to " << initialKey;
+      // convert key from sharp to flat
+      if (initialKey.length() >= 2 && initialKey[1] == '#') {
+        if (initialKey[0] == 'G') initialKey[0] = 'A';
+        else initialKey[0] = initialKey[0] + 1;
+        initialKey[1] = 'b';
       }
-      if (oldKey.empty() && keys.size() > 0) oldKey = *(keys.begin());
-      song->setTonicKey(oldKey);
-      song->setTonicKeys(keys);
+      song->setTonicKey(initialKey);
       updated = true;
     }
   }
