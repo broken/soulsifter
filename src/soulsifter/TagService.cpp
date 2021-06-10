@@ -152,9 +152,9 @@ bool readId3v2TagAttributes(Song* song, TagLib::ID3v2::Tag* id3v2) {
   if (boost::regex_search(grpTag, grpMatch, grpRegex, boost::match_default)) {
     string energystr = grpMatch[1];
     oldKey = grpMatch[2];
-    LOG(INFO) << "song " << song->getId() << " from " << grpTag
-              << " found energy " << energystr
-              << " and key " << oldKey;
+    LOG(DEBUG) << "song " << song->getId() << " from " << grpTag
+               << " found energy " << energystr
+               << " and key " << oldKey;
     int energy = std::atoi(energystr.c_str());
     if (energy != song->getEnergy() && (overwrite || !song->getEnergy())) {
       LOG(INFO) << "updating song " << song->getId()
@@ -169,7 +169,8 @@ bool readId3v2TagAttributes(Song* song, TagLib::ID3v2::Tag* id3v2) {
   // key
   string initialKey = getId3v2Text(id3v2, "TKEY");
   if (!initialKey.empty()) {
-    if ((size_t pos = initialKey.find("\\")) != string::npos) {
+    size_t pos;
+    if ((pos = initialKey.find("\\")) != string::npos) {
       initialKey = initialKey.substr(0, pos);
     }
     if (initialKey != song->getTonicKey() &&
@@ -409,7 +410,7 @@ void TagService::updateSongAttributesFromTags(std::function<void(float)> progres
   vector<Style*> emptyStyles;
   vector<Song*> emptySongs;
   string query = "id:\"(select max(id) from songs)\"";
-  vector<Song*>* songs = SearchUtil::searchSongs(query, 0, set<string>(), emptyStyles, emptySongs, 1);
+  vector<Song*>* songs = SearchUtil::searchSongs(query, 0, "", emptyStyles, emptySongs, 1);
   int maxId = 0;
   for (Song* song : *songs) {
     maxId = song->getId();
@@ -425,7 +426,7 @@ void TagService::updateSongAttributesFromTags(std::function<void(float)> progres
     ss << "q:\"s.id >= " << i << "\" q:\"s.id < " << (i + span) << "\"";
     ss << " trashed:0";  // q:\"bpm is null\"";
     query = ss.str();
-    songs = SearchUtil::searchSongs(query,  0, set<string>(), emptyStyles, emptySongs, span);
+    songs = SearchUtil::searchSongs(query,  0, "", emptyStyles, emptySongs, span);
 
     for (Song* song : *songs) {
       if (readId3v2TagAttributes(song)) {
