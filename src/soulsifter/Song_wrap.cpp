@@ -103,6 +103,8 @@ void Song::Init(v8::Local<v8::Object> exports) {
   Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("musicVideoConst").ToLocalChecked(), getMusicVideoConst);
   Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("styleIds").ToLocalChecked(), getStyleIds, setStyleIds);
   Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("styles").ToLocalChecked(), getStyles, setStyles);
+  Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("bpmLock").ToLocalChecked(), getBpmLock, setBpmLock);
+  Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("tonicKeyLock").ToLocalChecked(), getTonicKeyLock, setTonicKeyLock);
 
   constructor.Reset(Nan::GetFunction(tpl).ToLocalChecked());
   exports->Set(Nan::GetCurrentContext(), Nan::New<v8::String>("Song").ToLocalChecked(), Nan::GetFunction(tpl).ToLocalChecked());
@@ -707,5 +709,31 @@ NAN_SETTER(Song::setStyles) {
     a0.push_back(x);
   }
   obj->song->setStyles(a0);
+}
+
+NAN_GETTER(Song::getBpmLock) {
+  Song* obj = Nan::ObjectWrap::Unwrap<Song>(info.Holder());
+  const bool result =  obj->song->getBpmLock();
+
+  info.GetReturnValue().Set(Nan::New<v8::Boolean>(result));
+}
+
+NAN_SETTER(Song::setBpmLock) {
+  Song* obj = Nan::ObjectWrap::Unwrap<Song>(info.Holder());
+  bool a0(value->BooleanValue());
+  obj->song->setBpmLock(a0);
+}
+
+NAN_GETTER(Song::getTonicKeyLock) {
+  Song* obj = Nan::ObjectWrap::Unwrap<Song>(info.Holder());
+  const bool result =  obj->song->getTonicKeyLock();
+
+  info.GetReturnValue().Set(Nan::New<v8::Boolean>(result));
+}
+
+NAN_SETTER(Song::setTonicKeyLock) {
+  Song* obj = Nan::ObjectWrap::Unwrap<Song>(info.Holder());
+  bool a0(value->BooleanValue());
+  obj->song->setTonicKeyLock(a0);
 }
 

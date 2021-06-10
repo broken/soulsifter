@@ -124,6 +124,10 @@ namespace soulsifter {
         void setStyleIds(const vector<int>& styleIds);
         const vector<Style*>& getStyles();
         void setStyles(const vector<Style*>& styles);
+        const bool getBpmLock() const;
+        void setBpmLock(bool bpmLock);
+        const bool getTonicKeyLock() const;
+        void setTonicKeyLock(bool tonicKeyLock);
 
         friend ResultSetIterator<Song>;
         friend class SearchUtil;
@@ -158,6 +162,8 @@ namespace soulsifter {
         MusicVideo* musicVideo;
         vector<int> styleIds;
         vector<Style*> styles;
+        bool bpmLock;
+        bool tonicKeyLock;
 
         static void populateFields(const sql::ResultSet* rs, Song* song);
     };

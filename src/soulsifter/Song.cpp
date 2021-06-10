@@ -66,7 +66,9 @@ namespace soulsifter {
     musicVideoId(0),
     musicVideo(NULL),
     styleIds(),
-    styles() {
+    styles(),
+    bpmLock(false),
+    tonicKeyLock(false) {
     }
 
     Song::Song(const Song& song) :
@@ -98,7 +100,9 @@ namespace soulsifter {
     musicVideoId(song.getMusicVideoId()),
     musicVideo(NULL),
     styleIds(song.getStyleIds()),
-    styles() {
+    styles(),
+    bpmLock(song.getBpmLock()),
+    tonicKeyLock(song.getTonicKeyLock()) {
         if (song.reSong) setRESong(*song.reSong);
         if (song.album) setAlbum(*song.album);
         if (song.albumPart) setAlbumPart(*song.albumPart);
@@ -159,6 +163,8 @@ namespace soulsifter {
         }
         styleIds = song.getStyleIds();
         deleteVectorPointers(&styles);
+        bpmLock = song.getBpmLock();
+        tonicKeyLock = song.getTonicKeyLock();
     }
 
     Song::~Song() {
@@ -207,6 +213,8 @@ namespace soulsifter {
         musicVideo = NULL;
         styleIds.clear();
         deleteVectorPointers(&styles);
+        bpmLock = false;
+        tonicKeyLock = false;
     }
 
 # pragma mark static methods
@@ -235,6 +243,8 @@ namespace soulsifter {
         song->setAlbumId(rs->getInt("albumId"));
         song->setAlbumPartId(rs->getInt("albumPartId"));
         song->setMusicVideoId(rs->getInt("musicVideoId"));
+        song->setBpmLock(rs->getBoolean("bpmLock"));
+        song->setTonicKeyLock(rs->getBoolean("tonicKeyLock"));
         if (!rs->isNull("styleIds")) {
             string csv = rs->getString("styleIds");
             istringstream iss(csv);
@@ -424,7 +434,7 @@ namespace soulsifter {
                     musicVideoId = musicVideo->getId();
                 }
 
-                sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("update Songs set artist=?, track=?, title=?, remixer=?, featuring=?, filepath=?, rating=?, dateAdded=?, bpm=?, tonicKey=?, energy=?, comments=?, trashed=?, lowQuality=?, googleSongId=?, youtubeSongId=?, durationInMs=?, curator=?, reSongId=?, albumId=?, albumPartId=?, musicVideoId=? where id=?");
+                sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("update Songs set artist=?, track=?, title=?, remixer=?, featuring=?, filepath=?, rating=?, dateAdded=?, bpm=?, tonicKey=?, energy=?, comments=?, trashed=?, lowQuality=?, googleSongId=?, youtubeSongId=?, durationInMs=?, curator=?, reSongId=?, albumId=?, albumPartId=?, musicVideoId=?, bpmLock=?, tonicKeyLock=? where id=?");
                 if (!artist.empty()) ps->setString(1, artist);
                 else ps->setNull(1, sql::DataType::VARCHAR);
                 if (!track.empty()) ps->setString(2, track);
@@ -465,7 +475,9 @@ namespace soulsifter {
                 else ps->setNull(21, sql::DataType::INTEGER);
                 if (musicVideoId > 0) ps->setInt(22, musicVideoId);
                 else ps->setNull(22, sql::DataType::INTEGER);
-                ps->setInt(23, id);
+                ps->setBoolean(23, bpmLock);
+                ps->setBoolean(24, tonicKeyLock);
+                ps->setInt(25, id);
                 int result = ps->executeUpdate();
                 if (!styleIds.empty()) {
                     stringstream ss("insert ignore into SongStyles (songId, styleId) values (?, ?)", ios_base::app | ios_base::out | ios_base::ate);
@@ -550,7 +562,7 @@ namespace soulsifter {
                     musicVideoId = musicVideo->getId();
                 }
 
-                sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("insert into Songs (artist, track, title, remixer, featuring, filepath, rating, dateAdded, bpm, tonicKey, energy, comments, trashed, lowQuality, googleSongId, youtubeSongId, durationInMs, curator, reSongId, albumId, albumPartId, musicVideoId) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("insert into Songs (artist, track, title, remixer, featuring, filepath, rating, dateAdded, bpm, tonicKey, energy, comments, trashed, lowQuality, googleSongId, youtubeSongId, durationInMs, curator, reSongId, albumId, albumPartId, musicVideoId, bpmLock, tonicKeyLock) values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
                 if (!artist.empty()) ps->setString(1, artist);
                 else ps->setNull(1, sql::DataType::VARCHAR);
                 if (!track.empty()) ps->setString(2, track);
@@ -591,6 +603,8 @@ namespace soulsifter {
                 else ps->setNull(21, sql::DataType::INTEGER);
                 if (musicVideoId > 0) ps->setInt(22, musicVideoId);
                 else ps->setNull(22, sql::DataType::INTEGER);
+                ps->setBoolean(23, bpmLock);
+                ps->setBoolean(24, tonicKeyLock);
                 int saved = ps->executeUpdate();
                 if (!saved) {
                     LOG(WARNING) << "Not able to save song";
@@ -850,6 +864,22 @@ namespace soulsifter {
             }
             appendUniqueVector<int>(song->getStyleIds(), &styleIds);
         }
+        if (bpmLock != song->getBpmLock()) {
+            if (bpmLock) {
+                LOG(INFO) << "updating song " << id << " bpmLock from " << song->getBpmLock() << " to " << bpmLock;
+                needsUpdate = true;
+            } else {
+                bpmLock = song->getBpmLock();
+            }
+        }
+        if (tonicKeyLock != song->getTonicKeyLock()) {
+            if (tonicKeyLock) {
+                LOG(INFO) << "updating song " << id << " tonicKeyLock from " << song->getTonicKeyLock() << " to " << tonicKeyLock;
+                needsUpdate = true;
+            } else {
+                tonicKeyLock = song->getTonicKeyLock();
+            }
+        }
         return needsUpdate;
     }
 
@@ -1052,6 +1082,12 @@ namespace soulsifter {
             this->styleIds.push_back((*it)->getId());
         }
     }
+
+    const bool Song::getBpmLock() const { return bpmLock; }
+    void Song::setBpmLock(const bool bpmLock) { this->bpmLock = bpmLock; }
+
+    const bool Song::getTonicKeyLock() const { return tonicKeyLock; }
+    void Song::setTonicKeyLock(const bool tonicKeyLock) { this->tonicKeyLock = tonicKeyLock; }
 
 }
 }

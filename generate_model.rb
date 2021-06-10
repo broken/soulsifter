@@ -902,6 +902,8 @@ songFields = [
   ["MusicVideo", "musicVideo", Attrib::PTR],
   ["vector<int>", "styleIds", Attrib::ID],
   ["vector<Style*>", "styles", 0],
+  [:bool, "bpmLock", 0],
+  [:bool, "tonicKeyLock", 0],
 ]
 songAttribs = 0
 songCustomMethods = "        explicit Song(RESong* song);\n\n        static RESong* createRESongFromSong(Song& song);\n\n        const string reAlbum();\n        const string getDateAddedString() const;\n        void setDateAddedToNow();\n\n"

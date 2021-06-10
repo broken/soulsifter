@@ -96,6 +96,10 @@ class Song : public Nan::ObjectWrap {
   static void setStyleIds(v8::Local<v8::String> property, v8::Local<v8::Value> value, const Nan::PropertyCallbackInfo<void>& info);
   static void getStyles(v8::Local<v8::String> property, const Nan::PropertyCallbackInfo<v8::Value>& info);
   static void setStyles(v8::Local<v8::String> property, v8::Local<v8::Value> value, const Nan::PropertyCallbackInfo<void>& info);
+  static void getBpmLock(v8::Local<v8::String> property, const Nan::PropertyCallbackInfo<v8::Value>& info);
+  static void setBpmLock(v8::Local<v8::String> property, v8::Local<v8::Value> value, const Nan::PropertyCallbackInfo<void>& info);
+  static void getTonicKeyLock(v8::Local<v8::String> property, const Nan::PropertyCallbackInfo<v8::Value>& info);
+  static void setTonicKeyLock(v8::Local<v8::String> property, v8::Local<v8::Value> value, const Nan::PropertyCallbackInfo<void>& info);
 
   static Nan::Persistent<v8::Function> constructor;
   dogatech::soulsifter::Song* song;

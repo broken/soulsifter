@@ -52,7 +52,9 @@ namespace soulsifter {
     albumPart(NULL),
     musicVideoId(0),
     musicVideo(NULL),
-    styles() {
+    styles(),
+    bpmLock(false),
+    tonicKeyLock(false) {
         
         // styles
         vector<Style*>* allStyles;
