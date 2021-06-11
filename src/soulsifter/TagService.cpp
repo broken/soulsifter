@@ -102,6 +102,13 @@ static inline std::string trim_copy(std::string s) {
     return s;
 }
 
+float strToFloat(const string& s) {
+  stringstream ss(s);
+  float x;
+  ss >> x;
+  return x;
+}
+
 int canonicalizeBpm(const int bpm) {
   if (bpm <= 0) return 0;
   if (bpm < 75) return canonicalizeBpm(bpm << 1);
@@ -110,7 +117,7 @@ int canonicalizeBpm(const int bpm) {
 }
 
 int canonicalizeBpm(const string& bpm) {
-  return canonicalizeBpm(std::atoi(bpm.c_str()));
+  return canonicalizeBpm((int)(strToFloat(bpm) + 0.5));
 }
     
 const string getId3v2Text(TagLib::ID3v2::Tag* id3v2, const char* name) {
@@ -132,8 +139,10 @@ bool readId3v2TagAttributes(Song* song, TagLib::ID3v2::Tag* id3v2) {
   }
   // bpm
   const string bpm = getId3v2Text(id3v2, "TBPM");
-  if (canonicalizeBpm(bpm) != canonicalizeBpm(song->getBpm()) && (overwrite || !canonicalizeBpm(song->getBpm()))) {
-    LOG(INFO) << "updating song " << song->getId()
+  if (!song->getBpmLock()
+      && canonicalizeBpm(bpm) != canonicalizeBpm(song->getBpm())
+      && (overwrite || !canonicalizeBpm(song->getBpm()))) {
+    LOG(DEBUG) << "updating song " << song->getId()
          << " bpm from " << song->getBpm()
          << " to " << bpm;
     if (abs(canonicalizeBpm(bpm) - canonicalizeBpm(song->getBpm())) > 3) {
@@ -168,7 +177,7 @@ bool readId3v2TagAttributes(Song* song, TagLib::ID3v2::Tag* id3v2) {
   }
   // key
   string initialKey = getId3v2Text(id3v2, "TKEY");
-  if (!initialKey.empty()) {
+  if (!song->getTonicKeyLock() && !initialKey.empty()) {
     size_t pos;
     if ((pos = initialKey.find("\\")) != string::npos) {
       initialKey = initialKey.substr(0, pos);
