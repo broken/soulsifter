@@ -88,8 +88,8 @@ class UpdateSongAttributesFromTagsWorker : public Nan::AsyncProgressWorkerBase<f
 void TagService::updateSongAttributesFromTags(const Nan::FunctionCallbackInfo<v8::Value>& info) {
   Nan::Callback* a0 = new Nan::Callback();
   a0->Reset(info[0].As<v8::Function>());
-  Nan::Callback* callback = new Nan::Callback();
-  callback->Reset(info[1].As<v8::Function>());
-  Nan::AsyncQueueWorker(new UpdateSongAttributesFromTagsWorker(a0, callback));
+  Nan::Callback* cb = new Nan::Callback();
+  cb->Reset(info[1].As<v8::Function>());
+  Nan::AsyncQueueWorker(new UpdateSongAttributesFromTagsWorker(a0, cb));
 }
 
