@@ -801,7 +801,7 @@ mixFields = [
   [:int, "inSongId", Attrib::ID | Attrib::KEY2],
   ["Song", "inSong", Attrib::PTR],
   [:string, "bpmDiff", 0],
-  [:int, "rank", 0],
+  [:int, "rating", 0],
   [:string, "comments", 0],
   [:bool, "addon", 0],
 ]

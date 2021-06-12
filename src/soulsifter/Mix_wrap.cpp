@@ -67,7 +67,7 @@ void Mix::Init(v8::Local<v8::Object> exports) {
   Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("inSong").ToLocalChecked(), getInSong, setInSong);
   Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("inSongConst").ToLocalChecked(), getInSongConst);
   Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("bpmDiff").ToLocalChecked(), getBpmDiff, setBpmDiff);
-  Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("rank").ToLocalChecked(), getRank, setRank);
+  Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("rating").ToLocalChecked(), getRating, setRating);
   Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("comments").ToLocalChecked(), getComments, setComments);
   Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("addon").ToLocalChecked(), getAddon, setAddon);
 
@@ -321,17 +321,17 @@ NAN_SETTER(Mix::setBpmDiff) {
   obj->mix->setBpmDiff(a0);
 }
 
-NAN_GETTER(Mix::getRank) {
+NAN_GETTER(Mix::getRating) {
   Mix* obj = Nan::ObjectWrap::Unwrap<Mix>(info.Holder());
-  const int result =  obj->mix->getRank();
+  const int result =  obj->mix->getRating();
 
   info.GetReturnValue().Set(Nan::New<v8::Integer>(result));
 }
 
-NAN_SETTER(Mix::setRank) {
+NAN_SETTER(Mix::setRating) {
   Mix* obj = Nan::ObjectWrap::Unwrap<Mix>(info.Holder());
   int a0(value->IntegerValue());
-  obj->mix->setRank(a0);
+  obj->mix->setRating(a0);
 }
 
 NAN_GETTER(Mix::getComments) {

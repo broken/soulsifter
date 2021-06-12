@@ -65,8 +65,8 @@ namespace soulsifter {
         void setInSong(Song* inSong);  // takes ownership
         const string& getBpmDiff() const;
         void setBpmDiff(const string& bpmDiff);
-        const int getRank() const;
-        void setRank(int rank);
+        const int getRating() const;
+        void setRating(int rating);
         const string& getComments() const;
         void setComments(const string& comments);
         const bool getAddon() const;
@@ -82,7 +82,7 @@ namespace soulsifter {
         int inSongId;
         Song* inSong;
         string bpmDiff;
-        int rank;
+        int rating;
         string comments;
         bool addon;
 

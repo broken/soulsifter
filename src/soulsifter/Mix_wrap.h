@@ -44,8 +44,8 @@ class Mix : public Nan::ObjectWrap {
   static void setInSong(v8::Local<v8::String> property, v8::Local<v8::Value> value, const Nan::PropertyCallbackInfo<void>& info);
   static void getBpmDiff(v8::Local<v8::String> property, const Nan::PropertyCallbackInfo<v8::Value>& info);
   static void setBpmDiff(v8::Local<v8::String> property, v8::Local<v8::Value> value, const Nan::PropertyCallbackInfo<void>& info);
-  static void getRank(v8::Local<v8::String> property, const Nan::PropertyCallbackInfo<v8::Value>& info);
-  static void setRank(v8::Local<v8::String> property, v8::Local<v8::Value> value, const Nan::PropertyCallbackInfo<void>& info);
+  static void getRating(v8::Local<v8::String> property, const Nan::PropertyCallbackInfo<v8::Value>& info);
+  static void setRating(v8::Local<v8::String> property, v8::Local<v8::Value> value, const Nan::PropertyCallbackInfo<void>& info);
   static void getComments(v8::Local<v8::String> property, const Nan::PropertyCallbackInfo<v8::Value>& info);
   static void setComments(v8::Local<v8::String> property, v8::Local<v8::Value> value, const Nan::PropertyCallbackInfo<void>& info);
   static void getAddon(v8::Local<v8::String> property, const Nan::PropertyCallbackInfo<v8::Value>& info);

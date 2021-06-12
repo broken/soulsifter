@@ -40,7 +40,7 @@ namespace soulsifter {
     inSongId(0),
     inSong(NULL),
     bpmDiff(),
-    rank(0),
+    rating(0),
     comments(),
     addon(false) {
     }
@@ -52,7 +52,7 @@ namespace soulsifter {
     inSongId(mix.getInSongId()),
     inSong(NULL),
     bpmDiff(mix.getBpmDiff()),
-    rank(mix.getRank()),
+    rating(mix.getRating()),
     comments(mix.getComments()),
     addon(mix.getAddon()) {
         if (mix.outSong) setOutSong(*mix.outSong);
@@ -78,7 +78,7 @@ namespace soulsifter {
             inSong = NULL;
         }
         bpmDiff = mix.getBpmDiff();
-        rank = mix.getRank();
+        rating = mix.getRating();
         comments = mix.getComments();
         addon = mix.getAddon();
     }
@@ -99,7 +99,7 @@ namespace soulsifter {
         delete inSong;
         inSong = NULL;
         bpmDiff.clear();
-        rank = 0;
+        rating = 0;
         comments.clear();
         addon = false;
     }
@@ -111,7 +111,7 @@ namespace soulsifter {
         mix->setOutSongId(rs->getInt("outSongId"));
         mix->setInSongId(rs->getInt("inSongId"));
         mix->setBpmDiff(rs->getString("bpmDiff"));
-        mix->setRank(rs->getInt("rank"));
+        mix->setRating(rs->getInt("rating"));
         mix->setComments(rs->getString("comments"));
         mix->setAddon(rs->getBoolean("addon"));
     }
@@ -220,14 +220,14 @@ namespace soulsifter {
                     inSongId = inSong->getId();
                 }
 
-                sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("update Mixes set outSongId=?, inSongId=?, bpmDiff=?, rank=?, comments=?, addon=? where id=?");
+                sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("update Mixes set outSongId=?, inSongId=?, bpmDiff=?, rating=?, comments=?, addon=? where id=?");
                 if (outSongId > 0) ps->setInt(1, outSongId);
                 else ps->setNull(1, sql::DataType::INTEGER);
                 if (inSongId > 0) ps->setInt(2, inSongId);
                 else ps->setNull(2, sql::DataType::INTEGER);
                 if (!bpmDiff.empty()) ps->setString(3, bpmDiff);
                 else ps->setNull(3, sql::DataType::VARCHAR);
-                if (rank > 0) ps->setInt(4, rank);
+                if (rating > 0) ps->setInt(4, rating);
                 else ps->setNull(4, sql::DataType::INTEGER);
                 if (!comments.empty()) ps->setString(5, comments);
                 else ps->setNull(5, sql::DataType::VARCHAR);
@@ -269,14 +269,14 @@ namespace soulsifter {
                     inSongId = inSong->getId();
                 }
 
-                sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("insert into Mixes (outSongId, inSongId, bpmDiff, rank, comments, addon) values (?, ?, ?, ?, ?, ?)");
+                sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("insert into Mixes (outSongId, inSongId, bpmDiff, rating, comments, addon) values (?, ?, ?, ?, ?, ?)");
                 if (outSongId > 0) ps->setInt(1, outSongId);
                 else ps->setNull(1, sql::DataType::INTEGER);
                 if (inSongId > 0) ps->setInt(2, inSongId);
                 else ps->setNull(2, sql::DataType::INTEGER);
                 if (!bpmDiff.empty()) ps->setString(3, bpmDiff);
                 else ps->setNull(3, sql::DataType::VARCHAR);
-                if (rank > 0) ps->setInt(4, rank);
+                if (rating > 0) ps->setInt(4, rating);
                 else ps->setNull(4, sql::DataType::INTEGER);
                 if (!comments.empty()) ps->setString(5, comments);
                 else ps->setNull(5, sql::DataType::VARCHAR);
@@ -357,12 +357,12 @@ namespace soulsifter {
                 bpmDiff = mix->getBpmDiff();
             }
         }
-        if (rank != mix->getRank()) {
-            if (rank) {
-                LOG(INFO) << "updating mix " << id << " rank from " << mix->getRank() << " to " << rank;
+        if (rating != mix->getRating()) {
+            if (rating) {
+                LOG(INFO) << "updating mix " << id << " rating from " << mix->getRating() << " to " << rating;
                 needsUpdate = true;
             } else {
-                rank = mix->getRank();
+                rating = mix->getRating();
             }
         }
         if (comments.compare(mix->getComments())  && (!boost::regex_match(comments, match1, decimal) || !boost::regex_match(mix->getComments(), match2, decimal) || match1[1].str().compare(match2[1].str()))) {
@@ -451,8 +451,8 @@ namespace soulsifter {
     const string& Mix::getBpmDiff() const { return bpmDiff; }
     void Mix::setBpmDiff(const string& bpmDiff) { this->bpmDiff = bpmDiff; }
 
-    const int Mix::getRank() const { return rank; }
-    void Mix::setRank(const int rank) { this->rank = rank; }
+    const int Mix::getRating() const { return rating; }
+    void Mix::setRating(const int rating) { this->rating = rating; }
 
     const string& Mix::getComments() const { return comments; }
     void Mix::setComments(const string& comments) { this->comments = comments; }
