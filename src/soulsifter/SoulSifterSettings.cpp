@@ -40,6 +40,8 @@ namespace soulsifter {
       ptree.put("db.password", "pw");
       //ptree.put("feedly.userId", "");
       //ptree.put("feedly.devToken", "");
+      //ptree.put("google.clientId", "");
+      //ptree.put("google.clientSecret", "");
       //ptree.put("google.appKey", "");
       //ptree.put("google.email", "");
       //ptree.put("google.androidId", "");
