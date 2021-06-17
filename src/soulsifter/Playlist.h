@@ -52,6 +52,8 @@ namespace soulsifter {
         void setQuery(const string& query);
         const string& getGmusicId() const;
         void setGmusicId(const string& gmusicId);
+        const string& getYoutubeId() const;
+        void setYoutubeId(const string& youtubeId);
         const vector<int>& getStyleIds() const;
         void setStyleIds(const vector<int>& styleIds);
         const vector<Style*>& getStyles();
@@ -65,6 +67,7 @@ namespace soulsifter {
         string name;
         string query;
         string gmusicId;
+        string youtubeId;
         vector<int> styleIds;
         vector<Style*> styles;
 

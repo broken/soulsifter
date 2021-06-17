@@ -819,6 +819,7 @@ playlistFields = [
   [:string, "name", Attrib::FIND],
   [:string, "query", 0],
   [:string, "gmusicId", 0],
+  [:string, "youtubeId", 0],
   ["vector<int>", "styleIds", Attrib::ID],
   ["vector<Style*>", "styles", 0],
 ]
