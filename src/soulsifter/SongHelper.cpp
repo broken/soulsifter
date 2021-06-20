@@ -43,7 +43,7 @@ namespace soulsifter {
     trashed(!song->getDisabled().compare("yes")),
     lowQuality(false),
     googleSongId(),
-    youtubeSongId(),
+    youtubeId(),
     durationInMs(0),
     curator(),
     albumId(0),

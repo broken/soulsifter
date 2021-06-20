@@ -59,7 +59,7 @@ void Song::Init(v8::Local<v8::Object> exports) {
   Nan::SetMethod(tpl, "findById", findById);
   Nan::SetMethod(tpl, "findByFilepath", findByFilepath);
   Nan::SetMethod(tpl, "findByGoogleSongId", findByGoogleSongId);
-  Nan::SetMethod(tpl, "findByYoutubeSongId", findByYoutubeSongId);
+  Nan::SetMethod(tpl, "findByYoutubeId", findByYoutubeId);
   Nan::SetMethod(tpl, "findByRESongId", findByRESongId);
   Nan::SetMethod(tpl, "findAll", findAll);
   Nan::SetPrototypeMethod(tpl, "update", update);
@@ -85,7 +85,7 @@ void Song::Init(v8::Local<v8::Object> exports) {
   Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("trashed").ToLocalChecked(), getTrashed, setTrashed);
   Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("lowQuality").ToLocalChecked(), getLowQuality, setLowQuality);
   Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("googleSongId").ToLocalChecked(), getGoogleSongId, setGoogleSongId);
-  Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("youtubeSongId").ToLocalChecked(), getYoutubeSongId, setYoutubeSongId);
+  Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("youtubeId").ToLocalChecked(), getYoutubeId, setYoutubeId);
   Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("durationInMs").ToLocalChecked(), getDurationInMs, setDurationInMs);
   Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("curator").ToLocalChecked(), getCurator, setCurator);
   Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("rESongId").ToLocalChecked(), getRESongId, setRESongId);
@@ -163,10 +163,10 @@ void Song::findByGoogleSongId(const Nan::FunctionCallbackInfo<v8::Value>& info) 
   }
 }
 
-void Song::findByYoutubeSongId(const Nan::FunctionCallbackInfo<v8::Value>& info) {
+void Song::findByYoutubeId(const Nan::FunctionCallbackInfo<v8::Value>& info) {
   string a0(*v8::String::Utf8Value(info[0]->ToString()));
   dogatech::soulsifter::Song* result =
-      dogatech::soulsifter::Song::findByYoutubeSongId(a0);
+      dogatech::soulsifter::Song::findByYoutubeId(a0);
 
   if (result == NULL) {
     info.GetReturnValue().SetNull();
@@ -460,17 +460,17 @@ NAN_SETTER(Song::setGoogleSongId) {
   obj->song->setGoogleSongId(a0);
 }
 
-NAN_GETTER(Song::getYoutubeSongId) {
+NAN_GETTER(Song::getYoutubeId) {
   Song* obj = Nan::ObjectWrap::Unwrap<Song>(info.Holder());
-  const string result =  obj->song->getYoutubeSongId();
+  const string result =  obj->song->getYoutubeId();
 
   info.GetReturnValue().Set(Nan::New<v8::String>(result).ToLocalChecked());
 }
 
-NAN_SETTER(Song::setYoutubeSongId) {
+NAN_SETTER(Song::setYoutubeId) {
   Song* obj = Nan::ObjectWrap::Unwrap<Song>(info.Holder());
   string a0(*v8::String::Utf8Value(value->ToString()));
-  obj->song->setYoutubeSongId(a0);
+  obj->song->setYoutubeId(a0);
 }
 
 NAN_GETTER(Song::getDurationInMs) {

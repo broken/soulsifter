@@ -41,7 +41,7 @@ namespace soulsifter {
         static Song* findById(int id);
         static Song* findByFilepath(const string& filepath);
         static Song* findByGoogleSongId(const string& googleSongId);
-        static Song* findByYoutubeSongId(const string& youtubeSongId);
+        static Song* findByYoutubeId(const string& youtubeId);
         static Song* findByRESongId(int reSongId);
         static ResultSetIterator<Song>* findAll();
 
@@ -90,8 +90,8 @@ namespace soulsifter {
         void setLowQuality(bool lowQuality);
         const string& getGoogleSongId() const;
         void setGoogleSongId(const string& googleSongId);
-        const string& getYoutubeSongId() const;
-        void setYoutubeSongId(const string& youtubeSongId);
+        const string& getYoutubeId() const;
+        void setYoutubeId(const string& youtubeId);
         const int getDurationInMs() const;
         void setDurationInMs(int durationInMs);
         const string& getCurator() const;
@@ -149,7 +149,7 @@ namespace soulsifter {
         bool trashed;
         bool lowQuality;
         string googleSongId;
-        string youtubeSongId;
+        string youtubeId;
         int durationInMs;
         string curator;
         int reSongId;

@@ -107,7 +107,7 @@ vector<string> MusicVideoService::downloadAudio(const string& url) {
         boost::regex artistTopicRegex(" - Topic$");
         song->setArtist(boost::regex_replace(song->getArtist(), artistTopicRegex, ""));
       }
-      song->setYoutubeSongId(ptree.get<string>("id"));
+      song->setYoutubeId(ptree.get<string>("id"));
       song->setLowQuality(true);
       song->setCurator(ptree.get<string>("uploader"));
       string date = ptree.get<string>("upload_date", "00000000");
