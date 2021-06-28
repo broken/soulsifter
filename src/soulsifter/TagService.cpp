@@ -41,6 +41,7 @@ namespace {
 // custom tag descriptions
 const char* const CURATOR = "CURATOR";
 const char* const LOW_QUALITY = "LQ";
+const char* const YOUTUBE = "YOUTUBE";
 
 class ImageFile : public TagLib::File {
 public:
@@ -314,6 +315,7 @@ void TagService::readId3v2Tag(Song* song) {
   string lq(getId3v2UserText(id3v2, LOW_QUALITY));
   song->setLowQuality(lq.length() > 0 && lq.compare("0") && lq.compare("false"));
   song->setCurator(getId3v2UserText(id3v2, CURATOR));
+  song->setYoutubeId(getId3v2UserText(id3v2, YOUTUBE));
 
   // attributes (bpm, key, energy)
   readId3v2TagAttributes(song, id3v2);
@@ -398,6 +400,12 @@ void TagService::writeId3v2Tag(Song* song) {
       setId3v2UserText(id3v2, CURATOR, song->getCurator().c_str());
     } else {
       TagLib::ID3v2::UserTextIdentificationFrame* frame = TagLib::ID3v2::UserTextIdentificationFrame::find(id3v2, CURATOR);
+      if (frame) id3v2->removeFrames(frame->frameID());
+    }
+    if (song->getYoutubeId().length() > 0) {
+      setId3v2UserText(id3v2, YOUTUBE, song->getYoutubeId().c_str());
+    } else {
+      TagLib::ID3v2::UserTextIdentificationFrame* frame = TagLib::ID3v2::UserTextIdentificationFrame::find(id3v2, YOUTUBE);
       if (frame) id3v2->removeFrames(frame->frameID());
     }
     // picture
