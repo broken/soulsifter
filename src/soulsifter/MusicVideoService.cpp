@@ -82,6 +82,7 @@ vector<string> MusicVideoService::downloadAudio(const string& url) {
 
   // read output
   string json;
+  bool isCoverAdded = false;  // in case downloading full album
   while (std::getline(ss, json, '\n')) {
     if (json.at(0) == '{') {
       boost::property_tree::ptree ptree;
@@ -98,19 +99,32 @@ vector<string> MusicVideoService::downloadAudio(const string& url) {
       if (!boost::filesystem::exists(album->getCoverFilepath())) {
         album->setCoverFilepath(SoulSifterSettings::getInstance().get<string>("dir.tmp") + '/' + baseFileName + "webp");
       }
-      // TODO check again and throw warning if still missing
-      string title = ptree.get<string>("title");
-      if (!MusicManager::getInstance().splitArtistAndTitle(title, song)) {
-        song->setTitle(title);
-        song->setArtist(ptree.get<string>("uploader"));
-        // Remove " - Topic" from artist field
-        boost::regex artistTopicRegex(" - Topic$");
-        song->setArtist(boost::regex_replace(song->getArtist(), artistTopicRegex, ""));
-      }
-      song->setYoutubeId(ptree.get<string>("id"));
       song->setLowQuality(true);
-      song->setCurator(ptree.get<string>("uploader"));
-      string date = ptree.get<string>("upload_date", "00000000");
+      string date;
+      if (url.find("music.youtube") != std::string::npos) {
+        // youtube music
+        song->setArtist(ptree.get<string>("artist"));
+        song->setTitle(ptree.get<string>("track"));
+        album->setName(ptree.get<string>("album"));
+        song->setTrack(ptree.get<string>("playlist_index"));
+        date = ptree.get<string>("release_date", "00000000");
+        // remix people are added inline, so let's remove them
+        boost::regex artistRegex(", .*$");
+        song->setArtist(boost::regex_replace(song->getArtist(), artistRegex, ""));
+      } else {
+        // youtube
+        song->setYoutubeId(ptree.get<string>("id"));
+        song->setCurator(ptree.get<string>("uploader"));
+        string title = ptree.get<string>("title");
+        if (!MusicManager::getInstance().splitArtistAndTitle(title, song)) {
+          song->setTitle(title);
+          song->setArtist(ptree.get<string>("uploader"));
+          // Remove " - Topic" from artist field
+          boost::regex artistTopicRegex(" - Topic$");
+          song->setArtist(boost::regex_replace(song->getArtist(), artistTopicRegex, ""));
+        }
+        date = ptree.get<string>("upload_date", "00000000");
+      }
       if (!date.empty() && !!date.compare("null")) {
         album->setReleaseDateYear(std::stoi(date.substr(0, 4)));
         album->setReleaseDateMonth(std::stoi(date.substr(4, 2)));
@@ -119,9 +133,11 @@ vector<string> MusicVideoService::downloadAudio(const string& url) {
 
       TagService::writeId3v2Tag(song);
       filepaths.push_back(song->getFilepath());
-      filepaths.push_back(album->getCoverFilepath());
+      if (url.find("music.youtube") == std::string::npos || !isCoverAdded) {
+        filepaths.push_back(album->getCoverFilepath());
+        isCoverAdded = true;
+      }
       delete song;
-      return filepaths;
     }
   }
   return filepaths;
