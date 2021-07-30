@@ -37,7 +37,7 @@
     "@polymer/paper-toggle-button": "^3.0.1",
     "@polymer/polymer": "^3.2.0",
     "async": "^3.0.1",
-    "axios": "^0.19.0",
+    "axios": "^0.21.1",
     "google-auth-library": "^7.1.2",
     "googleapis": "^74.2.0",
     "playmusic": "^2.3.0",
