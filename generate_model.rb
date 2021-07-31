@@ -301,7 +301,7 @@ def cFindFunction(name, f, fields)
   else
     str << "    #{cap(name)}* #{cap(name)}::findBy#{cap(f[$name])}(const #{f[$type]}& #{f[$name]}) {\n"
   end
-  str << "        for (int i = 0; i < 2; ++i) {\n            try {\n"
+  str << sqlTryBlock()
   str << "                sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement(\"select #{selectStar(name, fields)} from #{fromTable(name, fields)} where #{cap(plural(name))}.#{f[$name]} = ?#{groupBy(name,fields)}\");\n"
   str << "                ps->set#{cap(f[$type].to_s)}(1, #{f[$name]});\n                sql::ResultSet *rs = ps->executeQuery();\n                #{cap(name)} *#{name} = NULL;\n                if (rs->next()) {\n                    #{name} = new #{cap(name)}();\n                    populateFields(rs, #{name});\n                }\n                rs->close();\n                delete rs;\n\n"
   str << "                return #{name};\n"
@@ -357,7 +357,7 @@ def cSecondaryKeysFindFunction(name, secondaryKeys, fields)
     end
   end
   str << ") {\n"
-  str << "        for (int i = 0; i < 2; ++i) {\n            try {\n"
+  str << sqlTryBlock()
   str << "                sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement(\"select #{selectStar(name, fields)} from #{fromTable(name, fields)} where "
   secondaryKeys.each_with_index do |f,idx|
     if (idx > 0)
@@ -466,7 +466,8 @@ def hUpdateFunction()
 end
 
 def cUpdateFunction(name, fields)
-  str = "    int #{cap(name)}::update() {\n        for (int i = 0; i < 2; ++i) {\n            try {\n"
+  str = "    int #{cap(name)}::update() {\n"
+  str << sqlTryBlock()
   fields.select{|f| f[$attrib] & Attrib::PTR > 0}.each do |f|
     str << syncChildBlock(f)
   end
@@ -504,7 +505,8 @@ def hSaveFunction()
 end
 
 def cSaveFunction(name, fields, attribs)
-  str = "    int #{cap(name)}::save() {\n        for (int i = 0; i < 2; ++i) {\n            try {\n"
+  str = "    int #{cap(name)}::save() {\n"
+  str << sqlTryBlock()
   fields.select{|f| f[$attrib] & Attrib::PTR > 0}.each do |f|
     str << syncChildBlock(f)
   end
@@ -555,7 +557,8 @@ def hEraseFunction()
 end
 
 def cEraseFunction(name, fields)
-  str = "    int #{cap(name)}::erase() {\n        for (int i = 0; i < 2; ++i) {\n            try {\n"
+  str = "    int #{cap(name)}::erase() {\n"
+  str << sqlTryBlock()
   fields.each do |f|
     next unless (isVector(f[$type]) && !["int", "string"].include?(getVectorGeneric(f[$type])) && f[$attrib] & Attrib::JOINTABLE > 0)
     str << "                {\n                    const #{f[$type]}& #{f[$name]} = get#{cap(f[$name])}();\n                    for (#{f[$type]}::const_iterator it = #{f[$name]}.begin(); it != #{f[$name]}.end(); ++it) {\n                        (*it)->erase();\n                    }\n                    #{f[$type]} tmp;\n                    set#{cap(f[$name])}(tmp);\n                }\n"
