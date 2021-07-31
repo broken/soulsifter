@@ -162,6 +162,10 @@ end
 
 ######################### h & cc outputs
 
+def sqlTryBlock()
+  return "        for (int i = 0; i < 2; ++i) {\n            try {\n"
+end
+
 def sqlCatchBlock()
   return "            } catch (sql::SQLException &e) {\n                LOG(WARNING) << \"ERROR: SQLException in \" << __FILE__ << \" (\" << __func__<< \") on line \" << __LINE__;\n                LOG(WARNING) << \"ERROR: \" << e.what() << \" (MySQL error code: \" << e.getErrorCode() << \", SQLState: \" << e.getSQLState() << \")\";\n                bool reconnected = MysqlAccess::getInstance().reconnect();\n                LOG(INFO) << (reconnected ? \"Successful\" : \"Failed\") << \" mysql reconnection\";\n            }\n        }\n        LOG(FATAL) << \"Unable to complete model operation\";\n"
 end
@@ -384,7 +388,11 @@ def hFindAllFunction(name)
 end
 
 def cFindAllFunction(name, fields)
-  return "    ResultSetIterator<#{cap(name)}>* #{cap(name)}::findAll() {\n        sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement(\"select #{selectStar(name, fields)} from #{fromTable(name, fields)}#{groupBy(name,fields)}\");\n        sql::ResultSet *rs = ps->executeQuery();\n        ResultSetIterator<#{cap(name)}> *dtrs = new ResultSetIterator<#{cap(name)}>(rs);\n        return dtrs;\n    }\n"
+  str = "    ResultSetIterator<#{cap(name)}>* #{cap(name)}::findAll() {\n"
+  str << sqlTryBlock()
+  str << "                sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement(\"select #{selectStar(name, fields)} from #{fromTable(name, fields)}#{groupBy(name,fields)}\");\n                sql::ResultSet *rs = ps->executeQuery();\n                ResultSetIterator<#{cap(name)}> *dtrs = new ResultSetIterator<#{cap(name)}>(rs);\n                return dtrs;\n"
+  str << sqlCatchBlock()
+  str << "    }\n"
 end
 
 def hSyncFunction()

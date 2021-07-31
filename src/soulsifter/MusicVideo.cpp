@@ -93,10 +93,20 @@ namespace soulsifter {
     }
 
     ResultSetIterator<MusicVideo>* MusicVideo::findAll() {
-        sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select MusicVideos.* from MusicVideos");
-        sql::ResultSet *rs = ps->executeQuery();
-        ResultSetIterator<MusicVideo> *dtrs = new ResultSetIterator<MusicVideo>(rs);
-        return dtrs;
+        for (int i = 0; i < 2; ++i) {
+            try {
+                sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select MusicVideos.* from MusicVideos");
+                sql::ResultSet *rs = ps->executeQuery();
+                ResultSetIterator<MusicVideo> *dtrs = new ResultSetIterator<MusicVideo>(rs);
+                return dtrs;
+            } catch (sql::SQLException &e) {
+                LOG(WARNING) << "ERROR: SQLException in " << __FILE__ << " (" << __func__<< ") on line " << __LINE__;
+                LOG(WARNING) << "ERROR: " << e.what() << " (MySQL error code: " << e.getErrorCode() << ", SQLState: " << e.getSQLState() << ")";
+                bool reconnected = MysqlAccess::getInstance().reconnect();
+                LOG(INFO) << (reconnected ? "Successful" : "Failed") << " mysql reconnection";
+            }
+        }
+        LOG(FATAL) << "Unable to complete model operation";
     }
 
 # pragma mark persistence

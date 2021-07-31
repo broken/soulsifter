@@ -382,10 +382,20 @@ namespace soulsifter {
     }
 
     ResultSetIterator<Song>* Song::findAll() {
-        sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select Songs.*, group_concat(distinct(styles.styleId)) as styleIds from Songs left outer join SongStyles styles on Songs.id = styles.songId group by Songs.id");
-        sql::ResultSet *rs = ps->executeQuery();
-        ResultSetIterator<Song> *dtrs = new ResultSetIterator<Song>(rs);
-        return dtrs;
+        for (int i = 0; i < 2; ++i) {
+            try {
+                sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select Songs.*, group_concat(distinct(styles.styleId)) as styleIds from Songs left outer join SongStyles styles on Songs.id = styles.songId group by Songs.id");
+                sql::ResultSet *rs = ps->executeQuery();
+                ResultSetIterator<Song> *dtrs = new ResultSetIterator<Song>(rs);
+                return dtrs;
+            } catch (sql::SQLException &e) {
+                LOG(WARNING) << "ERROR: SQLException in " << __FILE__ << " (" << __func__<< ") on line " << __LINE__;
+                LOG(WARNING) << "ERROR: " << e.what() << " (MySQL error code: " << e.getErrorCode() << ", SQLState: " << e.getSQLState() << ")";
+                bool reconnected = MysqlAccess::getInstance().reconnect();
+                LOG(INFO) << (reconnected ? "Successful" : "Failed") << " mysql reconnection";
+            }
+        }
+        LOG(FATAL) << "Unable to complete model operation";
     }
 
 # pragma mark persistence

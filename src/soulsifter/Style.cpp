@@ -159,10 +159,20 @@ namespace soulsifter {
     }
 
     ResultSetIterator<Style>* Style::findAll() {
-        sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select Styles.*, group_concat(distinct(children.childId)) as childIds, group_concat(distinct(parents.parentId)) as parentIds from Styles left outer join StyleChildren children on Styles.id = children.parentId left outer join StyleChildren parents on Styles.id = parents.childId group by Styles.id");
-        sql::ResultSet *rs = ps->executeQuery();
-        ResultSetIterator<Style> *dtrs = new ResultSetIterator<Style>(rs);
-        return dtrs;
+        for (int i = 0; i < 2; ++i) {
+            try {
+                sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select Styles.*, group_concat(distinct(children.childId)) as childIds, group_concat(distinct(parents.parentId)) as parentIds from Styles left outer join StyleChildren children on Styles.id = children.parentId left outer join StyleChildren parents on Styles.id = parents.childId group by Styles.id");
+                sql::ResultSet *rs = ps->executeQuery();
+                ResultSetIterator<Style> *dtrs = new ResultSetIterator<Style>(rs);
+                return dtrs;
+            } catch (sql::SQLException &e) {
+                LOG(WARNING) << "ERROR: SQLException in " << __FILE__ << " (" << __func__<< ") on line " << __LINE__;
+                LOG(WARNING) << "ERROR: " << e.what() << " (MySQL error code: " << e.getErrorCode() << ", SQLState: " << e.getSQLState() << ")";
+                bool reconnected = MysqlAccess::getInstance().reconnect();
+                LOG(INFO) << (reconnected ? "Successful" : "Failed") << " mysql reconnection";
+            }
+        }
+        LOG(FATAL) << "Unable to complete model operation";
     }
 
 # pragma mark persistence
