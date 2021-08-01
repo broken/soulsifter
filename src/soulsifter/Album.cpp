@@ -201,21 +201,41 @@ namespace soulsifter {
     }
 
     ResultSetIterator<Album>* Album::findByName(string name) {
-        sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select Albums.* from Albums where ifnull(name,'') = ifnull(?,'')");
-        if (!name.empty()) ps->setString(1, name);
-        else ps->setNull(1, sql::DataType::VARCHAR);
-        sql::ResultSet *rs = ps->executeQuery();
-        ResultSetIterator<Album> *dtrs = new ResultSetIterator<Album>(rs);
-        return dtrs;
+        for (int i = 0; i < 2; ++i) {
+            try {
+                sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select Albums.* from Albums where ifnull(name,'') = ifnull(?,'')");
+                if (!name.empty()) ps->setString(1, name);
+                else ps->setNull(1, sql::DataType::VARCHAR);
+                sql::ResultSet *rs = ps->executeQuery();
+                ResultSetIterator<Album> *dtrs = new ResultSetIterator<Album>(rs);
+                return dtrs;
+            } catch (sql::SQLException &e) {
+                LOG(WARNING) << "ERROR: SQLException in " << __FILE__ << " (" << __func__<< ") on line " << __LINE__;
+                LOG(WARNING) << "ERROR: " << e.what() << " (MySQL error code: " << e.getErrorCode() << ", SQLState: " << e.getSQLState() << ")";
+                bool reconnected = MysqlAccess::getInstance().reconnect();
+                LOG(INFO) << (reconnected ? "Successful" : "Failed") << " mysql reconnection";
+            }
+        }
+        LOG(FATAL) << "Unable to complete model operation";
     }
 
     ResultSetIterator<Album>* Album::findByArtist(string artist) {
-        sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select Albums.* from Albums where ifnull(artist,'') = ifnull(?,'')");
-        if (!artist.empty()) ps->setString(1, artist);
-        else ps->setNull(1, sql::DataType::VARCHAR);
-        sql::ResultSet *rs = ps->executeQuery();
-        ResultSetIterator<Album> *dtrs = new ResultSetIterator<Album>(rs);
-        return dtrs;
+        for (int i = 0; i < 2; ++i) {
+            try {
+                sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select Albums.* from Albums where ifnull(artist,'') = ifnull(?,'')");
+                if (!artist.empty()) ps->setString(1, artist);
+                else ps->setNull(1, sql::DataType::VARCHAR);
+                sql::ResultSet *rs = ps->executeQuery();
+                ResultSetIterator<Album> *dtrs = new ResultSetIterator<Album>(rs);
+                return dtrs;
+            } catch (sql::SQLException &e) {
+                LOG(WARNING) << "ERROR: SQLException in " << __FILE__ << " (" << __func__<< ") on line " << __LINE__;
+                LOG(WARNING) << "ERROR: " << e.what() << " (MySQL error code: " << e.getErrorCode() << ", SQLState: " << e.getSQLState() << ")";
+                bool reconnected = MysqlAccess::getInstance().reconnect();
+                LOG(INFO) << (reconnected ? "Successful" : "Failed") << " mysql reconnection";
+            }
+        }
+        LOG(FATAL) << "Unable to complete model operation";
     }
 
     ResultSetIterator<Album>* Album::findAll() {

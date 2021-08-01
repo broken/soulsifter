@@ -374,10 +374,14 @@ def cSecondaryKeysFindFunction(name, secondaryKeys, fields)
   str << "    }\n\n"
   if (secondaryKeys.length > 1)
     secondaryKeys.each do |f|
-      str << "    ResultSetIterator<#{cap(name)}>* #{cap(name)}::findBy#{cap(f[$name])}(#{f[$type]} #{f[$name]}) {\n        sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement(\"select #{selectStar(name, fields)} from #{fromTable(name, fields)} where "
+      str << "    ResultSetIterator<#{cap(name)}>* #{cap(name)}::findBy#{cap(f[$name])}(#{f[$type]} #{f[$name]}) {\n"
+      str << sqlTryBlock()
+      str << "                sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement(\"select #{selectStar(name, fields)} from #{fromTable(name, fields)} where "
       str << "ifnull(#{f[$name]}," << defaultNullValue(f) << ") = ifnull(?," << defaultNullValue(f) << ")"
-      str << "#{groupBy(name,fields)}\");\n" << setField(f, 1, "        ")
-      str << "        sql::ResultSet *rs = ps->executeQuery();\n        ResultSetIterator<#{cap(name)}> *dtrs = new ResultSetIterator<#{cap(name)}>(rs);\n        return dtrs;\n    }\n\n"
+      str << "#{groupBy(name,fields)}\");\n" << setField(f, 1, "                ")
+      str << "                sql::ResultSet *rs = ps->executeQuery();\n                ResultSetIterator<#{cap(name)}> *dtrs = new ResultSetIterator<#{cap(name)}>(rs);\n                return dtrs;\n"
+      str << sqlCatchBlock()
+      str << "    }\n\n"
     end
   end
   return str

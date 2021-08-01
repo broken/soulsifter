@@ -161,21 +161,41 @@ namespace soulsifter {
     }
 
     ResultSetIterator<PlaylistEntry>* PlaylistEntry::findByPlaylistId(int playlistId) {
-        sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select PlaylistEntries.* from PlaylistEntries where ifnull(playlistId,0) = ifnull(?,0)");
-        if (playlistId > 0) ps->setInt(1, playlistId);
-        else ps->setNull(1, sql::DataType::INTEGER);
-        sql::ResultSet *rs = ps->executeQuery();
-        ResultSetIterator<PlaylistEntry> *dtrs = new ResultSetIterator<PlaylistEntry>(rs);
-        return dtrs;
+        for (int i = 0; i < 2; ++i) {
+            try {
+                sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select PlaylistEntries.* from PlaylistEntries where ifnull(playlistId,0) = ifnull(?,0)");
+                if (playlistId > 0) ps->setInt(1, playlistId);
+                else ps->setNull(1, sql::DataType::INTEGER);
+                sql::ResultSet *rs = ps->executeQuery();
+                ResultSetIterator<PlaylistEntry> *dtrs = new ResultSetIterator<PlaylistEntry>(rs);
+                return dtrs;
+            } catch (sql::SQLException &e) {
+                LOG(WARNING) << "ERROR: SQLException in " << __FILE__ << " (" << __func__<< ") on line " << __LINE__;
+                LOG(WARNING) << "ERROR: " << e.what() << " (MySQL error code: " << e.getErrorCode() << ", SQLState: " << e.getSQLState() << ")";
+                bool reconnected = MysqlAccess::getInstance().reconnect();
+                LOG(INFO) << (reconnected ? "Successful" : "Failed") << " mysql reconnection";
+            }
+        }
+        LOG(FATAL) << "Unable to complete model operation";
     }
 
     ResultSetIterator<PlaylistEntry>* PlaylistEntry::findBySongId(int songId) {
-        sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select PlaylistEntries.* from PlaylistEntries where ifnull(songId,0) = ifnull(?,0)");
-        if (songId > 0) ps->setInt(1, songId);
-        else ps->setNull(1, sql::DataType::INTEGER);
-        sql::ResultSet *rs = ps->executeQuery();
-        ResultSetIterator<PlaylistEntry> *dtrs = new ResultSetIterator<PlaylistEntry>(rs);
-        return dtrs;
+        for (int i = 0; i < 2; ++i) {
+            try {
+                sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select PlaylistEntries.* from PlaylistEntries where ifnull(songId,0) = ifnull(?,0)");
+                if (songId > 0) ps->setInt(1, songId);
+                else ps->setNull(1, sql::DataType::INTEGER);
+                sql::ResultSet *rs = ps->executeQuery();
+                ResultSetIterator<PlaylistEntry> *dtrs = new ResultSetIterator<PlaylistEntry>(rs);
+                return dtrs;
+            } catch (sql::SQLException &e) {
+                LOG(WARNING) << "ERROR: SQLException in " << __FILE__ << " (" << __func__<< ") on line " << __LINE__;
+                LOG(WARNING) << "ERROR: " << e.what() << " (MySQL error code: " << e.getErrorCode() << ", SQLState: " << e.getSQLState() << ")";
+                bool reconnected = MysqlAccess::getInstance().reconnect();
+                LOG(INFO) << (reconnected ? "Successful" : "Failed") << " mysql reconnection";
+            }
+        }
+        LOG(FATAL) << "Unable to complete model operation";
     }
 
     ResultSetIterator<PlaylistEntry>* PlaylistEntry::findAll() {

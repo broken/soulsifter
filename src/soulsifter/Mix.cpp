@@ -170,21 +170,41 @@ namespace soulsifter {
     }
 
     ResultSetIterator<Mix>* Mix::findByOutSongId(int outSongId) {
-        sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select Mixes.* from Mixes where ifnull(outSongId,0) = ifnull(?,0)");
-        if (outSongId > 0) ps->setInt(1, outSongId);
-        else ps->setNull(1, sql::DataType::INTEGER);
-        sql::ResultSet *rs = ps->executeQuery();
-        ResultSetIterator<Mix> *dtrs = new ResultSetIterator<Mix>(rs);
-        return dtrs;
+        for (int i = 0; i < 2; ++i) {
+            try {
+                sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select Mixes.* from Mixes where ifnull(outSongId,0) = ifnull(?,0)");
+                if (outSongId > 0) ps->setInt(1, outSongId);
+                else ps->setNull(1, sql::DataType::INTEGER);
+                sql::ResultSet *rs = ps->executeQuery();
+                ResultSetIterator<Mix> *dtrs = new ResultSetIterator<Mix>(rs);
+                return dtrs;
+            } catch (sql::SQLException &e) {
+                LOG(WARNING) << "ERROR: SQLException in " << __FILE__ << " (" << __func__<< ") on line " << __LINE__;
+                LOG(WARNING) << "ERROR: " << e.what() << " (MySQL error code: " << e.getErrorCode() << ", SQLState: " << e.getSQLState() << ")";
+                bool reconnected = MysqlAccess::getInstance().reconnect();
+                LOG(INFO) << (reconnected ? "Successful" : "Failed") << " mysql reconnection";
+            }
+        }
+        LOG(FATAL) << "Unable to complete model operation";
     }
 
     ResultSetIterator<Mix>* Mix::findByInSongId(int inSongId) {
-        sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select Mixes.* from Mixes where ifnull(inSongId,0) = ifnull(?,0)");
-        if (inSongId > 0) ps->setInt(1, inSongId);
-        else ps->setNull(1, sql::DataType::INTEGER);
-        sql::ResultSet *rs = ps->executeQuery();
-        ResultSetIterator<Mix> *dtrs = new ResultSetIterator<Mix>(rs);
-        return dtrs;
+        for (int i = 0; i < 2; ++i) {
+            try {
+                sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select Mixes.* from Mixes where ifnull(inSongId,0) = ifnull(?,0)");
+                if (inSongId > 0) ps->setInt(1, inSongId);
+                else ps->setNull(1, sql::DataType::INTEGER);
+                sql::ResultSet *rs = ps->executeQuery();
+                ResultSetIterator<Mix> *dtrs = new ResultSetIterator<Mix>(rs);
+                return dtrs;
+            } catch (sql::SQLException &e) {
+                LOG(WARNING) << "ERROR: SQLException in " << __FILE__ << " (" << __func__<< ") on line " << __LINE__;
+                LOG(WARNING) << "ERROR: " << e.what() << " (MySQL error code: " << e.getErrorCode() << ", SQLState: " << e.getSQLState() << ")";
+                bool reconnected = MysqlAccess::getInstance().reconnect();
+                LOG(INFO) << (reconnected ? "Successful" : "Failed") << " mysql reconnection";
+            }
+        }
+        LOG(FATAL) << "Unable to complete model operation";
     }
 
     ResultSetIterator<Mix>* Mix::findAll() {
