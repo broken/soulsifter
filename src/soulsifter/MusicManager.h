@@ -46,8 +46,6 @@ public:
     string getCopyToPath();
     bool moveSong(Song* song);
     bool moveImage(const string& filepath);
-    void populateStagingDirectory();
-    void flushStagingDirectory();
     
     // organizational genres
     void updateDatabaseBasicGenres();
