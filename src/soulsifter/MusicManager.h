@@ -41,6 +41,8 @@ public:
     void clearLastSongs();
     
     // paths
+    static string cleanDirName(const string& name);
+    static string cleanDirName(const string& name, const bool keepPathSeparator);
     string getCopyToPath();
     bool moveSong(Song* song);
     bool moveImage(const string& filepath);

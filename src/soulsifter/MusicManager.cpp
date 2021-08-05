@@ -61,19 +61,6 @@ namespace {
   const string FEATURING_REGEX = " [(]?[Ff](eaturing|t[.]?|eat[.]?) ([^()]+)[)]?";
   const string REMIX_REGEX = "[(]([^()]+) ([Rr]emix|[Rr]mx|[Mm]ix|[Rr]efix|[Dd]ub|[Ff]lip)[)]";
 
-  string cleanDirName(const string& s) {
-    string name(s);
-    std::replace(name.begin(), name.end(), '/', '-');
-    std::replace(name.begin(), name.end(), ':', ' ');
-    boost::regex charsToRemoveRegex("[!@#$%^&*?'\";]");
-    boost::regex prefixSpacesRegex("^[ ]*");
-    boost::regex suffixSpacesRegex("[ ]*$");
-    name = boost::regex_replace(name, charsToRemoveRegex, "");
-    name = boost::regex_replace(name, prefixSpacesRegex, "");
-    name = boost::regex_replace(name, suffixSpacesRegex, "");
-    return name;
-  }
-
   // trim from start (in place)
   static inline void ltrim(std::string &s) {
     s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](int ch) {
@@ -325,7 +312,7 @@ void MusicManager::writeTagsToSong(Song* song) {
         // code taken from moveImage(img)
         stringstream destpath;
         boost::filesystem::path src(img);
-        destpath << albumSubPathForImage << "/" << src.filename().string();
+        destpath << albumSubPathForImage << "/" << cleanDirName(src.filename().string());
         
         Album* album = lastSongFixed->getAlbum();
         album->setCoverFilepath(destpath.str());
@@ -338,6 +325,20 @@ void MusicManager::writeTagsToSong(Song* song) {
     }
                 
 # pragma mark paths
+
+string MusicManager::cleanDirName(const string& s) {
+  string name(s);
+  std::replace(name.begin(), name.end(), '/', '-');
+  std::replace(name.begin(), name.end(), ':', ' ');
+  std::replace(name.begin(), name.end(), '\\', ' ');
+  boost::regex charsToRemoveRegex("[!@#$%^&*?'\";]");
+  boost::regex prefixSpacesRegex("^[ ]*");
+  boost::regex suffixSpacesRegex("[ ]*$");
+  name = boost::regex_replace(name, charsToRemoveRegex, "");
+  name = boost::regex_replace(name, prefixSpacesRegex, "");
+  name = boost::regex_replace(name, suffixSpacesRegex, "");
+  return name;
+}
  
 string MusicManager::getCopyToPath() {
     filesystem::path dir(SoulSifterSettings::getInstance().get<string>("music.dir"));
@@ -385,7 +386,7 @@ bool MusicManager::moveSong(Song* song) {
     
         // move file to dest
         boost::filesystem::path src(song->getFilepath());
-        string songPath = albumPath + "/" + src.filename().string();
+        string songPath = albumPath + "/" + cleanDirName(src.filename().string());
         stringstream destPath;
         destPath << SoulSifterSettings::getInstance().get<string>("music.dir") << songPath;
         boost::filesystem::path dest(destPath.str());
@@ -407,7 +408,7 @@ bool MusicManager::moveSong(Song* song) {
             // move file to dest
             stringstream destpath;
             boost::filesystem::path src(img);
-            destpath << SoulSifterSettings::getInstance().get<string>("music.dir") << albumSubPathForImage << "/" << src.filename().string();
+            destpath << SoulSifterSettings::getInstance().get<string>("music.dir") << albumSubPathForImage << "/" << cleanDirName(src.filename().string());
             boost::filesystem::path dest(destpath.str());
             boost::filesystem::rename(src, dest);
             
@@ -493,7 +494,7 @@ bool MusicManager::moveSong(Song* song) {
                     }
                     // move file
                     stringstream destpath;
-                    destpath << dir.string() << "/" << it->path().filename().string();
+                    destpath << dir.string() << "/" << cleanDirName(it->path().filename().string());
                     filesystem::path dest(destpath.str());
                     LOG(INFO) << "Moving " << it->path().string() << " to " << dest.string();
                     filesystem::copy(it->path(), dest);

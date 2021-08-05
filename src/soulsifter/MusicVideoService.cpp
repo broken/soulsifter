@@ -31,7 +31,7 @@ namespace soulsifter {
 namespace {
 
 string removeSpecialCharsFromPath(string filepath) {
-  string newPath = boost::remove_erase_if(filepath, boost::is_any_of("'\""));
+  string newPath = MusicManager::cleanDirName(filepath, true);
   if (!newPath.compare(filepath)) return filepath;
 
   LOG(INFO) << "Renaming '" << filepath << "'' to '" << newPath << "'";
@@ -155,7 +155,8 @@ MusicVideo* MusicVideoService::associateYouTubeVideo(Song* song, const string& u
   string mvArtistDir;
   {
     stringstream ss;
-    ss << mvBasePath.string() << song->getAlbum()->getBasicGenre()->getName() << "/" << song->getArtist();
+    ss << mvBasePath.string() << MusicManager::cleanDirName(song->getAlbum()->getBasicGenre()->getName())
+       << "/" << MusicManager::cleanDirName(song->getArtist());
     mvArtistDir = ss.str();
   }
   boost::filesystem::path mvArtistPath(mvArtistDir);
@@ -236,8 +237,8 @@ MusicVideo* MusicVideoService::associateYouTubeVideo(Song* song, const string& u
     musicVideo->setFilePath(ssMv.str());
   }
 
-  // remove special chars from files
-  // TODO remove if --restrict-filenames works
+  // remove special chars from files just in case
+  // probably don't need with --restrict-filenames, but whatever
   musicVideo->setFilePath(removeSpecialCharsFromPath(musicVideo->getFilePath()));
   musicVideo->setThumbnailFilePath(removeSpecialCharsFromPath(musicVideo->getThumbnailFilePath()));
 
