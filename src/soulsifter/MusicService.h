@@ -3,8 +3,6 @@
 
 #include <string>
 
-#include "MusicManager.h"
-
 using namespace std;
 
 namespace dogatech {

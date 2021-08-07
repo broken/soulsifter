@@ -7,7 +7,7 @@
 namespace dogatech {
 namespace soulsifter {
 
-std::string cleanDirName(const std::string& name) { return MusicManager::cleanDirName(name); }
+std::string MusicService::cleanDirName(const std::string& name) { return MusicManager::cleanDirName(name); }
 
 }  // namespace soulsifter
 }  // namespace dogatech
