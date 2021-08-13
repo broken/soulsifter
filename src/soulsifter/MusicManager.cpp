@@ -14,6 +14,7 @@
 #include "MusicManager.h"
 
 #include <algorithm>
+#include <ctype.h>
 #include <map>
 #include <regex.h>
 #include <stdlib.h>
@@ -337,6 +338,8 @@ string MusicManager::cleanDirName(const string& s) {
   name = boost::regex_replace(name, charsToRemoveRegex, "");
   name = boost::regex_replace(name, prefixSpacesRegex, "");
   name = boost::regex_replace(name, suffixSpacesRegex, "");
+  // remove nonascii characters
+  name.erase(remove_if(name.begin(), name.end(), [](auto c) { return !isascii(c); }), name.end());
   return name;
 }
  
