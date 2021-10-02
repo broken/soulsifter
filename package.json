@@ -42,6 +42,7 @@
     "googleapis": "^74.2.0",
     "playmusic": "^2.3.0",
     "polymer-cli": "^1.9.10",
-    "polymer-modulizer": "^0.4.3"
+    "polymer-modulizer": "^0.4.3",
+    "spotify-web-api-node": "^5.0.2"
   }
 }
