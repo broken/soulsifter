@@ -44,6 +44,7 @@ namespace soulsifter {
     lowQuality(false),
     googleSongId(),
     youtubeId(),
+    spotifyId(),
     durationInMs(0),
     curator(),
     albumId(0),

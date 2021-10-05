@@ -835,6 +835,7 @@ playlistFields = [
   [:string, "query", 0],
   [:string, "gmusicId", 0],
   [:string, "youtubeId", 0],
+  [:string, "spotifyId", Attrib::FIND],
   ["vector<int>", "styleIds", Attrib::ID],
   ["vector<Style*>", "styles", 0],
 ]
@@ -906,6 +907,7 @@ songFields = [
   [:bool, "lowQuality", 0],
   [:string, "googleSongId", Attrib::FIND],
   [:string, "youtubeId", Attrib::FIND],
+  [:string, "spotifyId", Attrib::FIND],
   [:int, "durationInMs", 0],
   [:string, "curator", 0],
   [:int, "reSongId", Attrib::KEY2 | Attrib::ID],

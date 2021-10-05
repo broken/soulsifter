@@ -23,6 +23,7 @@ class Playlist : public Nan::ObjectWrap {
   static void clear(const Nan::FunctionCallbackInfo<v8::Value>& info);
   static void findById(const Nan::FunctionCallbackInfo<v8::Value>& info);
   static void findByName(const Nan::FunctionCallbackInfo<v8::Value>& info);
+  static void findBySpotifyId(const Nan::FunctionCallbackInfo<v8::Value>& info);
   static void findAll(const Nan::FunctionCallbackInfo<v8::Value>& info);
   static void update(const Nan::FunctionCallbackInfo<v8::Value>& info);
   static void save(const Nan::FunctionCallbackInfo<v8::Value>& info);
@@ -38,6 +39,8 @@ class Playlist : public Nan::ObjectWrap {
   static void setGmusicId(v8::Local<v8::String> property, v8::Local<v8::Value> value, const Nan::PropertyCallbackInfo<void>& info);
   static void getYoutubeId(v8::Local<v8::String> property, const Nan::PropertyCallbackInfo<v8::Value>& info);
   static void setYoutubeId(v8::Local<v8::String> property, v8::Local<v8::Value> value, const Nan::PropertyCallbackInfo<void>& info);
+  static void getSpotifyId(v8::Local<v8::String> property, const Nan::PropertyCallbackInfo<v8::Value>& info);
+  static void setSpotifyId(v8::Local<v8::String> property, v8::Local<v8::Value> value, const Nan::PropertyCallbackInfo<void>& info);
   static void getStyleIds(v8::Local<v8::String> property, const Nan::PropertyCallbackInfo<v8::Value>& info);
   static void setStyleIds(v8::Local<v8::String> property, v8::Local<v8::Value> value, const Nan::PropertyCallbackInfo<void>& info);
   static void getStyles(v8::Local<v8::String> property, const Nan::PropertyCallbackInfo<v8::Value>& info);

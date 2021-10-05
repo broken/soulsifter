@@ -52,6 +52,7 @@ void Playlist::Init(v8::Local<v8::Object> exports) {
   Nan::SetPrototypeMethod(tpl, "clear", clear);
   Nan::SetMethod(tpl, "findById", findById);
   Nan::SetMethod(tpl, "findByName", findByName);
+  Nan::SetMethod(tpl, "findBySpotifyId", findBySpotifyId);
   Nan::SetMethod(tpl, "findAll", findAll);
   Nan::SetPrototypeMethod(tpl, "update", update);
   Nan::SetPrototypeMethod(tpl, "save", save);
@@ -62,6 +63,7 @@ void Playlist::Init(v8::Local<v8::Object> exports) {
   Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("query").ToLocalChecked(), getQuery, setQuery);
   Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("gmusicId").ToLocalChecked(), getGmusicId, setGmusicId);
   Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("youtubeId").ToLocalChecked(), getYoutubeId, setYoutubeId);
+  Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("spotifyId").ToLocalChecked(), getSpotifyId, setSpotifyId);
   Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("styleIds").ToLocalChecked(), getStyleIds, setStyleIds);
   Nan::SetAccessor(tpl->InstanceTemplate(), Nan::New<v8::String>("styles").ToLocalChecked(), getStyles, setStyles);
 
@@ -94,6 +96,22 @@ void Playlist::findByName(const Nan::FunctionCallbackInfo<v8::Value>& info) {
   string a0(*v8::String::Utf8Value(info[0]->ToString()));
   dogatech::soulsifter::Playlist* result =
       dogatech::soulsifter::Playlist::findByName(a0);
+
+  if (result == NULL) {
+    info.GetReturnValue().SetNull();
+  } else {
+    v8::Local<v8::Object> instance = Playlist::NewInstance();
+    Playlist* r = Nan::ObjectWrap::Unwrap<Playlist>(instance);
+    r->setNwcpValue(result, true);
+
+    info.GetReturnValue().Set(instance);
+  }
+}
+
+void Playlist::findBySpotifyId(const Nan::FunctionCallbackInfo<v8::Value>& info) {
+  string a0(*v8::String::Utf8Value(info[0]->ToString()));
+  dogatech::soulsifter::Playlist* result =
+      dogatech::soulsifter::Playlist::findBySpotifyId(a0);
 
   if (result == NULL) {
     info.GetReturnValue().SetNull();
@@ -214,6 +232,19 @@ NAN_SETTER(Playlist::setYoutubeId) {
   Playlist* obj = Nan::ObjectWrap::Unwrap<Playlist>(info.Holder());
   string a0(*v8::String::Utf8Value(value->ToString()));
   obj->playlist->setYoutubeId(a0);
+}
+
+NAN_GETTER(Playlist::getSpotifyId) {
+  Playlist* obj = Nan::ObjectWrap::Unwrap<Playlist>(info.Holder());
+  const string result =  obj->playlist->getSpotifyId();
+
+  info.GetReturnValue().Set(Nan::New<v8::String>(result).ToLocalChecked());
+}
+
+NAN_SETTER(Playlist::setSpotifyId) {
+  Playlist* obj = Nan::ObjectWrap::Unwrap<Playlist>(info.Holder());
+  string a0(*v8::String::Utf8Value(value->ToString()));
+  obj->playlist->setSpotifyId(a0);
 }
 
 NAN_GETTER(Playlist::getStyleIds) {

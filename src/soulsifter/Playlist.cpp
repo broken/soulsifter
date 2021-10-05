@@ -39,6 +39,7 @@ namespace soulsifter {
     query(),
     gmusicId(),
     youtubeId(),
+    spotifyId(),
     styleIds(),
     styles() {
     }
@@ -49,6 +50,7 @@ namespace soulsifter {
     query(playlist.getQuery()),
     gmusicId(playlist.getGmusicId()),
     youtubeId(playlist.getYoutubeId()),
+    spotifyId(playlist.getSpotifyId()),
     styleIds(playlist.getStyleIds()),
     styles() {
     }
@@ -59,6 +61,7 @@ namespace soulsifter {
         query = playlist.getQuery();
         gmusicId = playlist.getGmusicId();
         youtubeId = playlist.getYoutubeId();
+        spotifyId = playlist.getSpotifyId();
         styleIds = playlist.getStyleIds();
         deleteVectorPointers(&styles);
     }
@@ -73,6 +76,7 @@ namespace soulsifter {
         query.clear();
         gmusicId.clear();
         youtubeId.clear();
+        spotifyId.clear();
         styleIds.clear();
         deleteVectorPointers(&styles);
     }
@@ -85,6 +89,7 @@ namespace soulsifter {
         playlist->setQuery(rs->getString("query"));
         playlist->setGmusicId(rs->getString("gmusicId"));
         playlist->setYoutubeId(rs->getString("youtubeId"));
+        playlist->setSpotifyId(rs->getString("spotifyId"));
         if (!rs->isNull("styleIds")) {
             string csv = rs->getString("styleIds");
             istringstream iss(csv);
@@ -145,6 +150,31 @@ namespace soulsifter {
         LOG(FATAL) << "Unable to complete model operation";
     }
 
+    Playlist* Playlist::findBySpotifyId(const string& spotifyId) {
+        for (int i = 0; i < 2; ++i) {
+            try {
+                sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select Playlists.*, group_concat(distinct(styles.styleId)) as styleIds from Playlists left outer join PlaylistStyles styles on Playlists.id = styles.playlistId where Playlists.spotifyId = ? group by Playlists.id");
+                ps->setString(1, spotifyId);
+                sql::ResultSet *rs = ps->executeQuery();
+                Playlist *playlist = NULL;
+                if (rs->next()) {
+                    playlist = new Playlist();
+                    populateFields(rs, playlist);
+                }
+                rs->close();
+                delete rs;
+
+                return playlist;
+            } catch (sql::SQLException &e) {
+                LOG(WARNING) << "ERROR: SQLException in " << __FILE__ << " (" << __func__<< ") on line " << __LINE__;
+                LOG(WARNING) << "ERROR: " << e.what() << " (MySQL error code: " << e.getErrorCode() << ", SQLState: " << e.getSQLState() << ")";
+                bool reconnected = MysqlAccess::getInstance().reconnect();
+                LOG(INFO) << (reconnected ? "Successful" : "Failed") << " mysql reconnection";
+            }
+        }
+        LOG(FATAL) << "Unable to complete model operation";
+    }
+
     ResultSetIterator<Playlist>* Playlist::findAll() {
         for (int i = 0; i < 2; ++i) {
             try {
@@ -168,7 +198,7 @@ namespace soulsifter {
         for (int i = 0; i < 2; ++i) {
             try {
 
-                sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("update Playlists set name=?, query=?, gmusicId=?, youtubeId=? where id=?");
+                sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("update Playlists set name=?, query=?, gmusicId=?, youtubeId=?, spotifyId=? where id=?");
                 if (!name.empty()) ps->setString(1, name);
                 else ps->setNull(1, sql::DataType::VARCHAR);
                 if (!query.empty()) ps->setString(2, query);
@@ -177,7 +207,9 @@ namespace soulsifter {
                 else ps->setNull(3, sql::DataType::VARCHAR);
                 if (!youtubeId.empty()) ps->setString(4, youtubeId);
                 else ps->setNull(4, sql::DataType::VARCHAR);
-                ps->setInt(5, id);
+                if (!spotifyId.empty()) ps->setString(5, spotifyId);
+                else ps->setNull(5, sql::DataType::VARCHAR);
+                ps->setInt(6, id);
                 int result = ps->executeUpdate();
                 if (!styleIds.empty()) {
                     stringstream ss("insert ignore into PlaylistStyles (playlistId, styleId) values (?, ?)", ios_base::app | ios_base::out | ios_base::ate);
@@ -222,7 +254,7 @@ namespace soulsifter {
         for (int i = 0; i < 2; ++i) {
             try {
 
-                sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("insert into Playlists (name, query, gmusicId, youtubeId) values (?, ?, ?, ?)");
+                sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("insert into Playlists (name, query, gmusicId, youtubeId, spotifyId) values (?, ?, ?, ?, ?)");
                 if (!name.empty()) ps->setString(1, name);
                 else ps->setNull(1, sql::DataType::VARCHAR);
                 if (!query.empty()) ps->setString(2, query);
@@ -231,6 +263,8 @@ namespace soulsifter {
                 else ps->setNull(3, sql::DataType::VARCHAR);
                 if (!youtubeId.empty()) ps->setString(4, youtubeId);
                 else ps->setNull(4, sql::DataType::VARCHAR);
+                if (!spotifyId.empty()) ps->setString(5, spotifyId);
+                else ps->setNull(5, sql::DataType::VARCHAR);
                 int saved = ps->executeUpdate();
                 if (!saved) {
                     LOG(WARNING) << "Not able to save playlist";
@@ -316,6 +350,14 @@ namespace soulsifter {
                 youtubeId = playlist->getYoutubeId();
             }
         }
+        if (spotifyId.compare(playlist->getSpotifyId())  && (!boost::regex_match(spotifyId, match1, decimal) || !boost::regex_match(playlist->getSpotifyId(), match2, decimal) || match1[1].str().compare(match2[1].str()))) {
+            if (!spotifyId.empty()) {
+                LOG(INFO) << "updating playlist " << id << " spotifyId from " << playlist->getSpotifyId() << " to " << spotifyId;
+                needsUpdate = true;
+            } else {
+                spotifyId = playlist->getSpotifyId();
+            }
+        }
         if (!equivalentVectors<int>(styleIds, playlist->getStyleIds())) {
             if (!containsVector<int>(styleIds, playlist->getStyleIds())) {
                 LOG(INFO) << "updating playlist " << id << " styleIds";
@@ -363,6 +405,9 @@ namespace soulsifter {
 
     const string& Playlist::getYoutubeId() const { return youtubeId; }
     void Playlist::setYoutubeId(const string& youtubeId) { this->youtubeId = youtubeId; }
+
+    const string& Playlist::getSpotifyId() const { return spotifyId; }
+    void Playlist::setSpotifyId(const string& spotifyId) { this->spotifyId = spotifyId; }
 
     const vector<int>& Playlist::getStyleIds() const { return styleIds; }
     void Playlist::setStyleIds(const vector<int>& styleIds) {

@@ -36,6 +36,7 @@ namespace soulsifter {
 
         static Playlist* findById(int id);
         static Playlist* findByName(const string& name);
+        static Playlist* findBySpotifyId(const string& spotifyId);
         static ResultSetIterator<Playlist>* findAll();
 
         int update();
@@ -54,6 +55,8 @@ namespace soulsifter {
         void setGmusicId(const string& gmusicId);
         const string& getYoutubeId() const;
         void setYoutubeId(const string& youtubeId);
+        const string& getSpotifyId() const;
+        void setSpotifyId(const string& spotifyId);
         const vector<int>& getStyleIds() const;
         void setStyleIds(const vector<int>& styleIds);
         const vector<Style*>& getStyles();
@@ -68,6 +71,7 @@ namespace soulsifter {
         string query;
         string gmusicId;
         string youtubeId;
+        string spotifyId;
         vector<int> styleIds;
         vector<Style*> styles;
 
