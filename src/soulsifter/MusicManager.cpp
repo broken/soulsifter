@@ -127,77 +127,83 @@ void copyRemixer(Song* updatedSong) {
 }
 
 void guessGenresForSong(Song* song) {
-  // Search by Album Artist on artist, album artist, & remixer fields
-  for (int i = 0; i < 2; ++i) {
-    try {
-      sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select styleId from songstyles st inner join (select genres, id, count(*) cnt from (select group_concat(styleid) as genres, s.id from songstyles ss inner join songs s on ss.songid = s.id inner join albums a on s.albumid = a.id where a.artist = ? or s.artist = ? or s.remixer = ? group by ss.songid) j group by genres order by cnt desc limit 1) i on st.songid=i.id");
-      ps->setString(1, song->getAlbum()->getArtist());
-      ps->setString(2, song->getAlbum()->getArtist());
-      ps->setString(3, song->getAlbum()->getArtist());
-      sql::ResultSet *rs = ps->executeQuery();
-      vector<int> styleIds;
-      if (rs->next()) {
-        styleIds.push_back(rs->getInt("styleId"));
+  // Search by Remixer on artist, album artist, & remixer fields
+  if (!song->getRemixer().empty()) {
+    for (int i = 0; i < 2; ++i) {
+      try {
+        sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select styleId from songstyles st inner join (select genres, id, count(*) cnt from (select group_concat(styleid) as genres, s.id from songstyles ss inner join songs s on ss.songid = s.id inner join albums a on s.albumid = a.id where a.artist = ? or s.artist = ? or s.remixer = ? group by ss.songid) j group by genres order by cnt desc limit 1) i on st.songid=i.id");
+        ps->setString(1, song->getRemixer());
+        ps->setString(2, song->getRemixer());
+        ps->setString(3, song->getRemixer());
+        sql::ResultSet *rs = ps->executeQuery();
+        vector<int> styleIds;
+        if (rs->next()) {
+          styleIds.push_back(rs->getInt("styleId"));
+        }
+        rs->close();
+        delete rs;
+        if (styleIds.size()) {
+          song->setStyleIds(styleIds);
+          return;
+        }
+      } catch (sql::SQLException &e) {
+        LOG(WARNING) << "ERROR: SQLException in " << __FILE__ << " (" << __func__<< ") on line " << __LINE__;
+        LOG(WARNING) << "ERROR: " << e.what() << " (MySQL error code: " << e.getErrorCode() << ", SQLState: " << e.getSQLState() << ")";
+        bool reconnected = MysqlAccess::getInstance().reconnect();
+        LOG(INFO) << (reconnected ? "Successful" : "Failed") << " mysql reconnection";
       }
-      rs->close();
-      delete rs;
-      if (styleIds.size()) {
-        song->setStyleIds(styleIds);
-        return;
-      }
-    } catch (sql::SQLException &e) {
-      LOG(WARNING) << "ERROR: SQLException in " << __FILE__ << " (" << __func__<< ") on line " << __LINE__;
-      LOG(WARNING) << "ERROR: " << e.what() << " (MySQL error code: " << e.getErrorCode() << ", SQLState: " << e.getSQLState() << ")";
-      bool reconnected = MysqlAccess::getInstance().reconnect();
-      LOG(INFO) << (reconnected ? "Successful" : "Failed") << " mysql reconnection";
     }
   }
   // Search by Curator
-  for (int i = 0; i < 2; ++i) {
-    try {
-      sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select styleId from songstyles st inner join (select genres, id, count(*) cnt from (select group_concat(styleid) as genres, s.id from songstyles ss inner join songs s on ss.songid = s.id where s.curator = ? group by ss.songid) j group by genres order by cnt desc limit 1) i on st.songid=i.id");
-      ps->setString(1, song->getCurator());
-      sql::ResultSet *rs = ps->executeQuery();
-      vector<int> styleIds;
-      if (rs->next()) {
-        styleIds.push_back(rs->getInt("styleId"));
+  if (!song->getCurator().empty()) {
+    for (int i = 0; i < 2; ++i) {
+      try {
+        sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select styleId from songstyles st inner join (select genres, id, count(*) cnt from (select group_concat(styleid) as genres, s.id from songstyles ss inner join songs s on ss.songid = s.id where s.curator = ? group by ss.songid) j group by genres order by cnt desc limit 1) i on st.songid=i.id");
+        ps->setString(1, song->getCurator());
+        sql::ResultSet *rs = ps->executeQuery();
+        vector<int> styleIds;
+        if (rs->next()) {
+          styleIds.push_back(rs->getInt("styleId"));
+        }
+        rs->close();
+        delete rs;
+        if (styleIds.size()) {
+          song->setStyleIds(styleIds);
+          return;
+        }
+      } catch (sql::SQLException &e) {
+        LOG(WARNING) << "ERROR: SQLException in " << __FILE__ << " (" << __func__<< ") on line " << __LINE__;
+        LOG(WARNING) << "ERROR: " << e.what() << " (MySQL error code: " << e.getErrorCode() << ", SQLState: " << e.getSQLState() << ")";
+        bool reconnected = MysqlAccess::getInstance().reconnect();
+        LOG(INFO) << (reconnected ? "Successful" : "Failed") << " mysql reconnection";
       }
-      rs->close();
-      delete rs;
-      if (styleIds.size()) {
-        song->setStyleIds(styleIds);
-        return;
-      }
-    } catch (sql::SQLException &e) {
-      LOG(WARNING) << "ERROR: SQLException in " << __FILE__ << " (" << __func__<< ") on line " << __LINE__;
-      LOG(WARNING) << "ERROR: " << e.what() << " (MySQL error code: " << e.getErrorCode() << ", SQLState: " << e.getSQLState() << ")";
-      bool reconnected = MysqlAccess::getInstance().reconnect();
-      LOG(INFO) << (reconnected ? "Successful" : "Failed") << " mysql reconnection";
     }
   }
-  // Search by Remixer on artist, album artist, & remixer fields
-  for (int i = 0; i < 2; ++i) {
-    try {
-      sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select styleId from songstyles st inner join (select genres, id, count(*) cnt from (select group_concat(styleid) as genres, s.id from songstyles ss inner join songs s on ss.songid = s.id inner join albums a on s.albumid = a.id where a.artist = ? or s.artist = ? or s.remixer = ? group by ss.songid) j group by genres order by cnt desc limit 1) i on st.songid=i.id");
-      ps->setString(1, song->getRemixer());
-      ps->setString(2, song->getRemixer());
-      ps->setString(3, song->getRemixer());
-      sql::ResultSet *rs = ps->executeQuery();
-      vector<int> styleIds;
-      if (rs->next()) {
-        styleIds.push_back(rs->getInt("styleId"));
+  // Search by Album Artist on artist, album artist, & remixer fields
+  if (!song->getAlbum()->getArtist().empty()) {
+    for (int i = 0; i < 2; ++i) {
+      try {
+        sql::PreparedStatement *ps = MysqlAccess::getInstance().getPreparedStatement("select styleId from songstyles st inner join (select genres, id, count(*) cnt from (select group_concat(styleid) as genres, s.id from songstyles ss inner join songs s on ss.songid = s.id inner join albums a on s.albumid = a.id where a.artist = ? or s.artist = ? or s.remixer = ? group by ss.songid) j group by genres order by cnt desc limit 1) i on st.songid=i.id");
+        ps->setString(1, song->getAlbum()->getArtist());
+        ps->setString(2, song->getAlbum()->getArtist());
+        ps->setString(3, song->getAlbum()->getArtist());
+        sql::ResultSet *rs = ps->executeQuery();
+        vector<int> styleIds;
+        if (rs->next()) {
+          styleIds.push_back(rs->getInt("styleId"));
+        }
+        rs->close();
+        delete rs;
+        if (styleIds.size()) {
+          song->setStyleIds(styleIds);
+          return;
+        }
+      } catch (sql::SQLException &e) {
+        LOG(WARNING) << "ERROR: SQLException in " << __FILE__ << " (" << __func__<< ") on line " << __LINE__;
+        LOG(WARNING) << "ERROR: " << e.what() << " (MySQL error code: " << e.getErrorCode() << ", SQLState: " << e.getSQLState() << ")";
+        bool reconnected = MysqlAccess::getInstance().reconnect();
+        LOG(INFO) << (reconnected ? "Successful" : "Failed") << " mysql reconnection";
       }
-      rs->close();
-      delete rs;
-      if (styleIds.size()) {
-        song->setStyleIds(styleIds);
-        return;
-      }
-    } catch (sql::SQLException &e) {
-      LOG(WARNING) << "ERROR: SQLException in " << __FILE__ << " (" << __func__<< ") on line " << __LINE__;
-      LOG(WARNING) << "ERROR: " << e.what() << " (MySQL error code: " << e.getErrorCode() << ", SQLState: " << e.getSQLState() << ")";
-      bool reconnected = MysqlAccess::getInstance().reconnect();
-      LOG(INFO) << (reconnected ? "Successful" : "Failed") << " mysql reconnection";
     }
   }
 }
