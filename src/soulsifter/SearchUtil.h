@@ -33,7 +33,7 @@ public:
                                     int limit,
                                     int energy = 0,
                                     const bool musicVideoMode = false,
-                                    const int orderBy = DATE_ADDED,
+                                    int orderBy = DATE_ADDED,
                                     std::function<void(string)> errorCallback = {});
 };
   

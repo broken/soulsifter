@@ -122,6 +122,7 @@ struct Atom {
     A_YEAR,
     CUSTOM_QUERY_PREDICATE,
     LIMIT,
+    ORDER_BY,
   };
   enum Property {
     NONE = 0x00,
@@ -148,7 +149,7 @@ void splitString(const string& query, vector<string>* atoms) {
 
 bool parse(const string& queryFragment, Atom* atom) {
   atom->clear();
-  boost::regex regex("^(-)?((id|a|artist|t|title|remixer|r|rating|comment|c|curator|e|energy|bpm|trashed|lowq|aid|n|album|m|mixed|l|label|y|year|q|query|limit):)?(.+)$");
+  boost::regex regex("^(-)?((id|a|artist|t|title|remixer|r|rating|comment|c|curator|e|energy|bpm|trashed|lowq|aid|n|album|m|mixed|l|label|y|year|q|query|limit|o|order|orderby|orderBy):)?(.+)$");
   boost::smatch match;
   if (!boost::regex_match(queryFragment, match, regex)) {
     return false;
@@ -206,6 +207,8 @@ bool parse(const string& queryFragment, Atom* atom) {
       } else {
         atom->type = Atom::A_LABEL;
       }
+    } else if (!match[3].compare("o") || !match[3].compare("order") || !match[3].compare("orderby") || !match[3].compare("orderBy")) {
+      atom->type = Atom::ORDER_BY;
     } else {
       // error
       return false;
@@ -214,7 +217,7 @@ bool parse(const string& queryFragment, Atom* atom) {
   return true;
 }
 
-string buildQueryPredicate(const string& query, int* limit, int* energy) {
+string buildQueryPredicate(const string& query, int* limit, int* energy, int* orderBy) {
   // Break query up into fragments
   vector<string> fragments;
   splitString(query, &fragments);
@@ -285,6 +288,15 @@ string buildQueryPredicate(const string& query, int* limit, int* energy) {
       ss << "true";
     } else if (atom.type == Atom::S_ENERGY) {
       *energy = atoi(atom.value.c_str());
+      ss << "true";
+    } else if (atom.type == Atom::ORDER_BY) {
+      if (!atom.value.compare("rand") || !atom.value.compare("random")) {
+        *orderBy = RANDOM;
+      } else if (!atom.value.compare("release_date") || !atom.value.compare("rdate") || !atom.value.compare("date_released") || !atom.value.compare("released")) {
+        *orderBy = RELEASE_DATE;
+      } else if (!atom.value.compare("added_date") || !atom.value.compare("adate") || !atom.value.compare("date_added") || !atom.value.compare("added")) {
+        *orderBy = DATE_ADDED;
+      }
       ss << "true";
     }
   }
@@ -423,7 +435,7 @@ vector<Song*>* SearchUtil::searchSongs(const string& query,
                                        int limit,
                                        int energy,
                                        const bool musicVideoMode,
-                                       const int orderBy,
+                                       int orderBy,
                                        std::function<void(string)> errorCallback) {
   LOG(INFO) << "q:" << query << ", bpm:" << bpm << ", key:" << key << ", styles:" << ", limit:" << limit;
 
@@ -432,7 +444,7 @@ vector<Song*>* SearchUtil::searchSongs(const string& query,
     ss << "select s.*, s.id as songid, s.artist as songartist, group_concat(ss.styleid) as styleIds, a.*, a.id as albumid, a.artist as albumartist, v.filepath as mvFilePath, v.thumbnailFilePath as mvTnFilePath from Songs s inner join Albums a on s.albumid = a.id inner join MusicVideos v on s.musicVideoId=v.id left outer join SongStyles ss on ss.songid=s.id where true";
   else
     ss << "select s.*, s.id as songid, s.artist as songartist, group_concat(ss.styleid) as styleIds, a.*, a.id as albumid, a.artist as albumartist from Songs s inner join Albums a on s.albumid = a.id left outer join SongStyles ss on ss.songid=s.id where true";
-  ss << buildQueryPredicate(query, &limit, &energy);
+  ss << buildQueryPredicate(query, &limit, &energy, &orderBy);
   ss << buildOptionPredicate(bpm, key, styles, songsToOmit, limit, energy, orderBy);
 
   LOG(DEBUG) << "Query:";
