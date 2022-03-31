@@ -364,7 +364,9 @@ void MusicManager::writeTagsToSong(Song* song) {
     copyRemixer(updatedSong);
 
     // add an album artist if one does not exist & not a compilation
-    if (updatedSong->getAlbum()->getArtist().empty() && lastSongFixed && !lastSongFixed->getAlbum()->getArtist().empty()) {
+    if (updatedSong->getAlbum()->getArtist().empty()
+        && !(lastSongFixed && lastSongFixed->getAlbum()->getArtist().empty() &&
+             lastParsedSong && !song.getAlbumConst()->getName().compare(lastParsedSong->getAlbum()->getName()))) {
       updatedSong->getAlbum()->setArtist(updatedSong->getArtist());
     }
     // add an album name if one does not exist
