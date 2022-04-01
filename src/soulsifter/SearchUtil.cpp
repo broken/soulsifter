@@ -128,6 +128,9 @@ struct Atom {
     NONE = 0x00,
     NEGATED = 0x01,
     CASE_SENSITIVE = 0x02,
+    LESS_THAN = 0x04,
+    GREATER_THAN = 0x08,
+    EQUAL = 0x10,
   };
   string value;
   Type type;
@@ -149,16 +152,23 @@ void splitString(const string& query, vector<string>* atoms) {
 
 bool parse(const string& queryFragment, Atom* atom) {
   atom->clear();
-  boost::regex regex("^(-)?((id|a|artist|t|title|remixer|r|rating|comment|c|curator|e|energy|bpm|trashed|lowq|aid|n|album|m|mixed|l|label|y|year|q|query|limit|o|order|orderby|orderBy):)?(.+)$");
+  boost::regex regex("^(-)?((id|a|artist|t|title|remixer|r|rating|comment|c|curator|e|energy|bpm|trashed|lowq|aid|n|album|m|mixed|l|label|y|year|q|query|limit|o|order|orderby|orderBy):)?(<|>)?(=)?(.+)$");
   boost::smatch match;
   if (!boost::regex_match(queryFragment, match, regex)) {
     return false;
   }
   // set value
   boost::regex quoteRegex("'");
-  atom->value = boost::regex_replace(string(match[4]), quoteRegex, "\\\\'");
+  atom->value = boost::regex_replace(string(match[6]), quoteRegex, "\\\\'");
   if (match[1].length() > 0) {
     atom->props |= Atom::NEGATED;
+  }
+  if (match[4].length() > 0) {
+    if (!match[4].compare("<")) atom->props |= Atom::LESS_THAN;
+    else atom->props |= Atom::GREATER_THAN;
+  }
+  if (match[5].length() > 0) {
+    atom->props |= Atom::EQUAL;
   }
   // set type
   if (match[2].length() > 0) {
@@ -217,6 +227,15 @@ bool parse(const string& queryFragment, Atom* atom) {
   return true;
 }
 
+string buildEqualityOperator(const int& props, const string& defaultOp = "=") {
+  if (props & Atom::LESS_THAN && props & Atom::EQUAL) return "<=";
+  if (props & Atom::LESS_THAN) return "<";
+  if (props & Atom::GREATER_THAN && props & Atom::EQUAL) return ">=";
+  if (props & Atom::GREATER_THAN) return ">";
+  if (props & Atom::EQUAL) return "=";
+  return defaultOp;
+}
+
 string buildQueryPredicate(const string& query, int* limit, int* energy, int* orderBy) {
   // Break query up into fragments
   vector<string> fragments;
@@ -237,7 +256,7 @@ string buildQueryPredicate(const string& query, int* limit, int* energy, int* or
     if (atom.type == Atom::ANY) {
       ss << "(ifnull(s.artist,'') like '%" << atom.value << "%' or ifnull(s.title,'') like '%" << atom.value << "%' or ifnull(s.remixer,'') like '%" << atom.value << "%' or ifnull(s.comments,'') like '%" << atom.value << "%' or ifnull(s.curator,'') like '%" << atom.value << "%' or ifnull(a.name,'') like '%" << atom.value << "%')";
     } else if (atom.type == Atom::S_ID) {
-      ss << "s.id = " << atom.value;
+      ss << "s.id " << buildEqualityOperator(atom.props) << " " << atom.value;
     } else if (atom.type == Atom::S_ARTIST) {
       ss << "ifnull(s.artist,'') like '%" << atom.value << "%'";
     } else if (atom.type == Atom::S_TITLE) {
@@ -245,7 +264,7 @@ string buildQueryPredicate(const string& query, int* limit, int* energy, int* or
     } else if (atom.type == Atom::S_REMIXER) {
       ss << "ifnull(s.remixer,'') like '%" << atom.value << "%'";
     } else if (atom.type == Atom::S_RATING) {
-      ss << "s.rating >= " << atom.value;
+      ss << "s.rating " << buildEqualityOperator(atom.props, ">=") << " " << atom.value;
     } else if (atom.type == Atom::S_COMMENT) {
       ss << "ifnull(s.comment,'') like '%" << atom.value << "%'";
     } else if (atom.type == Atom::S_CURATOR) {
@@ -255,7 +274,7 @@ string buildQueryPredicate(const string& query, int* limit, int* energy, int* or
     } else if (atom.type == Atom::S_LOW_QUALITY) {
       ss << "s.lowQuality = " << atom.value;
     } else if (atom.type == Atom::A_ID) {
-      ss << "a.id = " << atom.value;
+      ss << "a.id " << buildEqualityOperator(atom.props) << " " << atom.value;
     } else if (atom.type == Atom::A_NAME) {
       ss << "ifnull(a.name,'') like '%" << atom.value << "%'";
     } else if (atom.type == Atom::A_MIXED) {
@@ -263,7 +282,7 @@ string buildQueryPredicate(const string& query, int* limit, int* energy, int* or
     } else if (atom.type == Atom::A_LABEL) {
       ss << "ifnull(a.label,'') like '%" << atom.value << "%'";
     } else if (atom.type == Atom::A_YEAR) {
-      ss << "a.releaseDateYear = " << atom.value;
+      ss << "a.releaseDateYear " << buildEqualityOperator(atom.props) << " " << atom.value;
     } else if (atom.type == Atom::CUSTOM_QUERY_PREDICATE) {
       ss << atom.value;
     } else if (atom.type == Atom::S_BPM) {
@@ -287,8 +306,13 @@ string buildQueryPredicate(const string& query, int* limit, int* energy, int* or
       *limit = atoi(atom.value.c_str());
       ss << "true";
     } else if (atom.type == Atom::S_ENERGY) {
-      *energy = atoi(atom.value.c_str());
-      ss << "true";
+      // If an operator property is specified, it will overwrite what is used in the options build. Otherwise, we default to it.
+      if (atom.props == 0) {
+        *energy = atoi(atom.value.c_str());
+        ss << "true";
+      } else {
+        ss << "s.energy " << buildEqualityOperator(atom.props) << " " << atom.value;
+      }
     } else if (atom.type == Atom::ORDER_BY) {
       if (!atom.value.compare("rand") || !atom.value.compare("random")) {
         *orderBy = RANDOM;
@@ -392,7 +416,7 @@ string buildOptionPredicate(const int bpm, const string& key, const vector<Style
   }
   if (energy > 0) {
     int diff = SoulSifterSettings::getInstance().get<int>("search.energyGap");
-    ss << " and (energy between " << energy - diff << " and " << energy + diff << ")";
+    ss << " and (s.energy between " << energy - diff << " and " << energy + diff << ")";
   }
   if (styles.size() > 0) {
     ss << " and exists (select 1 from SongStyles g where s.id = g.songId and g.styleId in (";
