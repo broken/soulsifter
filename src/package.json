@@ -1,6 +1,6 @@
 {
   "name": "soulsifter",
-  "version": "0.17.1",
+  "version": "0.18.0",
   "main": "views/index.html",
   "single-instance": true,
   "window": {
