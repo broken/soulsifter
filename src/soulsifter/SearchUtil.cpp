@@ -292,6 +292,8 @@ string buildQueryPredicate(const string& query, int* limit, int* energy, int* or
       if ((pos = atom.value.find("-")) != string::npos) {
         min_bpm = atoi(atom.value.substr(0, pos).c_str());
         max_bpm = atoi(atom.value.substr(pos + 1, atom.value.length()).c_str());
+      } else if (!buildEqualityOperator(atom.props, "").empty()) {
+        ss << "s.bpm " << buildEqualityOperator(atom.props) << " " << atom.value;
       } else {
         min_bpm = atoi(atom.value.c_str());
         max_bpm = min_bpm + 1;
