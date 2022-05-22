@@ -108,6 +108,10 @@ vector<string> MusicVideoService::downloadAudio(const string& url) {
         album->setName(ptree.get<string>("album"));
         song->setTrack(ptree.get<string>("playlist_index"));
         date = ptree.get<string>("release_date", "00000000");
+        if (!date.compare("null") || !date.compare("00000000")) {
+          int yr = ptree.get<int>("release_year", 0);
+          if (yr > 0) date = std::to_string(yr) + "0000";
+        }
         // remix people are added inline, so let's remove them
         boost::regex artistRegex(", .*$");
         song->setArtist(boost::regex_replace(song->getArtist(), artistRegex, ""));
