@@ -26,7 +26,7 @@ void InitAll(v8::Handle<v8::Object> exports) {
   static std::unique_ptr<g3::LogWorker> logworker = g3::LogWorker::createLogWorker();
   std::string home = getenv("HOME");
   logworker->addSink(
-      std2::make_unique<dogatech::soulsifter::StdoutFileSink>("ss", home + "/Library/Application Support/Soul Sifter"),
+      std::make_unique<dogatech::soulsifter::StdoutFileSink>("ss", home + "/Library/Application Support/Soul Sifter"),
       &dogatech::soulsifter::StdoutFileSink::log);
   g3::initializeLogging(logworker.get());
 

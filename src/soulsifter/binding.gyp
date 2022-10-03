@@ -99,11 +99,11 @@
           "/usr/local/lib/libboost_regex-mt.dylib",
           "/usr/local/lib/libboost_system-mt.dylib",
           "/usr/local/lib/libboost_thread-mt.dylib",
-          "/usr/local/lib/libg3logger.dylib",
+          "/usr/local/lib/libg3log.dylib",
           "/usr/local/lib/libmad.0.2.1.dylib",
           "/usr/local/lib/libmysqlclient.21.dylib",
           "/usr/local/lib/libmysqlcppconn.7.dylib",
-          "/usr/local/lib/libtag.1.17.0.dylib",
+          "/usr/local/lib/libtag.1.18.0.dylib",
         ],
       },
       'conditions': [
