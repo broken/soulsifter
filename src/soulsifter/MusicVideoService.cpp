@@ -65,7 +65,7 @@ vector<string> MusicVideoService::downloadAudio(const string& url) {
 
   FILE *fpipe;
   stringstream command;
-  command << "cd " << tmpPath << "; youtube-dl --print-json --write-thumbnail --restrict-filenames --extract-audio --audio-format mp3 --audio-quality 0 --quiet " << url;
+  command << "cd " << tmpPath << "; youtube-dl --print-json --write-thumbnail --restrict-filenames --extract-audio --audio-format mp3 --audio-quality 0 --quiet --download-archive /tmp/ss-ytdl.txt " << url;
   if (!(fpipe = (FILE*)popen(command.str().c_str(), "r"))) {
     LOG(WARNING) << "Problem with youtube-dl pipe.";
     return filepaths;
@@ -173,7 +173,7 @@ MusicVideo* MusicVideoService::associateYouTubeVideo(Song* song, const string& u
     LOG(WARNING) << "Music video artist directory is not a directory " << mvArtistDir;
     return NULL;
   }
-      
+
   FILE *fpipe;
   stringstream command;
   command << "cd \"" << mvArtistDir << "\"; youtube-dl -f 'bestvideo[ext=mp4]+bestaudio' --write-thumbnail --restrict-filenames " << url;
@@ -182,14 +182,14 @@ MusicVideo* MusicVideoService::associateYouTubeVideo(Song* song, const string& u
     pclose(fpipe);
     return NULL;
   }
-  
+
   char buffer[1024];
   stringstream ss;
   LOG(INFO) << "Command output for '" << command.str() << "':";
   while (fgets(buffer, sizeof buffer, fpipe)) {
     ss << buffer;
   }
-  
+
   pclose(fpipe);
 
   string output(ss.str());
@@ -249,7 +249,7 @@ MusicVideo* MusicVideoService::associateYouTubeVideo(Song* song, const string& u
   // remove base path
   musicVideo->setFilePath(boost::algorithm::ireplace_first_copy(musicVideo->getFilePath(), SoulSifterSettings::getInstance().get<string>("mv.dir"), ""));
   musicVideo->setThumbnailFilePath(boost::algorithm::ireplace_first_copy(musicVideo->getThumbnailFilePath(), SoulSifterSettings::getInstance().get<string>("mv.dir"), ""));
-  
+
   musicVideo->save();
 
   song->setMusicVideoId(musicVideo->getId());
