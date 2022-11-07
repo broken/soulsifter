@@ -54,7 +54,7 @@ namespace soulsifter {
       //ptree.put("tag.readOverwrite", "");
     }
   }
-  
+
   void SoulSifterSettings::save() {
     write_json(filename, ptree);
   }
