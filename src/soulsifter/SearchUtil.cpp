@@ -135,7 +135,7 @@ struct Atom {
   string value;
   Type type;
   int props;
-  
+
   void clear() {
     value = "";
     type = ANY;
@@ -158,7 +158,7 @@ bool parse(const string& queryFragment, Atom* atom) {
     return false;
   }
   // set value
-  boost::regex quoteRegex("'");
+  boost::regex quoteRegex("(?<=[^=])'(?=.)");
   atom->value = boost::regex_replace(string(match[6]), quoteRegex, "\\\\'");
   if (match[1].length() > 0) {
     atom->props |= Atom::NEGATED;
@@ -524,6 +524,6 @@ vector<Song*>* SearchUtil::searchSongs(const string& query,
 
   return songs;
 }
-  
+
 }  // namespace soulsifter
 }  // namespace dogatech
