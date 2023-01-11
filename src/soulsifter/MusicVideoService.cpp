@@ -65,7 +65,7 @@ vector<string> MusicVideoService::downloadAudio(const string& url) {
 
   FILE *fpipe;
   stringstream command;
-  command << "cd " << tmpPath << "; youtube-dl --print-json --write-thumbnail --restrict-filenames --extract-audio --audio-format mp3 --audio-quality 0 --quiet --download-archive /tmp/ss-ytdl.txt " << url;
+  command << "cd " << tmpPath << "; youtube-dl --print-json --write-thumbnail --restrict-filenames --extract-audio -f 'bestaudio/best' --audio-format mp3 --audio-quality 0 --quiet --download-archive /tmp/ss-ytdl.txt " << url;
   if (!(fpipe = (FILE*)popen(command.str().c_str(), "r"))) {
     LOG(WARNING) << "Problem with youtube-dl pipe.";
     return filepaths;
