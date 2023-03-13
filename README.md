@@ -1,6 +1,9 @@
 Soul Sifter
 ===========
 
+> **Warning**
+> This is no deprecated, and the new repository is at: https://github.com/broken/soulsifter-e
+
 DJ/Organization Music app.
 
 This is created by me for me.
