@@ -2,7 +2,7 @@ Soul Sifter
 ===========
 
 > **Warning**
-> This is no deprecated, and the new repository is at: https://github.com/broken/soulsifter-e
+> This is now deprecated, and the new repository is at: https://github.com/broken/soulsifter-e
 
 DJ/Organization Music app.
 
